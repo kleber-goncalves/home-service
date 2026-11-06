@@ -220,9 +220,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** d564e8d43a034912f7e5c9c546230bf5b16a2405
-- **Data do commit:** 2026-11-06T16:40:30-03:00
-- **Mensagem do commit:** fix: corrigir geração do snapshot do AI_CONTEXT
+- **Commit de referência:** e2fecf565d2fcf3dbc3c1d16bc049700ce488b43
+- **Data do commit:** 2026-11-06T16:45:17-03:00
+- **Mensagem do commit:** ci: adicionar auditoria de dependências
 - **Branch desta execução:** chore/project-governance
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 6
@@ -294,6 +294,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| e2fecf5 | 2026-11-06 | ci: adicionar auditoria de dependências |
+| 99140b5 | 2026-11-06 | docs(ai-context): atualizar snapshot automaticamente |
+| aa05e60 | 2026-11-06 | docs(ai-context): atualizar snapshot automaticamente |
 | d564e8d | 2026-11-06 | fix: corrigir geração do snapshot do AI_CONTEXT |
 | 60dc9bb | 2026-11-06 | fix: corrigir validação do registro de ocorrências |
 | ea886b6 | 2026-11-06 | docs(ai-context): atualizar snapshot automaticamente |
