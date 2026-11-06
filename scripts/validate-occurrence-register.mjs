@@ -40,10 +40,13 @@ function reportError(message) {
     console.error("[occurrence-register] " + message);
 }
 
+function escapeRegex(value) {
+    return value.replace(/[.*+?^$()|[\]\\]/g, "\\$&");
+}
+
 function getField(block, label) {
-    const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const pattern = new RegExp(
-        "^- \\*\\*" + escapedLabel + ":\\*\\*\\s*(.+)$",
+        "^- \\*\\*" + escapeRegex(label) + ":\\*\\*\\s*(.+)$",
         "mi",
     );
 
@@ -51,7 +54,7 @@ function getField(block, label) {
 }
 
 function isRealDate(value) {
-    if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
         return false;
     }
 
@@ -66,7 +69,7 @@ function isRealDate(value) {
 }
 
 function getSectionContent(block, sectionName) {
-    const header = new RegExp("^#### " + sectionName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*$", "m");
+    const header = new RegExp("^#### " + escapeRegex(sectionName) + "\\s*$", "m");
     const match = header.exec(block);
 
     if (!match) {
@@ -74,9 +77,9 @@ function getSectionContent(block, sectionName) {
     }
 
     const remainder = block.slice(match.index + match[0].length);
-    const nextSection = remainder.search(/^#### /m);
+    const nextHeading = remainder.search(/^#{2,4} /m);
 
-    return (nextSection === -1 ? remainder : remainder.slice(0, nextSection)).trim();
+    return (nextHeading === -1 ? remainder : remainder.slice(0, nextHeading)).trim();
 }
 
 async function main() {
@@ -89,7 +92,7 @@ async function main() {
         throw error;
     }
 
-    const headingPattern = /^### (BUG|ERR|VULN|INC)-(\\d{4}) — (.+)$/gm;
+    const headingPattern = /^### (BUG|ERR|VULN|INC)-(\d{4}) — (.+)$/gm;
     const entries = [...document.matchAll(headingPattern)];
     const errors = [];
     const seenIds = new Set();
