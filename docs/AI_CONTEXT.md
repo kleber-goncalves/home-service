@@ -214,5 +214,89 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 ## 12. Snapshot automatizado do repositório
 
-<!-- BEGIN AUTO-GENERATED SECTION -->\n\n## Snapshot automatizado do repositório\n\n> Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.\n\n- **Commit de referência:** ebd072c307f9d2c5f47c37db8e271422f1a339f9	2026-11-06T16:37:54-03:00	cho e: adicio a  co texto, oco ê cias e validações\n- **Data do commit:** \n- **Mensagem do commit:** \n- **Branch desta execução:** cho e/p oject-gove a ce\n- **Projeto declarado:** home-se vice@0.0.0\n- **Scripts npm:** 6\n- **Dependências de runtime:** 4\n- **Dependências de desenvolvimento:** 9\n- **Workflows:** 0\n- **Scripts de automação:** 0\n\n### Scripts npm\n\n| Comando | Definição |\n|---|---|\n| npm run dev | vite |\n| npm run build | vite build |\n| npm run li t | esli t . |\n| npm run p eview | vite p eview |\n| npm run check:occu e ces | ode sc ipts/validate-occu e ce- egiste .mjs |\n| npm run update:ai-co text | ode sc ipts/update-ai-co text.mjs |\n\n### Variáveis declaradas no .env.example\n\n> Somente os nomes são listados; valores nunca são lidos nem publicados.\n\n- Nenhuma variável declarada.\n\n### Dependências de runtime\n\n| Pacote | Versão declarada |\n|---|---|\n| @tailwi dcss/vite | ^4.3.5 |\n| eact | ^19.3.1 |\n| eact-dom | ^19.3.1 |\n| tailwi dcss | ^4.3.5 |\n\n### Dependências de desenvolvimento\n\n| Pacote | Versão declarada |\n|---|---|\n| @esli t/js | ^10.0.1 |\n| @types/ eact | ^19.3.0 |\n| @types/ eact-dom | ^19.3.0 |\n| @vitejs/plugi - eact | ^6.1.2 |\n| esli t | ^10.14.0 |\n| esli t-plugi - eact-hooks | ^7.1.1 |\n| esli t-plugi - eact- ef esh | ^0.5.7 |\n| globals | ^17.13.0 |\n| vite | ^8.3.6 |\n\n### Workflows do GitHub Actions\n\n- Nenhum workflow encontrado.\n\n### Scripts de automação\n\n- Nenhum script encontrado.\n\n### Arquivos JavaScript/JSX em src/\n\n- Nenhum arquivo JavaScript/JSX encontrado.\n\n### Diretórios principais de src/\n\n- s c/assets/\n\n### Oito commits recentes até o commit de referência\n\n| Commit | Data | Mensagem |\n|---|---|---|\n| ebd072c	2026-11-06	cho e: adicio a  co texto, oco ê cias e validações
-45412ad	2026-11-06	fi st commit |  |  |\n\n<!-- END AUTO-GENERATED SECTION -->
+<!-- BEGIN AUTO-GENERATED SECTION -->
+
+## Snapshot automatizado do repositório
+
+> Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
+
+- **Commit de referência:** 60dc9bbeabe7087dc32c897e2ac1d76f9f5b61fe
+- **Data do commit:** 2026-11-06T16:40:28-03:00
+- **Mensagem do commit:** fix: corrigir validação do registro de ocorrências
+- **Branch desta execução:** chore/project-governance
+- **Projeto declarado:** home-service@0.0.0
+- **Scripts npm:** 6
+- **Dependências de runtime:** 4
+- **Dependências de desenvolvimento:** 9
+- **Workflows:** 2
+- **Scripts de automação:** 2
+
+### Scripts npm
+
+| Comando | Definição |
+|---|---|
+| npm run dev | vite |
+| npm run build | vite build |
+| npm run lint | eslint . |
+| npm run preview | vite preview |
+| npm run check:occurrences | node scripts/validate-occurrence-register.mjs |
+| npm run update:ai-context | node scripts/update-ai-context.mjs |
+
+### Variáveis declaradas no .env.example
+
+> Somente os nomes são listados; valores nunca são lidos nem publicados.
+
+- Nenhuma variável declarada.
+
+### Dependências de runtime
+
+| Pacote | Versão declarada |
+|---|---|
+| @tailwindcss/vite | ^4.3.5 |
+| react | ^19.3.1 |
+| react-dom | ^19.3.1 |
+| tailwindcss | ^4.3.5 |
+
+### Dependências de desenvolvimento
+
+| Pacote | Versão declarada |
+|---|---|
+| @eslint/js | ^10.0.1 |
+| @types/react | ^19.3.0 |
+| @types/react-dom | ^19.3.0 |
+| @vitejs/plugin-react | ^6.1.2 |
+| eslint | ^10.14.0 |
+| eslint-plugin-react-hooks | ^7.1.1 |
+| eslint-plugin-react-refresh | ^0.5.7 |
+| globals | ^17.13.0 |
+| vite | ^8.3.6 |
+
+### Workflows do GitHub Actions
+
+- .github/workflows/ai-context.yml — AI Context — Synchronize
+- .github/workflows/validate.yml — Validate Home Service
+
+### Scripts de automação
+
+- scripts/update-ai-context.mjs
+- scripts/validate-occurrence-register.mjs
+
+### Arquivos JavaScript/JSX em src/
+
+- src/App.jsx
+- src/main.jsx
+
+### Diretórios principais de src/
+
+- src/assets/
+
+### Oito commits recentes até o commit de referência
+
+| Commit | Data | Mensagem |
+|---|---|---|
+| 60dc9bb | 2026-11-06 | fix: corrigir validação do registro de ocorrências |
+| ea886b6 | 2026-11-06 | docs(ai-context): atualizar snapshot automaticamente |
+| ebd072c | 2026-11-06 | chore: adicionar contexto, ocorrências e validações |
+| 45412ad | 2026-11-06 | first commit |
+
+<!-- END AUTO-GENERATED SECTION -->
