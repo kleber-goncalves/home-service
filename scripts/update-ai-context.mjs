@@ -18,13 +18,13 @@ function git(args) {
 function markdownCell(value) {
     return String(value ?? "")
         .replaceAll("|", "\\|")
-        .replace(/[\\r\\n]+/g, " ")
+        .replace(/[\r\n]+/g, " ")
         .trim();
 }
 
 function parseCommitLine(line) {
-    const [sha = "", date = "", ...subject] = line.split("\\t");
-    return { sha, date, subject: subject.join("\\t") };
+    const [sha = "", date = "", ...subject] = line.split("\t");
+    return { sha, date, subject: subject.join("\t") };
 }
 
 async function listFiles(relativeDirectory, predicate = () => true) {
@@ -79,8 +79,8 @@ async function readEnvironmentNames() {
 
         return [...new Set(
             source
-                .split(/\\r?\\n/)
-                .map((line) => line.match(/^\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*=/)?.[1])
+                .split(/\r?\n/)
+                .map((line) => line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=/)?.[1])
                 .filter(Boolean),
         )].sort((a, b) => a.localeCompare(b, "en"));
     } catch {
@@ -104,21 +104,21 @@ async function buildGeneratedSection() {
         "--format=%h%x09%ad%x09%s",
         targetSha,
     ])
-        .split("\\n")
+        .split("\n")
         .filter(Boolean)
         .map(parseCommitLine);
 
     const workflowFiles = await listFiles(
         ".github/workflows",
-        (file) => /\\.ya?ml$/i.test(file),
+        (file) => /\.ya?ml$/i.test(file),
     );
     const scriptFiles = await listFiles(
         "scripts",
-        (file) => /\\.(?:mjs|cjs|js)$/i.test(file),
+        (file) => /\.(?:mjs|cjs|js)$/i.test(file),
     );
     const sourceFiles = await listFiles(
         "src",
-        (file) => /\\.(?:js|jsx)$/i.test(file),
+        (file) => /\.(?:js|jsx)$/i.test(file),
     );
     const sourceDirectories = await listTopLevelDirectories("src");
     const environmentNames = await readEnvironmentNames();
@@ -128,7 +128,7 @@ async function buildGeneratedSection() {
         let title = file;
         try {
             const source = await readFile(path.join(ROOT, file), "utf8");
-            title = source.match(/^name:\\s*(.+)$/m)?.[1]?.trim().replace(/^["']|["']$/g, "") || file;
+            title = source.match(/^name:\s*(.+)$/m)?.[1]?.trim().replace(/^["']|["']$/g, "") || file;
         } catch {
             // Mantém o caminho como título se não for possível ler o arquivo.
         }
@@ -227,7 +227,7 @@ async function buildGeneratedSection() {
         ),
     ];
 
-    return lines.join("\\n");
+    return lines.join("\n");
 }
 
 async function main() {
@@ -249,9 +249,9 @@ async function main() {
     const generated = await buildGeneratedSection();
     const expected =
         original.slice(0, start) +
-        "\\n\\n" +
+        "\n\n" +
         generated +
-        "\\n\\n" +
+        "\n\n" +
         original.slice(end);
 
     if (expected === original) {
