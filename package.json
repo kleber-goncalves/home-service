@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:occurrences": "node scripts/validate-occurrence-register.mjs",
+    "update:ai-context": "node scripts/update-ai-context.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.5",
