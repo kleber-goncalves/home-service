@@ -220,10 +220,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 6d8f2785f8f5cdb9da8b428a810dc57b5421467e
-- **Data do commit:** 2026-11-06T16:48:11-03:00
-- **Mensagem do commit:** ci: validar também atualizações documentais do bot
-- **Branch desta execução:** chore/project-governance
+- **Commit de referência:** cc3b7ef0e90646292f7591e24243c0cbcc121550
+- **Data do commit:** 2026-11-07T14:17:23-03:00
+- **Mensagem do commit:** Merge pull request #1 from kleber-goncalves/chore/project-governance
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 6
 - **Dependências de runtime:** 4
@@ -294,13 +294,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| cc3b7ef | 2026-11-07 | Merge pull request #1 from kleber-goncalves/chore/project-governance |
+| 544a009 | 2026-11-06 | docs(ai-context): atualizar snapshot automaticamente |
 | 6d8f278 | 2026-11-06 | ci: validar também atualizações documentais do bot |
 | 4d35058 | 2026-11-06 | docs(ai-context): atualizar snapshot automaticamente |
 | e2fecf5 | 2026-11-06 | ci: adicionar auditoria de dependências |
 | 99140b5 | 2026-11-06 | docs(ai-context): atualizar snapshot automaticamente |
 | aa05e60 | 2026-11-06 | docs(ai-context): atualizar snapshot automaticamente |
 | d564e8d | 2026-11-06 | fix: corrigir geração do snapshot do AI_CONTEXT |
-| 60dc9bb | 2026-11-06 | fix: corrigir validação do registro de ocorrências |
-| ea886b6 | 2026-11-06 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
