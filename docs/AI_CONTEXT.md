@@ -233,10 +233,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** ebef753548c7ea0e8f607b4c65ccb827e86c79b6
-- **Data do commit:** 2026-11-09T15:31:33-03:00
-- **Mensagem do commit:** Merge pull request #2 from kleber-goncalves/feat/homepage-publica
-- **Branch desta execução:** dev
+- **Commit de referência:** a01e3af73d3612ec4082c07ba58ca0b477f96316
+- **Data do commit:** 2026-11-09T15:40:28-03:00
+- **Mensagem do commit:** docs: especificar requisitos iniciais do MVP
+- **Branch desta execução:** docs/especificacao-mvp
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 6
 - **Dependências de runtime:** 5
@@ -321,13 +321,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| a01e3af | 2026-11-09 | docs: especificar requisitos iniciais do MVP |
+| bd12909 | 2026-11-09 | docs(ai-context): atualizar snapshot automaticamente |
 | ebef753 | 2026-11-09 | Merge pull request #2 from kleber-goncalves/feat/homepage-publica |
 | 6edabdc | 2026-11-09 | Merge pull request #3 from kleber-goncalves/fix/ci-pull-request-dev |
 | df9d867 | 2026-11-09 | ci: validar pull requests destinados a dev |
 | 09ce5e6 | 2026-11-09 | docs(ai-context): atualizar snapshot automaticamente |
 | fc04ba4 | 2026-11-09 | feat(homepage): construir homepage pública demonstrativa |
 | 04b8cb6 | 2026-11-07 | docs(ai-context): atualizar snapshot automaticamente |
-| cc3b7ef | 2026-11-07 | Merge pull request #1 from kleber-goncalves/chore/project-governance |
-| 544a009 | 2026-11-06 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
