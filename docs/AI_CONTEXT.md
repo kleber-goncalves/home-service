@@ -233,13 +233,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** cc3b7ef0e90646292f7591e24243c0cbcc121550
-- **Data do commit:** 2026-11-07T14:17:23-03:00
-- **Mensagem do commit:** Merge pull request #1 from kleber-goncalves/chore/project-governance
-- **Branch desta execução:** dev
+- **Commit de referência:** fc04ba4153c2adb66e3ff3693ef06495f1c03d3c
+- **Data do commit:** 2026-11-09T14:57:42-03:00
+- **Mensagem do commit:** feat(homepage): construir homepage pública demonstrativa
+- **Branch desta execução:** feat/homepage-publica
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 6
-- **Dependências de runtime:** 4
+- **Dependências de runtime:** 5
 - **Dependências de desenvolvimento:** 9
 - **Workflows:** 2
 - **Scripts de automação:** 2
@@ -266,6 +266,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | Pacote | Versão declarada |
 |---|---|
 | @tailwindcss/vite | ^4.3.5 |
+| lucide-react | ^1.61.0 |
 | react | ^19.3.1 |
 | react-dom | ^19.3.1 |
 | tailwindcss | ^4.3.5 |
@@ -297,23 +298,36 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 ### Arquivos JavaScript/JSX em src/
 
 - src/App.jsx
+- src/components/home/hero-search.jsx
+- src/components/home/home-sections.jsx
+- src/components/home/site-header.jsx
+- src/components/ui/badge.jsx
+- src/components/ui/button.jsx
+- src/components/ui/card.jsx
+- src/components/ui/input.jsx
+- src/data/homepage.js
+- src/lib/utils.js
 - src/main.jsx
+- src/pages/HomePage.jsx
 
 ### Diretórios principais de src/
 
-- src/assets/
+- src/components/
+- src/data/
+- src/lib/
+- src/pages/
 
 ### Oito commits recentes até o commit de referência
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| fc04ba4 | 2026-11-09 | feat(homepage): construir homepage pública demonstrativa |
+| 04b8cb6 | 2026-11-07 | docs(ai-context): atualizar snapshot automaticamente |
 | cc3b7ef | 2026-11-07 | Merge pull request #1 from kleber-goncalves/chore/project-governance |
 | 544a009 | 2026-11-06 | docs(ai-context): atualizar snapshot automaticamente |
 | 6d8f278 | 2026-11-06 | ci: validar também atualizações documentais do bot |
 | 4d35058 | 2026-11-06 | docs(ai-context): atualizar snapshot automaticamente |
 | e2fecf5 | 2026-11-06 | ci: adicionar auditoria de dependências |
 | 99140b5 | 2026-11-06 | docs(ai-context): atualizar snapshot automaticamente |
-| aa05e60 | 2026-11-06 | docs(ai-context): atualizar snapshot automaticamente |
-| d564e8d | 2026-11-06 | fix: corrigir geração do snapshot do AI_CONTEXT |
 
 <!-- END AUTO-GENERATED SECTION -->
