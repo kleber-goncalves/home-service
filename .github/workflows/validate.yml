@@ -9,6 +9,7 @@ on:
   pull_request:
     branches:
       - main
+      - dev
     paths-ignore:
       - "docs/AI_CONTEXT.md"
   workflow_dispatch:

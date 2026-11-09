@@ -78,24 +78,33 @@ A publicação automática é a decisão vigente: serviços que passarem pelas v
 
 ## 4. Estado atual do repositório
 
-**Estado verificado na criação deste contexto (2026-11-06):**
+**Estado após a implementação da homepage pública (branch `feat/homepage-publica`):**
 
-- O repositório contém o scaffold inicial de React + Vite.
-- `src/App.jsx` ainda apresenta a tela de demonstração do template Vite/React.
-- `src/main.jsx`, `src/App.css`, `index.html`, `vite.config.js`, `eslint.config.js`, `package.json` e `package-lock.json` pertencem à estrutura inicial.
-- O repositório está publicado na Vercel, mas isso não significa que funcionalidades do marketplace estejam implementadas.
-- Não há, nesta revisão inicial, backend Apps Script integrado, planilha operacional, cadastro, autenticação, pesquisa real ou painel de administração.
+- A aplicação React + Vite contém uma homepage pública demonstrativa do Conecta Local.
+- `src/pages/HomePage.jsx` coordena a composição das seções e o estado local da busca e dos filtros.
+- `src/components/home/` contém cabeçalho, hero/busca e seções públicas reutilizáveis.
+- `src/components/ui/` contém primitivas locais editáveis (Button, Input, Card e Badge) no padrão visual shadcn/ui.
+- `components.json` e `jsconfig.json` preparam a estrutura para componentes JavaScript (`tsx: false`) e aliases `@/`; `vite.config.js` resolve o alias no Vite.
+- `src/index.css` concentra tokens visuais, estilos globais, responsividade, foco visível e preferência por movimento reduzido.
+- A busca e a seleção de categorias filtram somente registros demonstrativos em `src/data/homepage.js`. O campo de cidade é ilustrativo e não executa busca geográfica.
+- Os perfis e as fotografias não representam profissionais cadastrados. A natureza demonstrativa é indicada na interface.
+- As fotografias são carregadas de URLs externas do Pexels; a disponibilidade visual depende da conexão com esse serviço. Os créditos estão no README.
+- Não há backend Apps Script integrado, planilha operacional, cadastro real, autenticação, busca remota, contato funcional com prestadores ou painel de administração.
+- A homepage não processa pagamentos, agendamentos ou contratação.
 
 Atualize esta seção quando funcionalidades reais forem adicionadas. Use o código e os resultados de validação como evidência.
+
 
 ## 5. Arquitetura e decisões tecnológicas
 
 ### 5.1. Frontend
 
 - **React + JavaScript/JSX:** interface e componentes.
-- **Vite:** servidor de desenvolvimento e build.
-- **Node.js:** ambiente de execução das ferramentas de desenvolvimento, scripts e build.
-- **CSS:** estilização responsiva. Tailwind CSS já está presente no scaffold inicial; confirme seu uso antes de descrevê-lo como padrão visual definitivo.
+- **Vite 8:** servidor de desenvolvimento e build.
+- **Node.js 24:** ambiente recomendado para ferramentas de desenvolvimento, scripts e build.
+- **Tailwind CSS 4:** utilitários e integração com Vite; estilos específicos da homepage ficam em `src/index.css`.
+- **shadcn/ui:** configuração em `components.json` no modo JavaScript (`tsx: false`), com aliases `@/`. As primitivas locais usadas nesta homepage são componentes editáveis no padrão visual shadcn; o CLI não é dependência de runtime.
+- **Lucide React:** biblioteca de ícones da interface.
 
 Não foi escolhida uma aplicação Next.js. Não adicionar Express por padrão: para manter o projeto simples, o Google Apps Script é a opção inicial de backend. Reavaliar somente se surgir requisito concreto que justifique uma API Node.js hospedada separadamente.
 
@@ -156,17 +165,21 @@ A publicação automática não significa conteúdo confiável. A plataforma pre
 
 ## 7. Direção visual aprovada
 
-Direção de design definida para a homepage:
+Direção visual vigente para a homepage:
 
-- Estilo híbrido: moderno, minimalista, acolhedor e regional.
-- Paleta principal laranja com neutros claros e grafite.
-- Hero com fotografia de profissional trabalhando e busca em destaque.
-- Cards de serviços com fotografia e informações organizadas.
-- Navegação responsiva e prioridade para dispositivos móveis.
-- Busca como ação principal da homepage.
-- Convite para profissionais divulgarem seu trabalho, sem competir visualmente com a busca.
+- Estilo moderno, editorial, acolhedor e profissional.
+- Paleta azul, azul-marinho, branco e neutros claros; o azul é a cor de ação.
+- Tipografia Manrope com títulos expressivos e texto de apoio legível.
+- Hero dividido entre mensagem/busca e fotografia contextual de profissional trabalhando.
+- Categorias navegáveis horizontalmente em telas estreitas.
+- Exemplos de perfil em cards com fotografia, categoria e descrição; a natureza demonstrativa deve ficar clara.
+- Seções editoriais com alternância entre branco e azul muito claro, evitando repetir uma grade de cards em todas as áreas.
+- CTA para profissionais com fundo azul-marinho e imagem de apoio.
+- Navegação móvel com menu expansível e FAQ com elementos nativos de disclosure.
+- Prioridade para layout mobile-first, sem rolagem horizontal acidental.
+- Fotografias da demonstração vêm de fontes externas do Pexels; créditos e links estão no README.
 
-A direção visual está definida, mas não deve ser descrita como implementada até a homepage real existir.
+A direção visual está implementada na homepage demonstrativa, mas não deve ser confundida com a implementação do marketplace ou com cadastro real de prestadores.
 
 ## 8. Regras de desenvolvimento e manutenção
 
