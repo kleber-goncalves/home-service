@@ -18,7 +18,7 @@
 12. Não edite manualmente o conteúdo entre os marcadores de snapshot automatizado. Ele é gerado por `scripts/update-ai-context.mjs`.
 13. Nunca inclua chaves, tokens, senhas, cookies, credenciais, valores de arquivos `.env`, dados pessoais ou informações privadas neste documento.
 14. Não assuma que a arquitetura planejada já está integrada. Confirme a existência dos arquivos, planilhas, scripts, serviços e variáveis no código antes de descrevê-los como ativos.
-15. Consulte também `README.md` e `docs/REGISTRO_DE_OCORRENCIAS.md`. O registro é histórico e não substitui a descrição do estado atual.
+15. Consulte também `README.md`, `docs/REGISTRO_DE_OCORRENCIAS.md` e `docs/ESPECIFICACAO_MVP.md`. O registro é histórico e a especificação contém requisitos em revisão; nenhum deles substitui a descrição do estado atual.
 16. Não faça testes de segurança intrusivos em sistemas, contas, planilhas ou arquivos reais sem autorização explícita. Prefira desenvolvimento local, Preview autorizado e dados sintéticos.
 
 ## 2. Identidade e propósito
@@ -76,11 +76,13 @@ Não incluir na primeira versão, salvo necessidade acadêmica demonstrada: paga
 
 A publicação automática é a decisão vigente: serviços que passarem pelas validações obrigatórias devem ficar disponíveis sem aprovação manual prévia. Isso não elimina moderação posterior, denúncias, suspensão ou remoção administrativa.
 
+O detalhamento funcional inicial está em `docs/ESPECIFICACAO_MVP.md`, em status de rascunho. O documento distingue decisões registradas, requisitos propostos e pontos pendentes; a modelagem de dados só deve ser fechada após a revisão desses pontos.
+
 ## 4. Estado atual do repositório
 
-**Estado após a implementação da homepage pública (branch `feat/homepage-publica`):**
+**Estado após integração da homepage pública à branch `dev` (PR #2):**
 
-- A aplicação React + Vite contém uma homepage pública demonstrativa do Conecta Local.
+- A branch `dev` contém a homepage pública demonstrativa do Conecta Local, integrada por Pull Request.
 - `src/pages/HomePage.jsx` coordena a composição das seções e o estado local da busca e dos filtros.
 - `src/components/home/` contém cabeçalho, hero/busca e seções públicas reutilizáveis.
 - `src/components/ui/` contém primitivas locais editáveis (Button, Input, Card e Badge) no padrão visual shadcn/ui.
@@ -89,8 +91,13 @@ A publicação automática é a decisão vigente: serviços que passarem pelas v
 - A busca e a seleção de categorias filtram somente registros demonstrativos em `src/data/homepage.js`. O campo de cidade é ilustrativo e não executa busca geográfica.
 - Os perfis e as fotografias não representam profissionais cadastrados. A natureza demonstrativa é indicada na interface.
 - As fotografias são carregadas de URLs externas do Pexels; a disponibilidade visual depende da conexão com esse serviço. Os créditos estão no README.
+- A validação de Pull Requests destinados a `dev` foi habilitada no workflow de CI pela correção integrada no PR #3.
+- O workflow de sincronização automática do AI Context e o workflow de validação foram executados com sucesso após a integração da homepage, conforme os registros consultados em 2026-11-09.
+- A branch `main` não recebeu as alterações desta etapa de homepage/documentação; `dev` é a linha de integração do trabalho em andamento.
 - Não há backend Apps Script integrado, planilha operacional, cadastro real, autenticação, busca remota, contato funcional com prestadores ou painel de administração.
 - A homepage não processa pagamentos, agendamentos ou contratação.
+
+A especificação funcional inicial do MVP está em `docs/ESPECIFICACAO_MVP.md`. Ela organiza requisitos e critérios de aceite, mas permanece como rascunho até a revisão das decisões pendentes. Não trate requisitos propostos como funcionalidades implementadas.
 
 Atualize esta seção quando funcionalidades reais forem adicionadas. Use o código e os resultados de validação como evidência.
 
@@ -206,6 +213,7 @@ A direção visual está implementada na homepage demonstrativa, mas não deve s
 ## 10. Documentação e registro de problemas
 
 - Este `AI_CONTEXT.md` descreve o estado atual e as regras de continuidade.
+- `ESPECIFICACAO_MVP.md` organiza os requisitos funcionais e não funcionais do MVP; a versão inicial está em revisão e contém decisões pendentes.
 - `REGISTRO_DE_OCORRENCIAS.md` preserva o histórico de bugs, erros, vulnerabilidades e incidentes.
 - Atualize o contexto narrativo no mesmo trabalho quando decisões ou comportamentos relevantes mudarem.
 - O snapshot delimitado por marcadores é automatizado; não editar manualmente.
@@ -217,9 +225,10 @@ A direção visual está implementada na homepage demonstrativa, mas não deve s
 Os comandos de validação são mantidos em `package.json`. O workflow de qualidade deve executar:
 
 1. Instalação reproduzível com `npm ci`.
-2. Validação estrutural do registro de ocorrências.
-3. ESLint.
-4. Build de produção do Vite.
+2. Auditoria de dependências com `npm audit --audit-level=high` (vulnerabilidades de severidade high ou critical fazem a etapa falhar; avisos de severidade inferior ainda podem existir).
+3. Validação estrutural do registro de ocorrências.
+4. ESLint.
+5. Build de produção do Vite.
 
 Quando testes automatizados forem criados, adicioná-los aos scripts e ao workflow. Não criar etapas E2E ou Lighthouse só para imitar outro projeto; introduzi-las quando houver fluxos reais que justifiquem esses testes.
 
