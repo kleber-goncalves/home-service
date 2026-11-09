@@ -6,14 +6,18 @@ O projeto tem finalidade acadêmica e busca demonstrar investigação de problem
 
 ## Estado atual
 
-O repositório foi iniciado com React + Vite e está publicado na Vercel. A aplicação ainda está na etapa de fundação; as funcionalidades do Conecta Local permanecem planejadas até serem implementadas e validadas.
+A homepage pública foi construída como experiência demonstrativa em React + Vite. Ela apresenta a identidade visual, categorias, exemplos ilustrativos de serviços, busca local de demonstração, explicação da jornada, FAQ e navegação responsiva.
+
+A demonstração **não** representa um marketplace operacional: não há cadastro real de profissionais, backend integrado, autenticação, planilha operacional, pesquisa geográfica ou fluxo de contratação.
 
 - **Repositório:** https://github.com/kleber-goncalves/home-service
 - **Deploy:** https://home-service-blush.vercel.app/
-- **Frontend:** React, JavaScript e Vite.
+- **Frontend:** React, JavaScript, Vite 8 e Tailwind CSS 4.
+- **Componentes:** primitivas locais editáveis no padrão visual shadcn/ui, configuradas para JavaScript.
+- **Ícones:** Lucide React.
 - **Backend planejado:** Google Apps Script.
 - **Dados planejados:** Google Sheets.
-- **Imagens planejadas:** Google Drive.
+- **Imagens:** fotografias ilustrativas externas do Pexels; fontes e créditos abaixo.
 
 ## Executar localmente
 
@@ -24,22 +28,31 @@ npm ci
 npm run dev
 ```
 
-O Vite exibirá o endereço local para abrir no navegador.
-
 ## Validações
 
 ```bash
 npm run lint
 npm run check:occurrences
 npm run build
+npm audit --audit-level=high
 ```
 
-O GitHub Actions executa essas verificações em pushes e Pull Requests direcionados à branch principal. O workflow de sincronização atualiza automaticamente a seção gerada de `docs/AI_CONTEXT.md`.
+O GitHub Actions executa essas verificações em pushes e Pull Requests direcionados às branches `main` e `dev`. O workflow de sincronização atualiza automaticamente a seção gerada de `docs/AI_CONTEXT.md`.
 
 ## Documentação
 
 - [Contexto técnico para IAs e desenvolvedores](docs/AI_CONTEXT.md)
 - [Registro público de ocorrências](docs/REGISTRO_DE_OCORRENCIAS.md)
+
+## Créditos das imagens
+
+As fotografias são gratuitas no Pexels e aparecem apenas como exemplos visuais. Não representam profissionais cadastrados no Conecta Local.
+
+- Eletricista — Pexels, imagem 27928762.
+- Encanador — [Bulat843 / Pexels](https://www.pexels.com/photo/plumber-repairing-pipe-with-wrench-indoors-32588548/).
+- Limpeza residencial — [Helena Lopes / Pexels](https://www.pexels.com/photo/woman-cleaning-a-living-room-27176671/).
+- Pintura — [Tima Miroshnichenko / Pexels](https://www.pexels.com/photo/man-painting-the-wall-6474471/).
+- Jardinagem — [Helena Lopes / Pexels](https://www.pexels.com/photo/gardener-hands-over-plants-on-ground-27176054/).
 
 ## Princípios do projeto
 
