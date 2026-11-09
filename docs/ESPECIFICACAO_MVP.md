@@ -18,7 +18,7 @@ O MVP não será um marketplace transacional: não intermediará pagamentos, con
 
 ## 2. Estado atual do projeto
 
-A branch \`dev\` contém uma homepage demonstrativa em React + Vite. A busca e os filtros atuais funcionam somente sobre dados ilustrativos no frontend; o campo de cidade ainda não realiza pesquisa geográfica.
+A branch `dev` contém uma homepage demonstrativa em React + Vite. A busca e os filtros atuais funcionam somente sobre dados ilustrativos no frontend; o campo de cidade ainda não realiza pesquisa geográfica.
 
 Ainda não estão implementados ou integrados:
 - cadastro e autenticação de profissionais;
@@ -64,7 +64,7 @@ A especificação deve ser usada como referência para a modelagem. Não transfo
 | Profissional | Gerenciar o próprio perfil e somente os próprios serviços, após autenticação |
 | Administrador | Gerenciar profissionais, serviços, categorias, localidades e denúncias; consultar a auditoria |
 
-A autorização deve ser verificada no Apps Script em toda operação protegida. Nunca confiar em \`role\`, \`userId\`, \`ownerId\` ou estado enviados pelo navegador sem validar a identidade e a permissão no backend.
+A autorização deve ser verificada no Apps Script em toda operação protegida. Nunca confiar em `role`, `userId`, `ownerId` ou estado enviados pelo navegador sem validar a identidade e a permissão no backend.
 
 ## 6. Requisitos funcionais aprovados
 
@@ -101,12 +101,12 @@ A conta poderá atender várias cidades e bairros. O endereço residencial compl
 
 **Cadastro e ativação**
 1. O visitante informa os dados exigidos e uma senha.
-2. A conta é criada como \`pending_activation\`.
+2. A conta é criada como `pending_activation`.
 3. O backend gera um código de confirmação de 6 dígitos.
 4. Na demonstração, o código é exibido na interface, sem envio de e-mail.
 5. O código expira em 10 minutos, aceita no máximo 5 tentativas e só pode ser utilizado uma vez.
 6. Solicitações de novo código respeitam intervalo mínimo de 60 segundos e invalidam o código anterior.
-7. Após confirmação válida, a conta passa para \`active\` e o profissional poderá acessar o painel.
+7. Após confirmação válida, a conta passa para `active` e o profissional poderá acessar o painel.
 
 **Política de senha aprovada**
 - Mínimo de 15 caracteres.
@@ -129,7 +129,7 @@ A conta poderá atender várias cidades e bairros. O endereço residencial compl
 - Duração máxima de 8 horas.
 - Logout invalida a sessão imediatamente.
 - Alteração/recuperação de senha, suspensão ou encerramento da conta invalidam todas as sessões existentes.
-- A forma segura de transportar e armazenar o identificador de sessão no navegador permanece pendente de prova de conceito. Não escolher \`localStorage\`, \`sessionStorage\` ou cookie sem avaliar XSS, CORS, redirecionamentos e as limitações do Web App do Apps Script.
+- A forma segura de transportar e armazenar o identificador de sessão no navegador permanece pendente de prova de conceito. Não escolher `localStorage`, `sessionStorage` ou cookie sem avaliar XSS, CORS, redirecionamentos e as limitações do Web App do Apps Script.
 
 **Recuperação de senha**
 - O profissional informa o e-mail; a resposta não deve permitir enumerar contas.
@@ -188,10 +188,10 @@ Valores monetários devem ser numéricos e não negativos quando a modalidade ex
 
 **Publicação e estados**
 - Serviço válido de profissional ativo é publicado automaticamente após validação no backend.
-- \`published\`: visível publicamente se a conta estiver ativa.
-- \`paused\`: oculto publicamente; o profissional pode reativar.
-- \`suspended\`: oculto por decisão administrativa; somente administrador pode reativar ou remover e deve registrar justificativa.
-- \`removed\`: removido logicamente pelo profissional ou administrador; não aparece publicamente e permanece no histórico da demonstração.
+- `published`: visível publicamente se a conta estiver ativa.
+- `paused`: oculto publicamente; o profissional pode reativar.
+- `suspended`: oculto por decisão administrativa; somente administrador pode reativar ou remover e deve registrar justificativa.
+- `removed`: removido logicamente pelo profissional ou administrador; não aparece publicamente e permanece no histórico da demonstração.
 - O profissional pode editar, pausar, reativar ou remover somente seus próprios serviços.
 - Uma suspensão administrativa não pode ser ignorada pelo profissional.
 - A suspensão da conta oculta os serviços e revoga suas permissões públicas de imagem. Ao reativar a conta, somente serviços que estavam publicados e não estejam individualmente pausados, suspensos ou removidos poderão voltar a aparecer. A modelagem deverá preservar o estado anterior à suspensão da conta.
@@ -225,7 +225,7 @@ A decisão funcional é que o Apps Script altere as permissões dos arquivos con
 - serviço pausado, suspenso ou removido: restringir o arquivo;
 - conta suspensa ou encerrada: restringir as imagens associadas.
 
-O comportamento pretendido utiliza permissões equivalentes a \`ANYONE_WITH_LINK\`/visualização e \`PRIVATE\`, quando permitido pelas configurações da conta. Isso exige teste no Drive real antes de ser considerado implementado.
+O comportamento pretendido utiliza permissões equivalentes a `ANYONE_WITH_LINK`/visualização e `PRIVATE`, quando permitido pelas configurações da conta. Isso exige teste no Drive real antes de ser considerado implementado.
 
 **Limitação conhecida:** uma pessoa pode copiar ou baixar uma imagem enquanto ela estiver pública. Revogar o acesso no Drive não apaga cópias já baixadas, capturas de tela ou arquivos redistribuídos. A mudança de permissão também deve ser verificada em testes de transição e falha parcial.
 
@@ -250,7 +250,7 @@ Qualquer visitante poderá denunciar um perfil ou serviço sem criar conta.
 - Identificação do denunciante não será obrigatória.
 - Data/hora e identificador serão gerados pelo backend.
 
-**Estados:** \`received\`, \`in_analysis\`, \`valid\`, \`invalid\`, \`closed\`.
+**Estados:** `received`, `in_analysis`, `valid`, `invalid`, `closed`.
 
 O recebimento de denúncia não remove nem suspende automaticamente o conteúdo. Um administrador analisa, registra a decisão e aplica a ação cabível.
 
@@ -271,7 +271,7 @@ O painel administrativo mínimo permitirá:
 - Toda autorização administrativa será validada no Apps Script, nunca apenas pela interface.
 
 **Suspensão da conta**
-- A conta recebe \`suspended\`.
+- A conta recebe `suspended`.
 - O acesso ao painel é bloqueado e todas as sessões são invalidadas.
 - Serviços ficam ocultos e imagens associadas deixam de ter acesso público.
 - A reativação pelo administrador restaura a visibilidade apenas dos serviços que eram publicados e não possuem bloqueio individual.
@@ -285,7 +285,7 @@ O painel administrativo mínimo permitirá:
 ### 6.9. Encerramento de conta e retenção
 
 - O profissional poderá solicitar o encerramento da própria conta.
-- A conta recebe \`closed\`; as sessões são invalidadas.
+- A conta recebe `closed`; as sessões são invalidadas.
 - Seus serviços deixam de aparecer publicamente e as imagens são restringidas.
 - Na demonstração, os registros permanecem armazenados enquanto o projeto estiver ativo, para preservar histórico e relacionamentos.
 - O administrador poderá limpar os dados fictícios por procedimento controlado.
@@ -334,9 +334,9 @@ Cada evento deverá conter identificador, ator, ação, entidade afetada e data/
 
 | Entidade | Estados |
 |---|---|
-| Conta profissional | \`pending_activation\`, \`active\`, \`suspended\`, \`closed\` |
-| Serviço | \`published\`, \`paused\`, \`suspended\`, \`removed\` |
-| Denúncia | \`received\`, \`in_analysis\`, \`valid\`, \`invalid\`, \`closed\` |
+| Conta profissional | `pending_activation`, `active`, `suspended`, `closed` |
+| Serviço | `published`, `paused`, `suspended`, `removed` |
+| Denúncia | `received`, `in_analysis`, `valid`, `invalid`, `closed` |
 | Categoria | ativa / inativa |
 | Arquivo de imagem | visível por link / privado, conforme estado elegível |
 
@@ -387,8 +387,8 @@ As quantidades são uma base inicial para demonstração, não um limite de arqu
 
 A escolha funcional por Apps Script + e-mail/senha próprios não encerra a análise técnica. Antes de integrar autenticação, fazer uma prova de conceito isolada com dados sintéticos para validar:
 
-1. **Hash de senha:** Apps Script não deve armazenar senha em texto puro nem usar um digest rápido isolado como substituto de um KDF de senha. A referência oficial de \`Utilities\` documenta digest e HMAC; não se deve presumir a existência de uma função nativa pronta para Argon2id, scrypt ou PBKDF2. Avaliar uma implementação PBKDF2-HMAC-SHA-256 revisada e testada, ou uma estratégia demonstrativa mais restrita que não seja confundida com segurança de produção. Validar salt individual, parâmetros, comparação segura e desempenho.
-2. **Sessão no navegador:** comprovar como token/sessão será transportado, persistido, renovado, expirado e revogado. A referência de \`TextOutput\` documenta métodos de conteúdo/MIME, mas não oferece método documentado para configurar cabeçalhos arbitrários; não presumir que seja possível configurar \`HttpOnly\`/cookies apenas com TextOutput. Avaliar redirecionamentos do Content Service, CORS e exposição a XSS antes de escolher armazenamento no navegador.
+1. **Hash de senha:** Apps Script não deve armazenar senha em texto puro nem usar um digest rápido isolado como substituto de um KDF de senha. A referência oficial de `Utilities` documenta digest e HMAC; não se deve presumir a existência de uma função nativa pronta para Argon2id, scrypt ou PBKDF2. Avaliar uma implementação PBKDF2-HMAC-SHA-256 revisada e testada, ou uma estratégia demonstrativa mais restrita que não seja confundida com segurança de produção. Validar salt individual, parâmetros, comparação segura e desempenho.
+2. **Sessão no navegador:** comprovar como token/sessão será transportado, persistido, renovado, expirado e revogado. A referência de `TextOutput` documenta métodos de conteúdo/MIME, mas não oferece método documentado para configurar cabeçalhos arbitrários; não presumir que seja possível configurar `HttpOnly`/cookies apenas com TextOutput. Avaliar redirecionamentos do Content Service, CORS e exposição a XSS antes de escolher armazenamento no navegador.
 3. **Concorrência e bloqueios:** validar contadores de tentativas, bloqueio de 15 minutos, limites de códigos e operações concorrentes. Evitar que um terceiro consiga bloquear uma conta indefinidamente por abuso da regra de tentativas.
 4. **Autorização:** testar que usuário comum não consegue alterar papel, proprietário ou estado enviando payload manipulado; testar acesso cruzado entre profissionais.
 5. **Google Drive:** validar a troca entre acesso por link e privado em arquivos individuais, falhas parciais e a política da conta. Confirmar que esconder a URL na interface não é tratado como controle de acesso.
