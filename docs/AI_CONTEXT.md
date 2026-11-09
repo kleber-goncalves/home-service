@@ -15,16 +15,16 @@
 9. Antes de alterar uma área, leia os arquivos relacionados e verifique impactos em navegação, dados, segurança, desempenho e publicação.
 10. Não declare lint, testes, build, Actions ou deploy aprovados sem executar os comandos ou consultar os resultados correspondentes. Diferencie validação automatizada de inspeção manual.
 11. Quando uma mudança alterar comportamento, arquitetura, regras do produto, segurança ou publicação, atualize a seção narrativa pertinente deste arquivo no mesmo trabalho.
-12. Não edite manualmente o conteúdo entre os marcadores de snapshot automatizado. Ele é gerado por \`scripts/update-ai-context.mjs\`.
-13. Nunca inclua chaves, tokens, senhas, cookies, credenciais, valores de arquivos \`.env\`, dados pessoais ou informações privadas neste documento.
+12. Não edite manualmente o conteúdo entre os marcadores de snapshot automatizado. Ele é gerado por `scripts/update-ai-context.mjs`.
+13. Nunca inclua chaves, tokens, senhas, cookies, credenciais, valores de arquivos `.env`, dados pessoais ou informações privadas neste documento.
 14. Não assuma que a arquitetura planejada já está integrada. Confirme a existência dos arquivos, planilhas, scripts, serviços e variáveis no código antes de descrevê-los como ativos.
-15. Consulte também \`README.md\`, \`docs/REGISTRO_DE_OCORRENCIAS.md\` e \`docs/ESPECIFICACAO_MVP.md\`. A especificação consolidou decisões funcionais, mas ainda contém bloqueios de validação técnica; nenhum desses documentos substitui a descrição do estado atual.
+15. Consulte também `README.md`, `docs/REGISTRO_DE_OCORRENCIAS.md` e `docs/ESPECIFICACAO_MVP.md`. A especificação consolidou decisões funcionais, mas ainda contém bloqueios de validação técnica; nenhum desses documentos substitui a descrição do estado atual.
 16. Não faça testes de segurança intrusivos em sistemas, contas, planilhas ou arquivos reais sem autorização explícita. Prefira desenvolvimento local, Preview autorizado e dados sintéticos.
 
 ## 2. Identidade e propósito
 
 - **Nome do produto:** Conecta Local.
-- **Nome do repositório:** \`home-service\`.
+- **Nome do repositório:** `home-service`.
 - **Repositório:** https://github.com/kleber-goncalves/home-service
 - **Deploy informado:** https://home-service-blush.vercel.app/
 - **Tipo:** plataforma web regional de divulgação e descoberta de serviços.
@@ -78,24 +78,24 @@ A confirmação de e-mail e a recuperação de senha serão simuladas na interfa
 
 Não incluir pagamentos, contratação, contratos, agendamento, chat interno, avaliações, favoritos, geolocalização em tempo real ou aplicativo nativo no MVP.
 
-O levantamento funcional está consolidado em \`docs/ESPECIFICACAO_MVP.md\` v0.2. A Fase 3 deverá modelar dados e relacionamentos a partir desses requisitos. A autenticação não está liberada para implementação até a prova de conceito técnica descrita na especificação.
+O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. A Fase 3 deverá modelar dados e relacionamentos a partir desses requisitos. A autenticação não está liberada para implementação até a prova de conceito técnica descrita na especificação.
 
 ## 4. Estado atual do repositório
 
-**Estado após integração da homepage pública à branch \`dev\` (PR #2) e consolidação documental em andamento:**
+**Estado após integração da homepage pública à branch `dev` (PR #2) e consolidação documental em andamento:**
 
-- A branch \`dev\` contém a homepage pública demonstrativa do Conecta Local, integrada por Pull Request.
-- \`src/pages/HomePage.jsx\` coordena a composição das seções e o estado local da busca e dos filtros.
-- \`src/components/home/\` contém cabeçalho, hero/busca e seções públicas reutilizáveis.
-- \`src/components/ui/\` contém primitivas locais editáveis (Button, Input, Card e Badge) no padrão visual shadcn/ui.
-- \`components.json\` e \`jsconfig.json\` preparam a estrutura para componentes JavaScript (\`tsx: false\`) e aliases \`@/\`; \`vite.config.js\` resolve o alias no Vite.
-- \`src/index.css\` concentra tokens visuais, estilos globais, responsividade, foco visível e preferência por movimento reduzido.
-- A busca e a seleção de categorias filtram somente registros demonstrativos em \`src/data/homepage.js\`. O campo de cidade é ilustrativo e não executa busca geográfica.
+- A branch `dev` contém a homepage pública demonstrativa do Conecta Local, integrada por Pull Request.
+- `src/pages/HomePage.jsx` coordena a composição das seções e o estado local da busca e dos filtros.
+- `src/components/home/` contém cabeçalho, hero/busca e seções públicas reutilizáveis.
+- `src/components/ui/` contém primitivas locais editáveis (Button, Input, Card e Badge) no padrão visual shadcn/ui.
+- `components.json` e `jsconfig.json` preparam a estrutura para componentes JavaScript (`tsx: false`) e aliases `@/`; `vite.config.js` resolve o alias no Vite.
+- `src/index.css` concentra tokens visuais, estilos globais, responsividade, foco visível e preferência por movimento reduzido.
+- A busca e a seleção de categorias filtram somente registros demonstrativos em `src/data/homepage.js`. O campo de cidade é ilustrativo e não executa busca geográfica.
 - Os perfis e as fotografias não representam profissionais cadastrados. A natureza demonstrativa é indicada na interface.
 - As fotografias são carregadas de URLs externas do Pexels; a disponibilidade visual depende da conexão com esse serviço. Os créditos estão no README.
-- A validação de Pull Requests destinados a \`dev\` foi habilitada no workflow de CI pela correção integrada no PR #3.
+- A validação de Pull Requests destinados a `dev` foi habilitada no workflow de CI pela correção integrada no PR #3.
 - O workflow de sincronização automática do AI Context e o workflow de validação foram executados com sucesso após a integração da homepage, conforme os registros consultados em 2026-11-09.
-- \`main\` permanece fora do escopo desta etapa; \`dev\` é a linha de integração do trabalho em andamento.
+- `main` permanece fora do escopo desta etapa; `dev` é a linha de integração do trabalho em andamento.
 - Não há backend Apps Script integrado, planilha operacional, cadastro, autenticação, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo.
 - A homepage não processa pagamentos, agendamentos ou contratação.
 
@@ -108,8 +108,8 @@ A especificação v0.2 consolida requisitos funcionais aprovados, mas não alter
 - **React + JavaScript/JSX:** interface e componentes.
 - **Vite 8:** servidor de desenvolvimento e build.
 - **Node.js 24:** ambiente recomendado para ferramentas de desenvolvimento, scripts e build.
-- **Tailwind CSS 4:** utilitários e integração com Vite; estilos específicos da homepage ficam em \`src/index.css\`.
-- **shadcn/ui:** configuração em \`components.json\` no modo JavaScript (\`tsx: false\`), com aliases \`@/\`. As primitivas locais usadas nesta homepage são componentes editáveis no padrão visual shadcn; o CLI não é dependência de runtime.
+- **Tailwind CSS 4:** utilitários e integração com Vite; estilos específicos da homepage ficam em `src/index.css`.
+- **shadcn/ui:** configuração em `components.json` no modo JavaScript (`tsx: false`), com aliases `@/`. As primitivas locais usadas nesta homepage são componentes editáveis no padrão visual shadcn; o CLI não é dependência de runtime.
 - **Lucide React:** biblioteca de ícones da interface.
 
 Não foi escolhida uma aplicação Next.js. Não adicionar Express por padrão: para manter o projeto simples, o Google Apps Script é a opção inicial de backend. Reavaliar somente se surgir requisito concreto que justifique uma API Node.js hospedada separadamente.
@@ -144,7 +144,7 @@ Essa lista não determina automaticamente uma aba por entidade. Avaliar relaçõ
 **Decisão funcional para a demonstração**
 - Cadastro e login próprios por e-mail e senha, com lógica no Apps Script; não adicionar Firebase ou provedor externo sem reabrir a decisão.
 - A demonstração utilizará dados fictícios e não deverá receber senhas ou dados reais.
-- Conta nasce em \`pending_activation\`; confirmação de e-mail simulada por código de 6 dígitos, validade de 10 minutos, máximo 5 tentativas e intervalo de 60 segundos para novo código.
+- Conta nasce em `pending_activation`; confirmação de e-mail simulada por código de 6 dígitos, validade de 10 minutos, máximo 5 tentativas e intervalo de 60 segundos para novo código.
 - Recuperação de senha usa as mesmas regras de código; novo código invalida o anterior; uso único.
 - O código é exibido somente na demonstração. Envio real por e-mail é uma etapa futura e deverá respeitar quotas e falhas do MailApp.
 - Senha: mínimo 15 caracteres, suporte a pelo menos 64, sem exigência de classes de caracteres, rejeição de senhas comuns e sem troca periódica obrigatória.
@@ -162,7 +162,7 @@ Essa lista não determina automaticamente uma aba por entidade. Avaliar relaçõ
 
 **Imagens no Drive**
 - Decisão funcional: imagens de serviços publicados e contas ativas poderão ser visualizadas por link; serviços pausados, suspensos ou removidos e contas suspensas/encerradas terão acesso restringido.
-- O fluxo pretendido usa permissões equivalentes a \`ANYONE_WITH_LINK\` para visualização e \`PRIVATE\` para restringir, quando permitido pela conta. Testar em arquivos individuais e tratar falhas parciais.
+- O fluxo pretendido usa permissões equivalentes a `ANYONE_WITH_LINK` para visualização e `PRIVATE` para restringir, quando permitido pela conta. Testar em arquivos individuais e tratar falhas parciais.
 - Links públicos podem ser copiados e imagens podem ser baixadas; revogar a permissão não apaga cópias já obtidas. Não tratar esconder a URL na interface como controle de acesso.
 
 ### 5.5. Limites da plataforma
@@ -226,16 +226,16 @@ Em falhas: informar estado de carregamento/sucesso/erro; não declarar sucesso a
 
 - Não presumir que a branch de produção deve receber mudanças diretamente.
 - Antes de editar, confirmar branch, estado e commit atual.
-- Preferir branches de trabalho com nomes claros, por exemplo \`feat/nome-da-funcionalidade\`, \`fix/nome-do-problema\` e \`docs/nome-da-documentacao\`.
+- Preferir branches de trabalho com nomes claros, por exemplo `feat/nome-da-funcionalidade`, `fix/nome-do-problema` e `docs/nome-da-documentacao`.
 - Usar mensagens de commit descritivas e consistentes, preferencialmente Conventional Commits.
 - Pull Requests devem explicar objetivo, mudanças, validações executadas e limitações.
 - Não declarar um Preview Vercel como produção nem confundir status de deploy com aprovação funcional.
 
 ## 11. Documentação e registro de problemas
 
-- Este \`AI_CONTEXT.md\` descreve o estado atual e as regras de continuidade.
-- \`ESPECIFICACAO_MVP.md\` v0.2 consolida decisões funcionais; os bloqueios técnicos estão descritos na seção 12 do documento.
-- \`REGISTRO_DE_OCORRENCIAS.md\` preserva o histórico de bugs, erros, vulnerabilidades e incidentes. Não criar ocorrência apenas por haver pendência de projeto ou risco conhecido ainda não observado como falha.
+- Este `AI_CONTEXT.md` descreve o estado atual e as regras de continuidade.
+- `ESPECIFICACAO_MVP.md` v0.2 consolida decisões funcionais; os bloqueios técnicos estão descritos na seção 12 do documento.
+- `REGISTRO_DE_OCORRENCIAS.md` preserva o histórico de bugs, erros, vulnerabilidades e incidentes. Não criar ocorrência apenas por haver pendência de projeto ou risco conhecido ainda não observado como falha.
 - Atualize o contexto narrativo no mesmo trabalho quando decisões ou comportamentos relevantes mudarem.
 - O snapshot delimitado por marcadores é automatizado; não editar manualmente.
 - Não apagar ocorrências resolvidas. Corrigir informações de maneira rastreável.
@@ -243,10 +243,10 @@ Em falhas: informar estado de carregamento/sucesso/erro; não declarar sucesso a
 
 ## 12. Validação e publicação
 
-Os comandos de validação são mantidos em \`package.json\`. O workflow de qualidade deve executar:
+Os comandos de validação são mantidos em `package.json`. O workflow de qualidade deve executar:
 
-1. Instalação reproduzível com \`npm ci\`.
-2. Auditoria de dependências com \`npm audit --audit-level=high\` (vulnerabilidades high/critical fazem a etapa falhar; avisos inferiores ainda podem existir).
+1. Instalação reproduzível com `npm ci`.
+2. Auditoria de dependências com `npm audit --audit-level=high` (vulnerabilidades high/critical fazem a etapa falhar; avisos inferiores ainda podem existir).
 3. Validação estrutural do registro de ocorrências.
 4. ESLint.
 5. Build de produção do Vite.
