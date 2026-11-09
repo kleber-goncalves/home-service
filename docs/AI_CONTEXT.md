@@ -263,9 +263,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** b4a04f7d7b7152fcf0d6e858829050b079f7e881
-- **Data do commit:** 2026-11-09T16:53:32-03:00
-- **Mensagem do commit:** docs(spec): consolidar requisitos funcionais do MVP
+- **Commit de referência:** 454e260e92cea275196f1dd94839628a709a0ac5
+- **Data do commit:** 2026-11-09T16:54:20-03:00
+- **Mensagem do commit:** docs(spec): corrigir formatação Markdown da especificação
 - **Branch desta execução:** docs/consolidar-requisitos-mvp
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 6
@@ -351,13 +351,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 454e260 | 2026-11-09 | docs(spec): corrigir formatação Markdown da especificação |
+| 61078f6 | 2026-11-09 | docs(ai-context): atualizar snapshot automaticamente |
+| 58e1414 | 2026-11-09 | docs(ai-context): registrar decisões do MVP e bloqueios técnicos |
 | b4a04f7 | 2026-11-09 | docs(spec): consolidar requisitos funcionais do MVP |
 | 7239983 | 2026-11-09 | docs(ai-context): atualizar snapshot automaticamente |
 | d1cea5b | 2026-11-09 | Merge pull request #4 from kleber-goncalves/docs/especificacao-mvp |
 | e482b10 | 2026-11-09 | docs(ai-context): atualizar snapshot automaticamente |
 | d86afab | 2026-11-09 | docs(readme): incluir especificação funcional do MVP |
-| 00cd50c | 2026-11-09 | docs(ai-context): atualizar estado e plano do MVP |
-| e507b2d | 2026-11-09 | docs(ai-context): atualizar snapshot automaticamente |
-| a01e3af | 2026-11-09 | docs: especificar requisitos iniciais do MVP |
 
 <!-- END AUTO-GENERATED SECTION -->
