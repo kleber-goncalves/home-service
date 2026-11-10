@@ -99,7 +99,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 - Não há backend Apps Script integrado, planilha operacional, cadastro, autenticação, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo.
 - A homepage não processa pagamentos, agendamentos ou contratação.
 
-A especificação v0.2 consolida requisitos funcionais aprovados, mas não altera o estado do código. Atualize esta seção somente quando funcionalidades reais forem implementadas e validadas.
+A especificação v0.3 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica aprovados. Esses documentos não alteram o estado do código nem significam que Sheets, Apps Script, Drive ou autenticação estejam implementados. Atualize esta seção somente quando funcionalidades reais forem implementadas e validadas.
 
 ## 5. Arquitetura e decisões tecnológicas
 
@@ -124,20 +124,11 @@ Fluxo previsto: React/Vite → Web App/endpoint Apps Script → Google Sheets/Dr
 
 Google Sheets é uma solução de armazenamento simplificada para o escopo acadêmico; não é um banco relacional. Considerar concorrência, cotas, limites de execução, latência e integridade. Não prometer capacidade de produção em grande escala.
 
-### 5.3. Modelagem de dados prevista
+### 5.3. Modelagem de dados aprovada
 
-As entidades e os campos serão derivados da especificação v0.2 na Fase 3. Candidatas a análise:
-- contas/usuários e papéis;
-- perfis profissionais;
-- serviços;
-- categorias;
-- cidades e áreas atendidas;
-- arquivos/imagens;
-- denúncias;
-- sessões e códigos de verificação;
-- eventos de auditoria.
+A modelagem lógica está consolidada em [`docs/MODELAGEM_DADOS.md`](./MODELAGEM_DADOS.md): 12 entidades e 102 campos, com UUIDs, PKs/FKs lógicas, cardinalidades, unicidade, estados e regras de integridade. Entidades: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CONTROLE_AUTENTICACAO`, `SERVICOS`, `CATEGORIAS`, `CIDADES`, `SERVICO_CIDADES`, `IMAGENS`, `DENUNCIAS` e `AUDITORIA`.
 
-Essa lista não determina automaticamente uma aba por entidade. Avaliar relações, estados, concorrência, unicidade e limites do Sheets antes de fechar as abas. Usar UUIDs ou identificadores estáveis; nunca usar o número da linha da planilha como identificador de negócio.
+A decisão aprovada é um único arquivo Google Sheets com 12 abas, uma por entidade. Google Sheets não impõe automaticamente FKs, unicidade composta ou integridade relacional; esses controles pertencem ao Apps Script e exigem testes de concorrência. A modelagem é conceitual: nenhuma aba ou integração foi criada por esse documento. Próxima etapa: desenhar o esquema físico das abas e, após aprovação, inicializar uma estrutura vazia com dados sintéticos.
 
 ### 5.4. Autenticação, e-mail e imagens — decisões e bloqueios
 
@@ -148,10 +139,11 @@ Essa lista não determina automaticamente uma aba por entidade. Avaliar relaçõ
 - Recuperação de senha usa as mesmas regras de código; novo código invalida o anterior; uso único.
 - O código é exibido somente na demonstração. Envio real por e-mail é uma etapa futura e deverá respeitar quotas e falhas do MailApp.
 - Senha: mínimo 15 caracteres, suporte a pelo menos 64, sem exigência de classes de caracteres, rejeição de senhas comuns e sem troca periódica obrigatória.
-- Login: 5 tentativas consecutivas incorretas geram bloqueio de 15 minutos; mensagens genéricas.
+- Login: 5 falhas dentro de uma janela de contabilização de 15 minutos geram bloqueio de 15 minutos; controle no backend por HMAC do e-mail normalizado; mensagens genéricas; testar abuso de bloqueio contra contas.
 - Sessões: 30 minutos de inatividade, máximo 8 horas; logout, alteração/recuperação de senha, suspensão e encerramento revogam sessões.
 - Alteração de e-mail só efetiva após confirmação do novo endereço; endereço anterior continua válido até então.
 - Primeiro administrador criado manualmente por procedimento controlado; papel administrativo nunca é definido por valor livre do frontend.
+- Toda conta `professional` precisa possuir exatamente um perfil válido em `PROFISSIONAIS` antes de ser ativada; conta `admin` não exige perfil. Mudança de papel que gere vínculos inconsistentes fica bloqueada até procedimento seguro e auditado.
 
 **Bloqueios técnicos antes de implementar**
 - Não armazenar senhas em texto puro e não usar SHA/digest rápido isolado como armazenamento de senha.
@@ -162,7 +154,7 @@ Essa lista não determina automaticamente uma aba por entidade. Avaliar relaçõ
 
 **Imagens no Drive**
 - Decisão funcional: imagens de serviços publicados e contas ativas poderão ser visualizadas por link; serviços pausados, suspensos ou removidos e contas suspensas/encerradas terão acesso restringido.
-- O fluxo pretendido usa permissões equivalentes a `ANYONE_WITH_LINK` para visualização e `PRIVATE` para restringir, quando permitido pela conta. Testar em arquivos individuais e tratar falhas parciais.
+- O fluxo pretendido usa permissões equivalentes a `ANYONE_WITH_LINK` para visualização e `PRIVATE` para restringir, quando permitido pela conta. Pasta raiz privada; compartilhamento individual por arquivo; limite exato de 5.000.000 bytes; no máximo 1 imagem ativa por perfil e 5 por serviço, com posições exclusivas de 1 a 5. Testar em arquivos individuais e tratar falhas parciais.
 - Links públicos podem ser copiados e imagens podem ser baixadas; revogar a permissão não apaga cópias já obtidas. Não tratar esconder a URL na interface como controle de acesso.
 
 ### 5.5. Limites da plataforma
@@ -175,13 +167,13 @@ Consultar cotas oficiais vigentes do Apps Script antes e durante a implementaç�
 2. Cada profissional pode possuir vários serviços; não há limite numérico fixo decidido para o MVP.
 3. Profissionais só podem consultar/alterar seus próprios registros privados; a identidade e a propriedade são verificadas no Apps Script em toda operação.
 4. Papel administrativo não pode ser escolhido pelo usuário; a criação inicial é manual e concessões posteriores exigem administrador autorizado.
-5. Publicação automática só ocorre após validar os campos e confirmar conta ativa, categoria válida e regras de negócio.
+5. Um serviço pode permanecer como `draft` incompleto, privado e sem cidade; a publicação automática exige campos válidos, conta ativa, perfil válido, categoria ativa, preço coerente e ao menos uma cidade ativa associada.
 6. Conta suspensa ou encerrada não pode autenticar; suas sessões são invalidadas e seus serviços deixam de ser públicos.
-7. Estado individual de serviço deve ser preservado durante suspensão de conta. Na reativação, não restaurar serviços pausados, individualmente suspensos ou removidos.
+7. Suspensão/fechamento da conta oculta serviços e imagens sem sobrescrever `SERVICOS.status`; na reativação, somente serviços cujo estado individual continue `published` são elegíveis.
 8. Serviço pausado deixa de aparecer publicamente, mas pode ser reativado pelo proprietário se não estiver bloqueado por ação administrativa.
 9. Serviço suspenso administrativamente exige justificativa; somente administrador pode reativar ou remover.
 10. Serviço removido pelo proprietário ou administrador deixa de ser público, mas permanece no histórico da demonstração.
-11. Categoria inativa não pode ser usada em novos serviços; serviços existentes nela continuam públicos, conforme decisão aprovada.
+11. Categoria inativa não pode ser usada em novos serviços/publicações; serviços existentes nela continuam públicos, conforme decisão aprovada. Cidade inativa não recebe novas associações; vínculos existentes são preservados. O encerramento de denúncia (`valid`, `invalid` ou `closed`) preenche `analisado_em` no backend.
 12. Denúncia não remove automaticamente conteúdo; a moderação é uma ação administrativa registrada.
 13. Exibir nome público, apresentação, foto opcional, cidades/regiões e WhatsApp. Nome completo, e-mail e telefone alternativo ficam privados por padrão.
 14. Não solicitar nem expor endereço residencial completo.
@@ -204,7 +196,11 @@ Base demonstrativa inicial sugerida e aprovada: 8 profissionais fictícios, 16�
 
 O painel deverá permitir consulta/gestão de profissionais, serviços, denúncias, categorias e cidades, além de consulta da auditoria. Suspensões e remoções exigem justificativa quando definidas; ações sensíveis devem pedir confirmação.
 
-Registrar identificador do evento, ator, ação, entidade afetada e data/hora para login/eventos de autenticação relevantes, criação de conta, alteração de perfil, operações em serviços, suspensão/reativação, decisões de denúncia, alterações de categorias/localidades, encerramento e mudanças administrativas de papel. Não registrar senhas, códigos, tokens ou segredos.
+`AUDITORIA` possui nove campos e funciona como append-only pela aplicação: backend escreve, administradores consultam e a interface não edita eventos. Isso não torna a planilha inviolável contra quem tem acesso privilegiado direto ao arquivo/projeto. Registrar identificador, ator, tipo do ator, ação controlada, entidade/registro afetado, resultado, detalhes sanitizados e data/hora. Nunca registrar credenciais, hashes/salts de senha, códigos, tokens ou segredos.
+
+Para alterações auditadas, atualização de negócio e inclusão do evento deverão integrar o mesmo `spreadsheets.batchUpdate` do único arquivo Sheets. A API aplica o lote de forma atômica; se uma solicitação for inválida, nenhuma alteração daquele lote é aplicada. `LockService` protege trechos críticos de leitura–validação–gravação, mas não substitui a atomicidade do lote nem uma transação com outros serviços.
+
+Permissões do Drive são operações separadas: confirmar permissão efetiva, registrar falhas e reconciliar divergências. Não declarar uma operação integralmente concluída antes das etapas obrigatórias. Sheets e Drive não formam uma transação distribuída.
 
 Em falhas: informar estado de carregamento/sucesso/erro; não declarar sucesso antes da confirmação do backend; manter formulário em falha de rede; prevenir duplo envio; solicitar confirmação antes de ação destrutiva; pedir novo login quando a sessão expirar. Mensagens ao usuário são genéricas e não revelam detalhes internos. Não haverá offline para login, cadastro ou administração.
 
@@ -234,7 +230,7 @@ Em falhas: informar estado de carregamento/sucesso/erro; não declarar sucesso a
 ## 11. Documentação e registro de problemas
 
 - Este `AI_CONTEXT.md` descreve o estado atual e as regras de continuidade.
-- `ESPECIFICACAO_MVP.md` v0.2 consolida decisões funcionais; os bloqueios técnicos estão descritos na seção 12 do documento.
+- `ESPECIFICACAO_MVP.md` v0.3 consolida decisões funcionais; `MODELAGEM_DADOS.md` contém o modelo lógico aprovado de 12 entidades/102 campos; validações técnicas continuam pendentes.
 - `REGISTRO_DE_OCORRENCIAS.md` preserva o histórico de bugs, erros, vulnerabilidades e incidentes. Não criar ocorrência apenas por haver pendência de projeto ou risco conhecido ainda não observado como falha.
 - Atualize o contexto narrativo no mesmo trabalho quando decisões ou comportamentos relevantes mudarem.
 - O snapshot delimitado por marcadores é automatizado; não editar manualmente.
