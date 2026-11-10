@@ -281,7 +281,7 @@ Armazena metadados e propriedade lógica; o binário fica no Google Drive.
 | `atualizado_em` | DATETIME | Sim | Atualizado em mudança efetiva. |
 | `analisado_em` | DATETIME | Não | Nulo em `received`/ `in_analysis`; preenchido ao alcançar qualquer estado final: `valid`, `invalid` ou `closed`. |
 
-**Alvo exclusivo:** exatamente um entre `id_profissional` e `id_servico) deve estar preenchido e existir. O motivo `nonexistent_service` somente pode ser utilizado quando o alvo for um serviço. Não existe limite de uma denúncia por alvo; denúncias independentes podem ser recebidas.
+**Alvo exclusivo:** exatamente um entre `id_profissional` e `id_servico` deve estar preenchido e existir. O motivo `nonexistent_service` somente pode ser utilizado quando o alvo for um serviço. Não existe limite de uma denúncia por alvo; denúncias independentes podem ser recebidas.
 
 **Fluxo:** `received` → `in_analysis` → `valid`, `invalid` ou `closed`. Os três últimos estados são finais no MVP e não podem ser reabertos. Qualquer visitante pode enviar denúncia sem login; não coletar identidade do denunciante nem aceitar anexos. Receber denúncia não remove automaticamente o conteúdo. Todas as operações administrativas serão auditadas.
 
