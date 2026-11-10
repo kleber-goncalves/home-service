@@ -265,9 +265,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** a57d25760005d31c3bbdc7d5848ffdc6f372ebef
-- **Data do commit:** 2026-11-10T17:17:55-03:00
-- **Mensagem do commit:** docs: documentar arquitetura inicial do Apps Script
+- **Commit de referência:** 941e7708d9e75e8758eda1a37eb986f1d647a91d
+- **Data do commit:** 2026-11-10T17:19:09-03:00
+- **Mensagem do commit:** docs(spec): alinhar próxima etapa à arquitetura Apps Script
 - **Branch desta execução:** docs/arquitetura-apps-script
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 6
@@ -353,13 +353,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 941e770 | 2026-11-10 | docs(spec): alinhar próxima etapa à arquitetura Apps Script |
+| 4a275aa | 2026-11-10 | docs(modelagem): atualizar estado da planilha e próximos passos |
+| 78041eb | 2026-11-10 | docs(readme): incluir arquitetura Apps Script |
+| 01d8968 | 2026-11-10 | docs(ai-context): registrar arquitetura Apps Script e planilha criada |
+| d039b7b | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | a57d257 | 2026-11-10 | docs: documentar arquitetura inicial do Apps Script |
 | c1d6640 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | 49f1458 | 2026-11-10 | Merge pull request #7 from kleber-goncalves/docs/modelo-fisico-banco |
-| 074a29a | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| e3b3f86 | 2026-11-10 | docs(ai-context): atualizar estado do esquema físico |
-| 2665d0b | 2026-11-10 | docs(spec): registrar aprovação do esquema físico |
-| ed4b78a | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| 082a762 | 2026-11-10 | docs(data): consolidar esquema físico das 12 abas |
 
 <!-- END AUTO-GENERATED SECTION -->
