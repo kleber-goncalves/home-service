@@ -263,9 +263,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** f06c1408ac133573c7bbf090e1cc76ef6e74b232
-- **Data do commit:** 2026-11-10T15:29:52-03:00
-- **Mensagem do commit:** docs(modelagem): corrigir regra de alvo exclusivo
+- **Commit de referência:** ee9dc67f007ff1116d0f9ba29527d7045114918e
+- **Data do commit:** 2026-11-10T15:29:54-03:00
+- **Mensagem do commit:** docs(spec): consolidar decisões da modelagem lógica v0.3
 - **Branch desta execução:** docs/modelagem-logica-mvp
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 6
@@ -351,6 +351,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| ee9dc67 | 2026-11-10 | docs(spec): consolidar decisões da modelagem lógica v0.3 |
 | f06c140 | 2026-11-10 | docs(modelagem): corrigir regra de alvo exclusivo |
 | 045b8b7 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | f14c625 | 2026-11-10 | docs(modelagem): consolidar modelo lógico de dados |
@@ -358,6 +359,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | b5f80eb | 2026-11-09 | Merge pull request #5 — consolidate MVP requirements |
 | ba8c640 | 2026-11-09 | docs(ai-context): atualizar snapshot automaticamente |
 | 563b816 | 2026-11-09 | docs(ai-context): corrigir formatação Markdown do contexto |
-| 454e260 | 2026-11-09 | docs(spec): corrigir formatação Markdown da especificação |
 
 <!-- END AUTO-GENERATED SECTION -->
