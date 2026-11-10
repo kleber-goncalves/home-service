@@ -266,9 +266,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** f47cd45c01d1eefb1414c0f0ebdf34e787298812
-- **Data do commit:** 2026-11-10T17:34:11-03:00
-- **Mensagem do commit:** docs(architecture): detalhar organização da Vercel Function
+- **Commit de referência:** eb6ecf430965793fd3582517df751df3179550b6
+- **Data do commit:** 2026-11-10T17:34:14-03:00
+- **Mensagem do commit:** docs(spec): alinhar fluxo e sessão via gateway
 - **Branch desta execução:** docs/arquitetura-gateway-vercel
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 6
@@ -354,6 +354,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| eb6ecf4 | 2026-11-10 | docs(spec): alinhar fluxo e sessão via gateway |
 | f47cd45 | 2026-11-10 | docs(architecture): detalhar organização da Vercel Function |
 | e2a01df | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | 0afbbbb | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
@@ -361,6 +362,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | fc2eee8 | 2026-11-10 | docs(readme): atualizar nome da arquitetura de integração |
 | f1c5128 | 2026-11-10 | docs(ai-context): registrar Vercel Function como gateway |
 | 9b0a02e | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| f470abb | 2026-11-10 | docs(architecture): adotar Vercel Functions como gateway HTTP |
 
 <!-- END AUTO-GENERATED SECTION -->
