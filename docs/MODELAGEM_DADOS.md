@@ -4,7 +4,7 @@
 > **Data:** 2026-11-10  
 > **Status:** modelagem lógica e esquema físico aprovados conceitualmente; validações técnicas e implementação pendentes.  
 > **Escopo:** inventário lógico, esquema físico das 12 abas, campos, relacionamentos, integridade, estados e estratégia de persistência do MVP acadêmico.  
-> **Importante:** este documento descreve o modelo aprovado. Não significa que as abas, o Apps Script, as planilhas ou as integrações com Drive já existam.
+> **Importante:** este documento descreve o modelo aprovado. O arquivo Google Sheets com as 12 abas e os 102 cabeçalhos foi criado e conferido pelo responsável pelo projeto; ele ainda não contém dados de negócio nem está integrado a um backend Apps Script operacional. As integrações com Drive também não estão implementadas.
 
 ## 1. Objetivo e limites
 
@@ -16,7 +16,7 @@ Este documento consolida a modelagem lógica derivada da [Especificação funcio
 
 A decisão aprovada é utilizar **um único arquivo Google Sheets com 12 abas**, uma para cada entidade. O Google Drive armazenará os arquivos de imagem; seus metadados e relacionamentos serão mantidos na aba `IMAGENS`.
 
-O projeto é uma demonstração acadêmica com dados sintéticos. Não deve receber credenciais, cadastros ou dados pessoais reais. Nenhuma entidade ou aba descrita aqui foi criada por este documento.
+O projeto é uma demonstração acadêmica com dados sintéticos. Não deve receber credenciais, cadastros ou dados pessoais reais. A existência da estrutura no Google Sheets foi confirmada fora deste documento; isso não comprova integração, integridade relacional ou aplicação das regras pelo backend.
 
 ### 1.1. Convenções de representação
 
@@ -708,14 +708,17 @@ Nunca registrar senha, hash de senha, salt, parâmetros secretos, código de ver
 - esquema físico das 12 abas, totalizando 102 colunas, com nomes, ordem, formatos, tipos de célula e validações;
 - regras de privacidade, proteção e limites da persistência em Sheets/Drive.
 
+**Criado e conferido na planilha Google Sheets:**
+- arquivo estrutural com as 12 abas e os 102 cabeçalhos;
+- listas suspensas auxiliares aprovadas;
+- proteções e compartilhamento restrito, conforme conferência confirmada pelo responsável.
+
 **Ainda não implementado:**
-- arquivo Google Sheets e suas 12 abas;
-- cabeçalhos e validações nativas;
-- registros sintéticos iniciais;
-- projeto/API Apps Script;
+- registros sintéticos de negócio;
+- projeto/API Apps Script operacional e integração com o frontend;
 - uploads e permissões efetivas do Drive;
 - autenticação, códigos e sessões;
 - provas de conceito técnicas.
 
-**Próxima etapa:** revisão final de consistência da documentação e preparação da inicialização do arquivo Google Sheets. A criação da planilha deverá ocorrer somente após autorização explícita. A primeira inicialização deverá usar dados sintéticos. As provas de conceito de autenticação, concorrência, auditoria e permissões do Drive continuam obrigatórias antes de ativar esses fluxos.
+**Próxima etapa:** revisar a proposta em [ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md) e executar as provas de conceito, começando por transporte/CORS entre Vercel e Apps Script. A planilha já foi criada; não é necessário repetir sua inicialização. Os fluxos de autenticação, concorrência, auditoria e permissões do Drive continuam bloqueados até validação técnica.
 
