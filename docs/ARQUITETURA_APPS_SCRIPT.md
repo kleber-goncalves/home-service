@@ -253,12 +253,12 @@ A implementação inicial está isolada na branch feat/poc-01-vercel-apps-script
 
 - `api/backend.js` recebe POST same-origin, valida método, Content-Type, limite do corpo, JSON, requestId, payload e allowlist de três ações de teste.
 - `src/services/poc-01-api.js` envia somente para `/api/backend`; `src/pages/Poc01Page.jsx` disponibiliza cenários temporários em `?poc=01`.
-- `apps-script/poc-01/Code.gs` é um Web App independente, sem acesso a Sheets, Drive ou outros recursos; faz eco de payload sintético, devolve um erro lógico controlado e pode retornar texto intencionalmente inválido.
+- `apps-script/poc-01/Code.gs` é um Web App independente, sem acesso a Sheets, Drive ou outros recursos; repete a allowlist e o limite de 8 KiB no próprio Apps Script, faz eco de payload sintético, devolve um erro lógico controlado e pode retornar texto intencionalmente inválido.
 - A Function envia `application/x-www-form-urlencoded`, configura `redirect: follow`, aplica timeout e exige que a resposta final confirme o host `script.googleusercontent.com`.
 - A Function normaliza sucesso e falhas para JSON/HTTP, sem devolver a URL temporária do Content Service.
 - `tests/poc01/backend.test.js` valida o comportamento do gateway com respostas upstream simuladas; isso não comprova a comunicação real com o Google.
 
-**Limite deliberado:** a POC-01 ainda não implementa HMAC, timestamp assinado ou proteção contra replay. Como o Web App isolado será acessível anonimamente, ele não pode conter operações privilegiadas e não deverá acessar planilha, Drive, e-mail ou dados reais. A assinatura server-to-server pertence à POC-02.
+**Limite deliberado:** a POC-01 ainda não implementa HMAC, timestamp assinado ou proteção contra replay. Como o Web App isolado será acessível anonimamente, ele não pode conter operações privilegiadas e não deverá acessar planilha, Drive, e-mail ou dados reais. O Apps Script repete a allowlist e o limite de payload para reduzir abuso por chamadas diretas, mas terceiros ainda podem consumir a cota de execução. Desativar/remover a implantação pública após a prova. A assinatura server-to-server pertence à POC-02.
 
 **Pendência para aceite:** o responsável deverá criar e implantar o projeto Apps Script de teste, configurar `APPS_SCRIPT_WEB_APP_URL` no ambiente Preview da Vercel e executar o cenário de eco. A POC só será considerada comprovada quando a resposta real confirmar o redirecionamento para `script.googleusercontent.com` e devolver o requestId/payload esperados. Testes unitários e build não bastam.
 

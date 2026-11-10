@@ -112,7 +112,7 @@ O Content Service normalmente entrega uma resposta HTTP própria por redireciona
 5. Para esta prova isolada, selecione execução como o responsável pela implantação e acesso de qualquer pessoa, caso a política da conta permita.
 6. Implante e copie a URL terminada em /exec.
 
-**Atenção:** o Web App ficará acessível anonimamente. O código de teste não usa Sheets, Drive, e-mail ou outras permissões privilegiadas; limita-se a ecoar conteúdo sintético e produzir falhas controladas. Não coloque dados pessoais, segredos ou operações reais nesse projeto.
+**Atenção:** o Web App ficará acessível anonimamente. O código de teste não usa Sheets, Drive, e-mail ou outras permissões privilegiadas; limita-se a ecoar conteúdo sintético e produzir falhas controladas. O próprio Apps Script repete a allowlist e limita o payload a 8 KiB, pois chamadas diretas podem ignorar as validações da Vercel. Ainda assim, terceiros podem chamar o endpoint e consumir a cota de execução do projeto. Não coloque dados pessoais, segredos ou operações reais nesse projeto e desative/remova a implantação pública quando a prova terminar.
 
 A POC-01 ainda não valida a assinatura HMAC. Essa proteção pertence à POC-02. Não reutilize este endpoint público como backend operacional.
 
