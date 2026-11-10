@@ -261,9 +261,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 082a76289bc8ab4391304856757f1dd9236b0339
-- **Data do commit:** 2026-11-10T16:22:36-03:00
-- **Mensagem do commit:** docs(data): consolidar esquema físico das 12 abas
+- **Commit de referência:** 2665d0beac5d69708c5ad9c17615c32f9fd5c616
+- **Data do commit:** 2026-11-10T16:23:49-03:00
+- **Mensagem do commit:** docs(spec): registrar aprovação do esquema físico
 - **Branch desta execução:** docs/modelo-fisico-banco
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 6
@@ -349,13 +349,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 2665d0b | 2026-11-10 | docs(spec): registrar aprovação do esquema físico |
+| ed4b78a | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | 082a762 | 2026-11-10 | docs(data): consolidar esquema físico das 12 abas |
 | 1662f1b | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | 8bfbcd7 | 2026-11-10 | Merge pull request #6 — consolidate logical data model |
 | 3be3f5d | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | 8754e53 | 2026-11-10 | docs(spec): alinhar obrigatoriedade de rascunhos |
 | c2bab47 | 2026-11-10 | docs(ai-context): atualizar continuidade da modelagem lógica |
-| 68d9678 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| c0879a4 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
