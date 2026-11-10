@@ -127,6 +127,12 @@ Fluxo aprovado para orientar a POC: React/Vite → rota same-origin da Vercel Fu
 
 A estratégia de assinatura gateway→Apps Script e o possível cookie HttpOnly emitido pela Vercel continuam sujeitos a provas de conceito. A Function poderá emitir o cookie no domínio da aplicação; o Apps Script continuará validando o token e a sessão. A proposta completa, incluindo riscos, critérios de aceite e limites de TextOutput, está em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Google Sheets é uma solução de armazenamento simplificada para o escopo acadêmico; não é um banco relacional. Considerar concorrência, cotas, limites de execução, latência e integridade. Não prometer capacidade de produção em grande escala.
 
+### POC-01 — primeira implementação de comunicação
+
+A branch feat/poc-01-vercel-apps-script contém a implementação inicial de POST `/api/backend` (Vercel Function), a chamada same-origin do React, a tela temporária `?poc=01`, o script Apps Script isolado e testes automatizados do gateway. A amostra Apps Script não acessa Sheets/Drive e não implementa HMAC. O fluxo real ainda não foi validado: falta o responsável implantar o projeto Apps Script isolado, configurar `APPS_SCRIPT_WEB_APP_URL` no ambiente Preview e executar o teste de eco confirmando o redirecionamento do Content Service. Não iniciar login, sessão, planilha ou Drive antes do aceite da POC-01 e da POC-02.
+
+Detalhes e procedimento: [POC-01 — Comunicação React, Vercel Functions e Apps Script](./POC_01_COMUNICACAO.md).
+
 ### 5.3. Modelagem lógica e física de dados aprovada
 
 A modelagem lógica e o esquema físico estão consolidados em [`docs/MODELAGEM_DADOS.md`](./MODELAGEM_DADOS.md): 12 entidades e 102 campos lógicos, com 12 abas e 102 colunas físicas. O documento define UUIDs, PKs/FKs lógicas, cardinalidades, ordem de abas e colunas, tipos de célula, campos opcionais, valores controlados, unicidade, integridade, estados, visibilidade, privacidade e persistência no Sheets/Drive.

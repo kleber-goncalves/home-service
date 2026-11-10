@@ -15,7 +15,8 @@ A demonstração **não** representa um marketplace operacional: não há cadast
 - **Frontend:** React, JavaScript, Vite 8 e Tailwind CSS 4.
 - **Componentes:** primitivas locais editáveis no padrão visual shadcn/ui, configuradas para JavaScript.
 - **Ícones:** Lucide React.
-- **Backend planejado:** Google Apps Script.
+- **Backend de negócio planejado:** Google Apps Script.
+- **Gateway HTTP:** Vercel Functions; a primeira integração está isolada na POC-01 e ainda depende da implantação de teste do Apps Script.
 - **Dados planejados:** Google Sheets.
 - **Imagens:** fotografias ilustrativas externas do Pexels; fontes e créditos abaixo.
 
@@ -45,6 +46,7 @@ O GitHub Actions executa essas verificações em pushes e Pull Requests direcion
 - [Especificação funcional do MVP (em revisão)](docs/ESPECIFICACAO_MVP.md)
 - [Modelagem lógica e física dos dados](docs/MODELAGEM_DADOS.md)
 - [Arquitetura de integração Vercel Functions + Apps Script](docs/ARQUITETURA_APPS_SCRIPT.md)
+- [POC-01 — Comunicação React, Vercel Functions e Apps Script](docs/POC_01_COMUNICACAO.md)
 - [Registro público de ocorrências](docs/REGISTRO_DE_OCORRENCIAS.md)
 
 ## Créditos das imagens

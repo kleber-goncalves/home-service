@@ -2,7 +2,7 @@
 
 > **Versão:** 0.1  
 > **Data:** 2026-11-10  
-> **Status:** proposta arquitetural inicial para revisão; não liberada para implementação.  
+> **Status:** implementação inicial da POC-01 na branch feat/poc-01-vercel-apps-script; a comunicação real ainda depende da implantação isolada do Apps Script e da configuração da variável de ambiente na Vercel.  
 > **Escopo:** integração React/Vite, Google Apps Script, Google Sheets e Google Drive para a demonstração acadêmica.  
 > **Premissa:** manter Apps Script como backend inicial e autenticação própria por e-mail e senha, conforme decisão funcional aprovada. Transporte, sessão e armazenamento seguro de senhas continuam pendentes de prova de conceito.
 
@@ -14,10 +14,11 @@ Estado conhecido na data desta revisão:
 
 - Frontend demonstrativo em React, JavaScript/JSX e Vite, publicado na Vercel.
 - Projeto configurado como módulo JavaScript ES (package.json usa type module).
-- A branch dev ainda não possui diretório api/ nem arquivo vercel.json. A POC deverá comprovar a descoberta e publicação de uma Vercel Function no projeto Vite atual.
+- A branch dev ainda não possui diretório api/; a branch feat/poc-01-vercel-apps-script contém a primeira Function e a página de teste. A descoberta/publicação efetiva deverá ser comprovada pelo Preview Vercel.
 - Arquivo Google Sheets estrutural criado e conferido pelo responsável, com 12 abas e 102 cabeçalhos.
 - A planilha ainda não é armazenamento operacional integrado.
-- Não há Vercel Function, rota API, endpoint Apps Script integrado, autenticação, sessão, upload ou painel administrativo implementados.
+- A branch de trabalho contém a Function da POC-01 e o código do Web App de teste, mas ainda não há URL Apps Script configurada nem comunicação real concluída.
+- Não há autenticação, sessão, integração operacional com Sheets/Drive, upload ou painel administrativo implementados.
 
 O projeto continua sendo uma demonstração acadêmica com dados sintéticos. Não inserir credenciais, cadastros ou dados pessoais reais.
 
@@ -246,6 +247,22 @@ Diretrizes para o primeiro protótipo:
 
 A execução local com Vite não deve ser confundida com a execução de Vercel Functions. A POC precisa documentar como testar a Function localmente ou em Preview usando a ferramenta oficial da Vercel, sem presumir que npm run dev sozinho execute a pasta api/.
 
+### 5.7. POC-01 — transporte básico sem autenticação
+
+A implementação inicial está isolada na branch feat/poc-01-vercel-apps-script:
+
+- `api/backend.js` recebe POST same-origin, valida método, Content-Type, limite do corpo, JSON, requestId, payload e allowlist de três ações de teste.
+- `src/services/poc-01-api.js` envia somente para `/api/backend`; `src/pages/Poc01Page.jsx` disponibiliza cenários temporários em `?poc=01`.
+- `apps-script/poc-01/Code.gs` é um Web App independente, sem acesso a Sheets, Drive ou outros recursos; faz eco de payload sintético, devolve um erro lógico controlado e pode retornar texto intencionalmente inválido.
+- A Function envia `application/x-www-form-urlencoded`, configura `redirect: follow`, aplica timeout e exige que a resposta final confirme o host `script.googleusercontent.com`.
+- A Function normaliza sucesso e falhas para JSON/HTTP, sem devolver a URL temporária do Content Service.
+- `tests/poc01/backend.test.js` valida o comportamento do gateway com respostas upstream simuladas; isso não comprova a comunicação real com o Google.
+
+**Limite deliberado:** a POC-01 ainda não implementa HMAC, timestamp assinado ou proteção contra replay. Como o Web App isolado será acessível anonimamente, ele não pode conter operações privilegiadas e não deverá acessar planilha, Drive, e-mail ou dados reais. A assinatura server-to-server pertence à POC-02.
+
+**Pendência para aceite:** o responsável deverá criar e implantar o projeto Apps Script de teste, configurar `APPS_SCRIPT_WEB_APP_URL` no ambiente Preview da Vercel e executar o cenário de eco. A POC só será considerada comprovada quando a resposta real confirmar o redirecionamento para `script.googleusercontent.com` e devolver o requestId/payload esperados. Testes unitários e build não bastam.
+
+Procedimento, cenários e critérios de aceite: [POC-01 — Comunicação React, Vercel Functions e Apps Script](./POC_01_COMUNICACAO.md).
 ## 6. Organização proposta do projeto Apps Script
 
 O código deverá ficar versionado no repositório, separado do frontend, em uma pasta futura apps-script/. A ferramenta e o fluxo de publicação (editor Apps Script ou clasp) serão definidos antes da primeira implementação e documentados; credenciais de desenvolvedor e tokens de publicação nunca serão commitados.

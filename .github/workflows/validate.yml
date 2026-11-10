@@ -43,6 +43,9 @@ jobs:
       - name: Audit dependency vulnerabilities
         run: npm audit --audit-level=high
 
+      - name: Run POC-01 gateway tests
+        run: npm run test:poc01
+
       - name: Validate occurrence register
         run: npm run check:occurrences
 
