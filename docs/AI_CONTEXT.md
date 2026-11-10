@@ -124,11 +124,13 @@ Fluxo previsto: React/Vite → Web App/endpoint Apps Script → Google Sheets/Dr
 
 Google Sheets é uma solução de armazenamento simplificada para o escopo acadêmico; não é um banco relacional. Considerar concorrência, cotas, limites de execução, latência e integridade. Não prometer capacidade de produção em grande escala.
 
-### 5.3. Modelagem de dados aprovada
+### 5.3. Modelagem lógica e física de dados aprovada
 
-A modelagem lógica está consolidada em [`docs/MODELAGEM_DADOS.md`](./MODELAGEM_DADOS.md): 12 entidades e 102 campos, com UUIDs, PKs/FKs lógicas, cardinalidades, unicidade, estados e regras de integridade. Entidades: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CONTROLE_AUTENTICACAO`, `SERVICOS`, `CATEGORIAS`, `CIDADES`, `SERVICO_CIDADES`, `IMAGENS`, `DENUNCIAS` e `AUDITORIA`.
+A modelagem lógica e o esquema físico estão consolidados em [`docs/MODELAGEM_DADOS.md`](./MODELAGEM_DADOS.md): 12 entidades e 102 campos lógicos, com 12 abas e 102 colunas físicas. O documento define UUIDs, PKs/FKs lógicas, cardinalidades, ordem de abas e colunas, tipos de célula, campos opcionais, valores controlados, unicidade, integridade, estados, visibilidade, privacidade e persistência no Sheets/Drive.
 
-A decisão aprovada é um único arquivo Google Sheets com 12 abas, uma por entidade. Google Sheets não impõe automaticamente FKs, unicidade composta ou integridade relacional; esses controles pertencem ao Apps Script e exigem testes de concorrência. A modelagem é conceitual: nenhuma aba ou integração foi criada por esse documento. Próxima etapa: desenhar o esquema físico das abas e, após aprovação, inicializar uma estrutura vazia com dados sintéticos.
+Entidades/abas: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CONTROLE_AUTENTICACAO`, `SERVICOS`, `CATEGORIAS`, `CIDADES`, `SERVICO_CIDADES`, `IMAGENS`, `DENUNCIAS` e `AUDITORIA`. A estrutura prevê um único arquivo Google Sheets; linha 1 para cabeçalhos e linha 2 em diante para registros; UUIDs/textos como texto; datas como ISO 8601 UTC; números em células numéricas; células vazias para opcionais; validações do Sheets apenas auxiliares, com Apps Script como autoridade.
+
+Google Sheets não impõe automaticamente FKs, unicidade composta ou integridade relacional; esses controles pertencem ao Apps Script e exigem testes de concorrência. **Nenhuma planilha, aba, cabeçalho, validação, registro ou integração foi criada por essa aprovação.** A criação do arquivo depende de autorização explícita e deverá começar com dados sintéticos.
 
 ### 5.4. Autenticação, e-mail e imagens — decisões e bloqueios
 
@@ -230,7 +232,7 @@ Em falhas: informar estado de carregamento/sucesso/erro; não declarar sucesso a
 ## 11. Documentação e registro de problemas
 
 - Este `AI_CONTEXT.md` descreve o estado atual e as regras de continuidade.
-- `ESPECIFICACAO_MVP.md` v0.3 consolida decisões funcionais; `MODELAGEM_DADOS.md` contém o modelo lógico aprovado de 12 entidades/102 campos; validações técnicas continuam pendentes.
+- `ESPECIFICACAO_MVP.md` v0.4 consolida requisitos funcionais e as Fases 3 e 4; `MODELAGEM_DADOS.md` contém a modelagem lógica e o esquema físico aprovado conceitualmente (12 entidades/102 campos e 12 abas/102 colunas). Validações técnicas e implementação continuam pendentes.
 - `REGISTRO_DE_OCORRENCIAS.md` preserva o histórico de bugs, erros, vulnerabilidades e incidentes. Não criar ocorrência apenas por haver pendência de projeto ou risco conhecido ainda não observado como falha.
 - Atualize o contexto narrativo no mesmo trabalho quando decisões ou comportamentos relevantes mudarem.
 - O snapshot delimitado por marcadores é automatizado; não editar manualmente.
