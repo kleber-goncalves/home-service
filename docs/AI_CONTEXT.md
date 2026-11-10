@@ -272,12 +272,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** b3bfd6a756e611bc8f20193390a1aca92c82e1e7
-- **Data do commit:** 2026-11-10T17:36:38-03:00
-- **Mensagem do commit:** Merge pull request #9 from kleber-goncalves/docs/arquitetura-gateway-vercel
-- **Branch desta execução:** dev
+- **Commit de referência:** f68527f6b8edf3d36edc952cb6ebcf1e0f7f5c90
+- **Data do commit:** 2026-11-10T17:46:06-03:00
+- **Mensagem do commit:** feat(poc-01): add Vercel to Apps Script communication test
+- **Branch desta execução:** feat/poc-01-vercel-apps-script
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 6
+- **Scripts npm:** 7
 - **Dependências de runtime:** 5
 - **Dependências de desenvolvimento:** 9
 - **Workflows:** 2
@@ -293,12 +293,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run preview | vite preview |
 | npm run check:occurrences | node scripts/validate-occurrence-register.mjs |
 | npm run update:ai-context | node scripts/update-ai-context.mjs |
+| npm run test:poc01 | node --test tests/poc01/backend.test.js |
 
 ### Variáveis declaradas no .env.example
 
 > Somente os nomes são listados; valores nunca são lidos nem publicados.
 
-- Nenhuma variável declarada.
+- APPS_SCRIPT_WEB_APP_URL
 
 ### Dependências de runtime
 
@@ -348,6 +349,8 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/lib/utils.js
 - src/main.jsx
 - src/pages/HomePage.jsx
+- src/pages/Poc01Page.jsx
+- src/services/poc-01-api.js
 
 ### Diretórios principais de src/
 
@@ -355,18 +358,19 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/data/
 - src/lib/
 - src/pages/
+- src/services/
 
 ### Oito commits recentes até o commit de referência
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| f68527f | 2026-11-10 | feat(poc-01): add Vercel to Apps Script communication test |
+| da134ce | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | b3bfd6a | 2026-11-10 | Merge pull request #9 from kleber-goncalves/docs/arquitetura-gateway-vercel |
 | 5d95271 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | 32010ef | 2026-11-10 | docs(architecture): referenciar API das Vercel Functions |
 | 2fc6889 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | 6c0676b | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | eb6ecf4 | 2026-11-10 | docs(spec): alinhar fluxo e sessão via gateway |
-| f47cd45 | 2026-11-10 | docs(architecture): detalhar organização da Vercel Function |
-| e2a01df | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
