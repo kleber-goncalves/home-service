@@ -31,7 +31,7 @@ Ainda não estão implementados ou integrados:
 - denúncias e moderação operacionais;
 - envio de e-mails.
 
-A arquitetura planejada é React/Vite → Google Apps Script → Google Sheets/Drive. A especificação consolida as decisões funcionais, mas a arquitetura e principalmente a autenticação ainda exigem prova de conceito técnica antes da implementação.
+A arquitetura planejada é React/Vite → Vercel Function (gateway HTTP) → Google Apps Script (backend de negócio) → Google Sheets/Drive. A Function ainda não existe no repositório; a arquitetura e principalmente a autenticação exigem provas de conceito técnicas antes da implementação.
 
 ## 3. Classificação e leitura dos requisitos
 
@@ -129,7 +129,7 @@ A conta poderá atender várias cidades e bairros. O endereço residencial compl
 - Duração máxima de 8 horas.
 - Logout invalida a sessão imediatamente.
 - Alteração/recuperação de senha, suspensão ou encerramento da conta invalidam todas as sessões existentes.
-- A forma segura de transportar e armazenar o identificador de sessão no navegador permanece pendente de prova de conceito. Não escolher `localStorage`, `sessionStorage` ou cookie sem avaliar XSS, CORS, redirecionamentos e as limitações do Web App do Apps Script.
+- A forma segura de transportar e armazenar o identificador de sessão no navegador permanece pendente de prova de conceito. A Vercel Function poderá emitir um cookie HttpOnly no domínio da aplicação e encaminhar o token ao Apps Script; isso ainda exige testes de XSS, CSRF, SameSite, Origin, redirecionamentos, expiração e revogação. Não escolher `localStorage`, `sessionStorage` ou cookie sem evidência técnica.
 
 **Recuperação de senha**
 - O profissional informa o e-mail; a resposta não deve permitir enumerar contas.
