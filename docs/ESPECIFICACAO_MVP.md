@@ -162,12 +162,12 @@ Um profissional poderá cadastrar vários serviços, sem limite numérico fixo n
 
 | Campo | Regra |
 |---|---|
-| Nome do serviço | Obrigatório; 5 a 100 caracteres |
-| Descrição | Obrigatória; até 1.000 caracteres |
+| Nome do serviço | Pode ficar ausente/incompleto em `draft`; obrigatório na publicação, 5 a 100 caracteres |
+| Descrição | Pode ficar ausente/incompleta em `draft`; obrigatória na publicação, até 1.000 caracteres |
 | Categoria | Pode ficar ausente em `draft`; obrigatória e ativa na publicação. Uma categoria desativada posteriormente não oculta serviços já associados. |
 | Cidades de atendimento | `draft` pode não ter cidade; a publicação exige pelo menos uma cidade ativa associada por `SERVICO_CIDADES`; múltiplas cidades permitidas |
 | Bairros/regiões | Opcionais; texto livre |
-| Preço | Opcional; uma modalidade entre as opções aprovadas |
+| Preço | Modalidade obrigatória na publicação; valor obrigatório somente para preço fixo e a partir de |
 | Imagens | Opcionais; até 5 por serviço; cada arquivo até 5 MB |
 
 **Modalidades de preço**
