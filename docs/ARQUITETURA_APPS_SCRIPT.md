@@ -1,4 +1,4 @@
-# Arquitetura do backend Google Apps Script — Conecta Local
+# Arquitetura da integração Vercel Functions + Google Apps Script — Conecta Local
 
 > **Versão:** 0.1  
 > **Data:** 2026-11-10  
@@ -8,49 +8,63 @@
 
 ## 1. Objetivo e estado real
 
-Este documento transforma as decisões de produto e de dados em uma proposta de arquitetura técnica. Ele não declara que o backend, a API, a autenticação ou a integração com Drive já existam.
+Este documento registra a arquitetura aprovada para a comunicação do Conecta Local e os testes necessários antes da implementação. Ele não declara que qualquer API ou integração já exista.
 
-Estado conhecido nesta data:
+Estado conhecido na data desta revisão:
 
 - Frontend demonstrativo em React, JavaScript/JSX e Vite, publicado na Vercel.
-- Arquivo Google Sheets criado pelo responsável pelo projeto com as 12 abas e os 102 cabeçalhos do modelo físico.
-- O arquivo exportado em XLSX foi inspecionado: nomes e ordem das abas, cabeçalhos, listas suspensas e ausência de registros ou fórmulas inesperados foram conferidos.
-- O responsável confirmou a conferência das proteções e do compartilhamento restrito na interface do Google Sheets.
-- O arquivo ainda é uma estrutura inicial, não um backend operacional integrado.
-- Não há autenticação, sessão, API operacional, leitura/gravação de dados pelo frontend, upload de imagens ou painel administrativo implementados.
+- Projeto configurado como módulo JavaScript ES (package.json usa type module).
+- A branch dev ainda não possui diretório api/ nem arquivo vercel.json. A POC deverá comprovar a descoberta e publicação de uma Vercel Function no projeto Vite atual.
+- Arquivo Google Sheets estrutural criado e conferido pelo responsável, com 12 abas e 102 cabeçalhos.
+- A planilha ainda não é armazenamento operacional integrado.
+- Não há Vercel Function, rota API, endpoint Apps Script integrado, autenticação, sessão, upload ou painel administrativo implementados.
 
-O projeto é uma demonstração acadêmica com dados sintéticos. Não inserir senhas, credenciais, cadastros ou dados pessoais reais.
+O projeto continua sendo uma demonstração acadêmica com dados sintéticos. Não inserir credenciais, cadastros ou dados pessoais reais.
 
-## 2. Decisões preservadas
+## 2. Decisões arquiteturais aprovadas
 
 1. O frontend permanece em React/Vite.
-2. Google Apps Script é o único backend planejado para o MVP; não adicionar Firebase, Supabase, Express ou outro provedor de autenticação sem reabrir formalmente a decisão.
-3. Google Sheets armazena os registros nas 12 abas aprovadas.
-4. Google Drive armazena os arquivos de imagem; a aba IMAGENS contém os metadados e relacionamentos.
-5. Visitantes podem pesquisar e visualizar conteúdo público sem conta.
-6. Profissionais usam conta própria com e-mail e senha, quando os bloqueios técnicos forem resolvidos.
-7. O backend é a fronteira de confiança. O navegador nunca decide papel, propriedade, status ou autorização.
-8. O modelo físico e as regras de negócio aprovados continuam sendo a fonte de verdade para os dados.
-9. A demonstração não será apresentada como serviço pronto para produção ou escala comercial.
+2. Google Apps Script continua sendo o único backend de negócio do MVP: é a autoridade para autenticação, autorização, regras, transições de estado, integridade e operações de dados.
+3. Vercel Functions será utilizada como **gateway HTTP server-side** entre o navegador e o Web App do Apps Script.
+4. A Function é um componente técnico de borda/transporte, não uma segunda camada de domínio. Ela não será responsável por regras de negócio, não acessará Sheets/Drive diretamente e não será fonte de verdade para usuários, sessões, papéis ou permissões.
+5. Google Sheets continua armazenando os registros nas 12 abas aprovadas. Google Drive continua armazenando imagens.
+6. O navegador chamará somente rotas de mesma origem da aplicação, como /api/backend. Não chamará o Web App Apps Script diretamente.
+7. A Vercel Function chamará o Apps Script server-to-server, acompanhará os redirecionamentos do Content Service e converterá a resposta lógica em JSON/HTTP para o frontend.
+8. Toda regra crítica e toda autorização continuarão sendo verificadas no Apps Script. A Function não poderá ser a única barreira contra chamadas diretas ao Web App.
+9. URLs e segredos da integração serão configurados como variáveis server-side da Vercel e propriedades privadas do Apps Script. Nunca usar prefixo VITE_ para segredos.
+10. Não adicionar Firebase, Supabase, Express, banco adicional ou provedor de autenticação sem reabrir formalmente a decisão.
+11. A demonstração não será apresentada como serviço pronto para produção ou escala comercial.
+
+**Precisão importante:** tecnicamente haverá código server-side na Vercel, mas restrito a gateway HTTP. O backend que detém as regras de domínio e os dados continua sendo o Apps Script.
 
 ## 3. Visão geral da arquitetura
 
 Navegador do visitante/profissional  
+↓ mesma origem: POST /api/backend  
+Frontend React + Vite — hospedagem Vercel  
 ↓  
-Frontend React + Vite — hospedagem atual: Vercel  
-↓ HTTP GET/POST — transporte ainda precisa ser comprovado  
-Google Apps Script — Web App / camada de API  
+Vercel Function — gateway HTTP server-side  
+- valida método, formato, tamanho e contrato de entrada;
+- aplica controles de borda e timeout;
+- autentica a chamada servidor-servidor;
+- encaminha a ação e o payload;
+- acompanha o redirecionamento do Apps Script;
+- normaliza a resposta para JSON/HTTP.
+↓ POST server-to-server, application/x-www-form-urlencoded  
+Google Apps Script — backend de negócio  
+- valida a assinatura do gateway;
+- valida dados e regras de negócio;
+- verifica sessão, papel, propriedade e autorização;
+- coordena Sheets, Drive, LockService e auditoria.
+↙　　　　　　　　　　　　↘  
+Google Sheets　　　　　　　 Google Drive  
+12 abas　　　　　　　　　　 arquivos de imagem  
 ↓  
-Validação, autorização e regras de negócio  
-↙　　　　　　　　　↘  
-Google Sheets　　　　 Google Drive  
-12 abas　　　　　　　 arquivos de imagem  
-↘  
 Auditoria no Google Sheets
 
-O Apps Script também lê configuração e segredos do Script Properties. A seta entre Vercel e Apps Script representa uma integração planejada, não comprovada. A prova de conceito de transporte/CORS é a primeira condição técnica para avançar.
+A comunicação browser → Vercel Function é de mesma origem; por isso o navegador não precisa fazer uma chamada cross-origin ao Apps Script. A comunicação Vercel Function → Apps Script ocorre entre servidores e precisa seguir os redirecionamentos documentados do Content Service.
 
-O fluxo de confiança é: React solicita uma operação; Apps Script valida formato e tamanho da entrada, identifica a operação permitida, verifica sessão e autorização quando necessário, aplica regras de negócio e só então acessa Sheets ou Drive. A resposta retorna apenas os campos permitidos para aquele ator.
+O fluxo de confiança é: React envia uma ação permitida; a Function valida o envelope e encaminha a solicitação autenticada; Apps Script verifica a origem lógica da chamada, a sessão do usuário quando aplicável e todas as permissões; somente então acessa Sheets ou Drive. A Function não decide se um profissional pode editar determinado serviço.
 
 ## 4. Limite de confiança e implantação do Web App
 
@@ -76,44 +90,90 @@ Quando executa como quem publicou, o script atua com a autoridade dessa pessoa, 
 
 O modo de execução e o nível de acesso efetivamente utilizados deverão ser registrados na documentação de implantação depois do teste.
 
-## 5. Comunicação React/Vite ↔ Apps Script
 
-### 5.1. Entradas HTTP
+### 4.3. Autenticação da chamada Vercel → Apps Script
 
-O Web App recebe requisições por doGet(e) e doPost(e). A proposta inicial é:
+O Web App poderá precisar aceitar acesso anônimo para que visitantes sem conta Google alcancem as operações públicas. Se executar como o implantador, cada chamada usa a autoridade desse responsável. A URL do Web App não é segredo suficiente.
 
-- GET: somente consulta pública não sensível e verificação técnica de disponibilidade, quando necessário.
-- POST: operações de leitura que exijam payload estruturado, autenticação, alteração de dados, upload e ações administrativas.
-- Nunca enviar senha, código, token de sessão ou outros segredos em query string.
-- Não usar JSONP para operações autenticadas ou dados privados.
-- Tratar todo parâmetro recebido como não confiável.
+Portanto, a proposta exige autenticação própria da comunicação entre a Function e o Apps Script:
 
-### 5.2. Bloqueio conhecido do Content Service
+- A Function assina cada chamada no servidor com um segredo compartilhado, nunca enviado ao navegador.
+- O Apps Script valida a assinatura antes de executar qualquer ação.
+- A assinatura deverá vincular pelo menos o método lógico/ação, timestamp, requestId e conteúdo encaminhado.
+- A POC deverá testar validade temporal, comparação segura, tentativa de chamada direta sem assinatura e proteção contra replay.
+- Um segredo fixo enviado como parâmetro sem assinatura, timestamp ou controle de replay não será considerado solução final.
+- A chave fica em variável de ambiente server-side da Vercel e em Script Properties do projeto Apps Script. Não deve aparecer no repositório, no frontend, em logs ou em respostas.
 
-O Content Service redireciona a resposta para uma URL temporária em script.googleusercontent.com. A classe TextOutput documenta métodos para conteúdo, MIME type e nome de download; não documenta um método para configurar cabeçalhos HTTP arbitrários, como Access-Control-Allow-Origin, Set-Cookie ou atributos de cookie HttpOnly.
+HMAC-SHA-256 é uma possibilidade técnica a avaliar usando primitivas nativas do Node.js na Function e Utilities do Apps Script. O formato canônico, codificação, comparação e proteção contra replay ainda não estão aprovados; serão definidos e testados na POC-02.
 
-Consequências arquiteturais:
+### 4.4. Sessão do usuário e cookie do navegador
 
-- Não presumir que um fetch do domínio Vercel para o domínio Apps Script funcionará com CORS.
-- Não presumir que será possível criar cookie de sessão HttpOnly, Secure e SameSite apenas retornando TextOutput.
-- Requisições application/json podem provocar preflight CORS no navegador; a compatibilidade do Web App com o fluxo completo precisa ser testada.
-- Não considerar o redirecionamento para script.googleusercontent.com um detalhe irrelevante: ele faz parte do fluxo de resposta.
-- A ausência de um cabeçalho HTTP configurável pode impedir o desenho de sessão pretendido. A solução não deve ser improvisada com armazenamento inseguro de token.
+A Vercel Function pode emitir uma resposta HTTP própria para o navegador, separada do TextOutput produzido pelo Apps Script. Isso permite testar um cookie de sessão HttpOnly no domínio da aplicação Vercel sem exigir que o Apps Script configure Set-Cookie.
 
-O comportamento real será medido em navegador, na origem de produção e em uma origem de Preview autorizada, com GET, POST JSON, POST de formulário, redirecionamento, resposta de erro e requisições concorrentes.
+Modelo candidato, ainda não aprovado:
 
-### 5.3. Alternativas condicionais
+1. O login chega à rota da Vercel.
+2. A Function encaminha a operação autenticada ao Apps Script.
+3. O Apps Script cria/registra a sessão e devolve a informação necessária somente à Function.
+4. A Function define o cookie com atributos seguros, por exemplo HttpOnly, Secure, SameSite apropriado e Path restrito.
+5. Nas próximas requisições, o navegador envia o cookie automaticamente à mesma origem; a Function repassa o token ao Apps Script por canal server-to-server.
+6. Apps Script continua sendo a autoridade que consulta SESSOES, verifica o hash do token, expiração, revogação, estado da conta e permissões.
 
-A proposta principal continua sendo React/Vite hospedado na Vercel chamando o Web App. Se a prova de conceito demonstrar uma limitação impeditiva:
+A POC de sessão deverá avaliar CSRF, validação de Origin, SameSite, escopo do cookie em Preview/produção, logout, revogação, expiração e ausência do token em JavaScript, URL e logs. Não considerar cookie implementado só porque a Function consegue emitir Set-Cookie.
+## 5. Comunicação React/Vite ↔ Vercel Function ↔ Apps Script
 
-1. avaliar hospedagem da experiência web em HtmlService e chamada interna por google.script.run; ou
-2. retornar à decisão de arquitetura para discutir um intermediário HTTP controlado.
+### 5.1. Navegador → Vercel Function
 
-Nenhuma dessas alternativas está aprovada agora. A segunda introduziria outro componente de backend e contrariaria a premissa atual de Apps Script como único backend; portanto, não deverá ser adicionada automaticamente.
+O React deverá utilizar uma rota relativa de mesma origem, inicialmente uma entrada como POST /api/backend.
+
+O contrato público da rota deverá:
+
+- aceitar somente métodos explicitamente previstos;
+- limitar o tamanho do corpo antes de processar JSON;
+- validar estrutura, tipos e formato dos campos;
+- aceitar somente ações registradas em uma allowlist;
+- nunca permitir que o cliente escolha nome de aba, intervalo A1, função interna ou operação arbitrária;
+- usar Zod ou validação equivalente na Function para rejeitar envelopes inválidos;
+- devolver JSON com cabeçalhos de não cache e mensagens seguras;
+- aplicar timeout e tratamento de falhas;
+- não expor URL do Web App, segredo compartilhado, credenciais Google ou detalhes internos.
+
+A validação feita na Vercel é uma primeira barreira e melhora a experiência, mas não substitui a validação de negócio no Apps Script.
+
+Como navegador e API estarão na mesma origem de cada implantação Vercel, o frontend não precisará de CORS para chamar /api/backend. A origem do Preview será a própria origem do Preview. Isso não protege o endpoint contra clientes HTTP externos: Origin ausente ou falsificado não é autenticação.
+
+### 5.2. Vercel Function → Google Apps Script
+
+A Function faz uma chamada server-to-server ao URL armazenado em variável de ambiente, usando POST.
+
+Formato inicial recomendado para a POC:
+
+- Content-Type: application/x-www-form-urlencoded;charset=UTF-8.
+- Parâmetros: action, requestId, timestamp, signature e payload.
+- payload: JSON serializado com os campos da operação.
+- redirect: follow, pois o Content Service redireciona a resposta.
+- AbortController: interromper a chamada antes de exceder o limite de execução definido para a Function.
+- Resposta: ler o conteúdo, validar o envelope lógico e converter a falha/sucesso para a resposta HTTP da rota Vercel.
+
+O formato exato da assinatura e do payload será definido na POC. Não enviar segredos de sessão ou senha em query string.
+
+### 5.3. Content Service, redirecionamento e CORS
+
+O Content Service redireciona a resposta para uma URL temporária em script.googleusercontent.com. O cliente server-side deve acompanhar o redirecionamento. A Vercel Function será esse cliente; o navegador não acessará o Apps Script diretamente.
+
+A classe TextOutput documenta métodos para conteúdo e MIME type, mas não um método para configurar cabeçalhos HTTP arbitrários, como Set-Cookie ou Access-Control-Allow-Origin. Assim:
+
+- Apps Script não será responsável por configurar cookies do navegador.
+- A Function devolverá sua própria resposta JSON ao React.
+- A Function poderá emitir Set-Cookie quando a estratégia de sessão for aprovada.
+- A Function mapeará códigos lógicos de erro recebidos do Apps Script para status HTTP adequados.
+- O comportamento de redirects, resposta vazia, HTML inesperado, JSON inválido e timeout será coberto pela POC.
+
+O fato de a Function seguir redirecionamentos não elimina a necessidade de validar o envelope recebido. Não tratar qualquer HTTP 200 do Apps Script como sucesso de negócio.
 
 ### 5.4. Contrato lógico de mensagem
 
-Formato inicial ilustrativo de requisição:
+Formato ilustrativo de requisição do navegador para a Vercel:
 
     {
       "action": "catalog.search",
@@ -124,7 +184,7 @@ Formato inicial ilustrativo de requisição:
       }
     }
 
-Envelope lógico de resposta:
+Envelope de resposta da Function para o navegador:
 
     {
       "ok": true,
@@ -133,9 +193,40 @@ Envelope lógico de resposta:
       "error": null
     }
 
-Em falhas, ok será false e error conterá código estável e mensagem segura. O contrato exato será validado no teste de transporte. Não retornar stack trace, dados privados, hash de senha, salt, código, token ou chave.
+Em falhas:
 
-Como TextOutput não oferece setter documentado de status HTTP, o contrato lógico não deve depender exclusivamente de códigos HTTP específicos. A capacidade real do transporte será registrada na prova de conceito.
+    {
+      "ok": false,
+      "requestId": "identificador-da-requisicao",
+      "data": null,
+      "error": {
+        "code": "VALIDATION_ERROR",
+        "message": "Confira os dados enviados."
+      }
+    }
+
+Os exemplos são contratos lógicos, não código implementado. A Function converterá erros de validação, autenticação, autorização, conflito, limite, falha upstream e timeout em status HTTP coerentes. O Apps Script continuará retornando um envelope lógico no corpo, pois TextOutput não oferece configuração documentada de status HTTP arbitrário.
+
+Nunca retornar stack trace, dados privados, hash de senha, salt, código, token, assinatura ou chave.
+
+### 5.5. Proteções e limitações do gateway
+
+A Function poderá aplicar:
+
+- allowlist de métodos e ações;
+- limite de bytes e validação de estrutura;
+- verificação de Origin para reduzir chamadas cross-origin de navegador;
+- rate limit de melhor esforço na borda;
+- timeout, requestId e logs sanitizados;
+- normalização de respostas do Apps Script.
+
+Limitações e regras:
+
+- Origin não autentica chamadas server-to-server nem clientes HTTP arbitrários.
+- Rate limit em memória (Map) é best-effort em ambiente serverless; instâncias podem escalar, reiniciar ou não compartilhar estado.
+- Não usar Map da Function como controle definitivo de tentativas de login, consumo de códigos ou bloqueio de conta.
+- Os controles de autenticação, autorização e abuso que afetam a integridade da conta devem ser aplicados no Apps Script e testados sob concorrência.
+- A chamada direta ao Web App deverá falhar sem a assinatura válida do gateway; a Function não pode ser a única barreira.
 
 ## 6. Organização proposta do projeto Apps Script
 
@@ -164,23 +255,38 @@ Os arquivos .gs compartilham o contexto global do projeto. Nomes de funções e 
 
 - Exibir telas, formulários, feedback e navegação.
 - Fazer validação de experiência do usuário, sem substituir validação no servidor.
-- Enviar apenas os campos necessários à ação.
+- Enviar somente campos necessários para a ação, por rota de mesma origem da Vercel.
 - Nunca armazenar chaves Google, segredos HMAC, hashes de senha, salts ou credenciais.
 - Não confiar em role, userId, ownerId, preço, status ou autorização recebidos do cliente.
 - Não considerar a sessão válida apenas porque existe estado local no React.
-- Não afirmar sucesso antes da confirmação recebida do backend.
+- Não afirmar sucesso antes da confirmação da Function.
 
-### 7.2. Google Apps Script
+### 7.2. Vercel Function — gateway HTTP
 
-- Receber e validar requisições.
+- Receber chamadas HTTP do frontend pela mesma origem.
+- Validar método, tamanho, estrutura e allowlist de ações.
+- Executar validações iniciais de payload e controles de borda.
+- Assinar requisições servidor-servidor com o mecanismo aprovado.
+- Encaminhar somente os campos necessários ao Apps Script.
+- Acompanhar redirecionamentos, impor timeout e validar resposta.
+- Normalizar respostas e códigos de erro para JSON/HTTP.
+- Emitir e limpar cookie do navegador caso a estratégia de sessão seja aprovada.
+- Não implementar regras de negócio, consultas diretas ao Sheets/Drive, decisão de papel ou autorização final.
+- Não guardar usuários, senhas, sessões ou dados de domínio em memória ou armazenamento próprio.
+
+**A Function não é a autoridade final:** payloads manipulados ou chamadas diretas ao Apps Script devem ser recusados pelo backend de negócio.
+
+### 7.3. Google Apps Script
+
+- Receber requisições da Function e validar a assinatura servidor-servidor.
 - Controlar a lista de ações permitidas.
 - Verificar autenticação e autorização em todas as rotas protegidas.
 - Aplicar regras, integridade, transições de estado e limites.
 - Coordenar Sheets, Drive, lock e auditoria.
 - Sanitizar mensagens e logs.
-- Tratar falhas parciais e retornar confirmação somente quando a operação estiver concluída.
+- Tratar falhas parciais e confirmar operação somente quando concluída.
 
-### 7.3. Google Sheets
+### 7.4. Google Sheets
 
 - Continuar como armazenamento simplificado da demonstração.
 - Conservar as 12 abas e os 102 cabeçalhos aprovados.
@@ -191,7 +297,7 @@ Os arquivos .gs compartilham o contexto global do projeto. Nomes de funções e 
 - Usar RAW nas gravações pela Sheets API para evitar que conteúdo textual seja interpretado como fórmula.
 - Não permitir escrita pelo frontend nem distribuir credenciais de edição.
 
-### 7.4. Google Drive
+### 7.5. Google Drive
 
 - Manter a pasta raiz privada.
 - Guardar metadados e relacionamentos na aba IMAGENS.
@@ -203,12 +309,21 @@ Os arquivos .gs compartilham o contexto global do projeto. Nomes de funções e 
 
 ## 8. Configuração e segredos
 
-A proposta é utilizar PropertiesService.getScriptProperties() para configurações comuns do projeto, como:
+A proposta é utilizar PropertiesService.getScriptProperties() para configurações comuns do Apps Script, como:
 
 - SPREADSHEET_ID;
 - DRIVE_ROOT_FOLDER_ID;
+- segredo HMAC necessário à verificação das chamadas assinadas pela Vercel;
 - segredos HMAC necessários às operações de códigos e identificadores;
 - versão/configuração do ambiente, se necessário.
+
+Na Vercel, variáveis server-side candidatas:
+
+- APPS_SCRIPT_WEB_APP_URL;
+- APPS_SCRIPT_GATEWAY_SECRET;
+- configurações de ambiente estritamente necessárias.
+
+As variáveis Vercel deverão ser configuradas por ambiente (Development, Preview e Production) conforme a necessidade. Não utilizar prefixo VITE_ em qualquer segredo. Não incluir valores no repositório ou em logs.
 
 Regras:
 
@@ -272,12 +387,17 @@ A modelagem prevê apenas o hash do token na aba SESSOES, 30 minutos de inativid
 
 Ainda não está decidido:
 
-- como gerar token com aleatoriedade criptograficamente segura no runtime;
-- como transportá-lo do navegador ao Apps Script;
-- como persistir a sessão no navegador sem expô-la desnecessariamente;
-- como compatibilizar esse transporte com CORS, redirecionamentos e a limitação documentada de cabeçalhos do TextOutput.
+- como gerar token com aleatoriedade criptograficamente segura;
+- como a Vercel Function emitirá, receberá, apagará e encaminhará o token;
+- quais atributos de cookie e controles CSRF serão utilizados;
+- como Apps Script validará o hash do token, expiração e revogação;
+- como o fluxo funcionará em domínio de Preview e produção.
 
-Não escolher localStorage, sessionStorage, cookie ou token em query string antes da prova de conceito. HttpOnly não pode ser presumido pelo caminho TextOutput documentado.
+**Caminho candidato:** a Vercel Function emitir um cookie HttpOnly, Secure e SameSite adequado no domínio da aplicação. Em chamadas posteriores, a Function lê o cookie no servidor e encaminha o token ao Apps Script, que continua sendo a autoridade da sessão e valida o hash armazenado na aba SESSOES.
+
+Não escolher os atributos finais nem considerar o cookie seguro sem testar CSRF, validação de Origin, expiração por inatividade e absoluta, logout, revogação, XSS, Preview e produção. Não expor o token à aplicação React, à URL ou aos logs.
+
+A limitação de TextOutput continua relevante para respostas diretas do Apps Script, mas o cookie seria emitido pela Function, não pelo Apps Script.
 
 Para token realmente aleatório e de alta entropia, o hash de validação armazenado no Sheets pode ser rápido; isso é diferente de hash de senha, que exige KDF lento.
 
@@ -306,22 +426,22 @@ Testar acesso cruzado entre profissionais, elevação de papel, alteração de p
 
 ## 11. Catálogo inicial de operações da API
 
-A lista abaixo é um agrupamento lógico, não um contrato de endpoints já implementado.
+A lista abaixo é um agrupamento lógico, não um conjunto de endpoints já implementados.
 
-| Grupo | Operações previstas | Autenticação |
-|---|---|---|
-| Saúde | verificação mínima de disponibilidade | Pública, sem dados internos |
-| Catálogo público | pesquisar, filtrar e consultar serviço/perfil elegível | Pública |
-| Conta | cadastro, confirmação, login, logout, recuperação e alteração de senha/e-mail | Conforme operação; depende da PoC |
-| Profissional | consultar/alterar próprio perfil e próprios serviços | Profissional autenticado |
-| Imagens | upload, remoção e consulta de estado dos próprios arquivos | Profissional autenticado |
-| Administração | gerir contas, categorias, cidades, serviços e denúncias; consultar auditoria | Administrador autenticado |
+| Grupo | Operações previstas | Camada de entrada | Autoridade final |
+|---|---|---|---|
+| Saúde | verificação mínima de disponibilidade | Vercel Function | Function e disponibilidade do Apps Script |
+| Catálogo público | pesquisar, filtrar e consultar serviço/perfil elegível | Vercel Function | Apps Script |
+| Conta | cadastro, confirmação, login, logout, recuperação e alteração de senha/e-mail | Vercel Function | Apps Script |
+| Profissional | consultar/alterar próprio perfil e próprios serviços | Vercel Function | Apps Script |
+| Imagens | upload, remoção e consulta de estado dos próprios arquivos | Vercel Function | Apps Script + Drive |
+| Administração | gerir contas, categorias, cidades, serviços e denúncias; consultar auditoria | Vercel Function | Apps Script |
 
-O roteador deverá aceitar somente ações explicitamente permitidas. Não criar método genérico que receba nome de aba, intervalo A1 ou nome de função a executar diretamente do navegador.
+O gateway encaminha somente ações explicitamente permitidas. Não criar método genérico que receba nome de aba, intervalo A1 ou nome de função a executar diretamente do navegador. A autorização será refeita no Apps Script em toda operação protegida.
 
 ## 12. Erros, observabilidade e proteção de informações
 
-- Cada requisição terá requestId não secreto para correlação.
+- Cada requisição terá requestId não secreto para correlação entre React, Vercel Function e Apps Script.
 - O log registra operação, resultado, duração e identificador de correlação, com dados minimizados.
 - Não registrar senha, hash/salt de senha, código, token, hash de token, segredo HMAC, conteúdo integral de upload ou dados pessoais desnecessários.
 - Erros internos serão registrados de forma sanitizada; o cliente recebe mensagem genérica e código lógico estável.
@@ -346,39 +466,46 @@ Diretrizes:
 
 ## 14. Provas de conceito obrigatórias e critérios de aceite
 
-Nenhuma implementação de autenticação ou publicação anônima será liberada apenas por a arquitetura parecer viável. As PoCs devem ser isoladas, usar dados sintéticos e registrar evidências reproduzíveis.
+Nenhuma implementação de autenticação, publicação anônima ou escrita operacional será liberada apenas porque a arquitetura parece viável. As PoCs devem ser isoladas, usar dados sintéticos e registrar evidências reproduzíveis.
 
 | ID | Prova de conceito | Critério mínimo para avançar |
 |---|---|---|
-| POC-01 | Transporte React/Vercel ↔ Web App | GET/POST, corpo JSON/form, redirecionamento e CORS funcionam nos navegadores-alvo sem expor segredo; preflight documentado |
-| POC-02 | KDF e aleatoriedade | algoritmo apropriado, implementação mantida/revisada, salt por senha, parâmetros versionados, geração segura de token e desempenho medido |
-| POC-03 | Sessões no navegador | transporte/persistência escolhidos com justificativa, expiração por inatividade e absoluta, logout e revogação comprovados; token fora de URL/logs |
-| POC-04 | Concorrência e auditoria | chamadas simultâneas não duplicam unicidade/contadores; LockService e spreadsheets.batchUpdate demonstram o comportamento esperado |
-| POC-05 | Permissões do Drive | arquivos privados por padrão; mudança público/privado confirmada; falhas parciais detectadas e reconciliáveis |
-| POC-06 | Integração de arquivos | validação de tamanho e conteúdo; upload de até 5.000.000 bytes testado sem exceder limites práticos de execução/memória |
-| POC-07 | Implantação e abuso | configuração de acesso/identidade documentada; endpoints protegidos contra manipulação de papel/proprietário e uso abusivo básico |
-| POC-08 | Quotas e desempenho | tempos, limites e falhas medidos para o conjunto de dados sintético e navegador-alvo |
+| POC-01 | React → Vercel Function → Apps Script | a chamada same-origin funciona; a Function chama o Web App com POST form-urlencoded, segue redirect, valida a resposta, mapeia sucesso/erro e trata timeout; nenhum acesso direto do navegador ao Apps Script |
+| POC-02 | Autenticidade Vercel → Apps Script | chamadas assinadas são aceitas; chamadas diretas sem assinatura, assinatura inválida, timestamp expirado e replay são recusados; segredo não aparece no cliente ou logs |
+| POC-03 | KDF e aleatoriedade | algoritmo apropriado, implementação mantida/revisada, salt por senha, parâmetros versionados, geração segura de token e desempenho medido |
+| POC-04 | Sessão com cookie via gateway | cookie HttpOnly/Secure/SameSite testado; CSRF e Origin avaliados; token não aparece em JavaScript/URL/logs; expiração por inatividade e absoluta, logout e revogação comprovados |
+| POC-05 | Concorrência e auditoria | chamadas simultâneas não duplicam unicidade/contadores; LockService e spreadsheets.batchUpdate demonstram o comportamento esperado |
+| POC-06 | Permissões do Drive | arquivos privados por padrão; mudança público/privado confirmada; falhas parciais detectadas e reconciliáveis |
+| POC-07 | Integração de arquivos | validação de tamanho e conteúdo; upload de até 5.000.000 bytes testado sem exceder limites práticos de execução/memória |
+| POC-08 | Implantação e abuso | configuração de acesso/identidade documentada; variáveis separadas por ambiente; endpoints protegidos contra manipulação de papel/proprietário e bypass do gateway |
+| POC-09 | Quotas e desempenho | tempos, limites, timeout e falhas medidos para Vercel Functions, Apps Script e conjunto de dados sintético |
 
-**Critério de interrupção:** se qualquer requisito crítico de senha, sessão, transporte ou autorização não puder ser atendido sem improviso inseguro, interromper a implementação correspondente e reabrir a decisão arquitetural com o responsável.
+**Critério de interrupção:** se qualquer requisito crítico de assinatura, senha, sessão, transporte ou autorização não puder ser atendido sem improviso inseguro, interromper a implementação correspondente e reabrir a decisão arquitetural com o responsável.
 
 ## 15. Ordem de trabalho proposta
 
-1. Revisão desta arquitetura: confirmar escopo, fronteiras e riscos antes de código.
-2. POC-01 — transporte: verificar comunicação browser/Vercel com Apps Script. É o primeiro teste porque pode impedir a arquitetura de frontend atual.
-3. POC-02 e POC-03 — senha e sessão: avaliar primitivas reais do runtime, KDF e ciclo de vida da sessão.
-4. POC-04 — Sheets, locks e auditoria: confirmar lote atômico, concorrência e falhas.
-5. POC-05 e POC-06 — Drive e uploads: confirmar permissões, validações e limites.
-6. POC-07 e POC-08 — implantação, abuso e quotas: testar os limites do ambiente de demonstração.
-7. Somente após aprovações: implementar módulos progressivamente, começando por integração não privilegiada e leitura pública; autenticação permanece bloqueada até POC-02/03.
+1. Revisar e aprovar esta arquitetura de gateway.
+2. **POC-01 — comunicação:** criar uma Function mínima de teste e comprovar React/Vercel → Function → Apps Script, incluindo redirect, resposta JSON, timeout e erros.
+3. **POC-02 — assinatura do gateway:** comprovar que só chamadas server-to-server assinadas são processadas e que chamadas diretas/replay são recusadas.
+4. **POC-03 — senha e aleatoriedade:** avaliar primitivas, KDF e desempenho no ambiente disponível.
+5. **POC-04 — sessão:** testar cookie emitido pela Vercel Function, ciclo de vida e proteção CSRF; Apps Script continua validando a sessão.
+6. **POC-05 — Sheets, locks e auditoria:** confirmar lote atômico, concorrência e falhas.
+7. **POC-06/07 — Drive e arquivos:** confirmar permissões, validações e limites.
+8. **POC-08/09 — implantação, abuso e quotas:** testar limites do ambiente de demonstração.
+9. Somente após aprovações: implementar módulos progressivamente, começando por leitura pública e operações não privilegiadas; autenticação permanece bloqueada até POC-03/04.
 
-Não criar endpoints administrativos, painel autenticado, upload público ou escrita em produção antes das etapas e critérios correspondentes.
+Não criar endpoints administrativos, painel autenticado, upload público ou escrita operacional antes das etapas e critérios correspondentes.
 
 ## 16. Decisões ainda abertas
 
-- Transporte compatível com CORS/redirecionamento entre Vercel e Apps Script.
-- Disponibilidade de KDF seguro, mantido e viável no runtime Apps Script.
-- Geração de token criptograficamente seguro e estratégia de sessão no navegador.
-- Viabilidade prática de upload binário com o limite aprovado.
+- Local e formato definitivos da Vercel Function (a POC deverá avaliar a convenção /api/ no projeto Vite atual).
+- Formato do envelope e serialização do payload Vercel → Apps Script.
+- Algoritmo/canonicalização da assinatura, timestamp, nonce e controle de replay.
+- Variáveis e escopo dos ambientes Development, Preview e Production.
+- Timeout e região da Function compatíveis com os limites do Apps Script.
+- KDF seguro, mantido e viável no runtime Apps Script.
+- Geração de token e estratégia de cookie no navegador; atributos SameSite e defesa CSRF.
+- Viabilidade prática de upload binário com limite de 5.000.000 bytes.
 - Comportamento das permissões do Drive na conta Google utilizada.
 - Ferramenta de sincronização/versionamento do código Apps Script.
 - Quotas efetivas da conta e tempos medidos.
@@ -387,6 +514,9 @@ As decisões abertas não alteram as regras de negócio aprovadas. Elas impedem 
 
 ## 17. Referências técnicas consultadas
 
+- [Vercel — Functions](https://vercel.com/docs/functions)
+- [Vercel — Node.js Runtime](https://vercel.com/docs/functions/runtimes/node-js)
+- [Vercel — Environment Variables](https://vercel.com/docs/environment-variables)
 - [Google Apps Script — Web Apps](https://developers.google.com/apps-script/guides/web)
 - [Google Apps Script — Content Service](https://developers.google.com/apps-script/guides/content)
 - [Google Apps Script — TextOutput](https://developers.google.com/apps-script/reference/content/text-output)
