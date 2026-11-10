@@ -1,8 +1,8 @@
 # Especificação funcional do MVP — Conecta Local
 
-> **Status:** levantamento funcional consolidado; revisão documental e validações técnicas pendentes  
-> **Versão:** 0.2  
-> **Data da consolidação:** 2026-11-09  
+> **Status:** requisitos funcionais e modelagem lógica consolidados; validações técnicas e implementação pendentes  
+> **Versão:** 0.3  
+> **Data da consolidação:** 2026-11-10  
 > **Escopo:** requisitos funcionais, regras de negócio, dados demonstrativos e critérios técnicos para o MVP acadêmico.  
 > **Importante:** decisões registradas neste documento descrevem o comportamento desejado. Elas não significam que as funcionalidades já estejam implementadas.
 
@@ -106,7 +106,7 @@ A conta poderá atender várias cidades e bairros. O endereço residencial compl
 4. Na demonstração, o código é exibido na interface, sem envio de e-mail.
 5. O código expira em 10 minutos, aceita no máximo 5 tentativas e só pode ser utilizado uma vez.
 6. Solicitações de novo código respeitam intervalo mínimo de 60 segundos e invalidam o código anterior.
-7. Após confirmação válida, a conta passa para `active` e o profissional poderá acessar o painel.
+7. Após confirmação válida, a conta profissional passa para `active` somente se já possuir exatamente um perfil válido em `PROFISSIONAIS`; caso contrário, permanece `pending_activation` até concluir o perfil. Contas `admin` não exigem perfil profissional. A mudança de papel que gere vínculos incompatíveis será bloqueada até tratamento seguro e auditado.
 
 **Política de senha aprovada**
 - Mínimo de 15 caracteres.
@@ -120,7 +120,7 @@ A conta poderá atender várias cidades e bairros. O endereço residencial compl
 **Login e tentativas**
 - Respostas de erro genéricas, sem revelar se o e-mail está cadastrado.
 - Contabilizar tentativas incorretas no backend.
-- Após 5 tentativas consecutivas incorretas, aplicar bloqueio temporário de 15 minutos.
+- Após 5 falhas dentro de uma janela de contabilização de 15 minutos, aplicar bloqueio temporário de 15 minutos. O contador é controlado no backend por identificador HMAC do e-mail normalizado; login bem-sucedido reinicia o controle. Testar abuso de bloqueio malicioso contra contas.
 - Login correto reinicia a contagem.
 - A estratégia precisa ser testada contra bloqueio malicioso de contas; o contador não pode ser confiado ao frontend.
 
@@ -164,8 +164,8 @@ Um profissional poderá cadastrar vários serviços, sem limite numérico fixo n
 |---|---|
 | Nome do serviço | Obrigatório; 5 a 100 caracteres |
 | Descrição | Obrigatória; até 1.000 caracteres |
-| Categoria | Obrigatória e ativa no momento do cadastro |
-| Cidades de atendimento | Pelo menos uma; selecionar da lista cadastrada; múltiplas cidades permitidas |
+| Categoria | Pode ficar ausente em `draft`; obrigatória e ativa na publicação. Uma categoria desativada posteriormente não oculta serviços já associados. |
+| Cidades de atendimento | `draft` pode não ter cidade; a publicação exige pelo menos uma cidade ativa associada por `SERVICO_CIDADES`; múltiplas cidades permitidas |
 | Bairros/regiões | Opcionais; texto livre |
 | Preço | Opcional; uma modalidade entre as opções aprovadas |
 | Imagens | Opcionais; até 5 por serviço; cada arquivo até 5 MB |
@@ -180,21 +180,25 @@ Um profissional poderá cadastrar vários serviços, sem limite numérico fixo n
 Valores monetários devem ser numéricos e não negativos quando a modalidade exigir valor.
 
 **Imagens**
-- Perfil: até 1 foto.
-- Serviço: até 5 imagens.
+- Perfil: no máximo 1 imagem ativa, na posição 1.
+- Serviço: até 5 imagens ativas, com posições exclusivas de 1 a 5.
 - Formatos permitidos: JPG/JPEG, PNG e WebP.
-- Tamanho máximo: 5 MB por arquivo.
-- Validar tipo real do conteúdo, tamanho, autorização e quantidade no backend; não confiar apenas na extensão ou no MIME enviado pelo navegador.
+- Tamanho máximo exato: 5.000.000 bytes (5 MB) por arquivo.
+- Imagens removidas não ocupam posição; uma posição liberada pode ser reutilizada.
+- Validar conteúdo real, tamanho, autorização, quantidade e posição no backend; não confiar apenas na extensão ou no MIME enviado pelo navegador.
 
-**Publicação e estados**
-- Serviço válido de profissional ativo é publicado automaticamente após validação no backend.
-- `published`: visível publicamente se a conta estiver ativa.
-- `paused`: oculto publicamente; o profissional pode reativar.
-- `suspended`: oculto por decisão administrativa; somente administrador pode reativar ou remover e deve registrar justificativa.
-- `removed`: removido logicamente pelo profissional ou administrador; não aparece publicamente e permanece no histórico da demonstração.
+**Rascunho, publicação e estados**
+- Um serviço pode ser salvo como `draft` incompleto, sem cidade associada e sem categoria, nome, descrição ou modalidade de preço completos. O rascunho não aparece publicamente.
+- Na publicação, nome (5–100), descrição (até 1.000), categoria ativa, modalidade/preço coerentes, conta ativa, perfil válido e pelo menos uma cidade ativa são obrigatórios. Após a validação do backend, a publicação ocorre automaticamente no fluxo de conclusão.
+- `draft`: em elaboração, privado e não pesquisável.
+- `published`: visível publicamente quando a conta estiver ativa e as demais regras forem satisfeitas.
+- `paused`: oculto; o profissional pode reativar se não houver bloqueio administrativo.
+- `suspended`: oculto por decisão administrativa; somente administrador pode reativar ou remover, com justificativa auditada.
+- `removed`: removido logicamente pelo profissional ou administrador; não aparece publicamente e permanece no histórico.
 - O profissional pode editar, pausar, reativar ou remover somente seus próprios serviços.
 - Uma suspensão administrativa não pode ser ignorada pelo profissional.
-- A suspensão da conta oculta os serviços e revoga suas permissões públicas de imagem. Ao reativar a conta, somente serviços que estavam publicados e não estejam individualmente pausados, suspensos ou removidos poderão voltar a aparecer. A modelagem deverá preservar o estado anterior à suspensão da conta.
+- A suspensão/fechamento da conta oculta os serviços e restringe imagens, mas não sobrescreve o estado individual do serviço. Na reativação, somente serviços cujo estado individual continue `published` poderão voltar a aparecer.
+- `publicado_em` registra a primeira publicação e é preservado em pausas e reativações.
 
 ### 6.5. Localidades e categorias
 
@@ -225,7 +229,7 @@ A decisão funcional é que o Apps Script altere as permissões dos arquivos con
 - serviço pausado, suspenso ou removido: restringir o arquivo;
 - conta suspensa ou encerrada: restringir as imagens associadas.
 
-O comportamento pretendido utiliza permissões equivalentes a `ANYONE_WITH_LINK`/visualização e `PRIVATE`, quando permitido pelas configurações da conta. Isso exige teste no Drive real antes de ser considerado implementado.
+O comportamento pretendido utiliza permissões equivalentes a `ANYONE_WITH_LINK`/visualização e `PRIVATE`, quando permitido pelas configurações da conta. O compartilhamento será individual por arquivo, com pasta raiz privada. A revogação será confirmada no Drive; permissões herdadas de pastas exigem atenção. O limite por arquivo é 5.000.000 bytes. Isso exige teste no Drive real antes de ser considerado implementado.
 
 **Limitação conhecida:** uma pessoa pode copiar ou baixar uma imagem enquanto ela estiver pública. Revogar o acesso no Drive não apaga cópias já baixadas, capturas de tela ou arquivos redistribuídos. A mudança de permissão também deve ser verificada em testes de transição e falha parcial.
 
@@ -250,9 +254,9 @@ Qualquer visitante poderá denunciar um perfil ou serviço sem criar conta.
 - Identificação do denunciante não será obrigatória.
 - Data/hora e identificador serão gerados pelo backend.
 
-**Estados:** `received`, `in_analysis`, `valid`, `invalid`, `closed`.
+**Estados:** `received`, `in_analysis`, `valid`, `invalid`, `closed`. Os estados `valid`, `invalid` e `closed` são finais no MVP.
 
-O recebimento de denúncia não remove nem suspende automaticamente o conteúdo. Um administrador analisa, registra a decisão e aplica a ação cabível.
+Cada denúncia aponta para exatamente um alvo: profissional ou serviço. O motivo `nonexistent_service` só se aplica ao alvo serviço; `other` exige descrição. `analisado_em` fica nulo em `received`/`in_analysis` e é preenchido pelo backend ao alcançar qualquer estado final (`valid`, `invalid` ou `closed`). O recebimento de denúncia não remove nem suspende automaticamente o conteúdo. Um administrador analisa, registra a decisão e aplica a ação cabível.
 
 ### 6.8. Painel administrativo e governança
 
@@ -304,7 +308,7 @@ Registrar, no mínimo, eventos relevantes como:
 - encerramento de conta;
 - ações de concessão/revogação de papel administrativo.
 
-Cada evento deverá conter identificador, ator, ação, entidade afetada e data/hora. Não registrar senhas, códigos de confirmação, tokens, segredos ou conteúdo sensível desnecessário. O histórico não poderá ser editado por profissionais; somente administradores autorizados poderão consultá-lo no painel.
+Cada evento deverá conter identificador, ator, ação, entidade afetada, resultado e data/hora; detalhes complementares serão estruturados e sanitizados. A aplicação tratará `AUDITORIA` como append-only: somente o backend escreve e a interface administrativa consulta sem editar. Isso não torna a planilha inviolável contra editores com acesso direto. Não registrar senhas, hashes de senha, salts, códigos, tokens, hashes de tokens, chaves ou dados pessoais desnecessários. Alterações de dados e inclusão do evento correspondente serão agrupadas no mesmo `spreadsheets.batchUpdate` do arquivo de dados. Falhas de lote não serão consideradas sucesso; tentar registrar a falha em gravação separada.
 
 ### 6.11. Comportamento e tratamento de falhas
 
@@ -329,18 +333,21 @@ Cada evento deverá conter identificador, ator, ação, entidade afetada e data/
 - Tratar descrições como texto simples; não renderizar HTML fornecido pelo usuário como conteúdo confiável.
 - Verificar identidade, papel, propriedade e estado da conta no backend a cada operação protegida.
 - Aplicar controle de concorrência nas operações críticas para evitar duplicidade, inconsistência de estado ou corrida entre atualizações.
+- Validar unicidade simples/composta, FKs lógicas e regras condicionais no backend; Sheets não impõe integridade relacional automaticamente.
+- Usar lock em operações críticas de leitura–validação–gravação; o lock não substitui atomicidade de lote.
+- Operações com Drive são etapas separadas do Sheets; confirmar permissões e reconciliar falhas antes de apresentar conclusão integral.
 
 ## 8. Estados de domínio consolidados
 
 | Entidade | Estados |
 |---|---|
 | Conta profissional | `pending_activation`, `active`, `suspended`, `closed` |
-| Serviço | `published`, `paused`, `suspended`, `removed` |
+| Serviço | `draft`, `published`, `paused`, `suspended`, `removed` |
 | Denúncia | `received`, `in_analysis`, `valid`, `invalid`, `closed` |
 | Categoria | ativa / inativa |
-| Arquivo de imagem | visível por link / privado, conforme estado elegível |
+| Arquivo de imagem | `active`, `removed`; acesso público/privado é calculado pela imagem e pelos estados do proprietário/serviço |
 
-A conta funciona como condição superior de visibilidade. A modelagem deverá preservar o estado individual do serviço durante suspensão/encerramento da conta para não reativar indevidamente serviços pausados, suspensos ou removidos.
+A conta funciona como condição superior de visibilidade. A suspensão/fechamento oculta serviços e imagens sem sobrescrever `SERVICOS.status`; na reativação, somente serviços cujo estado individual continue `published` são elegíveis. `draft` nunca é público. Categorias/cidades inativadas não retiram automaticamente serviços e vínculos existentes.
 
 ## 9. Dados da demonstração
 
@@ -395,7 +402,10 @@ A escolha funcional por Apps Script + e-mail/senha próprios não encerra a aná
 6. **Integração:** testar CORS/POST/JSON, tempo de resposta, quotas, limites de execução e tratamento de exceções do Apps Script.
 7. **E-mail futuro:** quando for ativado, revisar permissões, remetente, quotas e tratamento de falha de envio. O fluxo demonstrativo não deve exibir códigos em produção.
 
-**Critério de bloqueio:** se a prova de conceito não conseguir atender aos requisitos mínimos, não implementar autenticação própria por improviso. Registrar a limitação e reapresentar alternativas antes de prosseguir.
+8. **Consistência Sheets + auditoria:** validar que atualização de negócio e inserção do evento utilizam o mesmo `spreadsheets.batchUpdate` no mesmo arquivo e falham em conjunto; testar a gravação separada de eventos de falha.
+9. **Permissões Drive + reconciliação:** testar etapas separadas, confirmação de revogação, falhas parciais e rotina idempotente que compare permissões reais com a elegibilidade calculada.
+
+**Critério de bloqueio:** se a prova de conceito não conseguir atender aos requisitos mínimos, não implementar autenticação, permissões ou transações por improviso. Registrar a limitação e reapresentar alternativas antes de prosseguir.
 
 Referências técnicas oficiais para a prova de conceito:
 - [Apps Script — Utilities](https://developers.google.com/apps-script/reference/utilities/utilities)
@@ -411,17 +421,11 @@ A hipótese de problema local ainda deve ser validada, se o prazo permitir, por 
 
 Se a pesquisa não for realizada, registrar essa limitação no trabalho e apresentar os requisitos como hipóteses de projeto, não como necessidades locais comprovadas.
 
-## 14. Critérios para iniciar a Fase 3 — Modelagem de dados
+## 14. Fase 3 — Modelagem lógica consolidada
 
-O levantamento funcional está consolidado para orientar a modelagem. Antes de implementar o backend, a Fase 3 deverá definir:
+A modelagem lógica foi consolidada e está documentada em [`MODELAGEM_DADOS.md`](./MODELAGEM_DADOS.md). O documento define 12 entidades, 102 campos, UUIDs, relacionamentos, cardinalidades, estados, regras de unicidade, integridade, visibilidade, auditoria e estratégia de persistência no Sheets/Drive.
 
-- entidades e campos derivados dos requisitos aprovados;
-- UUIDs e relacionamentos;
-- estados e transições, incluindo suspensão de conta versus estado individual do serviço;
-- abas do Google Sheets, unicidade, integridade e concorrência;
-- referências dos arquivos no Drive e regras de permissão;
-- dados sintéticos iniciais;
-- operações/endpoints e regras de autorização do Apps Script.
+A estrutura aprovada prevê um único arquivo Google Sheets com 12 abas. A modelagem é conceitual e ainda não representa planilhas criadas, dados inseridos ou integrações implementadas.
 
-A modelagem deve evitar criar campos e entidades sem requisito correspondente. A prova de conceito de autenticação deve ocorrer antes de considerar esse fluxo pronto para integração.
+**Próxima etapa:** revisar o modelo físico das abas (nomes, ordem de colunas, tipos concretos, validações, proteção e índices/estratégias de busca). Só depois da aprovação desse desenho deverão ser criadas as abas, inicialmente com dados sintéticos. As provas de conceito técnicas de autenticação, sessões, concorrência, auditoria e permissões Drive permanecem obrigatórias antes de ativar esses fluxos.
 
