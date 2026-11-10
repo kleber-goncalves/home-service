@@ -266,10 +266,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 32010efbd4de6d1e9bb85638700eb24977b5b747
-- **Data do commit:** 2026-11-10T17:34:42-03:00
-- **Mensagem do commit:** docs(architecture): referenciar API das Vercel Functions
-- **Branch desta execução:** docs/arquitetura-gateway-vercel
+- **Commit de referência:** b3bfd6a756e611bc8f20193390a1aca92c82e1e7
+- **Data do commit:** 2026-11-10T17:36:38-03:00
+- **Mensagem do commit:** Merge pull request #9 from kleber-goncalves/docs/arquitetura-gateway-vercel
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 6
 - **Dependências de runtime:** 5
@@ -354,13 +354,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| b3bfd6a | 2026-11-10 | Merge pull request #9 from kleber-goncalves/docs/arquitetura-gateway-vercel |
+| 5d95271 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | 32010ef | 2026-11-10 | docs(architecture): referenciar API das Vercel Functions |
 | 2fc6889 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | 6c0676b | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | eb6ecf4 | 2026-11-10 | docs(spec): alinhar fluxo e sessão via gateway |
 | f47cd45 | 2026-11-10 | docs(architecture): detalhar organização da Vercel Function |
 | e2a01df | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| 0afbbbb | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| 4c563af | 2026-11-10 | docs(spec): registrar gateway Vercel e novas provas de conceito |
 
 <!-- END AUTO-GENERATED SECTION -->
