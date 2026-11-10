@@ -129,7 +129,7 @@ A estratégia de assinatura gateway→Apps Script e o possível cookie HttpOnly 
 
 ### POC-01 — primeira implementação de comunicação
 
-A branch feat/poc-01-vercel-apps-script contém a implementação inicial de POST `/api/backend` (Vercel Function), a chamada same-origin do React, a tela temporária `?poc=01`, o script Apps Script isolado e testes automatizados do gateway. A amostra Apps Script não acessa Sheets/Drive e não implementa HMAC. O fluxo real ainda não foi validado: falta o responsável implantar o projeto Apps Script isolado, configurar `APPS_SCRIPT_WEB_APP_URL` no ambiente Preview e executar o teste de eco confirmando o redirecionamento do Content Service. Não iniciar login, sessão, planilha ou Drive antes do aceite da POC-01 e da POC-02.
+A branch feat/poc-01-vercel-apps-script contém a implementação inicial de POST `/api/backend` (Vercel Function), a chamada same-origin do React, a tela temporária `?poc=01`, o script Apps Script isolado e testes automatizados do gateway. A amostra Apps Script não acessa Sheets/Drive e não implementa HMAC; como a implantação de teste pode ser anônima, o próprio script também repete a allowlist e o limite de 8 KiB, e a implantação pública deve ser desativada após a prova para evitar consumo indevido de cotas. O fluxo real ainda não foi validado: falta o responsável implantar o projeto Apps Script isolado, configurar `APPS_SCRIPT_WEB_APP_URL` no ambiente Preview e executar o teste de eco confirmando o redirecionamento do Content Service. Não iniciar login, sessão, planilha ou Drive antes do aceite da POC-01 e da POC-02.
 
 Detalhes e procedimento: [POC-01 — Comunicação React, Vercel Functions e Apps Script](./POC_01_COMUNICACAO.md).
 
