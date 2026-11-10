@@ -259,9 +259,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** ee9dc67f007ff1116d0f9ba29527d7045114918e
-- **Data do commit:** 2026-11-10T15:29:54-03:00
-- **Mensagem do commit:** docs(spec): consolidar decisões da modelagem lógica v0.3
+- **Commit de referência:** 8754e539edb30489c62da3352a204d025adc43df
+- **Data do commit:** 2026-11-10T15:32:15-03:00
+- **Mensagem do commit:** docs(spec): alinhar obrigatoriedade de rascunhos
 - **Branch desta execução:** docs/modelagem-logica-mvp
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 6
@@ -347,13 +347,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 8754e53 | 2026-11-10 | docs(spec): alinhar obrigatoriedade de rascunhos |
+| c2bab47 | 2026-11-10 | docs(ai-context): atualizar continuidade da modelagem lógica |
+| 68d9678 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
+| c0879a4 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | ee9dc67 | 2026-11-10 | docs(spec): consolidar decisões da modelagem lógica v0.3 |
 | f06c140 | 2026-11-10 | docs(modelagem): corrigir regra de alvo exclusivo |
 | 045b8b7 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | f14c625 | 2026-11-10 | docs(modelagem): consolidar modelo lógico de dados |
-| 6e7d3fa | 2026-11-09 | docs(ai-context): atualizar snapshot automaticamente |
-| b5f80eb | 2026-11-09 | Merge pull request #5 — consolidate MVP requirements |
-| ba8c640 | 2026-11-09 | docs(ai-context): atualizar snapshot automaticamente |
-| 563b816 | 2026-11-09 | docs(ai-context): corrigir formatação Markdown do contexto |
 
 <!-- END AUTO-GENERATED SECTION -->
