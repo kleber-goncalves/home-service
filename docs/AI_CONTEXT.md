@@ -96,10 +96,12 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 - A validação de Pull Requests destinados a `dev` foi habilitada no workflow de CI pela correção integrada no PR #3.
 - O workflow de sincronização automática do AI Context e o workflow de validação foram executados com sucesso após a integração da homepage, conforme os registros consultados em 2026-11-09.
 - `main` permanece fora do escopo desta etapa; `dev` é a linha de integração do trabalho em andamento.
-- Não há backend Apps Script integrado, planilha operacional, cadastro, autenticação, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo.
+- O arquivo Google Sheets estrutural foi criado pelo responsável pelo projeto com as 12 abas e os 102 cabeçalhos aprovados. A exportação XLSX foi inspecionada e a conferência manual de proteções e compartilhamento restrito foi confirmada pelo responsável.
+- A planilha permanece uma estrutura inicial vazia, ainda sem uso como armazenamento operacional integrado.
+- Não há backend Apps Script operacional integrado ao frontend, API, cadastro, autenticação, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo.
 - A homepage não processa pagamentos, agendamentos ou contratação.
 
-A especificação v0.3 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica aprovados. Esses documentos não alteram o estado do código nem significam que Sheets, Apps Script, Drive ou autenticação estejam implementados. Atualize esta seção somente quando funcionalidades reais forem implementadas e validadas.
+A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a proposta inicial de arquitetura, seus limites e as provas de conceito obrigatórias. A criação da planilha estrutural foi concluída, mas isso não significa que Apps Script, API, Drive ou autenticação estejam integrados. Atualize esta seção somente quando funcionalidades reais forem implementadas e validadas.
 
 ## 5. Arquitetura e decisões tecnológicas
 
@@ -116,13 +118,13 @@ Não foi escolhida uma aplicação Next.js. Não adicionar Express por padrão: 
 
 ### 5.2. Backend e dados planejados
 
-- **Google Apps Script:** camada inicial de API, autenticação pretendida, autorização e regras de negócio.
-- **Google Sheets:** armazenamento inicial de registros, organizado em abas.
-- **Google Drive:** armazenamento de imagens enviadas pelos profissionais.
+- **Google Apps Script:** camada inicial pretendida de API, autenticação, autorização e regras de negócio. Ainda não há backend operacional integrado ao frontend.
+- **Google Sheets:** arquivo estrutural já criado pelo responsável, com 12 abas e 102 cabeçalhos aprovados; ainda não está integrado como armazenamento operacional.
+- **Google Drive:** armazenamento futuro das imagens enviadas pelos profissionais; fluxo de upload e permissões ainda não implementado.
 
-Fluxo previsto: React/Vite → Web App/endpoint Apps Script → Google Sheets/Drive. O Apps Script deve validar entradas, identidade, propriedade e permissões no lado confiável. O frontend nunca deve acessar a planilha com credenciais privilegiadas.
+Fluxo proposto: React/Vite → Web App/endpoint Apps Script → Google Sheets/Drive. A integração browser/Vercel ↔ Apps Script ainda depende de prova de conceito de transporte, redirecionamento e CORS. O Apps Script deve validar entradas, identidade, propriedade e permissões no lado confiável. O frontend nunca deve acessar a planilha com credenciais privilegiadas.
 
-Google Sheets é uma solução de armazenamento simplificada para o escopo acadêmico; não é um banco relacional. Considerar concorrência, cotas, limites de execução, latência e integridade. Não prometer capacidade de produção em grande escala.
+A proposta técnica, os limites de TextOutput, o modo de implantação, a separação de responsabilidades e as PoCs obrigatórias estão em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Google Sheets é uma solução de armazenamento simplificada para o escopo acadêmico; não é um banco relacional. Considerar concorrência, cotas, limites de execução, latência e integridade. Não prometer capacidade de produção em grande escala.
 
 ### 5.3. Modelagem lógica e física de dados aprovada
 
@@ -130,9 +132,11 @@ A modelagem lógica e o esquema físico estão consolidados em [`docs/MODELAGEM_
 
 Entidades/abas: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CONTROLE_AUTENTICACAO`, `SERVICOS`, `CATEGORIAS`, `CIDADES`, `SERVICO_CIDADES`, `IMAGENS`, `DENUNCIAS` e `AUDITORIA`. A estrutura prevê um único arquivo Google Sheets; linha 1 para cabeçalhos e linha 2 em diante para registros; UUIDs/textos como texto; datas como ISO 8601 UTC; números em células numéricas; células vazias para opcionais; validações do Sheets apenas auxiliares, com Apps Script como autoridade.
 
-Google Sheets não impõe automaticamente FKs, unicidade composta ou integridade relacional; esses controles pertencem ao Apps Script e exigem testes de concorrência. **Nenhuma planilha, aba, cabeçalho, validação, registro ou integração foi criada por essa aprovação.** A criação do arquivo depende de autorização explícita e deverá começar com dados sintéticos.
+Google Sheets não impõe automaticamente FKs, unicidade composta ou integridade relacional; esses controles pertencem ao Apps Script e exigem testes de concorrência. **A planilha estrutural foi criada e conferida; não há registros de negócio nem integração operacional.** A inserção futura deverá usar exclusivamente dados sintéticos e ocorrer após a validação dos fluxos de backend.
 
 ### 5.4. Autenticação, e-mail e imagens — decisões e bloqueios
+
+A proposta de arquitetura do backend e o plano das provas de conceito estão em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Esse documento não autoriza a implementação: transporte, KDF de senha e sessão permanecem bloqueados até serem testados e aprovados.
 
 **Decisão funcional para a demonstração**
 - Cadastro e login próprios por e-mail e senha, com lógica no Apps Script; não adicionar Firebase ou provedor externo sem reabrir a decisão.
