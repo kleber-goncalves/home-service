@@ -265,10 +265,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 76727672005bc709b31dec2d7612c5a0e91744ee
-- **Data do commit:** 2026-11-10T17:20:10-03:00
-- **Mensagem do commit:** docs(modelagem): corrigir estado do esquema físico
-- **Branch desta execução:** docs/arquitetura-apps-script
+- **Commit de referência:** ae160faa600c98ce8a580c4b57a21a52f6083b1d
+- **Data do commit:** 2026-11-10T17:23:10-03:00
+- **Mensagem do commit:** Merge pull request #8 from kleber-goncalves/docs/arquitetura-apps-script
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 6
 - **Dependências de runtime:** 5
@@ -353,13 +353,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| ae160fa | 2026-11-10 | Merge pull request #8 from kleber-goncalves/docs/arquitetura-apps-script |
+| d56f3cd | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | 7672767 | 2026-11-10 | docs(modelagem): corrigir estado do esquema físico |
 | 5994c1e | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | 941e770 | 2026-11-10 | docs(spec): alinhar próxima etapa à arquitetura Apps Script |
 | 4a275aa | 2026-11-10 | docs(modelagem): atualizar estado da planilha e próximos passos |
 | 78041eb | 2026-11-10 | docs(readme): incluir arquitetura Apps Script |
 | 01d8968 | 2026-11-10 | docs(ai-context): registrar arquitetura Apps Script e planilha criada |
-| d039b7b | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| a57d257 | 2026-11-10 | docs: documentar arquitetura inicial do Apps Script |
 
 <!-- END AUTO-GENERATED SECTION -->
