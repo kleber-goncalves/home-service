@@ -534,6 +534,7 @@ As decisões abertas não alteram as regras de negócio aprovadas. Elas impedem 
 
 - [Vercel — Functions](https://vercel.com/docs/functions)
 - [Vercel — Node.js Runtime](https://vercel.com/docs/functions/runtimes/node-js)
+- [Vercel — Functions API Reference](https://vercel.com/docs/functions/functions-api-reference)
 - [Vercel — Environment Variables](https://vercel.com/docs/environment-variables)
 - [Google Apps Script — Web Apps](https://developers.google.com/apps-script/guides/web)
 - [Google Apps Script — Content Service](https://developers.google.com/apps-script/guides/content)
