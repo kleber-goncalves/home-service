@@ -266,9 +266,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** fc2eee88bc3750b3870acc173844293c3abbe225
-- **Data do commit:** 2026-11-10T17:33:34-03:00
-- **Mensagem do commit:** docs(readme): atualizar nome da arquitetura de integração
+- **Commit de referência:** 4c563afb4990a10f2449a19dc0fd23896e8cddc8
+- **Data do commit:** 2026-11-10T17:33:38-03:00
+- **Mensagem do commit:** docs(spec): registrar gateway Vercel e novas provas de conceito
 - **Branch desta execução:** docs/arquitetura-gateway-vercel
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 6
@@ -354,6 +354,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 4c563af | 2026-11-10 | docs(spec): registrar gateway Vercel e novas provas de conceito |
 | fc2eee8 | 2026-11-10 | docs(readme): atualizar nome da arquitetura de integração |
 | f1c5128 | 2026-11-10 | docs(ai-context): registrar Vercel Function como gateway |
 | 9b0a02e | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
@@ -361,6 +362,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 3f9a084 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | ae160fa | 2026-11-10 | Merge pull request #8 from kleber-goncalves/docs/arquitetura-apps-script |
 | d56f3cd | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| 7672767 | 2026-11-10 | docs(modelagem): corrigir estado do esquema físico |
 
 <!-- END AUTO-GENERATED SECTION -->
