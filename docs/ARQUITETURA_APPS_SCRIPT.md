@@ -228,6 +228,24 @@ Limitações e regras:
 - Os controles de autenticação, autorização e abuso que afetam a integridade da conta devem ser aplicados no Apps Script e testados sob concorrência.
 - A chamada direta ao Web App deverá falhar sem a assinatura válida do gateway; a Function não pode ser a única barreira.
 
+### 5.6. Organização inicial da Function no repositório
+
+A POC deverá avaliar uma Function mínima na raiz do repositório, no diretório api/, com uma rota inicial como /api/backend.
+
+A documentação atual da Vercel descreve arquivos nesse diretório como Vercel Functions executadas no runtime Node.js. O projeto já utiliza JavaScript ES Modules (type: module), mas ainda não possui api/ nem vercel.json. A convenção de exportação e a descoberta da Function no projeto Vite atual deverão ser comprovadas com um Preview antes de qualquer implementação funcional.
+
+Diretrizes para o primeiro protótipo:
+
+- uma única Function de entrada, com POST e allowlist explícita de ações;
+- sem Express, Next.js, banco, fila ou dependência externa;
+- sem leitura/escrita direta em Google Sheets ou Drive;
+- configuração e segredo somente em variáveis server-side;
+- resposta JSON padronizada;
+- timeout e limite de corpo;
+- código pequeno e separado de componentes React.
+
+A execução local com Vite não deve ser confundida com a execução de Vercel Functions. A POC precisa documentar como testar a Function localmente ou em Preview usando a ferramenta oficial da Vercel, sem presumir que npm run dev sozinho execute a pasta api/.
+
 ## 6. Organização proposta do projeto Apps Script
 
 O código deverá ficar versionado no repositório, separado do frontend, em uma pasta futura apps-script/. A ferramenta e o fluxo de publicação (editor Apps Script ou clasp) serão definidos antes da primeira implementação e documentados; credenciais de desenvolvedor e tokens de publicação nunca serão commitados.
