@@ -118,13 +118,14 @@ Não foi escolhida uma aplicação Next.js. Não adicionar Express por padrão: 
 
 ### 5.2. Backend e dados planejados
 
-- **Google Apps Script:** camada inicial pretendida de API, autenticação, autorização e regras de negócio. Ainda não há backend operacional integrado ao frontend.
+- **Google Apps Script:** backend de negócio planejado para autenticação, autorização, regras, integridade e acesso a Sheets/Drive. Ainda não está operacional nem integrado.
+- **Vercel Functions:** gateway HTTP server-side aprovado conceitualmente para receber as chamadas same-origin do React e encaminhá-las ao Apps Script. Ainda não existe diretório api/ ou Function implementada na branch dev.
 - **Google Sheets:** arquivo estrutural já criado pelo responsável, com 12 abas e 102 cabeçalhos aprovados; ainda não está integrado como armazenamento operacional.
 - **Google Drive:** armazenamento futuro das imagens enviadas pelos profissionais; fluxo de upload e permissões ainda não implementado.
 
-Fluxo proposto: React/Vite → Web App/endpoint Apps Script → Google Sheets/Drive. A integração browser/Vercel ↔ Apps Script ainda depende de prova de conceito de transporte, redirecionamento e CORS. O Apps Script deve validar entradas, identidade, propriedade e permissões no lado confiável. O frontend nunca deve acessar a planilha com credenciais privilegiadas.
+Fluxo aprovado para orientar a POC: React/Vite → rota same-origin da Vercel Function → Web App Apps Script → Google Sheets/Drive. A Function será somente gateway técnico: valida formato, tamanho, método, timeout, assinatura servidor-servidor e normalização de resposta. Não será dona das regras de negócio, dados, autenticação final ou autorização. O Apps Script continua sendo a autoridade de domínio e precisa recusar chamadas diretas sem uma assinatura válida do gateway. Não usar CORS do navegador para falar diretamente com Apps Script.
 
-A proposta técnica, os limites de TextOutput, o modo de implantação, a separação de responsabilidades e as PoCs obrigatórias estão em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Google Sheets é uma solução de armazenamento simplificada para o escopo acadêmico; não é um banco relacional. Considerar concorrência, cotas, limites de execução, latência e integridade. Não prometer capacidade de produção em grande escala.
+A estratégia de assinatura gateway→Apps Script e o possível cookie HttpOnly emitido pela Vercel continuam sujeitos a provas de conceito. A Function poderá emitir o cookie no domínio da aplicação; o Apps Script continuará validando o token e a sessão. A proposta completa, incluindo riscos, critérios de aceite e limites de TextOutput, está em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Google Sheets é uma solução de armazenamento simplificada para o escopo acadêmico; não é um banco relacional. Considerar concorrência, cotas, limites de execução, latência e integridade. Não prometer capacidade de produção em grande escala.
 
 ### 5.3. Modelagem lógica e física de dados aprovada
 
@@ -154,7 +155,7 @@ A proposta de arquitetura do backend e o plano das provas de conceito estão em 
 **Bloqueios técnicos antes de implementar**
 - Não armazenar senhas em texto puro e não usar SHA/digest rápido isolado como armazenamento de senha.
 - A referência oficial de Apps Script Utilities documenta operações de digest e HMAC; não presumir que exista um KDF de senha pronto. Avaliar implementação adequada e revisada (por exemplo, PBKDF2-HMAC-SHA-256, se viável), parâmetros, salt individual, comparação e desempenho. Não inventar criptografia caseira.
-- Provar como uma sessão será transportada, persistida, expirada e revogada entre React e Apps Script. Não escolher armazenamento de token no navegador sem avaliar XSS, CORS e redirecionamentos. A referência de TextOutput não documenta um método para configurar cabeçalhos arbitrários/cookies; não presumir suporte a cookie HttpOnly por esse caminho.
+- Provar como uma sessão será transportada, persistida, expirada e revogada entre React, Vercel Function e Apps Script. A Vercel Function poderá emitir um cookie HttpOnly no domínio da aplicação, mas a estratégia, atributos e controles CSRF ainda exigem POC. O Apps Script permanece a autoridade que valida a sessão; não escolher armazenamento de token no navegador sem evidência.
 - Testar concorrência e o risco de um atacante bloquear uma conta provocando tentativas incorretas.
 - A prova de conceito deverá usar dados sintéticos e não será considerada pronta para produção.
 
@@ -265,10 +266,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** ae160faa600c98ce8a580c4b57a21a52f6083b1d
-- **Data do commit:** 2026-11-10T17:23:10-03:00
-- **Mensagem do commit:** Merge pull request #8 from kleber-goncalves/docs/arquitetura-apps-script
-- **Branch desta execução:** dev
+- **Commit de referência:** 32010efbd4de6d1e9bb85638700eb24977b5b747
+- **Data do commit:** 2026-11-10T17:34:42-03:00
+- **Mensagem do commit:** docs(architecture): referenciar API das Vercel Functions
+- **Branch desta execução:** docs/arquitetura-gateway-vercel
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 6
 - **Dependências de runtime:** 5
@@ -353,13 +354,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| ae160fa | 2026-11-10 | Merge pull request #8 from kleber-goncalves/docs/arquitetura-apps-script |
-| d56f3cd | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| 7672767 | 2026-11-10 | docs(modelagem): corrigir estado do esquema físico |
-| 5994c1e | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| 941e770 | 2026-11-10 | docs(spec): alinhar próxima etapa à arquitetura Apps Script |
-| 4a275aa | 2026-11-10 | docs(modelagem): atualizar estado da planilha e próximos passos |
-| 78041eb | 2026-11-10 | docs(readme): incluir arquitetura Apps Script |
-| 01d8968 | 2026-11-10 | docs(ai-context): registrar arquitetura Apps Script e planilha criada |
+| 32010ef | 2026-11-10 | docs(architecture): referenciar API das Vercel Functions |
+| 2fc6889 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
+| 6c0676b | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
+| eb6ecf4 | 2026-11-10 | docs(spec): alinhar fluxo e sessão via gateway |
+| f47cd45 | 2026-11-10 | docs(architecture): detalhar organização da Vercel Function |
+| e2a01df | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
+| 0afbbbb | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
+| 4c563af | 2026-11-10 | docs(spec): registrar gateway Vercel e novas provas de conceito |
 
 <!-- END AUTO-GENERATED SECTION -->

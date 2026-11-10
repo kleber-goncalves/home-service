@@ -31,7 +31,7 @@ Ainda não estão implementados ou integrados:
 - denúncias e moderação operacionais;
 - envio de e-mails.
 
-A arquitetura planejada é React/Vite → Google Apps Script → Google Sheets/Drive. A especificação consolida as decisões funcionais, mas a arquitetura e principalmente a autenticação ainda exigem prova de conceito técnica antes da implementação.
+A arquitetura planejada é React/Vite → Vercel Function (gateway HTTP) → Google Apps Script (backend de negócio) → Google Sheets/Drive. A Function ainda não existe no repositório; a arquitetura e principalmente a autenticação exigem provas de conceito técnicas antes da implementação.
 
 ## 3. Classificação e leitura dos requisitos
 
@@ -46,10 +46,10 @@ A especificação deve ser usada como referência para a modelagem. Não transfo
 
 1. Visitantes podem pesquisar e visualizar serviços públicos sem criar conta.
 2. Um profissional poderá manter vários serviços, sem limite numérico fixo no MVP.
-3. O backend inicial será Google Apps Script; os dados ficarão planejados em Google Sheets e as imagens em Google Drive. Não foi escolhido Firebase ou outro provedor de autenticação.
+3. O backend de negócio inicial será Google Apps Script; os dados ficarão em Google Sheets e as imagens em Google Drive. A Vercel Function atuará como gateway HTTP server-side entre React e Apps Script, sem assumir as regras de domínio ou a autoridade dos dados. Não foi escolhido Firebase ou outro provedor de autenticação.
 4. O login pretendido utilizará e-mail e senha próprios do Conecta Local, com a lógica no Apps Script. Essa decisão é para a demonstração acadêmica com dados fictícios, não uma aprovação para receber credenciais reais ou colocar o serviço em produção.
 5. A confirmação de e-mail e a recuperação de senha serão simuladas durante a demonstração, com códigos apresentados na própria interface. Não haverá envio real de e-mails nesta etapa. O fluxo deverá permitir futura integração de envio por e-mail sem redesenhar a experiência.
-6. A autenticação própria só poderá ser implementada depois de uma prova de conceito que valide armazenamento de senha, sessão, expiração, revogação e comunicação React–Apps Script.
+6. A autenticação própria só poderá ser implementada depois de provas de conceito que validem a comunicação React → Vercel Function → Apps Script, assinatura da chamada servidor-servidor, armazenamento de senha, cookie/sessão, expiração e revogação.
 7. A publicação de serviços será automática após validação do backend e confirmação de que a conta está ativa.
 8. Denúncias serão analisadas por administrador; o recebimento de uma denúncia não removerá automaticamente o conteúdo.
 9. Não expor endereço residencial completo. Utilizar cidades e áreas de atendimento.
@@ -129,7 +129,7 @@ A conta poderá atender várias cidades e bairros. O endereço residencial compl
 - Duração máxima de 8 horas.
 - Logout invalida a sessão imediatamente.
 - Alteração/recuperação de senha, suspensão ou encerramento da conta invalidam todas as sessões existentes.
-- A forma segura de transportar e armazenar o identificador de sessão no navegador permanece pendente de prova de conceito. Não escolher `localStorage`, `sessionStorage` ou cookie sem avaliar XSS, CORS, redirecionamentos e as limitações do Web App do Apps Script.
+- A forma segura de transportar e armazenar o identificador de sessão no navegador permanece pendente de prova de conceito. A Vercel Function poderá emitir um cookie HttpOnly no domínio da aplicação e encaminhar o token ao Apps Script; isso ainda exige testes de XSS, CSRF, SameSite, Origin, redirecionamentos, expiração e revogação. Não escolher `localStorage`, `sessionStorage` ou cookie sem evidência técnica.
 
 **Recuperação de senha**
 - O profissional informa o e-mail; a resposta não deve permitir enumerar contas.
@@ -392,14 +392,14 @@ As quantidades são uma base inicial para demonstração, não um limite de arqu
 
 ## 12. Validações técnicas obrigatórias antes da autenticação
 
-A escolha funcional por Apps Script + e-mail/senha próprios não encerra a análise técnica. A proposta arquitetural, o fluxo React/Vite ↔ Web App, os limites documentados de Content Service/TextOutput e a ordem das provas de conceito estão detalhados em [ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Antes de integrar autenticação, fazer uma prova de conceito isolada com dados sintéticos para validar:
+A escolha funcional por Apps Script + e-mail/senha próprios não encerra a análise técnica. A proposta arquitetural adota Vercel Functions como gateway HTTP e Apps Script como backend de negócio. O fluxo React/Vite → Vercel Function → Web App Apps Script, a assinatura servidor-servidor, o possível cookie HttpOnly emitido pela Vercel, os limites de Content Service/TextOutput e a ordem das provas de conceito estão detalhados em [ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Antes de integrar autenticação, fazer provas de conceito isoladas com dados sintéticos para validar:
 
 1. **Hash de senha:** Apps Script não deve armazenar senha em texto puro nem usar um digest rápido isolado como substituto de um KDF de senha. A referência oficial de `Utilities` documenta digest e HMAC; não se deve presumir a existência de uma função nativa pronta para Argon2id, scrypt ou PBKDF2. Avaliar uma implementação PBKDF2-HMAC-SHA-256 revisada e testada, ou uma estratégia demonstrativa mais restrita que não seja confundida com segurança de produção. Validar salt individual, parâmetros, comparação segura e desempenho.
-2. **Sessão no navegador:** comprovar como token/sessão será transportado, persistido, renovado, expirado e revogado. A referência de `TextOutput` documenta métodos de conteúdo/MIME, mas não oferece método documentado para configurar cabeçalhos arbitrários; não presumir que seja possível configurar `HttpOnly`/cookies apenas com TextOutput. Avaliar redirecionamentos do Content Service, CORS e exposição a XSS antes de escolher armazenamento no navegador.
+2. **Sessão no navegador:** comprovar como token/sessão será transportado, persistido, renovado, expirado e revogado. A Vercel Function poderá emitir cookie HttpOnly no domínio da aplicação, enquanto o Apps Script permanece a autoridade da sessão. Validar atributos Secure/SameSite, CSRF, Origin, redirecionamentos, exposição a XSS, logout e revogação antes de aprovar a estratégia.
 3. **Concorrência e bloqueios:** validar contadores de tentativas, bloqueio de 15 minutos, limites de códigos e operações concorrentes. Evitar que um terceiro consiga bloquear uma conta indefinidamente por abuso da regra de tentativas.
 4. **Autorização:** testar que usuário comum não consegue alterar papel, proprietário ou estado enviando payload manipulado; testar acesso cruzado entre profissionais.
 5. **Google Drive:** validar a troca entre acesso por link e privado em arquivos individuais, falhas parciais e a política da conta. Confirmar que esconder a URL na interface não é tratado como controle de acesso.
-6. **Integração:** testar CORS/POST/JSON, tempo de resposta, quotas, limites de execução e tratamento de exceções do Apps Script.
+6. **Integração:** testar POST same-origin React→Vercel Function, POST form-urlencoded Vercel→Apps Script, assinatura da chamada servidor-servidor, redirecionamento, timeout, resposta JSON, quotas, limites de execução e tratamento de exceções. O navegador não deverá chamar o Apps Script diretamente nem depender de CORS com o domínio Google.
 7. **E-mail futuro:** quando for ativado, revisar permissões, remetente, quotas e tratamento de falha de envio. O fluxo demonstrativo não deve exibir códigos em produção.
 
 8. **Consistência Sheets + auditoria:** validar que atualização de negócio e inserção do evento utilizam o mesmo `spreadsheets.batchUpdate` no mesmo arquivo e falham em conjunto; testar a gravação separada de eventos de falha.
