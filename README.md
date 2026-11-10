@@ -43,6 +43,8 @@ O GitHub Actions executa essas verificações em pushes e Pull Requests direcion
 
 - [Contexto técnico para IAs e desenvolvedores](docs/AI_CONTEXT.md)
 - [Especificação funcional do MVP (em revisão)](docs/ESPECIFICACAO_MVP.md)
+- [Modelagem lógica e física dos dados](docs/MODELAGEM_DADOS.md)
+- [Arquitetura inicial do backend Apps Script](docs/ARQUITETURA_APPS_SCRIPT.md)
 - [Registro público de ocorrências](docs/REGISTRO_DE_OCORRENCIAS.md)
 
 ## Créditos das imagens

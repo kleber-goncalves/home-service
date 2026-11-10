@@ -392,7 +392,7 @@ As quantidades são uma base inicial para demonstração, não um limite de arqu
 
 ## 12. Validações técnicas obrigatórias antes da autenticação
 
-A escolha funcional por Apps Script + e-mail/senha próprios não encerra a análise técnica. Antes de integrar autenticação, fazer uma prova de conceito isolada com dados sintéticos para validar:
+A escolha funcional por Apps Script + e-mail/senha próprios não encerra a análise técnica. A proposta arquitetural, o fluxo React/Vite ↔ Web App, os limites documentados de Content Service/TextOutput e a ordem das provas de conceito estão detalhados em [ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Antes de integrar autenticação, fazer uma prova de conceito isolada com dados sintéticos para validar:
 
 1. **Hash de senha:** Apps Script não deve armazenar senha em texto puro nem usar um digest rápido isolado como substituto de um KDF de senha. A referência oficial de `Utilities` documenta digest e HMAC; não se deve presumir a existência de uma função nativa pronta para Argon2id, scrypt ou PBKDF2. Avaliar uma implementação PBKDF2-HMAC-SHA-256 revisada e testada, ou uma estratégia demonstrativa mais restrita que não seja confundida com segurança de produção. Validar salt individual, parâmetros, comparação segura e desempenho.
 2. **Sessão no navegador:** comprovar como token/sessão será transportado, persistido, renovado, expirado e revogado. A referência de `TextOutput` documenta métodos de conteúdo/MIME, mas não oferece método documentado para configurar cabeçalhos arbitrários; não presumir que seja possível configurar `HttpOnly`/cookies apenas com TextOutput. Avaliar redirecionamentos do Content Service, CORS e exposição a XSS antes de escolher armazenamento no navegador.
@@ -429,7 +429,7 @@ A modelagem lógica está consolidada em [`MODELAGEM_DADOS.md`](./MODELAGEM_DADO
 
 O esquema físico das 12 abas foi aprovado conceitualmente e também está documentado em [`MODELAGEM_DADOS.md`](./MODELAGEM_DADOS.md), na seção 11. Foram definidos o nome e a ordem das abas, a ordem e o nome das 102 colunas, os tipos de célula, os campos opcionais, os valores controlados, os relacionamentos, as validações e as regras de proteção.
 
-A estrutura planejada contém um único arquivo Google Sheets com 12 abas. As decisões documentadas ainda não significam que o arquivo, os cabeçalhos, as validações, os registros ou as integrações tenham sido criados.
+A estrutura planejada contém um único arquivo Google Sheets com 12 abas. O arquivo estrutural foi criado pelo responsável pelo projeto e sua exportação foi conferida; as abas e cabeçalhos estão presentes. Isso não significa que os registros sintéticos, o backend Apps Script ou as integrações com Drive tenham sido implementados.
 
-**Próxima etapa:** revisão final de consistência e preparação da inicialização do arquivo. A criação do Google Sheets depende de autorização explícita e deverá começar com estrutura vazia e/ou dados inteiramente sintéticos, conforme aprovação específica. Provas de conceito de senha, transporte de sessão, códigos, concorrência, autorização, auditoria e permissões/reconciliação do Drive continuam obrigatórias antes de ativar esses fluxos.
+**Próxima etapa:** revisar [ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md) e executar as provas de conceito, começando pelo transporte entre Vercel e Apps Script. A criação inicial da planilha está concluída e não deve ser repetida. Provas de conceito de senha, transporte de sessão, códigos, concorrência, autorização, auditoria e permissões/reconciliação do Drive continuam obrigatórias antes de ativar esses fluxos.
 
