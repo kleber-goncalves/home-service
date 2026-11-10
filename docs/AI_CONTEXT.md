@@ -272,9 +272,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** f68527f6b8edf3d36edc952cb6ebcf1e0f7f5c90
-- **Data do commit:** 2026-11-10T17:46:06-03:00
-- **Mensagem do commit:** feat(poc-01): add Vercel to Apps Script communication test
+- **Commit de referência:** 09287d1d152b139f05662318629fa1737847acc1
+- **Data do commit:** 2026-11-10T17:49:03-03:00
+- **Mensagem do commit:** fix(poc-01): harden the public Apps Script echo endpoint
 - **Branch desta execução:** feat/poc-01-vercel-apps-script
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 7
@@ -364,13 +364,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 09287d1 | 2026-11-10 | fix(poc-01): harden the public Apps Script echo endpoint |
+| 64b68b1 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | f68527f | 2026-11-10 | feat(poc-01): add Vercel to Apps Script communication test |
 | da134ce | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | b3bfd6a | 2026-11-10 | Merge pull request #9 from kleber-goncalves/docs/arquitetura-gateway-vercel |
 | 5d95271 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | 32010ef | 2026-11-10 | docs(architecture): referenciar API das Vercel Functions |
 | 2fc6889 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| 6c0676b | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| eb6ecf4 | 2026-11-10 | docs(spec): alinhar fluxo e sessão via gateway |
 
 <!-- END AUTO-GENERATED SECTION -->
