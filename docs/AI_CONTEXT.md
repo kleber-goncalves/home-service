@@ -261,10 +261,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 2665d0beac5d69708c5ad9c17615c32f9fd5c616
-- **Data do commit:** 2026-11-10T16:23:49-03:00
-- **Mensagem do commit:** docs(spec): registrar aprovação do esquema físico
-- **Branch desta execução:** docs/modelo-fisico-banco
+- **Commit de referência:** 49f1458359402d0e806f42d0c9b154de2cd4a6b9
+- **Data do commit:** 2026-11-10T16:30:08-03:00
+- **Mensagem do commit:** Merge pull request #7 from kleber-goncalves/docs/modelo-fisico-banco
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 6
 - **Dependências de runtime:** 5
@@ -349,13 +349,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 49f1458 | 2026-11-10 | Merge pull request #7 from kleber-goncalves/docs/modelo-fisico-banco |
+| 074a29a | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
+| e3b3f86 | 2026-11-10 | docs(ai-context): atualizar estado do esquema físico |
 | 2665d0b | 2026-11-10 | docs(spec): registrar aprovação do esquema físico |
 | ed4b78a | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | 082a762 | 2026-11-10 | docs(data): consolidar esquema físico das 12 abas |
 | 1662f1b | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | 8bfbcd7 | 2026-11-10 | Merge pull request #6 — consolidate logical data model |
-| 3be3f5d | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| 8754e53 | 2026-11-10 | docs(spec): alinhar obrigatoriedade de rascunhos |
-| c2bab47 | 2026-11-10 | docs(ai-context): atualizar continuidade da modelagem lógica |
 
 <!-- END AUTO-GENERATED SECTION -->
