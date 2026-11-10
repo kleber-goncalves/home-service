@@ -440,9 +440,9 @@ Não criar novas entidades para bairros, regiões, avaliações, favoritos, conv
 
 ## 11. Esquema físico aprovado
 
-Esta seção registra o esquema físico aprovado para a futura planilha do Conecta Local. Ela complementa o modelo lógico anterior: define nomes e ordem das colunas, tipo de célula no Google Sheets, valores controlados, campos opcionais e restrições operacionais.
+Esta seção registra o esquema físico aprovado e utilizado como referência para a planilha estrutural já criada do Conecta Local. Ela complementa o modelo lógico anterior: define nomes e ordem das colunas, tipo de célula no Google Sheets, valores controlados, campos opcionais e restrições operacionais.
 
-**Estado:** as 12 estruturas foram aprovadas conceitualmente, uma por vez. A aprovação deste documento não significa que a planilha, suas abas, dados, validações ou integrações já tenham sido criados.
+**Estado:** as 12 estruturas foram aprovadas conceitualmente e a planilha com as 12 abas e 102 cabeçalhos foi criada e conferida pelo responsável. A criação não significa que existam registros de negócio ou que a API Apps Script, autenticação, uploads ou integrações operacionais estejam implementados.
 
 ### 11.1. Convenções gerais do arquivo
 
