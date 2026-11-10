@@ -1,7 +1,7 @@
 # Especificação funcional do MVP — Conecta Local
 
-> **Status:** requisitos funcionais e modelagem lógica consolidados; validações técnicas e implementação pendentes  
-> **Versão:** 0.3  
+> **Status:** requisitos funcionais e modelos lógico e físico aprovados conceitualmente; validações técnicas e implementação pendentes  
+> **Versão:** 0.4  
 > **Data da consolidação:** 2026-11-10  
 > **Escopo:** requisitos funcionais, regras de negócio, dados demonstrativos e critérios técnicos para o MVP acadêmico.  
 > **Importante:** decisões registradas neste documento descrevem o comportamento desejado. Elas não significam que as funcionalidades já estejam implementadas.
@@ -423,9 +423,13 @@ Se a pesquisa não for realizada, registrar essa limitação no trabalho e apres
 
 ## 14. Fase 3 — Modelagem lógica consolidada
 
-A modelagem lógica foi consolidada e está documentada em [`MODELAGEM_DADOS.md`](./MODELAGEM_DADOS.md). O documento define 12 entidades, 102 campos, UUIDs, relacionamentos, cardinalidades, estados, regras de unicidade, integridade, visibilidade, auditoria e estratégia de persistência no Sheets/Drive.
+A modelagem lógica está consolidada em [`MODELAGEM_DADOS.md`](./MODELAGEM_DADOS.md). O documento define 12 entidades e 102 campos, UUIDs, relacionamentos, cardinalidades, estados, unicidade, integridade, visibilidade, auditoria e estratégia de persistência no Sheets/Drive.
 
-A estrutura aprovada prevê um único arquivo Google Sheets com 12 abas. A modelagem é conceitual e ainda não representa planilhas criadas, dados inseridos ou integrações implementadas.
+## 15. Fase 4 — Esquema físico consolidado
 
-**Próxima etapa:** revisar o modelo físico das abas (nomes, ordem de colunas, tipos concretos, validações, proteção e índices/estratégias de busca). Só depois da aprovação desse desenho deverão ser criadas as abas, inicialmente com dados sintéticos. As provas de conceito técnicas de autenticação, sessões, concorrência, auditoria e permissões Drive permanecem obrigatórias antes de ativar esses fluxos.
+O esquema físico das 12 abas foi aprovado conceitualmente e também está documentado em [`MODELAGEM_DADOS.md`](./MODELAGEM_DADOS.md), na seção 11. Foram definidos o nome e a ordem das abas, a ordem e o nome das 102 colunas, os tipos de célula, os campos opcionais, os valores controlados, os relacionamentos, as validações e as regras de proteção.
+
+A estrutura planejada contém um único arquivo Google Sheets com 12 abas. As decisões documentadas ainda não significam que o arquivo, os cabeçalhos, as validações, os registros ou as integrações tenham sido criados.
+
+**Próxima etapa:** revisão final de consistência e preparação da inicialização do arquivo. A criação do Google Sheets depende de autorização explícita e deverá começar com estrutura vazia e/ou dados inteiramente sintéticos, conforme aprovação específica. Provas de conceito de senha, transporte de sessão, códigos, concorrência, autorização, auditoria e permissões/reconciliação do Drive continuam obrigatórias antes de ativar esses fluxos.
 
