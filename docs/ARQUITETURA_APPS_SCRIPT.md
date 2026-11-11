@@ -85,7 +85,7 @@ Quando executa como quem publicou, o script atua com a autoridade dessa pessoa, 
 - Conectar somente a planilha sintética do Conecta Local.
 - Usar uma pasta raiz de teste privada no Drive.
 - Não conceder acesso de editor do projeto Apps Script a quem não deva poder alterar código executado com a identidade do implantador.
-- Não publicar uma implantação anônima até que a superfície de API e os testes de autorização estejam revisados.
+- A implantação anônima usada na POC é isolada, aceita somente ações sintéticas `poc.*` e exige HMAC válido para executar essas ações. Não adicionar operações privilegiadas nem dados reais nessa implantação; qualquer expansão de superfície exige nova revisão de segurança.
 - Não transmitir ScriptApp.getOAuthToken() ou credenciais Google ao navegador.
 - Manter configurações e segredos fora do bundle Vite e do repositório.
 
@@ -101,11 +101,11 @@ Portanto, a proposta exige autenticação própria da comunicação entre a Func
 - A Function assina cada chamada no servidor com um segredo compartilhado, nunca enviado ao navegador.
 - O Apps Script valida a assinatura antes de executar qualquer ação.
 - A assinatura deverá vincular pelo menos o método lógico/ação, timestamp, requestId e conteúdo encaminhado.
-- A POC deverá testar validade temporal, comparação segura, tentativa de chamada direta sem assinatura e proteção contra replay.
+- A POC-02 foi validada manualmente em 2026-11-11: chamada sem assinatura recusada, timestamp expirado recusado, chamada assinada aceita, repetição de nonce recusada, payload adulterado recusado e duas chamadas concorrentes idênticas resultando em uma aceitação e uma recusa por replay. O ensaio concorrente cobriu duas chamadas, não carga ou escala.
 - Um segredo fixo enviado como parâmetro sem assinatura, timestamp ou controle de replay não será considerado solução final.
 - A chave fica em variável de ambiente server-side da Vercel e em Script Properties do projeto Apps Script. Não deve aparecer no repositório, no frontend, em logs ou em respostas.
 
-A POC-02 definiu HMAC-SHA-256 com mensagem canônica versionada, timestamp em milissegundos, nonce aleatório de 256 bits, hash SHA-256 do payload e segredo compartilhado de 32 bytes. O contrato e os limites estão em `docs/POC_02_ASSINATURA_GATEWAY.md`. A implementação está sendo validada na branch `feat/poc-02-hmac-replay`; a validação manual ainda depende da configuração do mesmo segredo em Preview e Script Properties e da implantação da versão protegida do Apps Script.
+A POC-02 implementa HMAC-SHA-256 com mensagem canônica versionada, timestamp em milissegundos, nonce aleatório de 256 bits, hash SHA-256 do payload e segredo compartilhado de 32 bytes. O contrato, os limites e os resultados manuais estão em `docs/POC_02_ASSINATURA_GATEWAY.md`. A implementação foi validada na branch `feat/poc-02-hmac-replay` em Preview e contra o Web App Apps Script isolado; o PR #11 ainda aguarda integração em `dev`. A assinatura autentica a comunicação entre servidores, não os usuários finais, e não substitui autorização. A POC permanece restrita a ações sintéticas e não está aprovada para produção.
 
 ### 4.4. Sessão do usuário e cookie do navegador
 
