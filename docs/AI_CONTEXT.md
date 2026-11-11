@@ -129,15 +129,26 @@ Fluxo aprovado para orientar a POC: React/Vite → rota same-origin da Vercel Fu
 
 A estratégia de assinatura gateway→Apps Script e o possível cookie HttpOnly emitido pela Vercel continuam sujeitos a provas de conceito. A Function poderá emitir o cookie no domínio da aplicação; o Apps Script continuará validando o token e a sessão. A proposta completa, incluindo riscos, critérios de aceite e limites de TextOutput, está em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Google Sheets é uma solução de armazenamento simplificada para o escopo acadêmico; não é um banco relacional. Considerar concorrência, cotas, limites de execução, latência e integridade. Não prometer capacidade de produção em grande escala.
 
-### POC-01 — comunicação real implementada e validada
+### POC-01 — transporte real integrado e validado
 
-A branch `feat/poc-01-vercel-apps-script` contém a implementação de POST `/api/backend` (Vercel Function), chamada same-origin do React, tela temporária `?poc=01`, Apps Script isolado e testes automatizados do gateway. A amostra Apps Script não acessa Sheets/Drive nem implementa HMAC; como a implantação de teste pode ser anônima, o próprio script repete a allowlist e o limite de 8 KiB. A implantação pública deve ser desativada após a prova para evitar consumo indevido de cotas.
+A POC-01 foi integrada à branch `dev` pelo PR #10 em 2026-11-11. O merge commit foi `837f7c6172764ee27ac835c81e1224640d78478d`. A validação manual em Preview confirmou: eco HTTP 200, erro lógico do Apps Script HTTP 422, resposta upstream inválida HTTP 502, JSON inválido HTTP 400 e método GET HTTP 405. O registro está em `docs/POC_01_COMUNICACAO.md`.
 
-Em 2026-11-11, o responsável executou os cenários reais na implantação Preview e confirmou na interface: eco HTTP 200, erro lógico do Apps Script HTTP 422, resposta inválida do Apps Script HTTP 502, JSON inválido enviado pelo React HTTP 400 e método GET HTTP 405. A validação manual reportada comprova o fluxo funcional básico React → Vercel Function → Apps Script → redirecionamento Google → React; não equivale a uma captura independente de tráfego ou logs. O registro detalhado está em `docs/POC_01_COMUNICACAO.md`.
+A implementação usa React → POST same-origin `/api/backend` → Vercel Function → Apps Script via form-urlencoded → redirecionamento para `script.googleusercontent.com`. O frontend não chama Apps Script diretamente. A POC-01, isoladamente, não autenticava a Function perante o Apps Script e não está aprovada para produção. Uma implantação antiga sem assinatura deve ser atualizada para o código protegido ou desativada.
 
-O PR #10 (`feat/poc-01-vercel-apps-script` → `dev`) permanece aberto e ainda não integrado. A validação real de transporte da POC-01 foi concluída, mas não significa aprovação para produção. Permanecem sem implementação HMAC, timestamp assinado e proteção contra replay, que devem ser tratados na POC-02. Não iniciar login, sessão, planilha ou Drive antes do aceite técnico da POC-02.
+### POC-02 — assinatura HMAC e proteção contra replay em implementação
 
-Detalhes e procedimento: [POC-01 — Comunicação React, Vercel Functions e Apps Script](./POC_01_COMUNICACAO.md).
+A branch atual de trabalho é `feat/poc-02-hmac-replay`, criada a partir de `dev` depois da integração do PR #10. O desenho está documentado em `docs/POC_02_ASSINATURA_GATEWAY.md` e a arquitetura geral em `docs/ARQUITETURA_APPS_SCRIPT.md`.
+
+Decisões implementadas nesta branch:
+- HMAC-SHA-256 com mensagem canônica versionada `v1`, domínio `CONECTA_LOCAL_GATEWAY`, método lógico, timestamp, nonce, ação, requestId e SHA-256 do payload UTF-8.
+- Timestamp Unix em milissegundos com tolerância máxima de 5 minutos.
+- Nonce de 32 bytes aleatórios (64 caracteres hexadecimais), gerado na Vercel Function com `node:crypto`.
+- Registro de nonces no Apps Script com Script Properties e Script Lock, retenção de 10 minutos e 30 segundos, capacidade limitada a 2.500 nonces ativos e comportamento fail closed.
+- Segredo de 32 bytes gerado fora do repositório: `APPS_SCRIPT_HMAC_SECRET` somente no ambiente Preview da Vercel e `POC02_HMAC_SECRET` em Script Properties do Apps Script. Os valores devem ser idênticos e não podem aparecer no React, Git, documentação, logs ou chat.
+- `apps-script/poc-02/Code.gs` contém a versão protegida que deverá ser aplicada ao projeto Apps Script isolado e implantada como nova versão.
+- `tests/poc02/` cobre a lógica Node do gateway e um harness local da lógica Apps Script. `scripts/poc02-replay-check.mjs` permite a validação manual direta de chamada sem assinatura, timestamp expirado, assinatura válida, repetição do nonce e payload adulterado.
+
+**Estado de validação:** o código e os testes estão em desenvolvimento nesta branch; CI e validação manual real no Preview/Apps Script ainda precisam ser concluídos. Não declarar POC-02 aprovada até confirmar o HMAC real entre as plataformas e os testes anti-replay. A POC continua restrita a dados sintéticos e às ações `poc.*`; não habilita login, sessão, Sheets, Drive ou operações de negócio. Não integrar a branch antes de todos os critérios de aceite passarem.
 
 ### 5.3. Modelagem lógica e física de dados aprovada
 
