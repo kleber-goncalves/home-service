@@ -278,10 +278,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 837f7c6172764ee27ac835c81e1224640d78478d
-- **Data do commit:** 2026-11-11T14:26:19-03:00
-- **Mensagem do commit:** Merge pull request #10 from kleber-goncalves/feat/poc-01-vercel-apps-script
-- **Branch desta execução:** dev
+- **Commit de referência:** b1db7c512dae2703b27f42b79108581fe98695da
+- **Data do commit:** 2026-11-11T14:31:06-03:00
+- **Mensagem do commit:** docs(poc-02): definir contrato HMAC e proteção contra replay
+- **Branch desta execução:** feat/poc-02-hmac-replay
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 7
 - **Dependências de runtime:** 5
@@ -370,13 +370,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| b1db7c5 | 2026-11-11 | docs(poc-02): definir contrato HMAC e proteção contra replay |
+| dc2ba6d | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | 837f7c6 | 2026-11-11 | Merge pull request #10 from kleber-goncalves/feat/poc-01-vercel-apps-script |
 | 7e5cf83 | 2026-11-11 | docs(context): atualizar estado validado da POC-01 |
 | fe4009f | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | 66b25fa | 2026-11-11 | docs(ai-context): registrar aprovacao funcional da POC-01 |
 | 626dab4 | 2026-11-11 | docs(poc-01): registrar validacao real dos cenarios |
 | 029d233 | 2026-11-10 | docs(poc-01): document public test endpoint limits |
-| 35e3eae | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| 09287d1 | 2026-11-10 | fix(poc-01): harden the public Apps Script echo endpoint |
 
 <!-- END AUTO-GENERATED SECTION -->
