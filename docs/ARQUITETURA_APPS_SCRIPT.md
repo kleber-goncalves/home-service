@@ -2,7 +2,7 @@
 
 > **Versão:** 0.1  
 > **Data:** 2026-11-10  
-> **Status:** implementação inicial da POC-01 na branch feat/poc-01-vercel-apps-script; a comunicação real ainda depende da implantação isolada do Apps Script e da configuração da variável de ambiente na Vercel.  
+> **Status:** POC-01 integrada à branch `dev` e validada manualmente em Preview. POC-02 em implementação na branch `feat/poc-02-hmac-replay`; segredo e validação manual real ainda pendentes. Nenhuma das PoCs está aprovada para produção.  
 > **Escopo:** integração React/Vite, Google Apps Script, Google Sheets e Google Drive para a demonstração acadêmica.  
 > **Premissa:** manter Apps Script como backend inicial e autenticação própria por e-mail e senha, conforme decisão funcional aprovada. Transporte, sessão e armazenamento seguro de senhas continuam pendentes de prova de conceito.
 
@@ -14,10 +14,10 @@ Estado conhecido na data desta revisão:
 
 - Frontend demonstrativo em React, JavaScript/JSX e Vite, publicado na Vercel.
 - Projeto configurado como módulo JavaScript ES (package.json usa type module).
-- A branch dev ainda não possui diretório api/; a branch feat/poc-01-vercel-apps-script contém a primeira Function e a página de teste. A descoberta/publicação efetiva deverá ser comprovada pelo Preview Vercel.
+- A branch `dev` já contém `api/backend.js`, a página temporária `?poc=01` e a camada de serviço da POC-01, integradas pelo PR #10. O Preview confirmou a publicação da Function.
 - Arquivo Google Sheets estrutural criado e conferido pelo responsável, com 12 abas e 102 cabeçalhos.
 - A planilha ainda não é armazenamento operacional integrado.
-- A branch de trabalho contém a Function da POC-01 e o código do Web App de teste, mas ainda não há URL Apps Script configurada nem comunicação real concluída.
+- A comunicação real da POC-01 foi confirmada manualmente em Preview em 2026-11-11: eco HTTP 200, erro lógico HTTP 422, resposta upstream inválida HTTP 502, JSON inválido HTTP 400 e GET HTTP 405. A evidência está registrada em `docs/POC_01_COMUNICACAO.md`.
 - Não há autenticação, sessão, integração operacional com Sheets/Drive, upload ou painel administrativo implementados.
 
 O projeto continua sendo uma demonstração acadêmica com dados sintéticos. Não inserir credenciais, cadastros ou dados pessoais reais.
@@ -105,7 +105,7 @@ Portanto, a proposta exige autenticação própria da comunicação entre a Func
 - Um segredo fixo enviado como parâmetro sem assinatura, timestamp ou controle de replay não será considerado solução final.
 - A chave fica em variável de ambiente server-side da Vercel e em Script Properties do projeto Apps Script. Não deve aparecer no repositório, no frontend, em logs ou em respostas.
 
-HMAC-SHA-256 é uma possibilidade técnica a avaliar usando primitivas nativas do Node.js na Function e Utilities do Apps Script. O formato canônico, codificação, comparação e proteção contra replay ainda não estão aprovados; serão definidos e testados na POC-02.
+A POC-02 definiu HMAC-SHA-256 com mensagem canônica versionada, timestamp em milissegundos, nonce aleatório de 256 bits, hash SHA-256 do payload e segredo compartilhado de 32 bytes. O contrato e os limites estão em `docs/POC_02_ASSINATURA_GATEWAY.md`. A implementação está sendo validada na branch `feat/poc-02-hmac-replay`; a validação manual ainda depende da configuração do mesmo segredo em Preview e Script Properties e da implantação da versão protegida do Apps Script.
 
 ### 4.4. Sessão do usuário e cookie do navegador
 
@@ -150,13 +150,13 @@ A Function faz uma chamada server-to-server ao URL armazenado em variável de am
 Formato inicial recomendado para a POC:
 
 - Content-Type: application/x-www-form-urlencoded;charset=UTF-8.
-- Parâmetros: action, requestId, timestamp, signature e payload.
+- Parâmetros da chamada autenticada: `signatureVersion`, `timestamp`, `nonce`, `signature`, `action`, `requestId` e `payload`.
 - payload: JSON serializado com os campos da operação.
 - redirect: follow, pois o Content Service redireciona a resposta.
 - AbortController: interromper a chamada antes de exceder o limite de execução definido para a Function.
 - Resposta: ler o conteúdo, validar o envelope lógico e converter a falha/sucesso para a resposta HTTP da rota Vercel.
 
-O formato exato da assinatura e do payload será definido na POC. Não enviar segredos de sessão ou senha em query string.
+A canonicalização, o HMAC e a proteção contra replay estão especificados em `docs/POC_02_ASSINATURA_GATEWAY.md`. Não enviar segredos de sessão, senha ou a chave compartilhada em query string.
 
 ### 5.3. Content Service, redirecionamento e CORS
 
@@ -247,22 +247,30 @@ Diretrizes para o primeiro protótipo:
 
 A execução local com Vite não deve ser confundida com a execução de Vercel Functions. A POC precisa documentar como testar a Function localmente ou em Preview usando a ferramenta oficial da Vercel, sem presumir que npm run dev sozinho execute a pasta api/.
 
-### 5.7. POC-01 — transporte básico sem autenticação
+### 5.7. POC-01 — transporte básico
 
-A implementação inicial está isolada na branch feat/poc-01-vercel-apps-script:
+A POC-01 foi integrada à branch `dev` pelo PR #10 e teve os cinco cenários reais confirmados manualmente em Preview em 2026-11-11. Ela comprovou o transporte React → Vercel Function → Apps Script, o redirecionamento do Content Service, o eco e o mapeamento de erros.
 
-- `api/backend.js` recebe POST same-origin, valida método, Content-Type, limite do corpo, JSON, requestId, payload e allowlist de três ações de teste.
-- `src/services/poc-01-api.js` envia somente para `/api/backend`; `src/pages/Poc01Page.jsx` disponibiliza cenários temporários em `?poc=01`.
-- `apps-script/poc-01/Code.gs` é um Web App independente, sem acesso a Sheets, Drive ou outros recursos; repete a allowlist e o limite de 8 KiB no próprio Apps Script, faz eco de payload sintético, devolve um erro lógico controlado e pode retornar texto intencionalmente inválido.
-- A Function envia `application/x-www-form-urlencoded`, configura `redirect: follow`, aplica timeout e exige que a resposta final confirme o host `script.googleusercontent.com`.
-- A Function normaliza sucesso e falhas para JSON/HTTP, sem devolver a URL temporária do Content Service.
-- `tests/poc01/backend.test.js` valida o comportamento do gateway com respostas upstream simuladas; isso não comprova a comunicação real com o Google.
+- `api/backend.js` recebe POST same-origin, valida método, Content-Type, tamanho, JSON, requestId, payload e allowlist.
+- `src/services/poc-01-api.js` chama somente `/api/backend`; `src/pages/Poc01Page.jsx` mantém os cenários temporários em `?poc=01`.
+- `apps-script/poc-01/Code.gs` registra a versão original, sem autenticação HMAC, e deve ser tratado como código histórico da POC-01.
+- `tests/poc01/backend.test.js` complementa a validação manual usando respostas upstream simuladas.
 
-**Limite deliberado:** a POC-01 ainda não implementa HMAC, timestamp assinado ou proteção contra replay. Como o Web App isolado será acessível anonimamente, ele não pode conter operações privilegiadas e não deverá acessar planilha, Drive, e-mail ou dados reais. O Apps Script repete a allowlist e o limite de payload para reduzir abuso por chamadas diretas, mas terceiros ainda podem consumir a cota de execução. Desativar/remover a implantação pública após a prova. A assinatura server-to-server pertence à POC-02.
+A POC-01, isoladamente, não protegia o Web App contra chamadas diretas. A versão de teste sem assinatura não deve executar ações privilegiadas, acessar Sheets/Drive, e-mail ou dados reais. Se uma implantação antiga dessa versão ainda estiver ativa, atualize-a para o código protegido da POC-02 ou desative-a.
 
-**Pendência para aceite:** o responsável deverá criar e implantar o projeto Apps Script de teste, configurar `APPS_SCRIPT_WEB_APP_URL` no ambiente Preview da Vercel e executar o cenário de eco. A POC só será considerada comprovada quando a resposta real confirmar o redirecionamento para `script.googleusercontent.com` e devolver o requestId/payload esperados. Testes unitários e build não bastam.
+### 5.8. POC-02 — assinatura HMAC e proteção contra replay
 
-Procedimento, cenários e critérios de aceite: [POC-01 — Comunicação React, Vercel Functions e Apps Script](./POC_01_COMUNICACAO.md).
+A implementação está na branch `feat/poc-02-hmac-replay` e ainda não foi integrada à `dev`.
+
+- `api/backend.js` gera timestamp, nonce aleatório de 32 bytes, hash SHA-256 do payload e HMAC-SHA-256 usando `APPS_SCRIPT_HMAC_SECRET` no servidor da Vercel.
+- A mensagem canônica usa domínio `CONECTA_LOCAL_GATEWAY`, versão `v1`, método lógico POST, timestamp, nonce, ação, requestId e hash do payload, separados por newline UTF-8.
+- `apps-script/poc-02/Code.gs` valida os campos e a janela temporal de cinco minutos, recalcula hash/HMAC e reserva o nonce em Script Properties sob `LockService.getScriptLock()` antes de executar a ação.
+- O registro de nonce tem retenção de 10 minutos e 30 segundos e limite explícito de 2.500 itens ativos. Falha de lock, armazenamento ou capacidade recusa a chamada (fail closed).
+- `APPS_SCRIPT_HMAC_SECRET` é configurada somente no ambiente Preview; `POC02_HMAC_SECRET` é configurada em Script Properties. Os valores devem ser idênticos, gerados fora do repositório e nunca enviados pelo chat.
+- `tests/poc02/` executa testes Node contra o gateway e um harness local da lógica Apps Script. Isso não substitui a validação de rede real no Google.
+- `scripts/poc02-replay-check.mjs` executa os testes manuais diretos de assinatura ausente, timestamp expirado, chamada assinada, repetição do mesmo nonce e payload adulterado sem imprimir o segredo.
+
+A implementação continua limitada a ações sintéticas e não está aprovada para produção. A aceitação exige configurar os dois segredos, atualizar/reimplantar o Web App protegido e validar um Preview real.
 ## 6. Organização proposta do projeto Apps Script
 
 O código deverá ficar versionado no repositório, separado do frontend, em uma pasta futura apps-script/. A ferramenta e o fluxo de publicação (editor Apps Script ou clasp) serão definidos antes da primeira implementação e documentados; credenciais de desenvolvedor e tokens de publicação nunca serão commitados.
@@ -535,7 +543,6 @@ Não criar endpoints administrativos, painel autenticado, upload público ou esc
 
 - Local e formato definitivos da Vercel Function (a POC deverá avaliar a convenção /api/ no projeto Vite atual).
 - Formato do envelope e serialização do payload Vercel → Apps Script.
-- Algoritmo/canonicalização da assinatura, timestamp, nonce e controle de replay.
 - Variáveis e escopo dos ambientes Development, Preview e Production.
 - Timeout e região da Function compatíveis com os limites do Apps Script.
 - KDF seguro, mantido e viável no runtime Apps Script.
