@@ -278,16 +278,16 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** b8cb64dc0b8b0f341708263ba771a288245891a5
-- **Data do commit:** 2026-11-11T14:34:26-03:00
-- **Mensagem do commit:** docs(env): documentar segredo HMAC da POC-02
+- **Commit de referência:** 469c5ca794987376dc474074c73e3283c5840637
+- **Data do commit:** 2026-11-11T14:34:31-03:00
+- **Mensagem do commit:** ci(poc-02): executar testes HMAC e anti-replay
 - **Branch desta execução:** feat/poc-02-hmac-replay
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 8
 - **Dependências de runtime:** 5
 - **Dependências de desenvolvimento:** 9
 - **Workflows:** 2
-- **Scripts de automação:** 2
+- **Scripts de automação:** 3
 
 ### Scripts npm
 
@@ -340,6 +340,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 ### Scripts de automação
 
+- scripts/poc02-replay-check.mjs
 - scripts/update-ai-context.mjs
 - scripts/validate-occurrence-register.mjs
 
@@ -372,13 +373,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 469c5ca | 2026-11-11 | ci(poc-02): executar testes HMAC e anti-replay |
+| 0fc0ad8 | 2026-11-11 | test(poc-02): adicionar scripts de validação de segurança |
 | b8cb64d | 2026-11-11 | docs(env): documentar segredo HMAC da POC-02 |
 | 3cdd60e | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | 4876e7a | 2026-11-11 | test(poc-02): validar assinatura e nonce no gateway |
 | 213f12c | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | fe4ac88 | 2026-11-11 | test(poc-02): testar autenticação e replay do Apps Script |
 | 1a9a3a4 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
-| 53de846 | 2026-11-11 | test(poc-02): validar assinatura no contrato do gateway |
-| c161c5f | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
