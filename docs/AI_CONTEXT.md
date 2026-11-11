@@ -278,12 +278,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 4876e7acd536113667c898571efaca20784debce
-- **Data do commit:** 2026-11-11T14:34:03-03:00
-- **Mensagem do commit:** test(poc-02): validar assinatura e nonce no gateway
+- **Commit de referência:** b8cb64dc0b8b0f341708263ba771a288245891a5
+- **Data do commit:** 2026-11-11T14:34:26-03:00
+- **Mensagem do commit:** docs(env): documentar segredo HMAC da POC-02
 - **Branch desta execução:** feat/poc-02-hmac-replay
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 7
+- **Scripts npm:** 8
 - **Dependências de runtime:** 5
 - **Dependências de desenvolvimento:** 9
 - **Workflows:** 2
@@ -300,11 +300,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run check:occurrences | node scripts/validate-occurrence-register.mjs |
 | npm run update:ai-context | node scripts/update-ai-context.mjs |
 | npm run test:poc01 | node --test tests/poc01/backend.test.js |
+| npm run test:poc02 | node --test tests/poc02/backend.test.js tests/poc02/apps-script.test.js |
 
 ### Variáveis declaradas no .env.example
 
 > Somente os nomes são listados; valores nunca são lidos nem publicados.
 
+- APPS_SCRIPT_HMAC_SECRET
 - APPS_SCRIPT_WEB_APP_URL
 
 ### Dependências de runtime
@@ -370,13 +372,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| b8cb64d | 2026-11-11 | docs(env): documentar segredo HMAC da POC-02 |
+| 3cdd60e | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | 4876e7a | 2026-11-11 | test(poc-02): validar assinatura e nonce no gateway |
 | 213f12c | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | fe4ac88 | 2026-11-11 | test(poc-02): testar autenticação e replay do Apps Script |
 | 1a9a3a4 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | 53de846 | 2026-11-11 | test(poc-02): validar assinatura no contrato do gateway |
 | c161c5f | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
-| b206c94 | 2026-11-11 | feat(poc-02): assinar chamadas do gateway com HMAC-SHA256 |
-| 4d2b12c | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
