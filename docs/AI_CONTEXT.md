@@ -278,9 +278,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 09792031fdd3f08d3fa5463fc4bd50c7e0e027c5
-- **Data do commit:** 2026-11-11T14:35:07-03:00
-- **Mensagem do commit:** fix(poc-02): falhar fechado ao ler configuração HMAC
+- **Commit de referência:** 981214bafe43e35430c814d8ac4d72609c4317d5
+- **Data do commit:** 2026-11-11T14:36:09-03:00
+- **Mensagem do commit:** docs(poc-02): alinhar contrato de erros com gateway
 - **Branch desta execução:** feat/poc-02-hmac-replay
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 8
@@ -373,13 +373,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 981214b | 2026-11-11 | docs(poc-02): alinhar contrato de erros com gateway |
+| ddc7625 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | 0979203 | 2026-11-11 | fix(poc-02): falhar fechado ao ler configuração HMAC |
 | aec2dfa | 2026-11-11 | test(poc-02): simular indisponibilidade no registro de nonce |
 | 9d5f6fe | 2026-11-11 | test(poc-02): corrigir canonicalização no teste de transporte |
 | 395ceb6 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | ff5ccd4 | 2026-11-11 | test(poc-02): adicionar verificação manual de replay no Apps Script |
 | d5a3a39 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
-| 469c5ca | 2026-11-11 | ci(poc-02): executar testes HMAC e anti-replay |
-| 0fc0ad8 | 2026-11-11 | test(poc-02): adicionar scripts de validação de segurança |
 
 <!-- END AUTO-GENERATED SECTION -->
