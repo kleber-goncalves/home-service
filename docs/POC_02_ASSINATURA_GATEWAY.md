@@ -128,20 +128,21 @@ A comparação do HMAC fará uma comparação de comprimento fixo e acumulará d
 
 ## 5. Contrato de erros
 
-O Apps Script Content Service não será considerado capaz de emitir status HTTP arbitrários. O Apps Script responde com envelope lógico; a Function converte códigos conhecidos para status HTTP na resposta própria da Vercel.
+O Apps Script Content Service não é usado nesta POC para emitir status HTTP arbitrários. Em uma chamada direta ao Web App, a resposta pode continuar com HTTP 200 enquanto o JSON contém `ok: false` e um código lógico. Quando a Function recebe esse envelope, ela o converte para um status HTTP próprio:
 
-| Código lógico do Apps Script | HTTP da Vercel | Significado |
-|---|---:|---|
-| `AUTHENTICATION_FAILED` | 401 | assinatura ausente, malformada ou inválida |
-| `REQUEST_EXPIRED` | 401 | timestamp fora da janela |
-| `REPLAY_DETECTED` | 409 | nonce já utilizado |
-| `ACTION_NOT_ALLOWED` | 403 | ação não permitida |
-| `NONCE_STORE_UNAVAILABLE` | 503 | lock, propriedades ou capacidade indisponível |
-| `INVALID_PAYLOAD` | 400 | payload autenticado com estrutura inválida |
-| `POC_SIMULATED_ERROR` | 422 | erro de negócio simulado da POC-01 |
-| resposta incompatível | 502 | contrato upstream inválido |
+| Código lógico do Apps Script | Código normalizado na Vercel | HTTP da Vercel |
+|---|---|---:|
+| `AUTHENTICATION_FAILED` | `UPSTREAM_AUTHENTICATION_FAILED` | 502 |
+| `REQUEST_EXPIRED` | `UPSTREAM_TIMESTAMP_REJECTED` | 502 |
+| `REPLAY_DETECTED` | `UPSTREAM_REPLAY_REJECTED` | 502 |
+| `ACTION_NOT_ALLOWED` | `UPSTREAM_ACTION_REJECTED` | 502 |
+| `NONCE_STORE_UNAVAILABLE` | `UPSTREAM_NONCE_STORE_UNAVAILABLE` | 503 |
+| `AUTH_CONFIG_ERROR` | `UPSTREAM_AUTH_CONFIG_ERROR` | 503 |
+| `INVALID_PAYLOAD` | `UPSTREAM_INVALID_PAYLOAD` | 502 |
+| `POC_SIMULATED_ERROR` | `APPS_SCRIPT_REJECTED` | 422 |
+| resposta incompatível | `UPSTREAM_INVALID_ENVELOPE` / `UPSTREAM_INVALID_JSON` | 502 |
 
-Os erros de autenticação não revelarão assinatura esperada, segredo, hash, nonce armazenado ou detalhes internos. Nenhum segredo será registrado em logs ou devolvido ao navegador.
+O 502 indica que o gateway enviou uma chamada assinada, mas o Apps Script a recusou como comunicação upstream inválida; não é uma falha de autenticação do usuário final. A falta de `APPS_SCRIPT_HMAC_SECRET` na Vercel é detectada antes da chamada e gera HTTP 503. Os erros do Apps Script não revelarão assinatura esperada, segredo, hash, nonce armazenado ou detalhes internos. Nenhum segredo será registrado em logs ou devolvido ao navegador.
 
 ## 6. Testes de aceite
 
