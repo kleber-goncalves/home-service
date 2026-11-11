@@ -76,6 +76,8 @@ function createAppsScriptHarness({
         },
     };
 
+    let propertiesAccessCount = 0;
+
     const contentService = {
         MimeType: {
             JSON: "application/json",
@@ -107,7 +109,8 @@ function createAppsScriptHarness({
         Utilities: fakeUtilities,
         PropertiesService: {
             getScriptProperties() {
-                if (propertiesUnavailable) {
+                propertiesAccessCount += 1;
+                if (propertiesUnavailable && propertiesAccessCount > 1) {
                     throw new Error("Properties service unavailable");
                 }
                 return properties;
