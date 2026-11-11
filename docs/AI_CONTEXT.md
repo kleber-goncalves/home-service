@@ -98,7 +98,9 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 - `main` permanece fora do escopo desta etapa; `dev` é a linha de integração do trabalho em andamento.
 - O arquivo Google Sheets estrutural foi criado pelo responsável pelo projeto com as 12 abas e os 102 cabeçalhos aprovados. A exportação XLSX foi inspecionada e a conferência manual de proteções e compartilhamento restrito foi confirmada pelo responsável.
 - A planilha permanece uma estrutura inicial vazia, ainda sem uso como armazenamento operacional integrado.
-- Não há backend Apps Script operacional integrado ao frontend, API, cadastro, autenticação, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo.
+- A POC-01 de comunicação React → Vercel Function → Apps Script foi implementada na branch `feat/poc-01-vercel-apps-script` e validada manualmente em Preview em 2026-11-11: o responsável confirmou HTTP 200 (eco), 422 (erro lógico Apps Script), 502 (resposta upstream inválida), 400 (JSON inválido no navegador) e 405 (método não permitido). Isso comprova o fluxo básico de transporte e normalização de erros no ambiente de teste, não uma operação de negócio.
+- A POC-01 não foi integrada à `dev` até o registro desta atualização; PR #10 permanece aberto e aguarda revisão/integração explícita.
+- Não há backend de negócio operacional integrado ao frontend, cadastro, autenticação, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo.
 - A homepage não processa pagamentos, agendamentos ou contratação.
 
 A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a proposta inicial de arquitetura, seus limites e as provas de conceito obrigatórias. A criação da planilha estrutural foi concluída, mas isso não significa que Apps Script, API, Drive ou autenticação estejam integrados. Atualize esta seção somente quando funcionalidades reais forem implementadas e validadas.
@@ -126,6 +128,16 @@ Não foi escolhida uma aplicação Next.js. Não adicionar Express por padrão: 
 Fluxo aprovado para orientar a POC: React/Vite → rota same-origin da Vercel Function → Web App Apps Script → Google Sheets/Drive. A Function será somente gateway técnico: valida formato, tamanho, método, timeout, assinatura servidor-servidor e normalização de resposta. Não será dona das regras de negócio, dados, autenticação final ou autorização. O Apps Script continua sendo a autoridade de domínio e precisa recusar chamadas diretas sem uma assinatura válida do gateway. Não usar CORS do navegador para falar diretamente com Apps Script.
 
 A estratégia de assinatura gateway→Apps Script e o possível cookie HttpOnly emitido pela Vercel continuam sujeitos a provas de conceito. A Function poderá emitir o cookie no domínio da aplicação; o Apps Script continuará validando o token e a sessão. A proposta completa, incluindo riscos, critérios de aceite e limites de TextOutput, está em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Google Sheets é uma solução de armazenamento simplificada para o escopo acadêmico; não é um banco relacional. Considerar concorrência, cotas, limites de execução, latência e integridade. Não prometer capacidade de produção em grande escala.
+
+### POC-01 — comunicação real implementada e validada
+
+A branch `feat/poc-01-vercel-apps-script` contém a implementação de POST `/api/backend` (Vercel Function), chamada same-origin do React, tela temporária `?poc=01`, Apps Script isolado e testes automatizados do gateway. A amostra Apps Script não acessa Sheets/Drive nem implementa HMAC; como a implantação de teste pode ser anônima, o próprio script repete a allowlist e o limite de 8 KiB. A implantação pública deve ser desativada após a prova para evitar consumo indevido de cotas.
+
+Em 2026-11-11, o responsável executou os cenários reais na implantação Preview e confirmou na interface: eco HTTP 200, erro lógico do Apps Script HTTP 422, resposta inválida do Apps Script HTTP 502, JSON inválido enviado pelo React HTTP 400 e método GET HTTP 405. A validação manual reportada comprova o fluxo funcional básico React → Vercel Function → Apps Script → redirecionamento Google → React; não equivale a uma captura independente de tráfego ou logs. O registro detalhado está em `docs/POC_01_COMUNICACAO.md`.
+
+O PR #10 (`feat/poc-01-vercel-apps-script` → `dev`) permanece aberto e ainda não integrado. A validação real de transporte da POC-01 foi concluída, mas não significa aprovação para produção. Permanecem sem implementação HMAC, timestamp assinado e proteção contra replay, que devem ser tratados na POC-02. Não iniciar login, sessão, planilha ou Drive antes do aceite técnico da POC-02.
+
+Detalhes e procedimento: [POC-01 — Comunicação React, Vercel Functions e Apps Script](./POC_01_COMUNICACAO.md).
 
 ### 5.3. Modelagem lógica e física de dados aprovada
 
@@ -266,12 +278,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** b3bfd6a756e611bc8f20193390a1aca92c82e1e7
-- **Data do commit:** 2026-11-10T17:36:38-03:00
-- **Mensagem do commit:** Merge pull request #9 from kleber-goncalves/docs/arquitetura-gateway-vercel
-- **Branch desta execução:** dev
+- **Commit de referência:** 626dab4c1bb5784f5a2c92291a4de890f2f9f3c1
+- **Data do commit:** 2026-11-11T14:18:32-03:00
+- **Mensagem do commit:** docs(poc-01): registrar validacao real dos cenarios
+- **Branch desta execução:** feat/poc-01-vercel-apps-script
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 6
+- **Scripts npm:** 7
 - **Dependências de runtime:** 5
 - **Dependências de desenvolvimento:** 9
 - **Workflows:** 2
@@ -287,12 +299,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run preview | vite preview |
 | npm run check:occurrences | node scripts/validate-occurrence-register.mjs |
 | npm run update:ai-context | node scripts/update-ai-context.mjs |
+| npm run test:poc01 | node --test tests/poc01/backend.test.js |
 
 ### Variáveis declaradas no .env.example
 
 > Somente os nomes são listados; valores nunca são lidos nem publicados.
 
-- Nenhuma variável declarada.
+- APPS_SCRIPT_WEB_APP_URL
 
 ### Dependências de runtime
 
@@ -342,6 +355,8 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/lib/utils.js
 - src/main.jsx
 - src/pages/HomePage.jsx
+- src/pages/Poc01Page.jsx
+- src/services/poc-01-api.js
 
 ### Diretórios principais de src/
 
@@ -349,18 +364,19 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/data/
 - src/lib/
 - src/pages/
+- src/services/
 
 ### Oito commits recentes até o commit de referência
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 626dab4 | 2026-11-11 | docs(poc-01): registrar validacao real dos cenarios |
+| 029d233 | 2026-11-10 | docs(poc-01): document public test endpoint limits |
+| 35e3eae | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
+| 09287d1 | 2026-11-10 | fix(poc-01): harden the public Apps Script echo endpoint |
+| 64b68b1 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
+| f68527f | 2026-11-10 | feat(poc-01): add Vercel to Apps Script communication test |
+| da134ce | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | b3bfd6a | 2026-11-10 | Merge pull request #9 from kleber-goncalves/docs/arquitetura-gateway-vercel |
-| 5d95271 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| 32010ef | 2026-11-10 | docs(architecture): referenciar API das Vercel Functions |
-| 2fc6889 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| 6c0676b | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| eb6ecf4 | 2026-11-10 | docs(spec): alinhar fluxo e sessão via gateway |
-| f47cd45 | 2026-11-10 | docs(architecture): detalhar organização da Vercel Function |
-| e2a01df | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
