@@ -2,7 +2,6 @@ import {
     createHash,
     createHmac,
     randomBytes,
-    timingSafeEqual,
 } from "node:crypto";
 
 const MAX_REQUEST_BYTES = 12 * 1024;
