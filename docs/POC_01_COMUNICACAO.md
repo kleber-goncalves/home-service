@@ -1,6 +1,6 @@
 # POC-01 — Comunicação React, Vercel Functions e Apps Script
 
-> **Estado:** implementação inicial preparada na branch de trabalho. A comunicação real ainda depende da criação e implantação do projeto Apps Script isolado e da configuração da variável de ambiente na Vercel.
+> **Estado:** comunicação real validada em Preview em 2026-11-11. Os cinco cenários manuais apresentaram os códigos HTTP esperados. A POC-01 está funcionalmente aprovada; a integração continua limitada ao ambiente de teste e não está aprovada para produção.
 
 ## 1. Objetivo
 
@@ -179,7 +179,21 @@ Os testes automatizados usam um cliente upstream simulado. Eles validam o contra
 - Timeout, indisponibilidade, URL ausente e respostas incompatíveis produzem erros JSON controlados.
 - Nenhuma chamada grava dados no Sheets ou Drive.
 
-A POC-01 só será considerada comprovada após um teste real em Preview ou ambiente local Vercel com o Web App implantado. Build e testes unitários, isoladamente, não são evidência de integração real.
+### Registro da validação manual — 2026-11-11
+
+O responsável pelo projeto executou os cinco cenários na implantação Preview da branch `feat/poc-01-vercel-apps-script`, utilizando a tela `/?poc=01`. Foram reportados os seguintes resultados efetivamente exibidos pela interface:
+
+| Cenário executado | Resultado observado | Resultado esperado | Estado |
+|---|---:|---:|---|
+| Comunicação completa (`poc.echo`) | HTTP 200 | HTTP 200 | Aprovado |
+| Erro lógico do Apps Script (`poc.simulate_error`) | HTTP 422 | HTTP 422 | Aprovado |
+| Resposta inválida do Apps Script (`poc.invalid_response`) | HTTP 502 | HTTP 502 | Aprovado |
+| JSON inválido enviado pelo React | HTTP 400 | HTTP 400 | Aprovado |
+| Método GET | HTTP 405 | HTTP 405 | Aprovado |
+
+**Conclusão:** a validação manual reportada comprova o fluxo funcional básico React → Vercel Function → Apps Script → redirecionamento Google → Vercel Function → React, incluindo os cenários de erro apresentados. Os códigos foram confirmados pelo responsável na interface; este registro não representa uma captura independente de tráfego ou logs do Apps Script.
+
+Build e testes unitários, isoladamente, não são evidência de integração real; por isso, eles permanecem complementares à validação manual acima.
 
 ## 9. Limitações que permanecem
 
