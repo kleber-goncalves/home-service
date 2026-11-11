@@ -1,9 +1,12 @@
 import assert from "node:assert/strict";
+import { createHash, createHmac } from "node:crypto";
 import test from "node:test";
 import { createBackendHandler } from "../../api/backend.js";
 
 const SCRIPT_URL = "https://script.google.com/macros/s/POC_DEPLOYMENT_ID/exec";
 const FINAL_URL = "https://script.googleusercontent.com/macros/echo?temporary=test";
+const HMAC_SECRET = "a".repeat(64);
+const FIXED_NOW = Date.UTC(2026, 10, 11, 12, 0, 0);
 
 function makeRequest(body, options = {}) {
     const method = options.method || "POST";
@@ -45,14 +48,18 @@ function makeUpstream(body, options = {}) {
 
 function makeHandler(options = {}) {
     return createBackendHandler({
-        env: { APPS_SCRIPT_WEB_APP_URL: SCRIPT_URL },
+        env: {
+            APPS_SCRIPT_WEB_APP_URL: SCRIPT_URL,
+            APPS_SCRIPT_HMAC_SECRET: HMAC_SECRET,
+        },
         fetchImpl: options.fetchImpl || (async () => makeUpstream(JSON.stringify({
             ok: true,
             action: "poc.echo",
             requestId: "request-12345678",
             data: { received: true },
         }))),
-        now: options.now || (() => 1_000),
+        now: options.now || (() => FIXED_NOW),
+        randomBytesImpl: options.randomBytesImpl || (() => Buffer.alloc(32, 0xab)),
         timeoutMs: 50,
         ...options,
     });
@@ -123,12 +130,31 @@ test("retorna 503 quando a URL do Apps Script não foi configurada", async () =>
     assert.equal((await readJson(response)).error.code, "INTEGRATION_NOT_CONFIGURED");
 });
 
-test("envia POST form-urlencoded, segue o redirecionamento e devolve os dados", async () => {
+
+test("retorna 503 quando o segredo HMAC não foi configurado", async () => {
+    let called = false;
+    const handler = createBackendHandler({
+        env: { APPS_SCRIPT_WEB_APP_URL: SCRIPT_URL },
+        fetchImpl: async () => {
+            called = true;
+            return makeUpstream("{}");
+        },
+    });
+
+    const response = await handler(makeRequest(JSON.stringify(makeInput())));
+    const body = await readJson(response);
+
+    assert.equal(response.status, 503);
+    assert.equal(body.error.code, "INTEGRATION_AUTH_NOT_CONFIGURED");
+    assert.equal(called, false);
+});
+
+test("envia POST form-urlencoded assinado, segue o redirecionamento e devolve os dados", async () => {
     let receivedUrl;
     let receivedOptions;
     const handler = makeHandler({
         now: (() => {
-            let value = 1_000;
+            let value = FIXED_NOW - 12;
             return () => {
                 value += 12;
                 return value;
@@ -158,7 +184,30 @@ test("envia POST form-urlencoded, segue o redirecionamento e devolve os dados", 
     assert.match(receivedOptions.headers["Content-Type"], /application\/x-www-form-urlencoded/i);
     assert.equal(form.get("action"), "poc.echo");
     assert.equal(form.get("requestId"), "request-12345678");
+    assert.equal(form.get("signatureVersion"), "v1");
+    assert.equal(form.get("timestamp"), String(FIXED_NOW));
+    assert.match(form.get("nonce"), /^[a-f0-9]{64}$/);
+    assert.match(form.get("signature"), /^[a-f0-9]{64}$/);
+    assert.equal(form.has("secret"), false);
     assert.deepEqual(JSON.parse(form.get("payload")), { message: "Mensagem sintética de teste." });
+
+    const payloadSha256 = createHash("sha256")
+        .update(form.get("payload"), "utf8")
+        .digest("hex");
+    const canonicalMessage = [
+        "CONECTA_LOCAL_GATEWAY",
+        "v1",
+        "POST",
+        form.get("timestamp"),
+        form.get("nonce"),
+        form.get("action"),
+        form.get("requestId"),
+        payloadSha256,
+    ].join("\n");
+    const expectedSignature = createHmac("sha256", Buffer.from(HMAC_SECRET, "utf8"))
+        .update(canonicalMessage, "utf8")
+        .digest("hex");
+    assert.equal(form.get("signature"), expectedSignature);
     assert.equal(body.ok, true);
     assert.equal(body.data.received, true);
     assert.equal(body.transport.redirected, true);

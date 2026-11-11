@@ -1,7 +1,17 @@
+import {
+    createHash,
+    createHmac,
+    randomBytes,
+} from "node:crypto";
+
 const MAX_REQUEST_BYTES = 12 * 1024;
 const MAX_PAYLOAD_BYTES = 8 * 1024;
 const MAX_UPSTREAM_RESPONSE_BYTES = 32 * 1024;
 const DEFAULT_TIMEOUT_MS = 10_000;
+const HMAC_SECRET_PATTERN = /^[a-f0-9]{64}$/;
+const HMAC_SIGNATURE_PATTERN = /^[a-f0-9]{64}$/;
+const SIGNATURE_VERSION = "v1";
+const CANONICAL_DOMAIN = "CONECTA_LOCAL_GATEWAY";
 
 const ALLOWED_ACTIONS = new Set([
     "poc.echo",
@@ -71,10 +81,85 @@ function getRedirectHost(response) {
     }
 }
 
+function buildCanonicalMessage({ timestamp, nonce, action, requestId, payloadSha256 }) {
+    return [
+        CANONICAL_DOMAIN,
+        SIGNATURE_VERSION,
+        "POST",
+        timestamp,
+        nonce,
+        action,
+        requestId,
+        payloadSha256,
+    ].join("\n");
+}
+
+function createGatewaySignature(secret, canonicalMessage) {
+    return createHmac("sha256", Buffer.from(secret, "utf8"))
+        .update(canonicalMessage, "utf8")
+        .digest("hex");
+}
+
+function mapAppsScriptError(output, requestId, transport) {
+    const upstreamCode = output?.error?.code;
+
+    const knownErrors = {
+        AUTHENTICATION_FAILED: {
+            code: "UPSTREAM_AUTHENTICATION_FAILED",
+            message: "O Apps Script recusou a assinatura do gateway.",
+            status: 502,
+        },
+        REQUEST_EXPIRED: {
+            code: "UPSTREAM_TIMESTAMP_REJECTED",
+            message: "O Apps Script recusou a validade temporal da chamada.",
+            status: 502,
+        },
+        REPLAY_DETECTED: {
+            code: "UPSTREAM_REPLAY_REJECTED",
+            message: "O Apps Script recusou uma chamada repetida.",
+            status: 502,
+        },
+        ACTION_NOT_ALLOWED: {
+            code: "UPSTREAM_ACTION_REJECTED",
+            message: "O Apps Script recusou a ação solicitada.",
+            status: 502,
+        },
+        NONCE_STORE_UNAVAILABLE: {
+            code: "UPSTREAM_NONCE_STORE_UNAVAILABLE",
+            message: "O Apps Script não conseguiu validar o uso único da chamada.",
+            status: 503,
+        },
+        AUTH_CONFIG_ERROR: {
+            code: "UPSTREAM_AUTH_CONFIG_ERROR",
+            message: "A autenticação do Apps Script não está configurada corretamente.",
+            status: 503,
+        },
+        INVALID_PAYLOAD: {
+            code: "UPSTREAM_INVALID_PAYLOAD",
+            message: "O Apps Script recusou o payload recebido.",
+            status: 502,
+        },
+        POC_SIMULATED_ERROR: {
+            code: "APPS_SCRIPT_REJECTED",
+            message: "O Apps Script retornou uma falha lógica controlada.",
+            status: 422,
+        },
+    };
+
+    const mapped = knownErrors[upstreamCode] || {
+        code: "APPS_SCRIPT_REJECTED",
+        message: "O Apps Script recusou a operação de teste.",
+        status: 422,
+    };
+
+    return fail(requestId, mapped.code, mapped.message, mapped.status, { transport });
+}
+
 export function createBackendHandler({
     env = process.env,
     fetchImpl = (...args) => fetch(...args),
     now = () => Date.now(),
+    randomBytesImpl = (size) => randomBytes(size),
     timeoutMs = DEFAULT_TIMEOUT_MS,
 } = {}) {
     return async function backendHandler(request) {
@@ -153,8 +238,56 @@ export function createBackendHandler({
             );
         }
 
+        const secret = env.APPS_SCRIPT_HMAC_SECRET;
+        if (typeof secret !== "string" || !HMAC_SECRET_PATTERN.test(secret)) {
+            return fail(
+                requestId,
+                "INTEGRATION_AUTH_NOT_CONFIGURED",
+                "A autenticação server-to-server ainda não foi configurada neste ambiente.",
+                503,
+            );
+        }
+
         const startedAt = now();
+        if (!Number.isSafeInteger(startedAt) || startedAt <= 0) {
+            return fail(requestId, "GATEWAY_CLOCK_UNAVAILABLE", "Não foi possível gerar o timestamp da chamada.", 500);
+        }
+
+        let nonceBytes;
+        try {
+            nonceBytes = randomBytesImpl(32);
+        } catch {
+            return fail(requestId, "GATEWAY_RANDOM_UNAVAILABLE", "Não foi possível gerar um identificador seguro para a chamada.", 500);
+        }
+
+        if (!Buffer.isBuffer(nonceBytes) || nonceBytes.length !== 32) {
+            return fail(requestId, "GATEWAY_RANDOM_UNAVAILABLE", "Não foi possível gerar um identificador seguro para a chamada.", 500);
+        }
+
+        const timestamp = String(startedAt);
+        const nonce = nonceBytes.toString("hex");
+        const payloadSha256 = createHash("sha256")
+            .update(serializedPayload, "utf8")
+            .digest("hex");
+
+        const canonicalMessage = buildCanonicalMessage({
+            timestamp,
+            nonce,
+            action,
+            requestId,
+            payloadSha256,
+        });
+
+        const signature = createGatewaySignature(secret, canonicalMessage);
+        if (!HMAC_SIGNATURE_PATTERN.test(signature)) {
+            return fail(requestId, "GATEWAY_SIGNATURE_FAILED", "Não foi possível assinar a chamada ao Apps Script.", 500);
+        }
+
         const formBody = new URLSearchParams({
+            signatureVersion: SIGNATURE_VERSION,
+            timestamp,
+            nonce,
+            signature,
             action,
             requestId,
             payload: serializedPayload,
@@ -174,7 +307,7 @@ export function createBackendHandler({
         } catch (error) {
             const isTimeout = error?.name === "TimeoutError" || error?.name === "AbortError";
 
-            console.error("[POC-01] Falha na chamada ao Apps Script.", {
+            console.error("[POC-02] Falha na chamada ao Apps Script.", {
                 requestId,
                 errorName: error?.name || "UnknownError",
             });
@@ -239,7 +372,7 @@ export function createBackendHandler({
         }
 
         if (!output.ok) {
-            return fail(requestId, "APPS_SCRIPT_REJECTED", "O Apps Script retornou uma falha lógica controlada.", 422, { transport });
+            return mapAppsScriptError(output, requestId, transport);
         }
 
         return jsonResponse({

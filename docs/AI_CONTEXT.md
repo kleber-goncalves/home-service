@@ -82,7 +82,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 
 ## 4. Estado atual do repositório
 
-**Estado após integração da homepage pública à branch `dev` (PR #2) e consolidação documental em andamento:**
+**Estado atualizado em 2026-11-11 após integração da POC-01 e validação manual da POC-02 em branch isolada:**
 
 - A branch `dev` contém a homepage pública demonstrativa do Conecta Local, integrada por Pull Request.
 - `src/pages/HomePage.jsx` coordena a composição das seções e o estado local da busca e dos filtros.
@@ -98,12 +98,12 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 - `main` permanece fora do escopo desta etapa; `dev` é a linha de integração do trabalho em andamento.
 - O arquivo Google Sheets estrutural foi criado pelo responsável pelo projeto com as 12 abas e os 102 cabeçalhos aprovados. A exportação XLSX foi inspecionada e a conferência manual de proteções e compartilhamento restrito foi confirmada pelo responsável.
 - A planilha permanece uma estrutura inicial vazia, ainda sem uso como armazenamento operacional integrado.
-- A POC-01 de comunicação React → Vercel Function → Apps Script foi implementada na branch `feat/poc-01-vercel-apps-script` e validada manualmente em Preview em 2026-11-11: o responsável confirmou HTTP 200 (eco), 422 (erro lógico Apps Script), 502 (resposta upstream inválida), 400 (JSON inválido no navegador) e 405 (método não permitido). Isso comprova o fluxo básico de transporte e normalização de erros no ambiente de teste, não uma operação de negócio.
-- A POC-01 não foi integrada à `dev` até o registro desta atualização; PR #10 permanece aberto e aguarda revisão/integração explícita.
+- A POC-01 de comunicação React → Vercel Function → Apps Script foi integrada à branch `dev` pelo PR #10 em 2026-11-11 e validada manualmente em Preview: HTTP 200 (eco), 422 (erro lógico Apps Script), 502 (resposta upstream inválida), 400 (JSON inválido no navegador) e 405 (método não permitido). O merge commit foi `837f7c6172764ee27ac835c81e1224640d78478d`; o registro está em `docs/POC_01_COMUNICACAO.md`.
+- A POC-02 de assinatura HMAC-SHA-256 e proteção contra replay está implementada na branch `feat/poc-02-hmac-replay`, no PR #11 aberto para `dev`. Em 2026-11-11, o responsável confirmou cinco cenários no Preview, cinco testes diretos contra o Apps Script isolado e um teste concorrente com duas chamadas idênticas, no qual somente uma foi aceita e a outra recebeu `REPLAY_DETECTED`. O código ainda não foi integrado à `dev`; a descrição e os resultados estão em `docs/POC_02_ASSINATURA_GATEWAY.md`.
 - Não há backend de negócio operacional integrado ao frontend, cadastro, autenticação, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo.
 - A homepage não processa pagamentos, agendamentos ou contratação.
 
-A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a proposta inicial de arquitetura, seus limites e as provas de conceito obrigatórias. A criação da planilha estrutural foi concluída, mas isso não significa que Apps Script, API, Drive ou autenticação estejam integrados. Atualize esta seção somente quando funcionalidades reais forem implementadas e validadas.
+A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a arquitetura e seus limites. O gateway Vercel → Apps Script da POC-01 está integrado à `dev`; a camada HMAC/anti-replay da POC-02 foi validada manualmente na branch `feat/poc-02-hmac-replay`, mas ainda aguarda integração. Isso não significa que operações de negócio, autenticação de usuários, sessões, Sheets ou Drive estejam integrados.
 
 ## 5. Arquitetura e decisões tecnológicas
 
@@ -120,8 +120,8 @@ Não foi escolhida uma aplicação Next.js. Não adicionar Express por padrão: 
 
 ### 5.2. Backend e dados planejados
 
-- **Google Apps Script:** backend de negócio planejado para autenticação, autorização, regras, integridade e acesso a Sheets/Drive. Ainda não está operacional nem integrado.
-- **Vercel Functions:** gateway HTTP server-side aprovado conceitualmente para receber as chamadas same-origin do React e encaminhá-las ao Apps Script. Ainda não existe diretório api/ ou Function implementada na branch dev.
+- **Google Apps Script:** backend de negócio planejado para autenticação, autorização, regras, integridade e acesso a Sheets/Drive. O Web App isolado da POC-02 executa somente ações sintéticas `poc.*`; operações de negócio e acesso a dados ainda não estão integrados.
+- **Vercel Functions:** o gateway HTTP server-side da POC-01 está implementado na branch `dev`. A assinatura HMAC-SHA-256 e a proteção contra replay da POC-02 estão implementadas e validadas na branch `feat/poc-02-hmac-replay`, aguardando merge do PR #11.
 - **Google Sheets:** arquivo estrutural já criado pelo responsável, com 12 abas e 102 cabeçalhos aprovados; ainda não está integrado como armazenamento operacional.
 - **Google Drive:** armazenamento futuro das imagens enviadas pelos profissionais; fluxo de upload e permissões ainda não implementado.
 
@@ -129,15 +129,32 @@ Fluxo aprovado para orientar a POC: React/Vite → rota same-origin da Vercel Fu
 
 A estratégia de assinatura gateway→Apps Script e o possível cookie HttpOnly emitido pela Vercel continuam sujeitos a provas de conceito. A Function poderá emitir o cookie no domínio da aplicação; o Apps Script continuará validando o token e a sessão. A proposta completa, incluindo riscos, critérios de aceite e limites de TextOutput, está em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Google Sheets é uma solução de armazenamento simplificada para o escopo acadêmico; não é um banco relacional. Considerar concorrência, cotas, limites de execução, latência e integridade. Não prometer capacidade de produção em grande escala.
 
-### POC-01 — comunicação real implementada e validada
+### POC-01 — transporte real integrado e validado
 
-A branch `feat/poc-01-vercel-apps-script` contém a implementação de POST `/api/backend` (Vercel Function), chamada same-origin do React, tela temporária `?poc=01`, Apps Script isolado e testes automatizados do gateway. A amostra Apps Script não acessa Sheets/Drive nem implementa HMAC; como a implantação de teste pode ser anônima, o próprio script repete a allowlist e o limite de 8 KiB. A implantação pública deve ser desativada após a prova para evitar consumo indevido de cotas.
+A POC-01 foi integrada à branch `dev` pelo PR #10 em 2026-11-11. O merge commit foi `837f7c6172764ee27ac835c81e1224640d78478d`. A validação manual em Preview confirmou: eco HTTP 200, erro lógico do Apps Script HTTP 422, resposta upstream inválida HTTP 502, JSON inválido HTTP 400 e método GET HTTP 405. O registro está em `docs/POC_01_COMUNICACAO.md`.
 
-Em 2026-11-11, o responsável executou os cenários reais na implantação Preview e confirmou na interface: eco HTTP 200, erro lógico do Apps Script HTTP 422, resposta inválida do Apps Script HTTP 502, JSON inválido enviado pelo React HTTP 400 e método GET HTTP 405. A validação manual reportada comprova o fluxo funcional básico React → Vercel Function → Apps Script → redirecionamento Google → React; não equivale a uma captura independente de tráfego ou logs. O registro detalhado está em `docs/POC_01_COMUNICACAO.md`.
+A implementação usa React → POST same-origin `/api/backend` → Vercel Function → Apps Script via form-urlencoded → redirecionamento para `script.googleusercontent.com`. O frontend não chama Apps Script diretamente. A POC-01, isoladamente, não autenticava a Function perante o Apps Script e não está aprovada para produção. Uma implantação antiga sem assinatura deve ser atualizada para o código protegido ou desativada.
 
-O PR #10 (`feat/poc-01-vercel-apps-script` → `dev`) permanece aberto e ainda não integrado. A validação real de transporte da POC-01 foi concluída, mas não significa aprovação para produção. Permanecem sem implementação HMAC, timestamp assinado e proteção contra replay, que devem ser tratados na POC-02. Não iniciar login, sessão, planilha ou Drive antes do aceite técnico da POC-02.
+### POC-02 — assinatura HMAC e proteção contra replay validadas em branch isolada
 
-Detalhes e procedimento: [POC-01 — Comunicação React, Vercel Functions e Apps Script](./POC_01_COMUNICACAO.md).
+A branch de trabalho é `feat/poc-02-hmac-replay`, criada a partir de `dev` após a integração do PR #10. O PR #11 está aberto e tem como destino `dev`; não foi integrado. O desenho e os resultados manuais estão documentados em `docs/POC_02_ASSINATURA_GATEWAY.md`.
+
+Decisões implementadas:
+- HMAC-SHA-256 com mensagem canônica versionada `v1`, domínio `CONECTA_LOCAL_GATEWAY`, método lógico, timestamp, nonce, ação, requestId e SHA-256 do payload UTF-8.
+- Timestamp Unix em milissegundos com tolerância máxima de 5 minutos.
+- Nonce de 32 bytes aleatórios (64 caracteres hexadecimais), gerado na Vercel Function com `node:crypto`.
+- Registro de nonces no Apps Script com Script Properties e Script Lock, retenção de 10 minutos e 30 segundos, capacidade limitada a 2.500 nonces ativos e comportamento fail closed.
+- Segredo de 32 bytes gerado fora do repositório: `APPS_SCRIPT_HMAC_SECRET` somente no ambiente Preview da Vercel e `POC02_HMAC_SECRET` em Script Properties do Apps Script. Os valores devem ser idênticos e não podem aparecer no React, Git, documentação, logs ou chat.
+- `apps-script/poc-02/Code.gs` contém a versão protegida implantada no Web App Apps Script isolado usado nos testes.
+- `tests/poc02/` contém os testes automatizados do gateway e um harness local que simula as APIs do Apps Script. `scripts/poc02-replay-check.mjs` executa testes reais diretos de chamada sem assinatura, timestamp expirado, assinatura válida, repetição de nonce e payload adulterado.
+
+**Validação manual em 2026-11-11, executada pelo responsável do projeto:**
+- Preview: eco HTTP 200; erro lógico HTTP 422; resposta upstream inválida HTTP 502; JSON inválido HTTP 400; GET HTTP 405.
+- Apps Script direto: chamada sem assinatura `AUTHENTICATION_FAILED`; timestamp expirado `REQUEST_EXPIRED`; chamada assinada aceita; repetição `REPLAY_DETECTED`; payload adulterado `AUTHENTICATION_FAILED`.
+- Concorrência: duas chamadas idênticas enviadas em paralelo; uma aceita e outra recusada com `REPLAY_DETECTED`.
+- GitHub Actions: validação automatizada anterior da branch concluída com sucesso; a atualização documental e da interface deve disparar nova validação antes de integrar.
+
+A validação concorrente realizada com duas chamadas comprova o comportamento básico de uso único, não capacidade de carga ou concorrência em escala. A POC continua restrita a dados sintéticos e ações `poc.*`; não habilita login, sessão, Sheets, Drive ou operações de negócio. Não é solução aprovada para produção.
 
 ### 5.3. Modelagem lógica e física de dados aprovada
 
@@ -266,7 +283,7 @@ Os comandos de validação são mantidos em `package.json`. O workflow de qualid
 4. ESLint.
 5. Build de produção do Vite.
 
-Quando testes automatizados forem criados, adicioná-los aos scripts e ao workflow. Não criar etapas E2E ou Lighthouse só para imitar outro projeto; introduzi-las quando houver fluxos reais que justifiquem esses testes.
+Os testes das POCs devem permanecer nos scripts npm e no workflow: `npm run test:poc01` e `npm run test:poc02`. Não criar etapas E2E ou Lighthouse só para imitar outro projeto; introduzi-las quando houver fluxos reais que justifiquem esses testes.
 
 A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substitui a conferência do deployment, do SHA publicado e testes manuais de navegação/responsividade. Não afirmar que o Google Apps Script, Sheets ou Drive estão funcionando antes de validar sua integração real.
 
@@ -278,16 +295,16 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 837f7c6172764ee27ac835c81e1224640d78478d
-- **Data do commit:** 2026-11-11T14:26:19-03:00
-- **Mensagem do commit:** Merge pull request #10 from kleber-goncalves/feat/poc-01-vercel-apps-script
-- **Branch desta execução:** dev
+- **Commit de referência:** 5096f9f0b5a24ee7dc03e08a09ef83ef8d0ebac3
+- **Data do commit:** 2026-11-11T15:24:52-03:00
+- **Mensagem do commit:** docs(arquitetura): registrar validação real da assinatura HMAC
+- **Branch desta execução:** feat/poc-02-hmac-replay
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 7
+- **Scripts npm:** 8
 - **Dependências de runtime:** 5
 - **Dependências de desenvolvimento:** 9
 - **Workflows:** 2
-- **Scripts de automação:** 2
+- **Scripts de automação:** 3
 
 ### Scripts npm
 
@@ -300,11 +317,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run check:occurrences | node scripts/validate-occurrence-register.mjs |
 | npm run update:ai-context | node scripts/update-ai-context.mjs |
 | npm run test:poc01 | node --test tests/poc01/backend.test.js |
+| npm run test:poc02 | node --test tests/poc02/backend.test.js tests/poc02/apps-script.test.js |
 
 ### Variáveis declaradas no .env.example
 
 > Somente os nomes são listados; valores nunca são lidos nem publicados.
 
+- APPS_SCRIPT_HMAC_SECRET
 - APPS_SCRIPT_WEB_APP_URL
 
 ### Dependências de runtime
@@ -338,6 +357,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 ### Scripts de automação
 
+- scripts/poc02-replay-check.mjs
 - scripts/update-ai-context.mjs
 - scripts/validate-occurrence-register.mjs
 
@@ -370,13 +390,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| 837f7c6 | 2026-11-11 | Merge pull request #10 from kleber-goncalves/feat/poc-01-vercel-apps-script |
-| 7e5cf83 | 2026-11-11 | docs(context): atualizar estado validado da POC-01 |
-| fe4009f | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
-| 66b25fa | 2026-11-11 | docs(ai-context): registrar aprovacao funcional da POC-01 |
-| 626dab4 | 2026-11-11 | docs(poc-01): registrar validacao real dos cenarios |
-| 029d233 | 2026-11-10 | docs(poc-01): document public test endpoint limits |
-| 35e3eae | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| 09287d1 | 2026-11-10 | fix(poc-01): harden the public Apps Script echo endpoint |
+| 5096f9f | 2026-11-11 | docs(arquitetura): registrar validação real da assinatura HMAC |
+| fcdf882 | 2026-11-11 | docs(ai-context): registrar validação manual da POC-02 |
+| 0532395 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
+| c6bdac7 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
+| 5127ec8 | 2026-11-11 | docs(arquitetura): atualizar estado das provas de conceito |
+| c3aad65 | 2026-11-11 | docs(poc-02): registrar validação manual HMAC e replay |
+| 4e55b23 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
+| 3c51b94 | 2026-11-11 | fix(poc-02): atualizar aviso de segurança da página de testes |
 
 <!-- END AUTO-GENERATED SECTION -->

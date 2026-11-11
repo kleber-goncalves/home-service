@@ -80,8 +80,9 @@ export default function Poc01Page() {
                             Comunicação React → Vercel → Apps Script
                         </h1>
                         <p className="max-w-3xl text-base leading-7 text-slate-600">
-                            Teste isolado de envio, recebimento, redirecionamento do Content Service e tratamento de falhas.
-                            Nenhuma conta, sessão, planilha ou arquivo do Drive é utilizado.
+                            Teste de comunicação React → Vercel → Apps Script com assinatura HMAC-SHA-256 no tráfego entre servidores,
+                            redirecionamento do Content Service e tratamento de falhas. Somente dados sintéticos são utilizados; não há login,
+                            sessão, acesso a planilhas ou arquivos do Drive.
                         </p>
                     </div>
                 </header>
@@ -163,8 +164,10 @@ export default function Poc01Page() {
 
                 <aside className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-950">
                     <strong className="block">Limite de segurança desta POC</strong>
-                    O Web App de teste é acessível anonimamente e ainda não valida HMAC. O script aceita somente mensagens sintéticas,
-                    não acessa Sheets nem Drive e não implementa autenticação. Não utilize este endpoint em produção.
+                    O Web App de teste pode ser alcançado anonimamente, mas o Apps Script recusa chamadas sem uma assinatura HMAC válida
+                    da Vercel Function. Essa assinatura autentica somente a comunicação entre servidores: não autentica usuários finais nem
+                    substitui autorização. O endpoint aceita apenas ações poc.* e dados sintéticos; não acessa Sheets ou Drive e não implementa
+                    login ou sessão. Não utilize esta prova de conceito em produção.
                 </aside>
             </div>
         </main>
