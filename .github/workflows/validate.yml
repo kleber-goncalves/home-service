@@ -46,6 +46,9 @@ jobs:
       - name: Run POC-01 gateway tests
         run: npm run test:poc01
 
+      - name: Run POC-02 gateway security tests
+        run: npm run test:poc02
+
       - name: Validate occurrence register
         run: npm run check:occurrences
 
