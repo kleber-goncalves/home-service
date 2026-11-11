@@ -1,6 +1,6 @@
 # POC-02 — Autenticidade do gateway Vercel → Apps Script
 
-> **Estado:** desenho técnico definido para implementação e validação em branch isolada. Não aprovado para produção.
+> **Estado:** implementada e validada manualmente em Preview e no Web App Apps Script isolado em 2026-11-11. PR #11 aberto para integração em `dev`; não aprovada para produção.
 > **Base:** branch `dev`, após integração da POC-01.
 > **Escopo:** autenticar cada chamada server-to-server, detectar adulteração, expiração e replay.
 
@@ -166,12 +166,37 @@ O 502 indica que o gateway enviou uma chamada assinada, mas o Apps Script a recu
 1. Configurar o mesmo segredo sintético nos dois ambientes.
 2. Atualizar e implantar a versão protegida do Web App de teste.
 3. Executar o eco assinado e confirmar HTTP 200.
-4. Fazer POST direto ao Apps Script sem assinatura e observar recusa lógica.
-5. Repetir exatamente uma requisição assinada já aceita e observar `REPLAY_DETECTED` (HTTP 409 quando encaminhada pela Function).
-6. Testar timestamp expirado e assinatura adulterada com um cliente de teste server-side, sem inserir segredos em comandos salvos, screenshots ou documentação.
-7. Conferir que a variável de segredo existe somente no ambiente Preview e que não há vazamento no bundle ou nos logs.
+#### Resultados manuais executados em 2026-11-11
 
-Os testes automatizados não substituem o teste de rede real entre Vercel e Apps Script.
+O responsável pelo projeto executou os testes no Preview da branch `feat/poc-02-hmac-replay` e diretamente contra a URL `/exec` do Web App Apps Script isolado. Os resultados apresentados foram:
+
+**Preview React → Vercel Function → Apps Script**
+
+| Cenário | Resultado observado | Avaliação |
+|---|---|---|
+| Eco assinado | HTTP 200, `ok: true`, `authenticated: true` e redirect para `script.googleusercontent.com` | Aprovado |
+| Erro lógico controlado | HTTP 422, `APPS_SCRIPT_REJECTED` | Aprovado |
+| Resposta upstream não JSON | HTTP 502, `UPSTREAM_INVALID_JSON` | Aprovado |
+| JSON inválido no navegador | HTTP 400, `INVALID_JSON`, sem chamada upstream | Aprovado |
+| Método GET | HTTP 405, `METHOD_NOT_ALLOWED`, allowlist `POST` | Aprovado |
+
+**Chamadas diretas ao Apps Script**
+
+| Cenário | Resultado lógico observado | Avaliação |
+|---|---|---|
+| Chamada sem assinatura | `AUTHENTICATION_FAILED` | Aprovado |
+| Timestamp expirado | `REQUEST_EXPIRED` | Aprovado |
+| Primeira chamada assinada | `ok: true` | Aprovado |
+| Repetição exata da chamada assinada | `REPLAY_DETECTED` | Aprovado |
+| Payload alterado após a assinatura | `AUTHENTICATION_FAILED` | Aprovado |
+
+O Apps Script Content Service respondeu HTTP 200 nesses testes diretos; a aprovação foi determinada pelo envelope JSON e pelos códigos lógicos, não pelo status HTTP.
+
+**Replay concorrente**
+
+Duas requisições idênticas, contendo o mesmo nonce e assinatura, foram enviadas em paralelo com `Promise.all`. Uma foi aceita (`ok: true`) e a outra foi recusada com `REPLAY_DETECTED`. Isso comprova o comportamento concorrente básico do bloqueio em um ensaio com duas chamadas; não é um teste de carga ou de estresse.
+
+Os testes automatizados continuam complementares: o harness simula as APIs do Apps Script e não substitui os ensaios reais registrados acima. Também não foram realizados testes de carga, medição de cotas em escala ou revisão independente de produção.
 
 ## 7. Configuração segura dos ambientes
 
