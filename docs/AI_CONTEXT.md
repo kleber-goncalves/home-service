@@ -278,9 +278,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 411de0e1a5842a4f3760546d4df5678924a4bd2d
-- **Data do commit:** 2026-11-11T14:32:26-03:00
-- **Mensagem do commit:** feat(poc-02): adicionar verificação HMAC no Apps Script
+- **Commit de referência:** b206c94537b3285f6b8b875f578e8edbf27b5b26
+- **Data do commit:** 2026-11-11T14:32:55-03:00
+- **Mensagem do commit:** feat(poc-02): assinar chamadas do gateway com HMAC-SHA256
 - **Branch desta execução:** feat/poc-02-hmac-replay
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 7
@@ -370,13 +370,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| b206c94 | 2026-11-11 | feat(poc-02): assinar chamadas do gateway com HMAC-SHA256 |
+| 4d2b12c | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | 411de0e | 2026-11-11 | feat(poc-02): adicionar verificação HMAC no Apps Script |
 | 67bde6c | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | b1db7c5 | 2026-11-11 | docs(poc-02): definir contrato HMAC e proteção contra replay |
 | dc2ba6d | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | 837f7c6 | 2026-11-11 | Merge pull request #10 from kleber-goncalves/feat/poc-01-vercel-apps-script |
 | 7e5cf83 | 2026-11-11 | docs(context): atualizar estado validado da POC-01 |
-| fe4009f | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
-| 66b25fa | 2026-11-11 | docs(ai-context): registrar aprovacao funcional da POC-01 |
 
 <!-- END AUTO-GENERATED SECTION -->
