@@ -278,9 +278,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 53de846424163361e2d33907d80df8edd154d764
-- **Data do commit:** 2026-11-11T14:33:10-03:00
-- **Mensagem do commit:** test(poc-02): validar assinatura no contrato do gateway
+- **Commit de referência:** fe4ac889bb63e34e1f663bf6353d0bbe31780543
+- **Data do commit:** 2026-11-11T14:33:42-03:00
+- **Mensagem do commit:** test(poc-02): testar autenticação e replay do Apps Script
 - **Branch desta execução:** feat/poc-02-hmac-replay
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 7
@@ -370,13 +370,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| fe4ac88 | 2026-11-11 | test(poc-02): testar autenticação e replay do Apps Script |
+| 1a9a3a4 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | 53de846 | 2026-11-11 | test(poc-02): validar assinatura no contrato do gateway |
 | c161c5f | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | b206c94 | 2026-11-11 | feat(poc-02): assinar chamadas do gateway com HMAC-SHA256 |
 | 4d2b12c | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | 411de0e | 2026-11-11 | feat(poc-02): adicionar verificação HMAC no Apps Script |
 | 67bde6c | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
-| b1db7c5 | 2026-11-11 | docs(poc-02): definir contrato HMAC e proteção contra replay |
-| dc2ba6d | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
