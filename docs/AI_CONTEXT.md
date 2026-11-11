@@ -98,7 +98,9 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 - `main` permanece fora do escopo desta etapa; `dev` é a linha de integração do trabalho em andamento.
 - O arquivo Google Sheets estrutural foi criado pelo responsável pelo projeto com as 12 abas e os 102 cabeçalhos aprovados. A exportação XLSX foi inspecionada e a conferência manual de proteções e compartilhamento restrito foi confirmada pelo responsável.
 - A planilha permanece uma estrutura inicial vazia, ainda sem uso como armazenamento operacional integrado.
-- Não há backend Apps Script operacional integrado ao frontend, API, cadastro, autenticação, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo.
+- A POC-01 de comunicação React → Vercel Function → Apps Script foi implementada na branch `feat/poc-01-vercel-apps-script` e validada manualmente em Preview em 2026-11-11: o responsável confirmou HTTP 200 (eco), 422 (erro lógico Apps Script), 502 (resposta upstream inválida), 400 (JSON inválido no navegador) e 405 (método não permitido). Isso comprova o fluxo básico de transporte e normalização de erros no ambiente de teste, não uma operação de negócio.
+- A POC-01 não foi integrada à `dev` até o registro desta atualização; PR #10 permanece aberto e aguarda revisão/integração explícita.
+- Não há backend de negócio operacional integrado ao frontend, cadastro, autenticação, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo.
 - A homepage não processa pagamentos, agendamentos ou contratação.
 
 A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a proposta inicial de arquitetura, seus limites e as provas de conceito obrigatórias. A criação da planilha estrutural foi concluída, mas isso não significa que Apps Script, API, Drive ou autenticação estejam integrados. Atualize esta seção somente quando funcionalidades reais forem implementadas e validadas.
