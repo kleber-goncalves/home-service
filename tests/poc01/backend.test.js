@@ -203,7 +203,7 @@ test("envia POST form-urlencoded assinado, segue o redirecionamento e devolve os
         form.get("action"),
         form.get("requestId"),
         payloadSha256,
-    ].join("\\n");
+    ].join("\n");
     const expectedSignature = createHmac("sha256", Buffer.from(HMAC_SECRET, "utf8"))
         .update(canonicalMessage, "utf8")
         .digest("hex");
