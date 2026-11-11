@@ -78,9 +78,19 @@ function doPost(event) {
         ));
     }
 
-    var secret = PropertiesService
-        .getScriptProperties()
-        .getProperty(POC02_SECRET_PROPERTY);
+    var secret = null;
+    try {
+        secret = PropertiesService
+            .getScriptProperties()
+            .getProperty(POC02_SECRET_PROPERTY);
+    } catch (error) {
+        return jsonOutput_(errorEnvelope_(
+            action,
+            requestId,
+            "AUTH_CONFIG_ERROR",
+            "A autenticação server-to-server não está disponível."
+        ));
+    }
 
     if (typeof secret !== "string" || !/^[a-f0-9]{64}$/.test(secret)) {
         return jsonOutput_(errorEnvelope_(
