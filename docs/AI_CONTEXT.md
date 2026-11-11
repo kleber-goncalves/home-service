@@ -278,10 +278,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 626dab4c1bb5784f5a2c92291a4de890f2f9f3c1
-- **Data do commit:** 2026-11-11T14:18:32-03:00
-- **Mensagem do commit:** docs(poc-01): registrar validacao real dos cenarios
-- **Branch desta execução:** feat/poc-01-vercel-apps-script
+- **Commit de referência:** 837f7c6172764ee27ac835c81e1224640d78478d
+- **Data do commit:** 2026-11-11T14:26:19-03:00
+- **Mensagem do commit:** Merge pull request #10 from kleber-goncalves/feat/poc-01-vercel-apps-script
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 7
 - **Dependências de runtime:** 5
@@ -370,13 +370,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 837f7c6 | 2026-11-11 | Merge pull request #10 from kleber-goncalves/feat/poc-01-vercel-apps-script |
+| 7e5cf83 | 2026-11-11 | docs(context): atualizar estado validado da POC-01 |
+| fe4009f | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
+| 66b25fa | 2026-11-11 | docs(ai-context): registrar aprovacao funcional da POC-01 |
 | 626dab4 | 2026-11-11 | docs(poc-01): registrar validacao real dos cenarios |
 | 029d233 | 2026-11-10 | docs(poc-01): document public test endpoint limits |
 | 35e3eae | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
 | 09287d1 | 2026-11-10 | fix(poc-01): harden the public Apps Script echo endpoint |
-| 64b68b1 | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| f68527f | 2026-11-10 | feat(poc-01): add Vercel to Apps Script communication test |
-| da134ce | 2026-11-10 | docs(ai-context): atualizar snapshot automaticamente |
-| b3bfd6a | 2026-11-10 | Merge pull request #9 from kleber-goncalves/docs/arquitetura-gateway-vercel |
 
 <!-- END AUTO-GENERATED SECTION -->
