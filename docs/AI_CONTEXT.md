@@ -295,9 +295,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 5127ec8ff6bf1ea6f4c05f015d3ab88bc80a2fae
-- **Data do commit:** 2026-11-11T15:21:42-03:00
-- **Mensagem do commit:** docs(arquitetura): atualizar estado das provas de conceito
+- **Commit de referência:** 5096f9f0b5a24ee7dc03e08a09ef83ef8d0ebac3
+- **Data do commit:** 2026-11-11T15:24:52-03:00
+- **Mensagem do commit:** docs(arquitetura): registrar validação real da assinatura HMAC
 - **Branch desta execução:** feat/poc-02-hmac-replay
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 8
@@ -390,13 +390,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 5096f9f | 2026-11-11 | docs(arquitetura): registrar validação real da assinatura HMAC |
+| fcdf882 | 2026-11-11 | docs(ai-context): registrar validação manual da POC-02 |
+| 0532395 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
+| c6bdac7 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | 5127ec8 | 2026-11-11 | docs(arquitetura): atualizar estado das provas de conceito |
 | c3aad65 | 2026-11-11 | docs(poc-02): registrar validação manual HMAC e replay |
 | 4e55b23 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | 3c51b94 | 2026-11-11 | fix(poc-02): atualizar aviso de segurança da página de testes |
-| f9c095d | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
-| d3be4f7 | 2026-11-11 | fix(poc-02): remover import criptográfico não utilizado |
-| 52a0f17 | 2026-11-11 | docs(context): registrar estado de implementação da POC-02 |
-| 221ed81 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
