@@ -2,7 +2,7 @@
 
 > **Versão:** 0.1  
 > **Data:** 2026-11-10  
-> **Status:** POC-01 integrada à branch `dev` e validada manualmente em Preview. POC-02 em implementação na branch `feat/poc-02-hmac-replay`; segredo e validação manual real ainda pendentes. Nenhuma das PoCs está aprovada para produção.  
+> **Status:** POC-01 integrada à branch `dev` e validada manualmente em Preview. POC-02 implementada e validada manualmente em Preview e no Apps Script isolado na branch `feat/poc-02-hmac-replay`; PR #11 aguarda integração em `dev`. Nenhuma das PoCs está aprovada para produção.  
 > **Escopo:** integração React/Vite, Google Apps Script, Google Sheets e Google Drive para a demonstração acadêmica.  
 > **Premissa:** manter Apps Script como backend inicial e autenticação própria por e-mail e senha, conforme decisão funcional aprovada. Transporte, sessão e armazenamento seguro de senhas continuam pendentes de prova de conceito.
 
