@@ -303,9 +303,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 0b51db491c78324c445245d875da8e75f8334cf5
-- **Data do commit:** 2026-11-12T16:59:03-03:00
-- **Mensagem do commit:** test(poc-03): simular estado persistente e falha fechada do throttling
+- **Commit de referência:** bb86da2ac362ffd32df3ccd75aa7d406be3e055c
+- **Data do commit:** 2026-11-12T17:01:50-03:00
+- **Mensagem do commit:** docs(architecture): registrar POC de throttling persistente com lock
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -400,13 +400,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| bb86da2 | 2026-11-12 | docs(architecture): registrar POC de throttling persistente com lock |
+| b18c3fe | 2026-11-12 | docs(poc-03): documentar throttling persistente e sonda concorrente |
+| aaef88b | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 0b51db4 | 2026-11-12 | test(poc-03): simular estado persistente e falha fechada do throttling |
 | 0fd9371 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 3cc3c5f | 2026-11-12 | feat(poc-03): testar throttling persistente com ScriptLock |
 | bc75c74 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | bfa8d6d | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| 09e6c40 | 2026-11-12 | docs(ai-context): registrar testes manuais da política POC-03 |
-| c04fcf7 | 2026-11-12 | docs(architecture): registrar resultados manuais da POC-03 |
-| 69869a5 | 2026-11-12 | docs(poc-03): registrar testes manuais de senha e throttling |
 
 <!-- END AUTO-GENERATED SECTION -->
