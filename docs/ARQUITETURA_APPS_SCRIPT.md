@@ -449,6 +449,14 @@ A comparação percorre 32 bytes com acumulador XOR, mas não há garantia forma
 
 **Comparação do hash:** o acumulador XOR atual é funcional, mas JavaScript/V8 não fornece garantia formal de tempo constante. Apps Script V8 não disponibiliza `crypto` nem `SubtleCrypto`. Node.js/Vercel oferece `crypto.timingSafeEqual`; mover apenas a comparação de 32 bytes para a Function é uma opção, mas amplia sua responsabilidade para além do gateway de transporte. Um comparador WASM revisado executado no Apps Script é outra alternativa. Nenhuma foi aprovada; autenticação permanece bloqueada até resolver a comparação, a blocklist, limites e proteção de abuso.
 
+**POC adicional — throttling persistente em Script Properties:** foi criada uma prova isolada com estado em `PropertiesService.getScriptProperties()` e seção crítica sob `LockService.getScriptLock()`. O identificador é sintético e é convertido em HMAC-SHA-256; a chave de teste permanece no armazenamento de propriedades e nunca vai para logs. A gravação/read-modify-write ocorre dentro do lock, e falhas de lock, serviço ou estado corrompido recusam a operação (fail closed). A bateria automatizada #231 passou no harness Node/VM, incluindo persistência simulada, falhas fechadas e dez chamadas sequenciais.
+
+**Resultado:** a POC demonstra a estrutura de leitura/transição/gravação com armazenamento key-value e exclusão mútua, mas ainda não comprovou concorrência real em Apps Script. A execução manual da bateria persistente e a sonda com dez execuções independentes ainda estão pendentes.
+
+**Não confundir com o armazenamento final:** o modelo físico aprovado continua sendo a aba `CONTROLE_AUTENTICACAO` em Sheets. Script Properties é apenas o armazenamento temporário desta POC, tem limites documentados de 500 KB por store/9 KB por valor e cotas diárias de leitura/escrita. `getScriptLock()` serializa o trecho protegido para todas as execuções do mesmo script, de modo que é seguro para a prova, mas pode ser um gargalo global. A implementação real precisa provar a atualização da linha em Sheets sob lock, o tratamento de concorrência e o risco de lockout DoS antes de login.
+
+Fontes oficiais: [LockService](https://developers.google.com/apps-script/reference/lock/lock-service) · [Properties Service](https://developers.google.com/apps-script/guides/properties) · [Apps Script quotas](https://developers.google.com/apps-script/guides/services/quotas).
+
 ### 10.2. Sessões
 
 A modelagem prevê apenas o hash do token na aba SESSOES, 30 minutos de inatividade e duração absoluta de 8 horas. O token em claro não deve ser gravado na planilha nem em logs.
