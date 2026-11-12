@@ -184,7 +184,7 @@ Referências:
 - O runtime não possui `TextEncoder`, que a biblioteca usa quando recebe strings.
 - O código-fonte da biblioteca aceita `Uint8Array`; portanto, a POC poderá converter senha/salt para bytes UTF-8 por meio de `Utilities.newBlob(...).getBytes()` e passar arrays tipados, sem depender de `TextEncoder`.
 - O pacote usa Promises e compilação/instanciação WebAssembly assíncrona. Isso precisa ser testado no fluxo real do editor Apps Script, sem presumir compatibilidade apenas porque a sonda simples passou.
-- O artefato distribuído precisa ser fixado na versão exata `4.13.0`, ter hash SHA-256 registrado e ser armazenado no repositório; não carregar script de CDN ou versão flutuante durante autenticação.
+- O artefato distribuído precisa ser fixado na versão exata `4.13.0`, ter hash SHA-256 registrado e ser armazenado no repositório; não carregar script de CDN ou versão flutuante durante autenticação. O `.npmignore` dessa tag contém as entradas `dist` e `wasm`; por isso, não presumir que o bundle UMD individual estará no tarball publicado. Inspecionar o conteúdo real com `npm pack --dry-run --json`/ `tar -tf` e, se necessário, usar somente um artefato comprovadamente incluído (ou build reproduzível a partir do source), documentando o processo.
 - O helper `argon2Verify` do código consultado compara strings com `===`. Não adotá-lo automaticamente para autenticação. A etapa seguinte precisa revisar a comparação do resultado derivado e a forma como o hash codificado é validado.
 - A documentação do pacote apresenta benchmarks do navegador/Node, não do Apps Script. Esses números não serão usados para estimar desempenho no Google.
 
@@ -194,10 +194,19 @@ A próxima etapa deve ser uma prova de execução do algoritmo, ainda sem cadast
 
 1. Fixar e obter o pacote `hash-wasm@4.13.0` e sua distribuição Argon2 WASM; guardar licença e SHA-256 dos artefatos.
 2. Verificar se o bundle UMD funciona no Apps Script com senha/salt como `Uint8Array`, sem `TextEncoder`, `Buffer`, `atob`, `fetch`, timers ou APIs Node/browser ausentes.
-3. Executar vetores Argon2id do RFC 9106 que possam ser reproduzidos com os parâmetros/opções suportados e comparar com a implementação de referência independente. Se a API não suportar todos os campos de um vetor (por exemplo, associated data), documentar e escolher um vetor independente apropriado; não alterar silenciosamente os parâmetros.
+3. Comparar contra vetores independentes gerados com `argon2-cffi` 25.1.0, que usa o código C de Argon2, sem secret nem associated data. A biblioteca `hash-wasm` consultada não expõe associated data e fixa seu tamanho em zero; portanto, não pode reproduzir diretamente o vetor completo da RFC 9106 (que usa associated data não vazio). Não rotular os vetores abaixo como vetores oficiais RFC.
+
+Vetores de referência calculados fora do pacote sob teste, Argon2id v1.3, saída raw de 32 bytes:
+
+| Caso | Senha (hex) | Salt (hex) | m (KiB) | t | p | Saída esperada (hex) |
+|---|---|---|---:|---:|---:|---|
+| KAT independente pequeno | `01` repetido 32 vezes | `02` repetido 16 vezes | 32 | 3 | 4 | `03aab965c12001c9d7d0d2de33192c0494b684bb148196d73c1df1acaf6d0c2e` |
+| Parâmetros-alvo | UTF-8 de `Conecta Local POC Argon2id test` | `00112233445566778899aabbccddeeff` | 19.456 | 2 | 1 | `e68ff93eaa19dc2c1721cc50614468011e94c113d2b5888d0c3c3976ff5497c4` |
+
+Referência de cálculo: `argon2-cffi==25.1.0`, `Type.ID`, version 19; o pacote de bindings utiliza a implementação C vendorizada do Argon2. A saída esperada deve ser reproduzida independentemente antes de aprovar qualquer teste automatizado.
 4. Testar a capacidade de crescer a memória dentro do próprio módulo WASM, além do teste independente de 19 MiB já aprovado.
 5. Medir tempo e memória com Argon2id v1.3, inicialmente com a configuração mínima OWASP `m=19.456 KiB, t=2, p=1`, saída de 32 bytes, salt de 16 bytes.
 6. Repetir a medição em execuções separadas e verificar concorrência, limite de seis minutos, consumo total e risco de negação de serviço.
 7. Se o pacote não funcionar ou não tiver margem operacional suficiente, reabrir a arquitetura. Não reduzir os parâmetros abaixo do recomendado apenas para fazer o teste passar.
 
-**Estado:** biblioteca candidata em análise. Argon2id WASM ainda não foi executado no Apps Script. Nenhum algoritmo, salt, comparação ou fluxo de autenticação está aprovado.
+**Estado:** biblioteca candidata em análise. Argon2id WASM ainda não foi executado no Apps Script. O teste RFC 9106 completo não é diretamente reproduzível pela API consultada devido ao associated data não exposto; utilizar os vetores cruzados acima. O conteúdo do tarball publicado ainda precisa ser inspecionado devido às regras `.npmignore`. Nenhum algoritmo, salt, comparação ou fluxo de autenticação está aprovado.
