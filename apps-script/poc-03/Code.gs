@@ -101,9 +101,9 @@ function poc03RunKnownAnswerTests() {
 function poc03RunRfc80000Vector() {
     var startedAt = Date.now();
     var deadline = startedAt + POC03_MAX_BENCHMARK_MS;
-    var expected = "4ddcd8f60b98be21830cee5ef22701f9"\
-        + "641a4418d04c0414aeff08876b34ab56"\
-        + "a1d425a1225833549adb841b51c9b317"\
+    var expected = "4ddcd8f60b98be21830cee5ef22701f9"
+        + "641a4418d04c0414aeff08876b34ab56"
+        + "a1d425a1225833549adb841b51c9b317"
         + "6a272bdebba1d078478f62b397f33c8d";
     var actual;
 
