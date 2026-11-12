@@ -297,9 +297,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 4e942c05fd8f21eff4084bb84c0f900a69a7dd3c
-- **Data do commit:** 2026-11-12T16:22:01-03:00
-- **Mensagem do commit:** test(poc-03): revisar política de senha e throttling
+- **Commit de referência:** 52dac4433aaefb4f24ed56a67c45137fe8a038ba
+- **Data do commit:** 2026-11-12T16:22:23-03:00
+- **Mensagem do commit:** fix(poc-03): tornar teste de política async
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -394,13 +394,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 52dac44 | 2026-11-12 | fix(poc-03): tornar teste de política async |
+| b92eb14 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 4e942c0 | 2026-11-12 | test(poc-03): revisar política de senha e throttling |
 | c9a2619 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 35acdaf | 2026-11-12 | docs(ai-context): registrar prova manual de verificação Argon2id |
 | 3e396e8 | 2026-11-12 | docs(architecture): registrar ciclo manual de verificação Argon2id |
 | c50236d | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 011b671 | 2026-11-12 | docs(poc-03): registrar prova manual de criação e verificação |
-| 3d9ceb5 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| c2d4033 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
