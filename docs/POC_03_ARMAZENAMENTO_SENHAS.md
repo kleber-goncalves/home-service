@@ -184,7 +184,7 @@ Referências:
 - O runtime não possui `TextEncoder`, que a biblioteca usa quando recebe strings.
 - O código-fonte da biblioteca aceita `Uint8Array`; portanto, a POC poderá converter senha/salt para bytes UTF-8 por meio de `Utilities.newBlob(...).getBytes()` e passar arrays tipados, sem depender de `TextEncoder`.
 - O pacote usa Promises e compilação/instanciação WebAssembly assíncrona. Isso precisa ser testado no fluxo real do editor Apps Script, sem presumir compatibilidade apenas porque a sonda simples passou.
-- O artefato distribuído precisa ser fixado na versão exata `4.13.0`, ter hash SHA-256 registrado e ser armazenado no repositório; não carregar script de CDN ou versão flutuante durante autenticação. O `.npmignore` dessa tag contém as entradas `dist` e `wasm`; por isso, não presumir que o bundle UMD individual estará no tarball publicado. Inspecionar o conteúdo real com `npm pack --dry-run --json`/ `tar -tf` e, se necessário, usar somente um artefato comprovadamente incluído (ou build reproduzível a partir do source), documentando o processo.
+- O arquivo enviado pelo responsável foi validado: `hash-wasm-4.13.0.tgz`, SHA-256 `237a2735a3bb8725603a797fea1ba3e455d70e11f338518a65d42dab60182b68`. A listagem real do tarball confirma `package/dist/argon2.umd.min.js` (30.094 bytes) e `package/LICENSE`. SHA-256 do bundle UMD: `acfe11b015852f593aaddc51116f71dc7850e4551e6b34d42c1f88cf39635f03`. Bundle compactado para versionamento no repositório: `apps-script/poc-03/vendor/hash-wasm-argon2-4.13.0.umd.min.js.gz`, SHA-256 `5363994b073eb309d0608242c50cb019dfa682f63bb69cc1bd7f0f2093fd40ef`. O bundle contém o módulo WebAssembly incorporado como Base64; não é necessário arquivo `.wasm` externo. Não carregar CDN ou versão flutuante durante autenticação.
 - O helper `argon2Verify` do código consultado compara strings com `===`. Não adotá-lo automaticamente para autenticação. A etapa seguinte precisa revisar a comparação do resultado derivado e a forma como o hash codificado é validado.
 - A documentação do pacote apresenta benchmarks do navegador/Node, não do Apps Script. Esses números não serão usados para estimar desempenho no Google.
 
@@ -209,4 +209,34 @@ Referência de cálculo: `argon2-cffi==25.1.0`, `Type.ID`, version 19; o pacote 
 6. Repetir a medição em execuções separadas e verificar concorrência, limite de seis minutos, consumo total e risco de negação de serviço.
 7. Se o pacote não funcionar ou não tiver margem operacional suficiente, reabrir a arquitetura. Não reduzir os parâmetros abaixo do recomendado apenas para fazer o teste passar.
 
-**Estado:** biblioteca candidata em análise. Argon2id WASM ainda não foi executado no Apps Script. O teste RFC 9106 completo não é diretamente reproduzível pela API consultada devido ao associated data não exposto; utilizar os vetores cruzados acima. O conteúdo do tarball publicado ainda precisa ser inspecionado devido às regras `.npmignore`. Nenhum algoritmo, salt, comparação ou fluxo de autenticação está aprovado.
+### 8.8. Teste local do bundle original — Node.js
+
+O bundle UMD extraído do tarball enviado foi carregado em um contexto JavaScript de teste sem `TextEncoder`. Foi necessário passar `secret: new Uint8Array(0)`, pois a biblioteca converte o valor padrão `secret=""` com `TextEncoder`, mesmo quando senha e salt já são bytes. O wrapper da POC converte a senha para UTF-8 com `Utilities.newBlob(...).getBytes()` e fornece o segredo vazio como array tipado.
+
+Resultados locais em Node.js 24, usando o bundle original 4.13.0 e os dois vetores independentes:
+
+| Caso | Resultado | Tempo local |
+|---|---|---:|
+| Vetor pequeno (m=32 KiB,t=3,p=4) | PASS | 11,6 ms |
+| Perfil OWASP (m=19.456 KiB,t=2,p=1) | PASS | 49,6 ms |
+
+Esses tempos são apenas referências do teste Node local, não estimativas nem resultados do Apps Script. A geração independente dos dois vetores foi reproduzida com `argon2-cffi==25.1.0`/libargon2, e o bundle UMD gerou as mesmas 32 bytes nos dois casos.
+
+### 8.9. Execução manual pendente no Apps Script
+
+A função preparada no harness é `poc03RunArgon2idTests`. Ela executa sequencialmente os dois vetores, compara a saída binária byte a byte, mede a duração e registra apenas PASS/FAIL e parâmetros — nunca a senha ou o hash derivado.
+
+Para executar no projeto Apps Script isolado:
+
+1. Criar um arquivo de script chamado `HashWasmArgon2.gs`.
+2. Extrair do tarball exatamente o bundle `package/dist/argon2.umd.min.js` e colar todo o conteúdo nesse arquivo. O caminho pode ser extraído no PowerShell com:
+   ```powershell
+   tar -xzf .\\hash-wasm-4.13.0.tgz package/dist/argon2.umd.min.js
+   ```
+   Depois abrir `package\\dist\\argon2.umd.min.js`, copiar seu conteúdo integral e colar em `HashWasmArgon2.gs`.
+3. Substituir o conteúdo de `Code.gs` pela versão desta branch, que contém `poc03RunArgon2idTests`.
+4. Selecionar e executar somente `poc03RunArgon2idTests`.
+
+O projeto deve continuar isolado, sem Web App publicado, sem planilha de negócio e sem credenciais reais. A função é assíncrona; o V8 do Apps Script suporta `async`/`await`, Promises e o processamento de microtarefas necessário à instanciação WebAssembly. <https://developers.google.com/apps-script/guides/v8-runtime>
+
+**Estado:** bundle e vetores foram verificados em Node local. Ainda falta a execução manual no Apps Script real para verificar compatibilidade, crescimento de memória interno e tempo na plataforma Google. Nenhum algoritmo, salt de produção, comparação de autenticação ou fluxo de login está aprovado.
