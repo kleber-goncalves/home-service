@@ -285,9 +285,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** f6fd6829bfbcd7efe2fe6ff47b1f7c9119e9a175
-- **Data do commit:** 2026-11-12T14:10:36-03:00
-- **Mensagem do commit:** docs(poc-03): adicionar sonda WebAssembly para Argon2id
+- **Commit de referência:** 67a90625f9b3d3547425792a73a15d6c772e91ec
+- **Data do commit:** 2026-11-12T14:11:04-03:00
+- **Mensagem do commit:** docs(arquitetura): avaliar sonda WebAssembly após PBKDF2
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -381,13 +381,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 67a9062 | 2026-11-12 | docs(arquitetura): avaliar sonda WebAssembly após PBKDF2 |
+| 837794c | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | f6fd682 | 2026-11-12 | docs(poc-03): adicionar sonda WebAssembly para Argon2id |
 | 70c01c0 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 85da53a | 2026-11-12 | test(poc-03): cobrir probe de WebAssembly |
 | 0db6c63 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | b742e68 | 2026-11-12 | test(poc-03): sondar WebAssembly e memória Argon2id |
 | 1fcf1a4 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| 71751a7 | 2026-11-12 | docs(ai-context): registrar conclusão técnica da POC-03 |
-| 3155d88 | 2026-11-12 | docs(arquitetura): reprovar KDF lento no Apps Script |
 
 <!-- END AUTO-GENERATED SECTION -->
