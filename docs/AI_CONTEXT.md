@@ -139,11 +139,13 @@ A implementação usa React → POST same-origin `/api/backend` → Vercel Funct
 
 O PR #11 foi integrado em 2026-11-11 e o workflow pós-merge #93 passou. A POC permanece restrita a chamadas sintéticas `poc.*`, sem login, sessão ou acesso a dados de negócio. Os testes manuais da branch e o teste concorrente com duas chamadas idênticas passaram. A execução Echo no último Preview de `dev`, redeployado após a configuração de variáveis exclusivas de Preview, ainda precisa de confirmação manual final.
 
-### POC-03 — viabilidade de armazenamento de senhas em avaliação
+### POC-03 — desempenho de KDF no Apps Script reprovado para implementação
 
-A branch de trabalho é `feat/poc-03-password-kdf`. O harness isolado `apps-script/poc-03/Code.gs` avalia PBKDF2-HMAC-SHA-256 sobre `Utilities.computeHmacSha256Signature`, com vetores RFC/UTF-8/chave longa e benchmark controlado. Não há endpoint HTTP, cadastro, login, sessão, leitura/escrita de Sheets ou armazenamento de credenciais. A documentação está em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
+A branch de trabalho é `feat/poc-03-password-kdf`. O harness isolado `apps-script/poc-03/Code.gs` testou PBKDF2-HMAC-SHA-256 sobre `Utilities.computeHmacSha256Signature`; nenhum endpoint, cadastro, login, sessão ou armazenamento de credenciais foi criado.
 
-A OWASP prioriza Argon2id e scrypt; PBKDF2 é indicado em contexto específico FIPS. O runtime V8 do Apps Script não disponibiliza `crypto` nem `SubtleCrypto`. Os testes automatizados em Node simulam `Utilities` e não substituem execução no Google Apps Script real. Nenhum KDF, salt ou mecanismo de autenticação está aprovado. Não usar contas ou senhas reais.
+Em 2026-11-12, o responsável executou os três vetores rápidos no Apps Script real: os três passaram. O vetor RFC de 80.000 iterações (64 bytes derivados) passou em 84.443 ms. O benchmark de 600.000 iterações (32 bytes derivados) foi interrompido pelo limite preventivo após 149.247 iterações em 180.229 ms. As velocidades dos ensaios diferiram por aproximadamente 2,29 vezes; projeções simples resultaram em 5,28 e 12,08 minutos. A quota documentada do Apps Script é seis minutos por execução, e a projeção mais lenta supera esse teto. Assim, a compatibilidade dos vetores foi demonstrada, mas a capacidade operacional não. PBKDF2 sobre `Utilities` está reprovado para implementação no Apps Script neste momento; não reduzir o custo arbitrariamente, nem usar SHA-256/HMAC simples como substituto. O resultado detalhado está em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
+
+Nenhum KDF, salt ou mecanismo de autenticação está aprovado. É necessária nova decisão arquitetural para avaliar ambiente com suporte criptográfico adequado ou abandonar a autenticação própria na arquitetura atual. A demonstração continua limitada a dados fictícios e não deve receber credenciais reais.
 ### 5.3. Modelagem lógica e física de dados aprovada
 
 A modelagem lógica e o esquema físico estão consolidados em [`docs/MODELAGEM_DADOS.md`](./MODELAGEM_DADOS.md): 12 entidades e 102 campos lógicos, com 12 abas e 102 colunas físicas. O documento define UUIDs, PKs/FKs lógicas, cardinalidades, ordem de abas e colunas, tipos de célula, campos opcionais, valores controlados, unicidade, integridade, estados, visibilidade, privacidade e persistência no Sheets/Drive.
