@@ -297,9 +297,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 2fecc7283c322fc5df4ae3a5956a636ef3f39770
-- **Data do commit:** 2026-11-12T16:25:35-03:00
-- **Mensagem do commit:** test(poc-03): corrigir contagem e expor diagnóstico dos casos
+- **Commit de referência:** 17577e7a4cf22e063f7cdea51bcdf70a12ffbacf
+- **Data do commit:** 2026-11-12T16:27:21-03:00
+- **Mensagem do commit:** fix(poc-03): isolar teste de derivação Unicode NFC
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -394,13 +394,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 17577e7 | 2026-11-12 | fix(poc-03): isolar teste de derivação Unicode NFC |
+| c8b48bd | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 2fecc72 | 2026-11-12 | test(poc-03): corrigir contagem e expor diagnóstico dos casos |
 | c215946 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | c52750d | 2026-11-12 | debug(poc-03): identificar casos que falham na política de senha |
 | 3598611 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 2a1c3ca | 2026-11-12 | test(poc-03): cobrir senha Unicode e modelo de throttling |
 | 284fb53 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| 52dac44 | 2026-11-12 | fix(poc-03): tornar teste de política async |
-| b92eb14 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
