@@ -183,6 +183,72 @@ function poc03Benchmark600k() {
 }
 
 /**
+ * Verifica se o runtime real suporta WebAssembly e reserva a memória mínima
+ * recomendada pela OWASP para Argon2id (19 MiB).
+ *
+ * Esta função NÃO executa Argon2id; apenas testa capacidades do runtime.
+ */
+function poc03ProbeWebAssembly() {
+    if (
+        typeof WebAssembly !== "object"
+        || typeof WebAssembly.Module !== "function"
+        || typeof WebAssembly.Instance !== "function"
+        || typeof WebAssembly.Memory !== "function"
+    ) {
+        throw new Error("WebAssembly não está totalmente disponível neste runtime.");
+    }
+
+    // Módulo mínimo que exporta answer() e retorna 42.
+    var wasmBytes = new Uint8Array([
+        0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00,
+        0x01, 0x05, 0x01, 0x60, 0x00, 0x01, 0x7f,
+        0x03, 0x02, 0x01, 0x00,
+        0x07, 0x0a, 0x01, 0x06, 0x61, 0x6e, 0x73, 0x77,
+        0x65, 0x72, 0x00, 0x00,
+        0x0a, 0x06, 0x01, 0x04, 0x00, 0x41, 0x2a, 0x0b
+    ]);
+
+    var compileStartedAt = Date.now();
+    var wasmModule = new WebAssembly.Module(wasmBytes);
+    var wasmInstance = new WebAssembly.Instance(wasmModule);
+    var answer = wasmInstance.exports.answer();
+    var compileElapsedMs = Date.now() - compileStartedAt;
+
+    if (answer !== 42) {
+        throw new Error("O módulo WebAssembly mínimo não retornou 42.");
+    }
+
+    // Argon2id: 19 MiB = 304 páginas WebAssembly de 64 KiB.
+    var memoryStartedAt = Date.now();
+    var memory = new WebAssembly.Memory({
+        initial: 304,
+        maximum: 304
+    });
+    var memoryBytes = memory.buffer.byteLength;
+    var memoryElapsedMs = Date.now() - memoryStartedAt;
+
+    if (memoryBytes !== 19 * 1024 * 1024) {
+        throw new Error("O runtime não reservou exatamente 19 MiB de memória WASM.");
+    }
+
+    Logger.log(JSON.stringify({
+        test: "Apps Script WebAssembly capability probe",
+        status: "PASS",
+        wasmFunctionResult: answer,
+        wasmModuleCompileAndRunMs: compileElapsedMs,
+        argon2idMinimumMemoryBytes: memoryBytes,
+        argon2idMinimumMemoryMiB: memoryBytes / (1024 * 1024),
+        memoryAllocationMs: memoryElapsedMs
+    }));
+
+    return {
+        wasmAvailable: true,
+        functionResult: answer,
+        memoryBytes: memoryBytes
+    };
+}
+
+/**
  * Implementação experimental de PBKDF2 (RFC 8018), usada somente no harness.
  * A PRF é HMAC-SHA-256 provida pelo serviço Utilities do Google.
  *
