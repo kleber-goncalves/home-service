@@ -1,6 +1,6 @@
 # POC-03 — viabilidade de derivação e armazenamento de senhas
 
-> **Status:** PBKDF2 sobre `Utilities` reprovado como candidato para implementação após os ensaios de 2026-11-12. Uma sonda separada de WebAssembly e memória mínima para Argon2id foi adicionada; ainda precisa ser executada manualmente no Apps Script. Nenhum KDF foi aprovado e nenhuma conta/login está implementada.
+> **Status:** PBKDF2 sobre `Utilities` reprovado como candidato para implementação. A sonda básica de WebAssembly passou no Apps Script real em 2026-11-12. `hash-wasm` 4.13.0 foi identificado como candidato para uma nova prova de execução Argon2id, ainda não integrado nem aprovado. Nenhum KDF ou login foi aprovado.
 > **Escopo:** comprovar primitivas, compatibilidade, vetores de referência e custo de execução no runtime real do Google Apps Script.
 > **Ambiente:** projeto Apps Script separado, sem implantação como Web App, sem planilha de negócio e sem credenciais reais.
 
@@ -145,11 +145,59 @@ A documentação oficial do Apps Script estabelece limite de **seis minutos por 
 
 **Conclusão técnica:** os vetores demonstram compatibilidade para os casos testados, mas o benchmark não demonstra que 600.000 iterações concluam com margem operacional segura no Apps Script. PBKDF2-HMAC-SHA-256 sobre `Utilities` fica **reprovado como candidato para implementação no Apps Script neste momento**. Não reduzir o custo de forma arbitrária para tentar fazê-lo caber no limite.
 
-### 8.5. Decisão e próximos passos
+### 8.5. Sonda WebAssembly — resultado manual
 
-- Não implementar cadastro, login ou armazenamento de senha no Apps Script com este harness.
-- Não copiar a implementação experimental para o sistema de negócio.
-- Não usar SHA-256 simples, HMAC simples ou um work factor reduzido como substituição.
-- Reabrir a decisão arquitetural para avaliar onde um KDF mantido e adequado poderia executar, preservando o Apps Script como autoridade de negócio somente se o fluxo de credenciais e a fronteira de confiança forem redesenhados e aprovados.
-- Qualquer alternativa terá de ser testada com carga, limite de corpo, rate limiting e proteção contra negação de serviço. A credencial não pode virar um hash ou verificador reutilizável exposto ao navegador.
-- A POC usa exclusivamente strings fictícias e não altera a modelagem aprovada de 12 abas/102 colunas.
+Função: `poc03ProbeWebAssembly`
+
+O responsável executou a sonda no projeto Apps Script isolado em 2026-11-12. Resultado: `PASS`.
+
+| Verificação | Resultado |
+|---|---:|
+| Execução do módulo WebAssembly mínimo | PASS |
+| Valor retornado pelo módulo | 42 |
+| Compilação e execução do módulo mínimo | 1 ms |
+| Memória WebAssembly reservada | 19.922.944 bytes (19 MiB) |
+| Tempo registrado para criar o objeto Memory | 0 ms |
+
+**Interpretação:** o runtime conseguiu compilar/executar um módulo WASM simples e criar um objeto `WebAssembly.Memory` de 19 MiB. Isso comprova a disponibilidade básica da API WebAssembly e a reserva isolada dessa memória.
+
+**Limite:** essa memória foi criada diretamente pela sonda, fora de um módulo Argon2id. A sonda não carregou o WASM de uma biblioteca criptográfica, não exercitou `memory.grow` dentro de um módulo Argon2id e não mediu o consumo total de memória do processo. Portanto, ainda não comprova que o heap interno, a memória adicional e a execução completa do Argon2id funcionarão no Apps Script.
+
+### 8.6. Biblioteca candidata para a próxima etapa: hash-wasm 4.13.0
+
+Foi feita uma análise preliminar da biblioteca `hash-wasm`:
+
+- Versão observada: `4.13.0`, publicada em 7 de novembro de 2026.
+- Licença declarada: MIT.
+- O pacote declara zero dependências, módulos WebAssembly incorporados como Base64 e suporte a Argon2id v1.3.
+- A API recebe senha e salt como `Uint8Array`, aceita parâmetros `iterations`, `parallelism`, `memorySize` (KiB) e `hashLength`, e pode gerar uma string codificada no formato PHC.
+- A implementação usa `WebAssembly.compile`/`WebAssembly.instantiate` e cresce a memória linear do módulo para reservar o espaço de Argon2.
+- A implementação consultada tem origem no código Argon2 mantido pelo projeto e declara ser baseada na implementação Go de Argon2.
+
+Referências:
+- [Repositório e API hash-wasm](https://github.com/Daninet/hash-wasm/tree/v4.13.0).
+- [Pacote hash-wasm 4.13.0 no npm](https://www.npmjs.com/package/hash-wasm).
+- [Implementação Argon2 usada pelo pacote](https://github.com/Daninet/hash-wasm/blob/v4.13.0/lib/argon2.ts).
+- [Interface WebAssembly usada pelo pacote](https://github.com/Daninet/hash-wasm/blob/v4.13.0/lib/WASMInterface.ts).
+
+**Compatibilidade preliminar com Apps Script:**
+- O runtime não possui `TextEncoder`, que a biblioteca usa quando recebe strings.
+- O código-fonte da biblioteca aceita `Uint8Array`; portanto, a POC poderá converter senha/salt para bytes UTF-8 por meio de `Utilities.newBlob(...).getBytes()` e passar arrays tipados, sem depender de `TextEncoder`.
+- O pacote usa Promises e compilação/instanciação WebAssembly assíncrona. Isso precisa ser testado no fluxo real do editor Apps Script, sem presumir compatibilidade apenas porque a sonda simples passou.
+- O artefato distribuído precisa ser fixado na versão exata `4.13.0`, ter hash SHA-256 registrado e ser armazenado no repositório; não carregar script de CDN ou versão flutuante durante autenticação.
+- O helper `argon2Verify` do código consultado compara strings com `===`. Não adotá-lo automaticamente para autenticação. A etapa seguinte precisa revisar a comparação do resultado derivado e a forma como o hash codificado é validado.
+- A documentação do pacote apresenta benchmarks do navegador/Node, não do Apps Script. Esses números não serão usados para estimar desempenho no Google.
+
+### 8.7. Plano da próxima prova — Argon2id WASM real
+
+A próxima etapa deve ser uma prova de execução do algoritmo, ainda sem cadastro/login ou conexão com Sheets:
+
+1. Fixar e obter o pacote `hash-wasm@4.13.0` e sua distribuição Argon2 WASM; guardar licença e SHA-256 dos artefatos.
+2. Verificar se o bundle UMD funciona no Apps Script com senha/salt como `Uint8Array`, sem `TextEncoder`, `Buffer`, `atob`, `fetch`, timers ou APIs Node/browser ausentes.
+3. Executar vetores Argon2id do RFC 9106 que possam ser reproduzidos com os parâmetros/opções suportados e comparar com a implementação de referência independente. Se a API não suportar todos os campos de um vetor (por exemplo, associated data), documentar e escolher um vetor independente apropriado; não alterar silenciosamente os parâmetros.
+4. Testar a capacidade de crescer a memória dentro do próprio módulo WASM, além do teste independente de 19 MiB já aprovado.
+5. Medir tempo e memória com Argon2id v1.3, inicialmente com a configuração mínima OWASP `m=19.456 KiB, t=2, p=1`, saída de 32 bytes, salt de 16 bytes.
+6. Repetir a medição em execuções separadas e verificar concorrência, limite de seis minutos, consumo total e risco de negação de serviço.
+7. Se o pacote não funcionar ou não tiver margem operacional suficiente, reabrir a arquitetura. Não reduzir os parâmetros abaixo do recomendado apenas para fazer o teste passar.
+
+**Estado:** biblioteca candidata em análise. Argon2id WASM ainda não foi executado no Apps Script. Nenhum algoritmo, salt, comparação ou fluxo de autenticação está aprovado.
