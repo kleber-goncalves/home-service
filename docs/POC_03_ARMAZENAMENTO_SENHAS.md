@@ -1,6 +1,6 @@
 # POC-03 — viabilidade de derivação e armazenamento de senhas
 
-> **Status:** experimento isolado em preparação. Nenhum algoritmo foi aprovado para autenticação e nenhuma conta/login está implementado.
+> **Status:** vetores executados manualmente no Apps Script em 2026-11-12; compatibilidade aprovada somente para os vetores testados. O custo operacional do PBKDF2 candidato não foi aprovado. Nenhuma conta/login está implementada.
 > **Escopo:** comprovar primitivas, compatibilidade, vetores de referência e custo de execução no runtime real do Google Apps Script.
 > **Ambiente:** projeto Apps Script separado, sem implantação como Web App, sem planilha de negócio e sem credenciais reais.
 
@@ -94,8 +94,62 @@ Todos os itens abaixo precisam ser verificados; nenhum resultado isolado é sufi
 - Cookies, CSRF, sessão, expiração e revogação.
 - Integração com Vercel, Apps Script de negócio ou Google Sheets.
 
-## 8. Resultado atual
+## 8. Resultados manuais no Apps Script — 2026-11-12
 
-**Ainda não executado no Google Apps Script.** O commit da POC apenas disponibiliza o harness e o protocolo. O resultado real depende da execução manual pelo responsável no runtime Google e deve ser registrado antes de qualquer decisão de implementação.
+O responsável executou as três funções no projeto Apps Script isolado, sem Web App ou planilha de negócio.
 
-A POC usa exclusivamente strings de teste públicas e não altera a modelagem aprovada de 12 abas/102 colunas.
+### 8.1. Vetores rápidos
+
+Função: `poc03RunKnownAnswerTests`
+
+| Caso | Resultado |
+|---|---|
+| RFC 7914 — uma iteração, chave derivada de 64 bytes | PASS |
+| UTF-8 com acentos e emoji — duas iterações, 32 bytes | PASS |
+| Senha ASCII de 80 bytes — duas iterações, 32 bytes | PASS |
+
+O Execution Log registrou início às 13:56:44 e conclusão às 13:56:49. A função informou que todos os vetores passaram.
+
+### 8.2. Vetor RFC de 80.000 iterações
+
+Função: `poc03RunRfc80000Vector`
+
+- Resultado: `PASS`.
+- Iterações: 80.000.
+- Chave derivada: 64 bytes.
+- Tempo interno medido: **84.443 ms** (aproximadamente 84,4 segundos).
+
+Como SHA-256 produz blocos de 32 bytes, uma chave derivada de 64 bytes requer dois blocos PBKDF2; portanto, esse ensaio executou duas sequências de 80.000 iterações HMAC.
+
+### 8.3. Benchmark de 600.000 iterações
+
+Função: `poc03Benchmark600k`
+
+- Alvo: 600.000 iterações, chave derivada de 32 bytes (um bloco).
+- Iterações concluídas: **149.247**.
+- Tempo interno medido: **180.229 ms**.
+- Resultado: `STOPPED`, por interrupção preventiva aos três minutos.
+
+A mensagem de erro ao final do Execution Log é esperada: o próprio harness interrompe o ensaio ao atingir o limite preventivo. Ela não representa falha de vetor ou divergência criptográfica.
+
+### 8.4. Leitura de desempenho e limite da plataforma
+
+Os dois ensaios de desempenho apresentaram taxas diferentes:
+
+- Benchmark interrompido: cerca de **828 iterações/segundo**. Extrapolação linear para 600.000: aproximadamente **12,08 minutos**.
+- Vetor RFC: 160.000 chamadas HMAC estimadas (80.000 por bloco, dois blocos) em 84,443 segundos. Extrapolação equivalente para 600.000 iterações de um bloco: aproximadamente **5,28 minutos**.
+
+A diferença entre as projeções é de aproximadamente 2,29 vezes. Os ensaios não devem ser tratados como benchmark perfeitamente controlado: entradas, tamanho derivado e condições de execução diferem. Não é correto afirmar um tempo exato de conclusão para 600.000 iterações sem medições repetidas e comparáveis.
+
+A documentação oficial do Apps Script estabelece limite de **seis minutos por execução** para contas de consumidor e Google Workspace. Assim, a projeção mais lenta supera o limite; a mais rápida deixaria cerca de 43 segundos de margem para toda a requisição, incluindo validação de entrada, acesso à planilha, lock, leitura/gravação e resposta. O KDF sozinho não pode consumir quase todo o tempo da execução de autenticação.
+
+**Conclusão técnica:** os vetores demonstram compatibilidade para os casos testados, mas o benchmark não demonstra que 600.000 iterações concluam com margem operacional segura no Apps Script. PBKDF2-HMAC-SHA-256 sobre `Utilities` fica **reprovado como candidato para implementação no Apps Script neste momento**. Não reduzir o custo de forma arbitrária para tentar fazê-lo caber no limite.
+
+### 8.5. Decisão e próximos passos
+
+- Não implementar cadastro, login ou armazenamento de senha no Apps Script com este harness.
+- Não copiar a implementação experimental para o sistema de negócio.
+- Não usar SHA-256 simples, HMAC simples ou um work factor reduzido como substituição.
+- Reabrir a decisão arquitetural para avaliar onde um KDF mantido e adequado poderia executar, preservando o Apps Script como autoridade de negócio somente se o fluxo de credenciais e a fronteira de confiança forem redesenhados e aprovados.
+- Qualquer alternativa terá de ser testada com carga, limite de corpo, rate limiting e proteção contra negação de serviço. A credencial não pode virar um hash ou verificador reutilizável exposto ao navegador.
+- A POC usa exclusivamente strings fictícias e não altera a modelagem aprovada de 12 abas/102 colunas.
