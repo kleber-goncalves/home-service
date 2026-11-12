@@ -255,7 +255,20 @@ O harness recebeu dois helpers:
 - `poc03GenerateSaltHex_()`: obtém um UUID pelo serviço oficial do Apps Script, exige formato UUID v4/RFC, remove os hífens e retorna 32 caracteres hexadecimais (16 bytes).
 - `poc03RunSaltGenerationTests()`: gera 256 amostras, verifica formato v4/variante, tamanho de 16 bytes e ausência de repetição dentro da amostra. Os valores nunca são impressos no log.
 
-**Limite:** o teste estrutural/colisão não mede entropia nem prova CSPRNG. A justificativa criptográfica decorre do contrato documental Google → Java, não de frequência estatística observada. Falta ainda executar essa função no Apps Script real.
+**Resultado manual no Apps Script — 2026-11-12:**
+
+| Verificação | Resultado |
+|---|---:|
+| Amostras geradas | 256 |
+| UUIDs v4/variante válidos | 256 |
+| Conversão para salt de 16 bytes | 256 |
+| Valores distintos na amostra | 256 |
+| Colisões observadas | 0 |
+| Salt exposto no log | Não |
+
+O Execution Log registrou `status=PASS`, `samples=256`, `validUuidV4=256`, `saltBytes=16`, `uniqueSamples=256`, `duplicateCount=0` e `statisticalProofOfCSPRNG=false`.
+
+**Interpretação:** a execução confirma que o helper funcionou no Apps Script real, gerou 256 UUIDs v4 válidos e os converteu para 16 bytes sem colisão na amostra. Conforme a RFC 9562, UUIDv4 contém 122 bits destinados a dados aleatórios; os demais 6 bits codificam versão e variante. A cadeia documental Google → Java declara que `Utilities.getUuid()` é equivalente a `UUID.randomUUID()`, e a documentação Java especifica um PRNG criptograficamente forte. Portanto, a fonte é aceita como candidata de salt aleatório para continuar a POC. O Google alerta que UUID não garante unicidade absoluta em todos os tempos e espaços; a ausência de colisões nas 256 amostras também não prova aleatoriedade. O requisito aqui é obter um salt aleatório por senha, não um identificador matematicamente único global.
 
 Formato de armazenamento candidato, ainda não aprovado para uso:
 - `senha_algoritmo`: `argon2id$v=19$m=19456,t=2,p=1`.
@@ -268,6 +281,7 @@ A separação corresponde aos três campos já modelados na entidade `USUARIOS`.
 
 - **PBKDF2 sobre `Utilities`: reprovado** por desempenho operacional inconclusivo e margem insuficiente.
 - **Argon2id via `hash-wasm@4.13.0`: aprovado somente como candidato tecnicamente viável para continuar a POC.** Os dois vetores passaram em cinco baterias manuais; o perfil de referência apresentou média de 139,8 ms, mediana de 130 ms e intervalo observado de 61–280 ms. O resultado é promissor, mas a amostra ainda é pequena e não avalia concorrência ou carga.
-- **Autenticação/login: continua bloqueado.** Ainda faltam execução manual do teste de salt, aprovação do formato de armazenamento, verificação/comparação, controle contra abuso, ensaio de concorrência e revisão de segurança da dependência e da integração.
+- **Fonte candidata de salt:** execução manual concluída com PASS em 256/256 UUIDs v4, 16 bytes cada e zero colisões observadas. A documentação Google → Java oferece a base criptográfica; a amostra não prova CSPRNG.
+- **Autenticação/login: continua bloqueado.** Ainda faltam aprovação do formato de armazenamento, verificação/comparação, controle contra abuso, ensaio de concorrência e revisão de segurança da dependência e da integração.
 
 O próximo passo é concluir essas validações complementares, sem implementar cadastro, login, sessão ou operações de negócio nesta etapa.
