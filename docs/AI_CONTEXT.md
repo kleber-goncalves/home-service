@@ -82,7 +82,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 
 ## 4. Estado atual do repositório
 
-**Estado atualizado em 2026-11-12 após integração da POC-02 em `dev` e início da POC-03:**
+**Estado atualizado em 2026-11-12 após integração da POC-02 em `dev` e execução manual de Argon2id na POC-03:**
 
 - A branch `dev` contém a homepage pública demonstrativa do Conecta Local, integrada por Pull Request.
 - `src/pages/HomePage.jsx` coordena a composição das seções e o estado local da busca e dos filtros.
@@ -139,17 +139,21 @@ A implementação usa React → POST same-origin `/api/backend` → Vercel Funct
 
 O PR #11 foi integrado em 2026-11-11 e o workflow pós-merge #93 passou. A POC permanece restrita a chamadas sintéticas `poc.*`, sem login, sessão ou acesso a dados de negócio. Os testes manuais da branch e o teste concorrente com duas chamadas idênticas passaram. A execução Echo no último Preview de `dev`, redeployado após a configuração de variáveis exclusivas de Preview, ainda precisa de confirmação manual final.
 
-### POC-03 — desempenho de KDF no Apps Script reprovado para implementação
+### POC-03 — Argon2id executado no Apps Script; autenticação ainda bloqueada
 
-A branch de trabalho é `feat/poc-03-password-kdf`. O harness isolado `apps-script/poc-03/Code.gs` testou PBKDF2-HMAC-SHA-256 sobre `Utilities.computeHmacSha256Signature`; nenhum endpoint, cadastro, login, sessão ou armazenamento de credenciais foi criado.
+A branch de trabalho é `feat/poc-03-password-kdf`. O harness `apps-script/poc-03/Code.gs` permanece isolado; nenhum endpoint, cadastro, login, sessão ou armazenamento de credenciais foi criado.
 
-Em 2026-11-12, o responsável executou os três vetores rápidos no Apps Script real: os três passaram. O vetor RFC de 80.000 iterações (64 bytes derivados) passou em 84.443 ms. O benchmark de 600.000 iterações (32 bytes derivados) foi interrompido pelo limite preventivo após 149.247 iterações em 180.229 ms. As velocidades dos ensaios diferiram por aproximadamente 2,29 vezes; projeções simples resultaram em 5,28 e 12,08 minutos. A quota documentada do Apps Script é seis minutos por execução, e a projeção mais lenta supera esse teto. Assim, a compatibilidade dos vetores foi demonstrada, mas a capacidade operacional não. PBKDF2 sobre `Utilities` está reprovado para implementação no Apps Script neste momento; não reduzir o custo arbitrariamente, nem usar SHA-256/HMAC simples como substituto. O resultado detalhado está em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
+**PBKDF2-HMAC-SHA-256 sobre `Utilities.computeHmacSha256Signature`: reprovado para implementação no Apps Script.** Os três vetores rápidos passaram; o vetor RFC de 80.000 iterações/64 bytes passou em 84.443 ms. O benchmark de 600.000 iterações/32 bytes foi interrompido preventivamente após 149.247 iterações em 180.229 ms. Extrapolações lineares diferentes variaram de 5,28 a 12,08 minutos, diante do limite documentado de seis minutos por execução. Não reduzir o work factor arbitrariamente nem usar SHA-256/HMAC simples como substituto. Detalhes em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
 
-Nenhum KDF, salt ou mecanismo de autenticação está aprovado. A sonda `poc03ProbeWebAssembly` passou no Apps Script real: módulo mínimo retornou 42, compilação/execução 1 ms e criação de uma memória independente de 19 MiB registrada em 0 ms. Isso não prova crescimento interno de memória nem execução do KDF.
+**Argon2id via WebAssembly — execução manual real concluída em 2026-11-12.** A sonda WebAssembly básica passou (módulo retornou 42; memória independente de 19 MiB criada). O bundle original `hash-wasm@4.13.0`, com WASM incorporado, foi fixado em `devDependencies` e verificado por SHA-256; o código de produto não importa essa dependência. A função `poc03RunArgon2idTests` passou no Apps Script real em dois vetores independentes:
+- KAT pequeno `m=32 KiB,t=3,p=4`: PASS em 10 ms.
+- Perfil de referência `m=19456 KiB,t=2,p=1`, saída de 32 bytes: PASS em 142 ms.
+- Bateria completa: PASS 2/2, `totalElapsedMs=161`.
 
-O tarball `hash-wasm@4.13.0` fornecido pelo responsável foi verificado (SHA-256 `237a2735a3bb8725603a797fea1ba3e455d70e11f338518a65d42dab60182b68`) e contém `dist/argon2.umd.min.js`, 30.094 bytes, com WASM incorporado. SHA-256 do bundle: `acfe11b015852f593aaddc51116f71dc7850e4551e6b34d42c1f88cf39635f03`. A dependência `hash-wasm` está fixada somente em `devDependencies`/`package-lock.json`; a CI carrega o bundle original e verifica seu SHA-256. O código do produto não importa essa dependência. A função `poc03RunArgon2idTests` está no harness. O bundle original passou dois vetores independentes em um contexto Node.js 24 local sem `TextEncoder` (KAT pequeno e perfil `m=19456,t=2,p=1`); isso não é resultado do Apps Script.
+O resultado demonstra compatibilidade funcional e desempenho pontual promissor para Argon2id no Apps Script. **Não aprova autenticação ou produção.** Foi uma única bateria manual; não comprova desempenho consistente, concorrência, pico de memória, CSPRNG para salts, comparação segura, armazenamento, rate limit ou resistência a abuso. A função `argon2Verify` da biblioteca usa comparação simples de strings e não será adotada automaticamente. O wrapper fornece `Uint8Array` para evitar dependência de `TextEncoder`. Os vetores cruzados independentes e as limitações estão documentados em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
 
-O wrapper contorna a falta de `TextEncoder` convertendo bytes via `Utilities.newBlob(...).getBytes()` e passando `secret: new Uint8Array(0)`, pois a biblioteca converte por padrão `secret=""` via TextEncoder. A API não expõe associated data e o helper `argon2Verify` usa comparação de strings simples; ele não será adotado sem revisão. Os vetores independentes sem secret/AD estão documentados em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`. Próximo passo: executar manualmente `poc03RunArgon2idTests` no Apps Script real. Nenhum KDF, salt de produção, comparação de credenciais ou login está aprovado. A demonstração usa apenas dados fictícios e não deve receber credenciais reais.
+**Próximas validações:** repetir a medição em pelo menos cinco execuções separadas; avaliar concorrência controlada e consumo de recursos; definir e comprovar uma fonte criptograficamente segura de salt exclusivo; revisar formato/versionamento do hash, limites de entrada e procedimento de verificação/comparação; definir rate limit e controles contra abuso; revisar dependência, licença e integridade do bundle. Nenhuma credencial real deve ser usada. Cadastro, login e sessões continuam bloqueados até concluir essas verificações e a POC-04.
+
 ### 5.3. Modelagem lógica e física de dados aprovada
 
 A modelagem lógica e o esquema físico estão consolidados em [`docs/MODELAGEM_DADOS.md`](./MODELAGEM_DADOS.md): 12 entidades e 102 campos lógicos, com 12 abas e 102 colunas físicas. O documento define UUIDs, PKs/FKs lógicas, cardinalidades, ordem de abas e colunas, tipos de célula, campos opcionais, valores controlados, unicidade, integridade, estados, visibilidade, privacidade e persistência no Sheets/Drive.
