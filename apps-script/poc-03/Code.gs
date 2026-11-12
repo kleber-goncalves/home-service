@@ -740,7 +740,7 @@ function poc03NormalizeAndValidatePasswordForPoc_(password) {
 /**
  * Valida a regra de senha em memória. Não registra valores fornecidos.
  */
-function poc03RunPasswordInputPolicyTests() {
+async function poc03RunPasswordInputPolicyTests() {
     var tests = [
         {
             name: "14 code points são rejeitados",
