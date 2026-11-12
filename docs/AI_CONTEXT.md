@@ -283,9 +283,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 614e38bdf25060304cb2ee239d0d26dd570bcc92
-- **Data do commit:** 2026-11-12T13:40:47-03:00
-- **Mensagem do commit:** fix(poc-03): corrigir sintaxe do vetor RFC
+- **Commit de referência:** cc8261528b2093c87531b270e9105620d6c1d27d
+- **Data do commit:** 2026-11-12T14:05:39-03:00
+- **Mensagem do commit:** docs(poc-03): registrar resultados reais do Apps Script
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -379,13 +379,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| cc82615 | 2026-11-12 | docs(poc-03): registrar resultados reais do Apps Script |
+| 8db0680 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 614e38b | 2026-11-12 | fix(poc-03): corrigir sintaxe do vetor RFC |
 | f97ee8e | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 2cc0230 | 2026-11-12 | fix(poc-03): simplificar vetor RFC de 80 mil iterações |
 | 8543149 | 2026-11-12 | docs(ai-context): registrar POC-02 integrada e POC-03 |
 | 82b4192 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 31fd748 | 2026-11-12 | docs(arquitetura): atualizar POC-02 e bloqueio de KDF |
-| bf4b1d5 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| 1cbd3b5 | 2026-11-12 | ci(poc-03): executar testes de compatibilidade do KDF |
 
 <!-- END AUTO-GENERATED SECTION -->
