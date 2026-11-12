@@ -289,9 +289,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 52f4c9909ecf0e3e062a2fafec31629177ebc0bd
-- **Data do commit:** 2026-11-12T15:08:43-03:00
-- **Mensagem do commit:** docs(poc-03): ajustar procedimento ao pacote fixado no lockfile
+- **Commit de referência:** c16e2a41986af3def0bbcb23c8f96f0ed68f0d9e
+- **Data do commit:** 2026-11-12T15:09:31-03:00
+- **Mensagem do commit:** docs(arquitetura): corrigir referência ao bundle de teste
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -386,13 +386,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| c16e2a4 | 2026-11-12 | docs(arquitetura): corrigir referência ao bundle de teste |
+| 1005d83 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 52f4c99 | 2026-11-12 | docs(poc-03): ajustar procedimento ao pacote fixado no lockfile |
 | 34b96be | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | ab420a8 | 2026-11-12 | chore(poc-03): remove invalid compressed vendor copy |
 | 534d8db | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | bebbad2 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 22342b8 | 2026-11-12 | test(poc-03): load pinned Argon2 bundle from dev dependency |
-| 8f3784f | 2026-11-12 | build(test): lock hash-wasm 4.13.0 for POC tests |
-| e5e4c0f | 2026-11-12 | build(test): pin hash-wasm for Argon2id POC tests |
 
 <!-- END AUTO-GENERATED SECTION -->
