@@ -295,9 +295,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 04823d68524aaeecd9119cd2d9e84ace959338f0
-- **Data do commit:** 2026-11-12T16:04:58-03:00
-- **Mensagem do commit:** test(poc-03): preparar verificação isolada de registro Argon2id
+- **Commit de referência:** 6c15e5f278d1bb204b9f900202f1a8813a4eb3bc
+- **Data do commit:** 2026-11-12T16:05:22-03:00
+- **Mensagem do commit:** test(poc-03): cobrir ciclo isolado de verificação Argon2id
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -392,13 +392,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 6c15e5f | 2026-11-12 | test(poc-03): cobrir ciclo isolado de verificação Argon2id |
+| 3ffff22 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 04823d6 | 2026-11-12 | test(poc-03): preparar verificação isolada de registro Argon2id |
 | 019f468 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | e41a773 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 47ce3ee | 2026-11-12 | docs(ai-context): registrar validação de salt UUIDv4 |
 | ecde6d9 | 2026-11-12 | docs(architecture): registrar teste real do UUID para salt |
 | fbd07e9 | 2026-11-12 | docs(poc-03): registrar teste real da fonte de salt |
-| 449c177 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| d963d87 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
