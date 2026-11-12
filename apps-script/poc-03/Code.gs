@@ -477,6 +477,8 @@ async function poc03RunArgon2idTests() {
             testsPassed: results.length,
             testsTotal: testCases.length,
             totalElapsedMs: Date.now() - suiteStartedAt,
+            performanceAssessment: "MEASURED_NOT_APPROVED",
+            meaning: "vetores corretos; desempenho no Apps Script ainda precisa ser avaliado",
             profile: "m=19456 KiB,t=2,p=1,hashLength=32"
         };
 
