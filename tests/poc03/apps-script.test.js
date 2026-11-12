@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { createHash, createHmac } from "node:crypto";
+import { createHash, createHmac, randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
@@ -21,6 +21,9 @@ function createAppsScriptHarness() {
   const logs = [];
 
   const utilities = {
+    getUuid() {
+      return randomUUID();
+    },
     newBlob(value) {
       const bytes = Buffer.from(String(value), "utf8");
       return {
@@ -102,6 +105,34 @@ test("POC-03: probe WebAssembly e alocação de 19 MiB", () => {
   );
 });
 
+
+
+test("POC-03: salt uses UUID v4, becomes 16 bytes and does not log the value", () => {
+  const { context, logs } = createAppsScriptHarness();
+
+  const result = context.poc03RunSaltGenerationTests();
+
+  assert.equal(result.status, "PASS");
+  assert.equal(result.samples, 256);
+  assert.equal(result.validUuidV4, 256);
+  assert.equal(result.saltBytes, 16);
+  assert.equal(result.uniqueSamples, 256);
+  assert.equal(result.duplicateCount, 0);
+  assert.equal(result.statisticalProofOfCSPRNG, false);
+  assert.equal(logs.length, 1);
+  assert.doesNotMatch(logs[0], /[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i);
+});
+
+test("POC-03: rejeita UUID que não seja v4 RFC", () => {
+  const { context } = createAppsScriptHarness();
+
+  context.Utilities.getUuid = () => "00000000-0000-0000-0000-000000000000";
+
+  assert.throws(
+    () => context.poc03GenerateSaltHex_(),
+    /UUID v4 RFC 9562 válido/,
+  );
+});
 
 test("POC-03: bundle Argon2id está fixado e íntegro", () => {
   const actual = createHash("sha256").update(vendorSourceBuffer).digest("hex");
