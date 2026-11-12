@@ -842,6 +842,7 @@ async function poc03RunPasswordInputPolicyTests() {
     ];
 
     var passedCount = 0;
+    var failedTests = [];
 
     tests.forEach(function (testCase) {
         var passed;
@@ -857,6 +858,8 @@ async function poc03RunPasswordInputPolicyTests() {
 
         if (passed) {
             passedCount += 1;
+        } else {
+            failedTests.push(testCase.name);
         }
 
         Logger.log(JSON.stringify({
@@ -877,6 +880,8 @@ async function poc03RunPasswordInputPolicyTests() {
 
     if (nfcPassed) {
         passedCount += 1;
+    } else {
+        failedTests.push("senha equivalente em NFC verifica o mesmo registro Argon2id");
     }
 
     Logger.log(JSON.stringify({
@@ -893,13 +898,17 @@ async function poc03RunPasswordInputPolicyTests() {
         maximumCodePoints: POC03_PASSWORD_MAX_CODE_POINTS,
         maximumUtf8Bytes: POC03_PASSWORD_MAX_UTF8_BYTES,
         unicodeNormalization: "NFC",
-        spacesTrimmed: false
+        spacesTrimmed: false,
+        failedTests: failedTests
     };
 
     Logger.log(JSON.stringify(summary));
 
     if (summary.status !== "PASS") {
-        throw new Error("Falha na política de entrada de senha da POC-03.");
+        throw new Error(
+            "Falha na política de entrada de senha da POC-03: "
+            + failedTests.join("; ")
+        );
     }
 
     return summary;
