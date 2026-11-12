@@ -289,9 +289,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** eb52ab76d19192236d4249086a44d489339ac192
-- **Data do commit:** 2026-11-12T15:11:24-03:00
-- **Mensagem do commit:** test(poc-03): mark Argon2id performance as measurement only
+- **Commit de referência:** a070ecab4a3f45249c1a95516ec4f2473839d8f1
+- **Data do commit:** 2026-11-12T15:34:43-03:00
+- **Mensagem do commit:** docs(poc-03): registrar execução real do Argon2id
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -386,13 +386,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| a070eca | 2026-11-12 | docs(poc-03): registrar execução real do Argon2id |
+| a46fd74 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | eb52ab7 | 2026-11-12 | test(poc-03): mark Argon2id performance as measurement only |
 | fc694cf | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | e950d04 | 2026-11-12 | docs(ai-context): corrigir localização do bundle de teste |
 | c16e2a4 | 2026-11-12 | docs(arquitetura): corrigir referência ao bundle de teste |
 | 1005d83 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 52f4c99 | 2026-11-12 | docs(poc-03): ajustar procedimento ao pacote fixado no lockfile |
-| 34b96be | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| ab420a8 | 2026-11-12 | chore(poc-03): remove invalid compressed vendor copy |
 
 <!-- END AUTO-GENERATED SECTION -->
