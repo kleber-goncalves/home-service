@@ -297,9 +297,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 011b671e925175c2761b61bd270aba57e8796c42
-- **Data do commit:** 2026-11-12T16:11:06-03:00
-- **Mensagem do commit:** docs(poc-03): registrar prova manual de criação e verificação
+- **Commit de referência:** 3e396e88bdf40807c9b99363ad81073cf85cc11a
+- **Data do commit:** 2026-11-12T16:11:35-03:00
+- **Mensagem do commit:** docs(architecture): registrar ciclo manual de verificação Argon2id
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -394,13 +394,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 3e396e8 | 2026-11-12 | docs(architecture): registrar ciclo manual de verificação Argon2id |
+| c50236d | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 011b671 | 2026-11-12 | docs(poc-03): registrar prova manual de criação e verificação |
 | 3d9ceb5 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | c2d4033 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 7947abd | 2026-11-12 | docs(ai-context): registrar teste de verificação Argon2id preparado |
 | c7a05a4 | 2026-11-12 | docs(architecture): registrar prova isolada de verificação Argon2id |
 | 01b417d | 2026-11-12 | docs(poc-03): documentar prova isolada de verificação |
-| f059d2b | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| 6c15e5f | 2026-11-12 | test(poc-03): cobrir ciclo isolado de verificação Argon2id |
 
 <!-- END AUTO-GENERATED SECTION -->
