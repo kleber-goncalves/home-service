@@ -285,9 +285,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** e7e2109aa1ef8f835ec4a531684d0bf0298e4107
-- **Data do commit:** 2026-11-12T14:57:27-03:00
-- **Mensagem do commit:** test(poc-03): add real Argon2id WASM runtime probe
+- **Commit de referência:** 9d508b10cf7375b09a5c2a8912321cb5b55a38a3
+- **Data do commit:** 2026-11-12T15:01:11-03:00
+- **Mensagem do commit:** build(poc-03): vendor pinned hash-wasm Argon2 bundle
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -381,13 +381,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 9d508b1 | 2026-11-12 | build(poc-03): vendor pinned hash-wasm Argon2 bundle |
+| 443b8c2 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | e7e2109 | 2026-11-12 | test(poc-03): add real Argon2id WASM runtime probe |
 | d202a8c | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | c0b7329 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 3eb7e46 | 2026-11-12 | docs(ai-context): registrar limites e vetores de Argon2id |
 | 218a150 | 2026-11-12 | docs(arquitetura): detalhar limites da biblioteca Argon2id |
 | 9474d2f | 2026-11-12 | docs(poc-03): definir vetores cruzados e checagem do pacote |
-| 2d4b34d | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| 30a7506 | 2026-11-12 | docs(ai-context): registrar resultado do probe WASM |
 
 <!-- END AUTO-GENERATED SECTION -->
