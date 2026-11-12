@@ -295,9 +295,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** fbd07e929c45c3eb71609c82ffe2130f2fee3978
-- **Data do commit:** 2026-11-12T16:01:20-03:00
-- **Mensagem do commit:** docs(poc-03): registrar teste real da fonte de salt
+- **Commit de referência:** ecde6d9c59ba9d57f55a46c1b80e24fe01d9c0e9
+- **Data do commit:** 2026-11-12T16:01:23-03:00
+- **Mensagem do commit:** docs(architecture): registrar teste real do UUID para salt
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -392,6 +392,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| ecde6d9 | 2026-11-12 | docs(architecture): registrar teste real do UUID para salt |
 | fbd07e9 | 2026-11-12 | docs(poc-03): registrar teste real da fonte de salt |
 | 449c177 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | d963d87 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
@@ -399,6 +400,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | b63e8e5 | 2026-11-12 | docs(architecture): documentar fonte candidata de salt |
 | 1a5b04e | 2026-11-12 | docs(poc-03): documentar fonte candidata de salt UUID |
 | 1da486f | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| d3d04fd | 2026-11-12 | test(poc-03): validar formato e unicidade estrutural de salts |
 
 <!-- END AUTO-GENERATED SECTION -->
