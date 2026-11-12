@@ -285,9 +285,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 4525484166b7cdc7fffa61422daceb6057a679b3
-- **Data do commit:** 2026-11-12T15:02:50-03:00
-- **Mensagem do commit:** docs(poc-03): registrar bundle fixado e teste Argon2id
+- **Commit de referência:** 0b5f0f5053f72ccf3d9339789cdd029656141460
+- **Data do commit:** 2026-11-12T15:03:56-03:00
+- **Mensagem do commit:** docs(arquitetura): registrar execução candidata Argon2id
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -381,13 +381,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 0b5f0f5 | 2026-11-12 | docs(arquitetura): registrar execução candidata Argon2id |
+| 42461ae | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 4525484 | 2026-11-12 | docs(poc-03): registrar bundle fixado e teste Argon2id |
 | f291e2c | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | c984455 | 2026-11-12 | test(poc-03): execute pinned Argon2id WASM vectors in CI |
 | f0c184c | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 9d508b1 | 2026-11-12 | build(poc-03): vendor pinned hash-wasm Argon2 bundle |
 | 443b8c2 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| e7e2109 | 2026-11-12 | test(poc-03): add real Argon2id WASM runtime probe |
-| d202a8c | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
