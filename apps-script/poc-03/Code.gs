@@ -1427,3 +1427,893 @@ function poc03BytesEqualForArgon2_(actual, expected) {
     return difference === 0;
 }
 
+
+
+// -----------------------------------------------------------------------------
+// Throttling persistente — POC isolada com PropertiesService + ScriptLock
+// -----------------------------------------------------------------------------
+
+var POC03_THROTTLE_TEST_PREFIX = "POC03_THROTTLE_TEST_";
+var POC03_THROTTLE_TEST_SECRET_KEY =
+    POC03_THROTTLE_TEST_PREFIX + "HMAC_SECRET_V1";
+var POC03_THROTTLE_TEST_STATE_PREFIX =
+    POC03_THROTTLE_TEST_PREFIX + "STATE_V1_";
+var POC03_THROTTLE_PROBE_RUN_ID_KEY =
+    POC03_THROTTLE_TEST_PREFIX + "PROBE_RUN_ID";
+var POC03_THROTTLE_PROBE_RESULTS_KEY =
+    POC03_THROTTLE_TEST_PREFIX + "PROBE_RESULTS";
+var POC03_THROTTLE_LOCK_TIMEOUT_MS = 15000;
+var POC03_THROTTLE_TEST_IDENTIFIER =
+    "poc03-synthetic-account@invalid.example";
+var POC03_THROTTLE_CONCURRENCY_HOLD_MS = 150;
+var POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS = 10;
+
+/**
+ * Retorna somente o Script Properties do projeto isolado.
+ * Nunca usar este armazenamento como substituto definitivo da entidade
+ * CONTROLE_AUTENTICACAO: ele serve aqui para provar read-modify-write sob lock.
+ */
+function poc03GetThrottleTestProperties_() {
+    if (
+        typeof PropertiesService !== "object"
+        || PropertiesService === null
+        || typeof PropertiesService.getScriptProperties !== "function"
+    ) {
+        throw new Error("THROTTLE_PROPERTIES_UNAVAILABLE");
+    }
+
+    var properties = PropertiesService.getScriptProperties();
+
+    if (
+        !properties
+        || typeof properties.getProperty !== "function"
+        || typeof properties.setProperty !== "function"
+        || typeof properties.deleteProperty !== "function"
+        || typeof properties.getKeys !== "function"
+    ) {
+        throw new Error("THROTTLE_PROPERTIES_UNAVAILABLE");
+    }
+
+    return properties;
+}
+
+/**
+ * Cria e guarda uma chave HMAC exclusiva para os dados sintéticos desta POC.
+ * Ela não é uma chave de produção nem é reutilizada pela POC-02.
+ * O valor nunca é registrado no log.
+ */
+function poc03GetOrCreateThrottleTestSecretLocked_(properties) {
+    var existing = properties.getProperty(POC03_THROTTLE_TEST_SECRET_KEY);
+
+    if (existing !== null && typeof existing !== "undefined") {
+        if (!/^[0-9a-f]{64}$/.test(existing)) {
+            throw new Error("THROTTLE_TEST_SECRET_INVALID");
+        }
+
+        return existing;
+    }
+
+    var firstUuid = Utilities.getUuid();
+    var secondUuid = Utilities.getUuid();
+
+    if (
+        typeof firstUuid !== "string"
+        || typeof secondUuid !== "string"
+        || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(firstUuid)
+        || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(secondUuid)
+    ) {
+        throw new Error("THROTTLE_TEST_SECRET_GENERATION_FAILED");
+    }
+
+    var secret = (
+        firstUuid.replace(/-/g, "")
+        + secondUuid.replace(/-/g, "")
+    ).toLowerCase();
+
+    if (!/^[0-9a-f]{64}$/.test(secret)) {
+        throw new Error("THROTTLE_TEST_SECRET_GENERATION_FAILED");
+    }
+
+    properties.setProperty(POC03_THROTTLE_TEST_SECRET_KEY, secret);
+    return secret;
+}
+
+/**
+ * Deriva a chave de estado com HMAC-SHA-256 do identificador normalizado.
+ * O valor de entrada desta POC é sempre sintético (.invalid.example).
+ */
+function poc03GetThrottleTestStateKeyLocked_(properties, identifier) {
+    if (
+        typeof identifier !== "string"
+        || identifier.trim().length < 1
+        || identifier.trim().length > 254
+    ) {
+        throw new Error("THROTTLE_IDENTIFIER_INVALID");
+    }
+
+    var normalizedIdentifier = identifier.trim().toLowerCase();
+    var secret = poc03GetOrCreateThrottleTestSecretLocked_(properties);
+    var digest = Utilities.computeHmacSha256Signature(
+        normalizedIdentifier,
+        secret
+    );
+    var identifierHash = bytesToHexForPoc_(digest);
+
+    if (!/^[0-9a-f]{64}$/.test(identifierHash)) {
+        throw new Error("THROTTLE_IDENTIFIER_HASH_INVALID");
+    }
+
+    return POC03_THROTTLE_TEST_STATE_PREFIX + identifierHash;
+}
+
+function poc03CreateEmptyPersistentThrottleState_() {
+    return {
+        schemaVersion: 1,
+        failureCount: 0,
+        windowStartedAtMs: null,
+        blockedUntilMs: null,
+        updatedAtMs: null
+    };
+}
+
+/**
+ * Valida rigorosamente o estado persistido antes de usá-lo.
+ * Estado desconhecido/corrompido falha fechado; nunca zera silenciosamente.
+ */
+function poc03IsValidPersistentThrottleState_(state) {
+    if (
+        !state
+        || typeof state !== "object"
+        || Array.isArray(state)
+        || state.schemaVersion !== 1
+        || !Number.isInteger(state.failureCount)
+        || state.failureCount < 1
+        || state.failureCount > POC03_LOGIN_FAILURE_LIMIT
+        || !Number.isSafeInteger(state.windowStartedAtMs)
+        || state.windowStartedAtMs <= 0
+        || !Number.isSafeInteger(state.updatedAtMs)
+        || state.updatedAtMs <= 0
+    ) {
+        return false;
+    }
+
+    if (state.failureCount < POC03_LOGIN_FAILURE_LIMIT) {
+        return state.blockedUntilMs === null;
+    }
+
+    return Number.isSafeInteger(state.blockedUntilMs)
+        && state.blockedUntilMs > 0
+        && state.blockedUntilMs >= state.updatedAtMs;
+}
+
+function poc03ReadPersistentThrottleStateLocked_(properties, stateKey) {
+    var raw = properties.getProperty(stateKey);
+
+    if (raw === null || typeof raw === "undefined") {
+        return {
+            ok: true,
+            exists: false,
+            state: poc03CreateEmptyPersistentThrottleState_()
+        };
+    }
+
+    if (typeof raw !== "string" || raw.length > 2048) {
+        return { ok: false, reason: "CORRUPT_STATE" };
+    }
+
+    var state;
+
+    try {
+        state = JSON.parse(raw);
+    } catch (error) {
+        return { ok: false, reason: "CORRUPT_STATE" };
+    }
+
+    if (!poc03IsValidPersistentThrottleState_(state)) {
+        return { ok: false, reason: "CORRUPT_STATE" };
+    }
+
+    return {
+        ok: true,
+        exists: true,
+        state: state
+    };
+}
+
+function poc03AcquireThrottleScriptLock_() {
+    if (
+        typeof LockService !== "object"
+        || LockService === null
+        || typeof LockService.getScriptLock !== "function"
+    ) {
+        return {
+            ok: false,
+            reason: "LOCK_UNAVAILABLE",
+            lock: null
+        };
+    }
+
+    try {
+        var lock = LockService.getScriptLock();
+
+        if (!lock || typeof lock.tryLock !== "function") {
+            return {
+                ok: false,
+                reason: "LOCK_UNAVAILABLE",
+                lock: null
+            };
+        }
+
+        if (!lock.tryLock(POC03_THROTTLE_LOCK_TIMEOUT_MS)) {
+            return {
+                ok: false,
+                reason: "LOCK_TIMEOUT",
+                lock: null
+            };
+        }
+
+        return {
+            ok: true,
+            lock: lock
+        };
+    } catch (error) {
+        return {
+            ok: false,
+            reason: "LOCK_UNAVAILABLE",
+            lock: null
+        };
+    }
+}
+
+/**
+ * Atualiza um único estado sob ScriptLock.
+ *
+ * Esta função é síncrona de propósito: adquire o lock, lê a propriedade,
+ * calcula a transição e grava antes de liberar o lock.
+ * Em falha de lock/propriedade/estado corrompido, não autoriza a tentativa.
+ */
+function poc03RegisterPersistentThrottleFailureForPoc_(
+    identifier,
+    nowMs,
+    options
+) {
+    var safeOptions = options && typeof options === "object" ? options : {};
+    var holdLockMs = safeOptions.holdLockMs || 0;
+    var probeMode = safeOptions.probeMode === true;
+
+    if (!Number.isSafeInteger(nowMs) || nowMs <= 0) {
+        return {
+            status: "INVALID_TIMESTAMP",
+            allowed: false,
+            failureCount: null,
+            blockedUntilMs: null
+        };
+    }
+
+    if (
+        !Number.isInteger(holdLockMs)
+        || holdLockMs < 0
+        || holdLockMs > 1000
+    ) {
+        return {
+            status: "INVALID_TEST_OPTION",
+            allowed: false,
+            failureCount: null,
+            blockedUntilMs: null
+        };
+    }
+
+    var lockResult = poc03AcquireThrottleScriptLock_();
+
+    if (!lockResult.ok) {
+        return {
+            status: lockResult.reason,
+            allowed: false,
+            failureCount: null,
+            blockedUntilMs: null
+        };
+    }
+
+    var lock = lockResult.lock;
+
+    try {
+        var properties = poc03GetThrottleTestProperties_();
+        var stateKey = poc03GetThrottleTestStateKeyLocked_(
+            properties,
+            identifier
+        );
+
+        // A espera existe apenas na sonda de concorrência para ampliar
+        // deliberadamente a janela de contenção; nunca no fluxo normal.
+        if (holdLockMs > 0) {
+            Utilities.sleep(holdLockMs);
+        }
+
+        var stored = poc03ReadPersistentThrottleStateLocked_(
+            properties,
+            stateKey
+        );
+
+        if (!stored.ok) {
+            return {
+                status: "PERSISTED_STATE_CORRUPT",
+                allowed: false,
+                failureCount: null,
+                blockedUntilMs: null
+            };
+        }
+
+        var state = stored.state;
+        var transition = poc03RegisterLoginFailureForPoc_(state, nowMs);
+
+        if (transition.status !== "BLOCKED") {
+            state.updatedAtMs = nowMs;
+            properties.setProperty(stateKey, JSON.stringify(state));
+        }
+
+        var result = {
+            status: transition.status,
+            allowed: transition.allowed,
+            failureCount: transition.failureCount,
+            blockedUntilMs: transition.blockedUntilMs
+        };
+
+        if (probeMode) {
+            var runId = properties.getProperty(POC03_THROTTLE_PROBE_RUN_ID_KEY);
+            var rawResults = properties.getProperty(POC03_THROTTLE_PROBE_RESULTS_KEY);
+            var probeResults;
+
+            if (
+                typeof runId !== "string"
+                || !/^[0-9a-f]{32}$/.test(runId)
+                || typeof rawResults !== "string"
+                || rawResults.length > 8192
+            ) {
+                return {
+                    status: "PROBE_NOT_INITIALIZED",
+                    allowed: false,
+                    failureCount: result.failureCount,
+                    blockedUntilMs: result.blockedUntilMs
+                };
+            }
+
+            try {
+                probeResults = JSON.parse(rawResults);
+            } catch (error) {
+                return {
+                    status: "PROBE_STATE_CORRUPT",
+                    allowed: false,
+                    failureCount: result.failureCount,
+                    blockedUntilMs: result.blockedUntilMs
+                };
+            }
+
+            if (!Array.isArray(probeResults)) {
+                return {
+                    status: "PROBE_STATE_CORRUPT",
+                    allowed: false,
+                    failureCount: result.failureCount,
+                    blockedUntilMs: result.blockedUntilMs
+                };
+            }
+
+            probeResults.push({
+                status: result.status,
+                failureCount: result.failureCount,
+                executedAtMs: nowMs
+            });
+
+            properties.setProperty(
+                POC03_THROTTLE_PROBE_RESULTS_KEY,
+                JSON.stringify(probeResults)
+            );
+        }
+
+        return result;
+    } catch (error) {
+        return {
+            status: "PERSISTENCE_UNAVAILABLE",
+            allowed: false,
+            failureCount: null,
+            blockedUntilMs: null
+        };
+    } finally {
+        try {
+            lock.releaseLock();
+        } catch (error) {
+            // Nenhum detalhe interno ou dado de teste é registrado.
+        }
+    }
+}
+
+/**
+ * Um login bem-sucedido limpa somente o estado de controle do identificador.
+ * A exclusão também ocorre sob ScriptLock.
+ */
+function poc03ResetPersistentThrottleForPoc_(identifier) {
+    var lockResult = poc03AcquireThrottleScriptLock_();
+
+    if (!lockResult.ok) {
+        return {
+            status: lockResult.reason,
+            reset: false
+        };
+    }
+
+    var lock = lockResult.lock;
+
+    try {
+        var properties = poc03GetThrottleTestProperties_();
+        var stateKey = poc03GetThrottleTestStateKeyLocked_(
+            properties,
+            identifier
+        );
+
+        properties.deleteProperty(stateKey);
+
+        return {
+            status: "RESET",
+            reset: true
+        };
+    } catch (error) {
+        return {
+            status: "PERSISTENCE_UNAVAILABLE",
+            reset: false
+        };
+    } finally {
+        try {
+            lock.releaseLock();
+        } catch (error) {
+            // Falha de liberação não deve expor detalhes da execução.
+        }
+    }
+}
+
+/** Consulta o estado sintético sob o mesmo lock, sem retornar chave/hash. */
+function poc03InspectPersistentThrottleForPoc_(identifier) {
+    var lockResult = poc03AcquireThrottleScriptLock_();
+
+    if (!lockResult.ok) {
+        return {
+            ok: false,
+            status: lockResult.reason,
+            exists: false,
+            state: null
+        };
+    }
+
+    var lock = lockResult.lock;
+
+    try {
+        var properties = poc03GetThrottleTestProperties_();
+        var stateKey = poc03GetThrottleTestStateKeyLocked_(
+            properties,
+            identifier
+        );
+        var stored = poc03ReadPersistentThrottleStateLocked_(
+            properties,
+            stateKey
+        );
+
+        if (!stored.ok) {
+            return {
+                ok: false,
+                status: "PERSISTED_STATE_CORRUPT",
+                exists: true,
+                state: null
+            };
+        }
+
+        return {
+            ok: true,
+            status: "READ",
+            exists: stored.exists,
+            state: stored.state
+        };
+    } catch (error) {
+        return {
+            ok: false,
+            status: "PERSISTENCE_UNAVAILABLE",
+            exists: false,
+            state: null
+        };
+    } finally {
+        try {
+            lock.releaseLock();
+        } catch (error) {
+            // No-op para não vazar informações do estado.
+        }
+    }
+}
+
+/** Instala um conteúdo inválido somente para verificar falha fechada. */
+function poc03CorruptPersistentThrottleForPoc_(identifier) {
+    var lockResult = poc03AcquireThrottleScriptLock_();
+
+    if (!lockResult.ok) {
+        return false;
+    }
+
+    var lock = lockResult.lock;
+
+    try {
+        var properties = poc03GetThrottleTestProperties_();
+        var stateKey = poc03GetThrottleTestStateKeyLocked_(
+            properties,
+            identifier
+        );
+        properties.setProperty(stateKey, "{invalid-json");
+        return true;
+    } catch (error) {
+        return false;
+    } finally {
+        try {
+            lock.releaseLock();
+        } catch (error) {
+            // No-op.
+        }
+    }
+}
+
+/**
+ * Remove somente propriedades iniciadas por POC03_THROTTLE_TEST_.
+ * Não chama deleteAllProperties e não toca nas propriedades de POC-02.
+ */
+function poc03CleanupPersistentThrottleTestData() {
+    var lockResult = poc03AcquireThrottleScriptLock_();
+
+    if (!lockResult.ok) {
+        throw new Error("Não foi possível obter o lock para limpar dados POC-03.");
+    }
+
+    var lock = lockResult.lock;
+
+    try {
+        var properties = poc03GetThrottleTestProperties_();
+        var keys = properties.getKeys();
+        var removedCount = 0;
+
+        keys.forEach(function (key) {
+            if (key.indexOf(POC03_THROTTLE_TEST_PREFIX) === 0) {
+                properties.deleteProperty(key);
+                removedCount += 1;
+            }
+        });
+
+        var summary = {
+            test: "POC-03 persistent throttle cleanup",
+            status: "PASS",
+            removedPoc03Properties: removedCount,
+            scope: "POC03_THROTTLE_TEST_PREFIX_ONLY"
+        };
+
+        Logger.log(JSON.stringify(summary));
+        return summary;
+    } finally {
+        try {
+            lock.releaseLock();
+        } catch (error) {
+            // No-op.
+        }
+    }
+}
+
+/**
+ * Bateria sequencial com PropertiesService real e ScriptLock real.
+ * Os timestamps simulados deixam a expiração determinística.
+ * Usa um único identificador .invalid e apaga os dados ao final.
+ */
+function poc03RunPersistentThrottlePolicyTests() {
+    var identifier = POC03_THROTTLE_TEST_IDENTIFIER;
+    var minute = 60 * 1000;
+    var startTime = Date.now();
+    var cases = [];
+    var cleanupCompleted = false;
+
+    try {
+        poc03CleanupPersistentThrottleTestData();
+
+        var failures = [];
+        for (var i = 0; i < 4; i += 1) {
+            failures.push(
+                poc03RegisterPersistentThrottleFailureForPoc_(
+                    identifier,
+                    startTime + i * 1000
+                )
+            );
+        }
+
+        var afterFour = poc03InspectPersistentThrottleForPoc_(identifier);
+        cases.push({
+            name: "quatro falhas ficam persistidas entre chamadas",
+            passed: failures.every(function (item, index) {
+                return item.status === "COUNTED"
+                    && item.failureCount === index + 1;
+            })
+                && afterFour.ok
+                && afterFour.exists
+                && afterFour.state.failureCount === 4
+        });
+
+        var fifth = poc03RegisterPersistentThrottleFailureForPoc_(
+            identifier,
+            startTime + 4000
+        );
+        cases.push({
+            name: "quinta falha persiste bloqueio por 15 minutos",
+            passed: fifth.status === "LOCKED_AFTER_FAILURE"
+                && fifth.failureCount === 5
+                && fifth.blockedUntilMs === startTime + 4000 + POC03_LOGIN_LOCK_MS
+        });
+
+        var blockedBeforeExpiry = poc03RegisterPersistentThrottleFailureForPoc_(
+            identifier,
+            startTime + 5000
+        );
+        var afterBlockedAttempt = poc03InspectPersistentThrottleForPoc_(identifier);
+        cases.push({
+            name: "tentativa durante bloqueio é recusada sem alterar estado",
+            passed: blockedBeforeExpiry.status === "BLOCKED"
+                && afterBlockedAttempt.ok
+                && afterBlockedAttempt.state.failureCount === 5
+                && afterBlockedAttempt.state.blockedUntilMs === fifth.blockedUntilMs
+        });
+
+        var afterExpiry = poc03RegisterPersistentThrottleFailureForPoc_(
+            identifier,
+            fifth.blockedUntilMs
+        );
+        cases.push({
+            name: "após expiração, uma nova janela começa em 1",
+            passed: afterExpiry.status === "COUNTED"
+                && afterExpiry.failureCount === 1
+                && afterExpiry.blockedUntilMs === null
+        });
+
+        var successReset = poc03ResetPersistentThrottleForPoc_(identifier);
+        var afterSuccess = poc03InspectPersistentThrottleForPoc_(identifier);
+        cases.push({
+            name: "login bem-sucedido remove o estado persistido",
+            passed: successReset.reset === true
+                && afterSuccess.ok
+                && afterSuccess.exists === false
+        });
+
+        var corruptInstalled = poc03CorruptPersistentThrottleForPoc_(identifier);
+        var corruptAttempt = poc03RegisterPersistentThrottleFailureForPoc_(
+            identifier,
+            Date.now()
+        );
+        cases.push({
+            name: "estado corrompido falha fechado sem autorizar tentativa",
+            passed: corruptInstalled === true
+                && corruptAttempt.status === "PERSISTED_STATE_CORRUPT"
+                && corruptAttempt.allowed === false
+        });
+
+        var passedCount = 0;
+
+        cases.forEach(function (testCase) {
+            if (testCase.passed) {
+                passedCount += 1;
+            }
+
+            Logger.log(JSON.stringify({
+                test: testCase.name,
+                status: testCase.passed ? "PASS" : "FAIL"
+            }));
+        });
+
+        var summary = {
+            test: "Persistent login throttling — isolated Apps Script POC",
+            status: passedCount === cases.length ? "PASS" : "FAIL",
+            testsPassed: passedCount,
+            testsTotal: cases.length,
+            threshold: POC03_LOGIN_FAILURE_LIMIT,
+            observationWindowMs: POC03_LOGIN_WINDOW_MS,
+            lockDurationMs: POC03_LOGIN_LOCK_MS,
+            persistence: "SCRIPT_PROPERTIES_TEST_ONLY",
+            synchronization: "SCRIPT_LOCK",
+            failClosedOnCorruptState: true,
+            concurrency: "NOT_TESTED_IN_THIS_SUITE",
+            syntheticIdentifier: "NOT_LOGGED",
+            realAccountsUsed: false
+        };
+
+        Logger.log(JSON.stringify(summary));
+
+        if (summary.status !== "PASS") {
+            throw new Error("Falha na bateria persistente de throttling.");
+        }
+
+        return summary;
+    } finally {
+        try {
+            poc03CleanupPersistentThrottleTestData();
+            cleanupCompleted = true;
+        } catch (cleanupError) {
+            Logger.log(JSON.stringify({
+                test: "persistent throttle test data cleanup",
+                status: "FAIL"
+            }));
+        }
+
+        if (!cleanupCompleted) {
+            throw new Error(
+                "A bateria terminou, mas os dados POC-03 não puderam ser limpos."
+            );
+        }
+    }
+}
+
+/**
+ * Prepara a sonda manual de concorrência. Execute uma vez antes de abrir
+ * dez execuções do worker. Somente propriedades POC-03 sintéticas são usadas.
+ */
+function poc03ResetPersistentThrottleConcurrencyProbe() {
+    var lockResult = poc03AcquireThrottleScriptLock_();
+
+    if (!lockResult.ok) {
+        throw new Error("Não foi possível obter o lock para iniciar a sonda.");
+    }
+
+    var lock = lockResult.lock;
+
+    try {
+        var properties = poc03GetThrottleTestProperties_();
+        var keys = properties.getKeys();
+
+        keys.forEach(function (key) {
+            if (key.indexOf(POC03_THROTTLE_TEST_PREFIX) === 0) {
+                properties.deleteProperty(key);
+            }
+        });
+
+        poc03GetOrCreateThrottleTestSecretLocked_(properties);
+
+        var runId = Utilities.getUuid().replace(/-/g, "").toLowerCase();
+
+        if (!/^[0-9a-f]{32}$/.test(runId)) {
+            throw new Error("Identificador da sonda inválido.");
+        }
+
+        properties.setProperty(POC03_THROTTLE_PROBE_RUN_ID_KEY, runId);
+        properties.setProperty(POC03_THROTTLE_PROBE_RESULTS_KEY, "[]");
+
+        var summary = {
+            test: "Persistent throttle concurrency probe reset",
+            status: "READY",
+            expectedWorkers: POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS,
+            artificialLockHoldMs: POC03_THROTTLE_CONCURRENCY_HOLD_MS,
+            identifier: "SYNTHETIC_ONLY_NOT_LOGGED"
+        };
+
+        Logger.log(JSON.stringify(summary));
+        return summary;
+    } finally {
+        try {
+            lock.releaseLock();
+        } catch (error) {
+            // No-op.
+        }
+    }
+}
+
+/**
+ * Execute esta função em dez execuções Apps Script separadas, iniciadas
+ * com poucos segundos de diferença. O atraso artificial existe somente para
+ * ampliar a disputa pelo ScriptLock durante o experimento.
+ */
+function poc03RunPersistentThrottleConcurrencyWorker() {
+    var result = poc03RegisterPersistentThrottleFailureForPoc_(
+        POC03_THROTTLE_TEST_IDENTIFIER,
+        Date.now(),
+        {
+            holdLockMs: POC03_THROTTLE_CONCURRENCY_HOLD_MS,
+            probeMode: true
+        }
+    );
+
+    Logger.log(JSON.stringify({
+        test: "Persistent throttle concurrency worker",
+        status: result.status,
+        allowed: result.allowed,
+        failureCount: result.failureCount
+    }));
+
+    return result;
+}
+
+/**
+ * Lê os resultados consolidados das dez execuções independentes.
+ * A aprovação exige 4 COUNTED, 1 LOCKED_AFTER_FAILURE e 5 BLOCKED.
+ */
+function poc03RunPersistentThrottleConcurrencySummary() {
+    var lockResult = poc03AcquireThrottleScriptLock_();
+
+    if (!lockResult.ok) {
+        throw new Error("Não foi possível obter lock para consultar a sonda.");
+    }
+
+    var lock = lockResult.lock;
+
+    try {
+        var properties = poc03GetThrottleTestProperties_();
+        var runId = properties.getProperty(POC03_THROTTLE_PROBE_RUN_ID_KEY);
+        var rawResults = properties.getProperty(POC03_THROTTLE_PROBE_RESULTS_KEY);
+
+        if (
+            typeof runId !== "string"
+            || !/^[0-9a-f]{32}$/.test(runId)
+            || typeof rawResults !== "string"
+        ) {
+            throw new Error("Sonda de concorrência não foi inicializada.");
+        }
+
+        var results = JSON.parse(rawResults);
+
+        if (!Array.isArray(results)) {
+            throw new Error("Resultados da sonda estão corrompidos.");
+        }
+
+        var stateKey = poc03GetThrottleTestStateKeyLocked_(
+            properties,
+            POC03_THROTTLE_TEST_IDENTIFIER
+        );
+        var stored = poc03ReadPersistentThrottleStateLocked_(
+            properties,
+            stateKey
+        );
+
+        if (!stored.ok || !stored.exists) {
+            throw new Error("Estado final persistido não está disponível.");
+        }
+
+        var counted = results.filter(function (item) {
+            return item.status === "COUNTED";
+        }).length;
+        var locked = results.filter(function (item) {
+            return item.status === "LOCKED_AFTER_FAILURE";
+        }).length;
+        var blocked = results.filter(function (item) {
+            return item.status === "BLOCKED";
+        }).length;
+        var lockUnavailable = results.filter(function (item) {
+            return item.status === "LOCK_TIMEOUT"
+                || item.status === "LOCK_UNAVAILABLE";
+        }).length;
+
+        var passed = results.length === POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS
+            && counted === 4
+            && locked === 1
+            && blocked === 5
+            && lockUnavailable === 0
+            && stored.state.failureCount === POC03_LOGIN_FAILURE_LIMIT
+            && stored.state.blockedUntilMs > Date.now();
+
+        var summary = {
+            test: "Persistent throttle — independent execution contention",
+            status: passed ? "PASS" : "INCOMPLETE_OR_FAIL",
+            expectedWorkers: POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS,
+            observedWorkers: results.length,
+            countedBeforeLimit: counted,
+            lockedAtLimit: locked,
+            rejectedWhileLocked: blocked,
+            lockUnavailable: lockUnavailable,
+            finalFailureCount: stored.state.failureCount,
+            finalStateBlocked: stored.state.blockedUntilMs > Date.now(),
+            synchronization: "SCRIPT_LOCK",
+            persistence: "SCRIPT_PROPERTIES_TEST_ONLY",
+            artificialLockHoldMs: POC03_THROTTLE_CONCURRENCY_HOLD_MS
+        };
+
+        Logger.log(JSON.stringify(summary));
+        return summary;
+    } finally {
+        try {
+            lock.releaseLock();
+        } catch (error) {
+            // No-op.
+        }
+    }
+}
