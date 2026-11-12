@@ -219,26 +219,36 @@ Esses tempos são apenas referências do teste Node local, não estimativas nem 
 
 A função `poc03RunArgon2idTests` foi executada no projeto Apps Script isolado em 2026-11-12, com o bundle original `hash-wasm@4.13.0` no arquivo `HashWasmArgon2.gs`. A função compara os resultados binários byte a byte e registra somente PASS/FAIL, parâmetros e tempos — não registra senha, salt de conta ou hash de usuário.
 
-Resultado informado pelo Execution Log:
+Resultado informado pelo Execution Log em cinco baterias manuais independentes:
 
-| Caso | Parâmetros | Resultado | Tempo medido |
-|---|---|---:|---:|
-| KAT independente pequeno | `m=32 KiB,t=3,p=4` | PASS | 10 ms |
-| Perfil de referência OWASP | `m=19456 KiB,t=2,p=1` | PASS | 142 ms |
-| Bateria completa | dois casos, saída de 32 bytes | PASS (2/2) | 161 ms |
+| Execução | KAT pequeno (m=32 KiB,t=3,p=4) | Perfil de referência (m=19456 KiB,t=2,p=1) | Total da bateria | Resultado |
+|---|---:|---:|---:|---|
+| Inicial | 10 ms | 142 ms | 161 ms | PASS 2/2 |
+| Repetição 1 | 24 ms | 130 ms | 162 ms | PASS 2/2 |
+| Repetição 2 | 8 ms | 86 ms | 100 ms | PASS 2/2 |
+| Repetição 3 | 9 ms | 280 ms | 294 ms | PASS 2/2 |
+| Repetição 4 | 9 ms | 61 ms | 94 ms | PASS 2/2 |
 
-O perfil de referência derivou 32 bytes e correspondeu exatamente ao vetor esperado independente. O teste executou o Argon2id real da biblioteca com seu módulo WebAssembly incorporado; não foi apenas a sonda anterior de memória independente.
+**Resumo das cinco medições do perfil de referência:**
 
-**Interpretação:** compatibilidade funcional demonstrada para os dois vetores testados no runtime real do Apps Script. O perfil `m=19456 KiB,t=2,p=1` concluiu em 142 ms na execução observada, resultado promissor para a viabilidade operacional.
+- Média aritmética: **139,8 ms**.
+- Mediana: **130 ms**.
+- Mínimo: **61 ms**.
+- Máximo: **280 ms**.
+- Todas as cinco execuções produziram exatamente os 32 bytes esperados e retornaram PASS.
 
-**Limites da evidência:** foi uma única bateria manual. O tempo não representa uma distribuição estatística, teste de carga ou garantia para todas as execuções. A duração do Execution Log (início/conclusão) também não deve ser confundida com os 161 ms medidos internamente pelo harness. O teste não mede pico total de memória, concorrência, rate limit, disponibilidade de CSPRNG para salt, comparação segura, armazenamento, recuperação, sessão ou resistência a abuso.
+O perfil de referência derivou 32 bytes e correspondeu exatamente ao vetor independente. O teste executou Argon2id real da biblioteca com seu módulo WebAssembly incorporado; não foi apenas a sonda anterior de memória independente.
+
+**Interpretação:** há evidência funcional repetida e desempenho pontual promissor no runtime real do Apps Script. O maior tempo observado, 280 ms, permanece muito abaixo do limite global de seis minutos por execução. Isso não significa que exista garantia de latência máxima: a variação de 61 a 280 ms (aproximadamente 4,6 vezes entre menor e maior amostra) mostra que o tempo oscila entre execuções. A média e a mediana descrevem somente estas cinco amostras, não uma distribuição estável ou um SLA.
+
+**Limites da evidência:** cinco baterias manuais independentes não constituem teste de carga ou garantia para outras contas, horários, quotas ou condições de concorrência. A duração do Execution Log (início/conclusão) não deve ser confundida com os tempos internos medidos pelo harness. O teste não mede pico total de memória do processo, concorrência simultânea, rate limit, disponibilidade de CSPRNG para salt, comparação segura, armazenamento, recuperação, sessão ou resistência a abuso.
 
 O projeto Apps Script continuou isolado, sem publicação como Web App, sem planilha de negócio e sem credenciais reais. A execução não autoriza copiar o harness para autenticação.
 
 ### 8.10. Decisão após a execução real
 
 - **PBKDF2 sobre `Utilities`: reprovado** por desempenho operacional inconclusivo e margem insuficiente.
-- **Argon2id via `hash-wasm@4.13.0`: aprovado somente como candidato tecnicamente viável para continuar a POC**, porque passou os dois vetores e concluiu o perfil de referência no Apps Script real.
-- **Autenticação/login: continua bloqueado.** Ainda faltam salt seguro, formato de armazenamento, verificação/comparação, controle contra abuso, repetição de medições, concorrência e revisão de segurança da dependência e da integração.
+- **Argon2id via `hash-wasm@4.13.0`: aprovado somente como candidato tecnicamente viável para continuar a POC.** Os dois vetores passaram em cinco baterias manuais; o perfil de referência apresentou média de 139,8 ms, mediana de 130 ms e intervalo observado de 61–280 ms. O resultado é promissor, mas a amostra ainda é pequena e não avalia concorrência ou carga.
+- **Autenticação/login: continua bloqueado.** Ainda faltam salt seguro, formato de armazenamento, verificação/comparação, controle contra abuso, ensaio de concorrência e revisão de segurança da dependência e da integração.
 
 O próximo passo é concluir essas validações complementares, sem implementar cadastro, login, sessão ou operações de negócio nesta etapa.
