@@ -363,3 +363,178 @@ function bytesToHexForPoc_(bytes) {
         return hex.length === 1 ? "0" + hex : hex;
     }).join("");
 }
+
+// -----------------------------------------------------------------------------
+// Argon2id WASM — experimento isolado (hash-wasm 4.13.0)
+// -----------------------------------------------------------------------------
+
+/**
+ * Executa dois vetores conhecidos de Argon2id v1.3:
+ * 1) vetor pequeno, com paralelismo 4, para validar a implementação;
+ * 2) perfil OWASP m=19456 KiB, t=2, p=1, para medir o runtime real.
+ *
+ * Requer o arquivo separado HashWasmArgon2.gs com o bundle UMD oficial
+ * hash-wasm 4.13.0. Os inputs são fictícios e os salts são determinísticos
+ * porque estes são testes conhecidos, não cadastro de contas.
+ *
+ * IMPORTANTE:
+ * - Não é fluxo de autenticação e não armazena senhas.
+ * - A opção secret é passada como Uint8Array vazio. A biblioteca, por padrão,
+ *   tenta codificar secret="" com TextEncoder, API ausente no Apps Script.
+ * - A senha e o salt também são Uint8Array para evitar TextEncoder.
+ * - O resultado não é registrado no log; somente comparação PASS/FAIL.
+ */
+async function poc03RunArgon2idTests() {
+    var suiteStartedAt = Date.now();
+    var results = [];
+
+    try {
+        if (
+            typeof hashwasm !== "object"
+            || hashwasm === null
+            || typeof hashwasm.argon2id !== "function"
+        ) {
+            throw new Error(
+                "Biblioteca não carregada. Adicione o bundle em HashWasmArgon2.gs."
+            );
+        }
+
+        var smallPassword = new Uint8Array(32);
+        smallPassword.fill(1);
+        var smallSalt = new Uint8Array(16);
+        smallSalt.fill(2);
+
+        var testCases = [
+            {
+                name: "KAT independente — Argon2id v1.3 (m=32 KiB,t=3,p=4)",
+                password: smallPassword,
+                salt: smallSalt,
+                memorySize: 32,
+                iterations: 3,
+                parallelism: 4,
+                expectedHex:
+                    "03aab965c12001c9d7d0d2de33192c0494b684bb148196d73c1df1acaf6d0c2e"
+            },
+            {
+                name: "Perfil OWASP — Argon2id v1.3 (m=19456 KiB,t=2,p=1)",
+                password: poc03Utf8BytesForArgon2_("Conecta Local POC Argon2id test"),
+                salt: poc03HexToBytesForArgon2_(
+                    "00112233445566778899aabbccddeeff"
+                ),
+                memorySize: 19456,
+                iterations: 2,
+                parallelism: 1,
+                expectedHex:
+                    "e68ff93eaa19dc2c1721cc50614468011e94c113d2b5888d0c3c3976ff5497c4"
+            }
+        ];
+
+        for (var i = 0; i < testCases.length; i += 1) {
+            var testCase = testCases[i];
+            var startedAt = Date.now();
+
+            var derived = await hashwasm.argon2id({
+                password: testCase.password,
+                salt: testCase.salt,
+
+                // Importante: evita a conversão secret="" via TextEncoder.
+                secret: new Uint8Array(0),
+
+                parallelism: testCase.parallelism,
+                iterations: testCase.iterations,
+                memorySize: testCase.memorySize,
+                hashLength: 32,
+                outputType: "binary"
+            });
+
+            var elapsedMs = Date.now() - startedAt;
+            var expected = poc03HexToBytesForArgon2_(testCase.expectedHex);
+            var passed = poc03BytesEqualForArgon2_(derived, expected);
+
+            results.push({
+                test: testCase.name,
+                status: passed ? "PASS" : "FAIL",
+                memoryKiB: testCase.memorySize,
+                iterations: testCase.iterations,
+                parallelism: testCase.parallelism,
+                derivedKeyBytes: derived.length,
+                elapsedMs: elapsedMs
+            });
+
+            Logger.log(JSON.stringify(results[results.length - 1]));
+
+            if (!passed) {
+                throw new Error(
+                    "A saída Argon2id não corresponde ao vetor independente: "
+                    + testCase.name
+                );
+            }
+        }
+
+        var summary = {
+            test: "Argon2id WASM — hash-wasm 4.13.0",
+            status: "PASS",
+            testsPassed: results.length,
+            testsTotal: testCases.length,
+            totalElapsedMs: Date.now() - suiteStartedAt,
+            profile: "m=19456 KiB,t=2,p=1,hashLength=32"
+        };
+
+        Logger.log(JSON.stringify(summary));
+        return summary;
+    } catch (error) {
+        Logger.log(JSON.stringify({
+            test: "Argon2id WASM — hash-wasm 4.13.0",
+            status: "FAIL",
+            elapsedMs: Date.now() - suiteStartedAt,
+            message: String(error && error.message ? error.message : error)
+        }));
+        throw error;
+    }
+}
+
+/** Converte texto para UTF-8 pelo serviço nativo do Apps Script. */
+function poc03Utf8BytesForArgon2_(value) {
+    return new Uint8Array(
+        Utilities.newBlob(String(value), "text/plain").getBytes()
+    );
+}
+
+/** Converte hexadecimal em bytes sem depender de Buffer/atob. */
+function poc03HexToBytesForArgon2_(hex) {
+    if (
+        typeof hex !== "string"
+        || hex.length % 2 !== 0
+        || !/^[0-9a-f]+$/i.test(hex)
+    ) {
+        throw new Error("Hexadecimal inválido no vetor Argon2id.");
+    }
+
+    var bytes = new Uint8Array(hex.length / 2);
+
+    for (var i = 0; i < bytes.length; i += 1) {
+        bytes[i] = parseInt(hex.substring(i * 2, i * 2 + 2), 16);
+    }
+
+    return bytes;
+}
+
+/** Comparação byte a byte para o teste de vetor conhecido. */
+function poc03BytesEqualForArgon2_(actual, expected) {
+    if (
+        !(actual instanceof Uint8Array)
+        || !(expected instanceof Uint8Array)
+        || actual.length !== expected.length
+    ) {
+        return false;
+    }
+
+    var difference = 0;
+
+    for (var i = 0; i < actual.length; i += 1) {
+        difference |= actual[i] ^ expected[i];
+    }
+
+    return difference === 0;
+}
+
