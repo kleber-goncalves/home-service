@@ -2,7 +2,7 @@
 
 > **Versão:** 0.1  
 > **Data:** 2026-11-10  
-> **Status:** POC-01 integrada à branch `dev` e validada manualmente em Preview. POC-02 implementada e validada manualmente em Preview e no Apps Script isolado na branch `feat/poc-02-hmac-replay`; PR #11 aguarda integração em `dev`. Nenhuma das PoCs está aprovada para produção.  
+> **Status:** POC-01 e POC-02 integradas à branch `dev` pelos PRs #10 e #11 e validadas manualmente em Preview/Apps Script isolado. O Echo do Preview redeployado de `dev` ainda aguarda confirmação manual final do responsável. POC-03 está em experimento isolado de KDF, sem autenticação ou armazenamento de contas. Nenhuma POC está aprovada para produção.  
 > **Escopo:** integração React/Vite, Google Apps Script, Google Sheets e Google Drive para a demonstração acadêmica.  
 > **Premissa:** manter Apps Script como backend inicial e autenticação própria por e-mail e senha, conforme decisão funcional aprovada. Transporte, sessão e armazenamento seguro de senhas continuam pendentes de prova de conceito.
 
@@ -260,17 +260,20 @@ A POC-01, isoladamente, não protegia o Web App contra chamadas diretas. A vers�
 
 ### 5.8. POC-02 — assinatura HMAC e proteção contra replay
 
-A implementação está na branch `feat/poc-02-hmac-replay` e ainda não foi integrada à `dev`.
+A implementação foi integrada à branch `dev` pelo PR #11 em 2026-11-11. O merge commit foi `aa1a98c130369892e6727dda90e97ca4c0f7d2a6`; o workflow pós-merge #93 concluiu com sucesso. A sincronização automática do AI Context atualizou a branch `dev` posteriormente.
 
 - `api/backend.js` gera timestamp, nonce aleatório de 32 bytes, hash SHA-256 do payload e HMAC-SHA-256 usando `APPS_SCRIPT_HMAC_SECRET` no servidor da Vercel.
 - A mensagem canônica usa domínio `CONECTA_LOCAL_GATEWAY`, versão `v1`, método lógico POST, timestamp, nonce, ação, requestId e hash do payload, separados por newline UTF-8.
 - `apps-script/poc-02/Code.gs` valida os campos e a janela temporal de cinco minutos, recalcula hash/HMAC e reserva o nonce em Script Properties sob `LockService.getScriptLock()` antes de executar a ação.
 - O registro de nonce tem retenção de 10 minutos e 30 segundos e limite explícito de 2.500 itens ativos. Falha de lock, armazenamento ou capacidade recusa a chamada (fail closed).
-- `APPS_SCRIPT_HMAC_SECRET` é configurada somente no ambiente Preview; `POC02_HMAC_SECRET` é configurada em Script Properties. Os valores devem ser idênticos, gerados fora do repositório e nunca enviados pelo chat.
+- `APPS_SCRIPT_HMAC_SECRET` fica somente no ambiente Preview da Vercel para a branch `dev`; `POC02_HMAC_SECRET` fica em Script Properties. Os valores precisam ser idênticos, mas nunca são lidos, registrados ou enviados pelo chat.
 - `tests/poc02/` executa testes Node contra o gateway e um harness local da lógica Apps Script. Isso não substitui a validação de rede real no Google.
-- `scripts/poc02-replay-check.mjs` executa os testes manuais diretos de assinatura ausente, timestamp expirado, chamada assinada, repetição do mesmo nonce e payload adulterado sem imprimir o segredo.
+- `scripts/poc02-replay-check.mjs` executa testes diretos de assinatura ausente, timestamp expirado, chamada assinada, repetição do mesmo nonce e payload adulterado sem imprimir o segredo.
 
-A implementação continua limitada a ações sintéticas e não está aprovada para produção. A aceitação exige configurar os dois segredos, atualizar/reimplantar o Web App protegido e validar um Preview real.
+**Validação manual em 2026-11-11:** cinco cenários no Preview da branch de trabalho, cinco testes diretos contra o Apps Script isolado e um teste concorrente com duas chamadas idênticas. No cenário concorrente, uma chamada foi aceita e a outra recebeu `REPLAY_DETECTED`. GitHub Actions da branch e execução pós-merge #93 concluíram com sucesso.
+
+A versão da POC-02 continua limitada a ações sintéticas `poc.*`; não habilita login, sessão, Sheets, Drive ou operações de negócio. A concorrência manual de duas chamadas não comprova capacidade de carga. O Preview mais recente de `dev` foi redeployado após a configuração das variáveis específicas de Preview; a chamada Echo completa nesse deployment ainda precisa ser confirmada manualmente. A POC não está aprovada para produção.
+
 ## 6. Organização proposta do projeto Apps Script
 
 O código deverá ficar versionado no repositório, separado do frontend, em uma pasta futura apps-script/. A ferramenta e o fluxo de publicação (editor Apps Script ou clasp) serão definidos antes da primeira implementação e documentados; credenciais de desenvolvedor e tokens de publicação nunca serão commitados.
@@ -420,9 +423,13 @@ Não apresentar sucesso integral quando a atualização de permissões falhar. O
 
 A aba USUARIOS já prevê senha_hash, senha_salt e senha_algoritmo, mas isso não significa que o mecanismo criptográfico esteja escolhido.
 
-A referência oficial do Apps Script Utilities documenta digest e HMAC; essas operações, isoladamente, não são KDFs adequados para armazenamento de senhas. A OWASP recomenda funções de derivação lentas e apropriadas, priorizando Argon2id; PBKDF2-HMAC-SHA-256 é uma alternativa em cenários específicos, com parâmetros adequados.
+A OWASP prioriza Argon2id e aponta scrypt como alternativa quando Argon2id não está disponível. PBKDF2-HMAC-SHA-256 aparece na orientação da OWASP para cenários que exigem conformidade FIPS; portanto, não tratar 600.000 iterações como aprovação universal de PBKDF2 ou como substituto automaticamente equivalente a um algoritmo memory-hard.
 
-**Bloqueio:** não implementar armazenamento de senha com SHA-256 simples, HMAC simples ou criptografia própria. Antes de aprovar um algoritmo, testar quais primitivas estão realmente disponíveis no runtime V8 do Apps Script, verificar uma implementação mantida e revisada, medir o desempenho e validar parâmetros, salt individual e comparação. Se não houver implementação adequada e viável dentro dos limites da plataforma, interromper a autenticação própria e reabrir a decisão com o responsável.
+A documentação do Apps Script V8 informa que `crypto` e `SubtleCrypto` não estão disponíveis. A classe `Utilities` fornece HMAC-SHA-256, mas não uma função PBKDF2/Argon2id/scrypt pronta.
+
+**POC-03 em andamento:** `apps-script/poc-03/Code.gs` contém um harness manual e isolado para examinar PBKDF2-HMAC-SHA-256 construído sobre a primitiva HMAC documentada. `docs/POC_03_ARMAZENAMENTO_SENHAS.md` define o protocolo, vetores, limites e critérios. O harness não tem `doGet`/`doPost`, não acessa planilhas e não guarda credenciais. Os testes automatizados no Node verificam a lógica contra vetores de referência, mas não comprovam o comportamento nem o tempo no runtime real do Google.
+
+**Bloqueio:** nenhum armazenamento de senha está aprovado. Não usar SHA-256 ou HMAC simples como KDF, não desenvolver algoritmo criptográfico próprio e não copiar o harness para autenticação. A aprovação exige vetores corretos, ensaio de 80.000 iterações, medição de 600.000 iterações no Apps Script real, salt individual gerado por fonte criptograficamente segura, revisão da comparação e avaliação do risco de abuso por custo computacional. Se não houver implementação adequada e viável, interromper a autenticação própria no Apps Script e reabrir a decisão de arquitetura.
 
 ### 10.2. Sessões
 
