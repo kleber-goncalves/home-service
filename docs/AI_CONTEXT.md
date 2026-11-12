@@ -293,9 +293,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** d3e251d1bcda14fc4bff77d617879d3ea1fbda5e
-- **Data do commit:** 2026-11-12T15:35:28-03:00
-- **Mensagem do commit:** docs(architecture): atualizar evidência de Argon2id no Apps Script
+- **Commit de referência:** ec62406c47ac6747e9c8ee83424694fc335e7886
+- **Data do commit:** 2026-11-12T15:42:39-03:00
+- **Mensagem do commit:** docs(poc-03): registrar cinco medições reais de Argon2id
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -390,13 +390,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| ec62406 | 2026-11-12 | docs(poc-03): registrar cinco medições reais de Argon2id |
+| fb945a2 | 2026-11-12 | docs(ai-context): registrar resultado Argon2id no Apps Script |
+| 57185a5 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | d3e251d | 2026-11-12 | docs(architecture): atualizar evidência de Argon2id no Apps Script |
 | 3a6d0a3 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | a070eca | 2026-11-12 | docs(poc-03): registrar execução real do Argon2id |
 | a46fd74 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | eb52ab7 | 2026-11-12 | test(poc-03): mark Argon2id performance as measurement only |
-| fc694cf | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| e950d04 | 2026-11-12 | docs(ai-context): corrigir localização do bundle de teste |
-| c16e2a4 | 2026-11-12 | docs(arquitetura): corrigir referência ao bundle de teste |
 
 <!-- END AUTO-GENERATED SECTION -->
