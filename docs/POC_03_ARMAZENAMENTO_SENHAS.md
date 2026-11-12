@@ -322,12 +322,14 @@ A execução automatizada em Node/VM é complementar e não substitui o resultad
 - **Argon2id via `hash-wasm@4.13.0`: aprovado somente como candidato tecnicamente viável para continuar a POC.** Os dois vetores passaram em cinco baterias manuais; o perfil de referência apresentou média de 139,8 ms, mediana de 130 ms e intervalo observado de 61–280 ms. O resultado é promissor, mas a amostra ainda é pequena e não avalia concorrência ou carga.
 - **Fonte candidata de salt:** execução manual concluída com PASS em 256/256 UUIDs v4, 16 bytes cada e zero colisões observadas. A documentação Google → Java oferece a base criptográfica; a amostra não prova CSPRNG.
 - **Ciclo de criação/verificação:** PASS 8/8 no Apps Script real, em 1.031 ms; registro apenas em memória. Senha correta aceita e senha incorreta/adulterações/metadados malformados rejeitados.
-- **Autenticação/login: continua bloqueado.** Ainda faltam aprovação formal do formato de armazenamento, revisão independente da comparação/rotina de verificação, limites de entrada, controle contra abuso, ensaio de concorrência e revisão de segurança da dependência e da integração.
+- **Política de entrada:** PASS 14/14 no Apps Script real; regras candidatas de comprimento, NFC, bytes UTF-8 e Unicode passaram. A blocklist continua pendente.
+- **Modelo de throttling:** PASS 6/6 no Apps Script real; confirma as transições 5 falhas/15 minutos e bloqueio de 15 minutos. Estado apenas em memória; concorrência não testada.
+- **Autenticação/login: continua bloqueado.** Ainda faltam aprovação formal do formato de armazenamento, revisão independente da comparação/rotina de verificação, blocklist, mecanismo real e atômico de rate limit, ensaio de concorrência e revisão de segurança da dependência e da integração.
 
-O próximo passo da POC é revisar limites de entrada e o mecanismo de comparação/verificação, planejar controles antiabuso e executar testes controlados de concorrência. O ciclo manual não implementa cadastro, login, sessão ou operações de negócio.
+O próximo passo da POC é fechar a blocklist, decidir o comparador de hash e desenhar a implementação persistente/atômica do controle de tentativas; depois executar testes controlados de concorrência. Os dois testes manuais acima validam somente a política e o modelo lógico, sem cadastro, login, sessão ou operações de negócio.
 
 
-### 8.13. Política de entrada de senha — preparada, execução manual pendente
+### 8.13. Política de entrada de senha — execução manual concluída
 
 A função `poc03RunPasswordInputPolicyTests` testa a política de entrada antes de chamar Argon2id. Critérios candidatos:
 
@@ -343,9 +345,11 @@ A função cobre 14 casos: 14/15 caracteres, comprimentos de 64/128/129, emoji c
 
 **Referência:** NIST SP 800-63B-4 (2025), seção 3.1.1.2 recomenda mínimo de 15 caracteres para senha como fator único, permitir pelo menos 64, contar code points Unicode, não truncar e aplicar NFC antes do hash quando Unicode for aceito. Também exige blocklist de senhas comuns/esperadas/comprometidas. [NIST SP 800-63B-4 — Password Verifiers](https://pages.nist.gov/800-63-4/sp800-63b.html#passwordver).
 
-**Limites:** o máximo de 128 code points/512 bytes é uma decisão de engenharia candidata desta POC, não um número determinado pelo NIST. A execução manual no Apps Script ainda está pendente. A blocklist de senhas comuns/comprometidas ainda não foi integrada; não declarar a política completa até escolher e validar a fonte/lista e a comparação do segredo inteiro.
+**Resultado manual no Apps Script — 2026-11-12: PASS 14/14.** O responsável executou `poc03RunPasswordInputPolicyTests` no projeto isolado. Passaram os 14 cenários listados acima, incluindo a derivação Argon2id idêntica para formas compostas/decompostas após NFC com o mesmo salt. O resumo confirmou `minimumCodePoints=15`, `maximumCodePoints=128`, `maximumUtf8Bytes=512`, `unicodeNormalization=NFC`, `spacesTrimmed=false` e `failedTests=[]`. Nenhuma senha, salt ou saída derivada foi exposta nos logs.
 
-### 8.14. Throttling de login — modelo lógico preparado, execução manual pendente
+**Limites:** o máximo de 128 code points/512 bytes é uma decisão de engenharia candidata desta POC, não um número determinado pelo NIST. A blocklist de senhas comuns/esperadas/comprometidas ainda não foi integrada; não declarar a política completa até escolher e validar a fonte/lista. A passagem dos casos de entrada não substitui a revisão da comparação segura nem aprova a autenticação.
+
+### 8.14. Throttling de login — modelo lógico executado manualmente
 
 A função `poc03RunLoginThrottlePolicyTests` simula em memória a regra já aprovada na especificação:
 
@@ -358,6 +362,8 @@ A função `poc03RunLoginThrottlePolicyTests` simula em memória a regra já apr
 São seis cenários determinísticos com relógio simulado. Nenhuma planilha, Properties Service, LockService, e-mail, IP ou conta real é acessada.
 
 **Limite importante:** o modelo apenas testa a lógica de transição. Não é um rate limiter operacional, não persiste estado, não comprova atomicidade concorrente e não protege endpoint algum. A implementação real precisará consultar/atualizar `CONTROLE_AUTENTICACAO` sob LockService antes de executar o KDF e testar concorrência com chamadas reais.
+
+**Resultado manual no Apps Script — 2026-11-12: PASS 6/6.** O responsável executou `poc03RunLoginThrottlePolicyTests` e os seis cenários passaram: quinta falha aciona bloqueio; novas tentativas durante o bloqueio são recusadas; a expiração libera e zera o contador; falhas fora da janela anterior iniciam nova janela; sucesso limpa o controle; tentativa bloqueada não incrementa o contador. O resumo confirmou `threshold=5`, `observationWindowMs=900000`, `lockDurationMs=900000`, `storage=MEMORY_ONLY_NOT_PERSISTED` e `concurrency=NOT_TESTED`.
 
 A OWASP observa que contadores por conta evitam a evasão por troca de IP, mas alerta que bloqueios de conta podem ser abusados para causar negação de serviço. É necessário combinar a regra aprovada com proteção de frequência na borda e resposta genérica, sem confiar em um `Map` em memória numa Function serverless como controle durável. [OWASP Authentication Cheat Sheet — Login Throttling](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#login-throttling).
 
