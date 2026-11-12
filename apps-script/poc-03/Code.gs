@@ -24,6 +24,12 @@ var POC03_ARGON2_RECORD_MEMORY_KIB = 19456;
 var POC03_ARGON2_RECORD_ITERATIONS = 2;
 var POC03_ARGON2_RECORD_PARALLELISM = 1;
 var POC03_ARGON2_RECORD_HASH_BYTES = 32;
+var POC03_PASSWORD_MIN_CODE_POINTS = 15;
+var POC03_PASSWORD_MAX_CODE_POINTS = 128;
+var POC03_PASSWORD_MAX_UTF8_BYTES = 512;
+var POC03_LOGIN_FAILURE_LIMIT = 5;
+var POC03_LOGIN_WINDOW_MS = 15 * 60 * 1000;
+var POC03_LOGIN_LOCK_MS = 15 * 60 * 1000;
 
 
 /**
@@ -634,6 +640,464 @@ function poc03HexToBytesForArgon2_(hex) {
 }
 
 
+
+/**
+ * Rejeita UTF-16 malformado (surrogate alto/baixo sem par).
+ * Isso evita que entradas inválidas sejam substituídas silenciosamente
+ * durante a conversão para UTF-8.
+ */
+function poc03IsWellFormedUnicodeForPoc_(value) {
+    for (var i = 0; i < value.length; i += 1) {
+        var unit = value.charCodeAt(i);
+
+        if (unit >= 0xD800 && unit <= 0xDBFF) {
+            if (i + 1 >= value.length) {
+                return false;
+            }
+
+            var nextUnit = value.charCodeAt(i + 1);
+
+            if (nextUnit < 0xDC00 || nextUnit > 0xDFFF) {
+                return false;
+            }
+
+            i += 1;
+        } else if (unit >= 0xDC00 && unit <= 0xDFFF) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Política candidata de entrada:
+ * - 15 a 128 pontos de código Unicode;
+ * - NFC antes de derivar;
+ * - até 512 bytes UTF-8;
+ * - rejeita controles C0/C1 e UTF-16 malformado;
+ * - não aplica trim, lowercase ou remoção de espaços.
+ *
+ * 128 pontos de código permitem pelo menos o máximo de 64 caracteres
+ * recomendado pelo NIST, com margem para passphrases maiores.
+ * O limite de 512 bytes limita o custo de entrada e suporta 128 code points
+ * de até quatro bytes UTF-8 cada.
+ */
+function poc03NormalizeAndValidatePasswordForPoc_(password) {
+    if (typeof password !== "string") {
+        throw new Error("PASSWORD_TYPE_INVALID");
+    }
+
+    if (!poc03IsWellFormedUnicodeForPoc_(password)) {
+        throw new Error("PASSWORD_UNICODE_INVALID");
+    }
+
+    if (typeof password.normalize !== "function") {
+        throw new Error("PASSWORD_NFC_UNAVAILABLE");
+    }
+
+    var normalizedPassword = password.normalize("NFC");
+    var codePointCount = Array.from(normalizedPassword).length;
+
+    if (codePointCount < POC03_PASSWORD_MIN_CODE_POINTS) {
+        throw new Error("PASSWORD_TOO_SHORT");
+    }
+
+    if (codePointCount > POC03_PASSWORD_MAX_CODE_POINTS) {
+        throw new Error("PASSWORD_TOO_LONG");
+    }
+
+    // Aceita espaços e caracteres imprimíveis, mas rejeita controles C0/C1.
+    for (var i = 0; i < normalizedPassword.length; ) {
+        var codePoint = normalizedPassword.codePointAt(i);
+
+        if (
+            codePoint <= 0x1F
+            || (codePoint >= 0x7F && codePoint <= 0x9F)
+        ) {
+            throw new Error("PASSWORD_CONTROL_CHARACTER");
+        }
+
+        i += codePoint > 0xFFFF ? 2 : 1;
+    }
+
+    var utf8ByteLength = Utilities.newBlob(
+        normalizedPassword,
+        "text/plain"
+    ).getBytes().length;
+
+    if (utf8ByteLength > POC03_PASSWORD_MAX_UTF8_BYTES) {
+        throw new Error("PASSWORD_BYTES_LIMIT_EXCEEDED");
+    }
+
+    return {
+        normalizedPassword: normalizedPassword,
+        codePoints: codePointCount,
+        utf8Bytes: utf8ByteLength
+    };
+}
+
+/**
+ * Valida a regra de senha em memória. Não registra valores fornecidos.
+ */
+function poc03RunPasswordInputPolicyTests() {
+    var tests = [
+        {
+            name: "14 code points são rejeitados",
+            action: function () {
+                return poc03NormalizeAndValidatePasswordForPoc_("A".repeat(14));
+            },
+            expected: false
+        },
+        {
+            name: "15 code points são aceitos",
+            action: function () {
+                return poc03NormalizeAndValidatePasswordForPoc_("A".repeat(15));
+            },
+            expected: true
+        },
+        {
+            name: "64 code points são aceitos",
+            action: function () {
+                return poc03NormalizeAndValidatePasswordForPoc_("A".repeat(64));
+            },
+            expected: true
+        },
+        {
+            name: "128 code points são aceitos",
+            action: function () {
+                return poc03NormalizeAndValidatePasswordForPoc_("A".repeat(128));
+            },
+            expected: true
+        },
+        {
+            name: "129 code points são rejeitados",
+            action: function () {
+                return poc03NormalizeAndValidatePasswordForPoc_("A".repeat(129));
+            },
+            expected: false
+        },
+        {
+            name: "15 emojis contam como 15 code points",
+            action: function () {
+                var result = poc03NormalizeAndValidatePasswordForPoc_("😀".repeat(15));
+                return result.codePoints === 15 && result.utf8Bytes === 60;
+            },
+            expected: true
+        },
+        {
+            name: "128 emojis respeitam o teto de 512 bytes",
+            action: function () {
+                var result = poc03NormalizeAndValidatePasswordForPoc_("😀".repeat(128));
+                return result.codePoints === 128 && result.utf8Bytes === 512;
+            },
+            expected: true
+        },
+        {
+            name: "129 emojis são rejeitados",
+            action: function () {
+                return poc03NormalizeAndValidatePasswordForPoc_("😀".repeat(129));
+            },
+            expected: false
+        },
+        {
+            name: "Unicode decomposto é normalizado em NFC",
+            action: function () {
+                var composed = poc03NormalizeAndValidatePasswordForPoc_("\u00e9".repeat(15));
+                var decomposed = poc03NormalizeAndValidatePasswordForPoc_("e\u0301".repeat(15));
+                return composed.normalizedPassword === decomposed.normalizedPassword;
+            },
+            expected: true
+        },
+        {
+            name: "espaços iniciais/finais são preservados",
+            action: function () {
+                var original = " " + "A".repeat(15) + " ";
+                var result = poc03NormalizeAndValidatePasswordForPoc_(original);
+                return result.normalizedPassword === original;
+            },
+            expected: true
+        },
+        {
+            name: "caracteres de controle são rejeitados",
+            action: function () {
+                return poc03NormalizeAndValidatePasswordForPoc_("A".repeat(14) + "\u0000");
+            },
+            expected: false
+        },
+        {
+            name: "surrogate isolado é rejeitado",
+            action: function () {
+                return poc03NormalizeAndValidatePasswordForPoc_("A".repeat(14) + "\uD800");
+            },
+            expected: false
+        },
+        {
+            name: "tipos diferentes de string são rejeitados",
+            action: function () {
+                return poc03NormalizeAndValidatePasswordForPoc_(123456789012345);
+            },
+            expected: false
+        }
+    ];
+
+    var passedCount = 0;
+
+    tests.forEach(function (testCase) {
+        var passed;
+
+        try {
+            var value = testCase.action();
+            passed = testCase.expected
+                ? value === true || Boolean(value && value.normalizedPassword)
+                : false;
+        } catch (error) {
+            passed = testCase.expected === false;
+        }
+
+        if (passed) {
+            passedCount += 1;
+        }
+
+        Logger.log(JSON.stringify({
+            test: testCase.name,
+            status: passed ? "PASS" : "FAIL"
+        }));
+    });
+
+    // Normalização NFC também precisa ocorrer no caminho real do KDF.
+    var composedPassword = "\u00e9".repeat(15);
+    var decomposedPassword = "e\u0301".repeat(15);
+    var record = poc03CreatePasswordRecordForPoc_(composedPassword);
+    var normalizedVerification = await poc03VerifyPasswordForPoc_(
+        decomposedPassword,
+        record
+    );
+    var nfcPassed = normalizedVerification === true;
+
+    if (nfcPassed) {
+        passedCount += 1;
+    }
+
+    Logger.log(JSON.stringify({
+        test: "senha equivalente em NFC verifica o mesmo registro Argon2id",
+        status: nfcPassed ? "PASS" : "FAIL"
+    }));
+
+    var summary = {
+        test: "Password input policy — isolated POC",
+        status: passedCount === tests.length + 1 ? "PASS" : "FAIL",
+        testsPassed: passedCount,
+        testsTotal: tests.length + 1,
+        minimumCodePoints: POC03_PASSWORD_MIN_CODE_POINTS,
+        maximumCodePoints: POC03_PASSWORD_MAX_CODE_POINTS,
+        maximumUtf8Bytes: POC03_PASSWORD_MAX_UTF8_BYTES,
+        unicodeNormalization: "NFC",
+        spacesTrimmed: false
+    };
+
+    Logger.log(JSON.stringify(summary));
+
+    if (summary.status !== "PASS") {
+        throw new Error("Falha na política de entrada de senha da POC-03.");
+    }
+
+    return summary;
+}
+
+/**
+ * Modelo puro/in-memory da regra de tentativas aprovada na especificação.
+ * NÃO é armazenamento nem proteção efetiva de produção.
+ */
+function poc03CreateLoginThrottleStateForPoc_() {
+    return {
+        failureCount: 0,
+        windowStartedAtMs: null,
+        blockedUntilMs: null
+    };
+}
+
+function poc03ResetLoginThrottleStateForPoc_(state) {
+    state.failureCount = 0;
+    state.windowStartedAtMs = null;
+    state.blockedUntilMs = null;
+}
+
+function poc03CanAttemptLoginForPoc_(state, nowMs) {
+    if (
+        !state
+        || !Number.isSafeInteger(nowMs)
+        || nowMs < 0
+    ) {
+        throw new Error("LOGIN_THROTTLE_STATE_INVALID");
+    }
+
+    if (state.blockedUntilMs !== null) {
+        if (nowMs < state.blockedUntilMs) {
+            return false;
+        }
+
+        poc03ResetLoginThrottleStateForPoc_(state);
+    }
+
+    if (
+        state.windowStartedAtMs !== null
+        && nowMs - state.windowStartedAtMs >= POC03_LOGIN_WINDOW_MS
+    ) {
+        poc03ResetLoginThrottleStateForPoc_(state);
+    }
+
+    return true;
+}
+
+function poc03RegisterLoginFailureForPoc_(state, nowMs) {
+    if (!poc03CanAttemptLoginForPoc_(state, nowMs)) {
+        return {
+            status: "BLOCKED",
+            allowed: false,
+            failureCount: state.failureCount,
+            blockedUntilMs: state.blockedUntilMs
+        };
+    }
+
+    if (state.windowStartedAtMs === null) {
+        state.windowStartedAtMs = nowMs;
+    }
+
+    state.failureCount += 1;
+
+    if (state.failureCount >= POC03_LOGIN_FAILURE_LIMIT) {
+        state.blockedUntilMs = nowMs + POC03_LOGIN_LOCK_MS;
+
+        return {
+            status: "LOCKED_AFTER_FAILURE",
+            allowed: false,
+            failureCount: state.failureCount,
+            blockedUntilMs: state.blockedUntilMs
+        };
+    }
+
+    return {
+        status: "COUNTED",
+        allowed: true,
+        failureCount: state.failureCount,
+        blockedUntilMs: null
+    };
+}
+
+function poc03RegisterLoginSuccessForPoc_(state) {
+    poc03ResetLoginThrottleStateForPoc_(state);
+    return true;
+}
+
+/**
+ * Testa a regra funcional 5 falhas/15 min -> bloqueio de 15 min.
+ * Teste somente lógico e in-memory; não prova LockService/Sheets concorrentes.
+ */
+function poc03RunLoginThrottlePolicyTests() {
+    var minute = 60 * 1000;
+    var cases = [];
+
+    // 1. Quatro erros ainda não bloqueiam; o quinto ativa o bloqueio.
+    var thresholdState = poc03CreateLoginThrottleStateForPoc_();
+    for (var i = 0; i < 4; i += 1) {
+        poc03RegisterLoginFailureForPoc_(thresholdState, i * 1000);
+    }
+    var fifth = poc03RegisterLoginFailureForPoc_(thresholdState, 4000);
+    cases.push({
+        name: "quinta falha dentro da janela ativa bloqueio de 15 minutos",
+        passed: fifth.status === "LOCKED_AFTER_FAILURE"
+            && fifth.failureCount === 5
+            && fifth.blockedUntilMs === 4000 + POC03_LOGIN_LOCK_MS
+    });
+
+    cases.push({
+        name: "nova tentativa durante bloqueio é recusada",
+        passed: poc03CanAttemptLoginForPoc_(thresholdState, 4000 + 14 * minute) === false
+    });
+
+    cases.push({
+        name: "após 15 minutos o bloqueio expira e o contador reinicia",
+        passed: poc03CanAttemptLoginForPoc_(
+            thresholdState,
+            4000 + POC03_LOGIN_LOCK_MS
+        ) === true
+            && thresholdState.failureCount === 0
+            && thresholdState.blockedUntilMs === null
+    });
+
+    // 2. A janela é baseada no primeiro erro e reinicia em 15 minutos.
+    var windowState = poc03CreateLoginThrottleStateForPoc_();
+    for (var j = 0; j < 4; j += 1) {
+        poc03RegisterLoginFailureForPoc_(windowState, j * minute);
+    }
+    var afterWindow = poc03RegisterLoginFailureForPoc_(windowState, 15 * minute);
+    cases.push({
+        name: "falhas fora da janela anterior começam uma nova janela",
+        passed: afterWindow.status === "COUNTED"
+            && afterWindow.failureCount === 1
+            && windowState.blockedUntilMs === null
+    });
+
+    // 3. Login bem-sucedido limpa o contador.
+    var resetState = poc03CreateLoginThrottleStateForPoc_();
+    poc03RegisterLoginFailureForPoc_(resetState, 0);
+    poc03RegisterLoginFailureForPoc_(resetState, 1000);
+    poc03RegisterLoginFailureForPoc_(resetState, 2000);
+    poc03RegisterLoginSuccessForPoc_(resetState);
+    cases.push({
+        name: "login bem-sucedido reinicia o controle",
+        passed: resetState.failureCount === 0
+            && resetState.windowStartedAtMs === null
+            && resetState.blockedUntilMs === null
+    });
+
+    // 4. Tentativa bloqueada não incrementa contador.
+    var blockedState = poc03CreateLoginThrottleStateForPoc_();
+    for (var k = 0; k < 5; k += 1) {
+        poc03RegisterLoginFailureForPoc_(blockedState, k * 1000);
+    }
+    var blockedCount = blockedState.failureCount;
+    poc03RegisterLoginFailureForPoc_(blockedState, 6000);
+    cases.push({
+        name: "tentativa durante bloqueio não incrementa o contador",
+        passed: blockedState.failureCount === blockedCount
+    });
+
+    var passedCount = 0;
+
+    cases.forEach(function (testCase) {
+        if (testCase.passed) {
+            passedCount += 1;
+        }
+
+        Logger.log(JSON.stringify({
+            test: testCase.name,
+            status: testCase.passed ? "PASS" : "FAIL"
+        }));
+    });
+
+    var summary = {
+        test: "Login throttling policy — in-memory model only",
+        status: passedCount === cases.length ? "PASS" : "FAIL",
+        testsPassed: passedCount,
+        testsTotal: cases.length,
+        threshold: POC03_LOGIN_FAILURE_LIMIT,
+        observationWindowMs: POC03_LOGIN_WINDOW_MS,
+        lockDurationMs: POC03_LOGIN_LOCK_MS,
+        storage: "MEMORY_ONLY_NOT_PERSISTED",
+        concurrency: "NOT_TESTED"
+    };
+
+    Logger.log(JSON.stringify(summary));
+
+    if (summary.status !== "PASS") {
+        throw new Error("Falha na simulação da política de bloqueio da POC-03.");
+    }
+
+    return summary;
+}
+
 /**
  * Converte bytes Argon2id para hexadecimal minúsculo, sem Buffer/atob.
  */
@@ -671,8 +1135,11 @@ function poc03IsValidArgon2PasswordRecordForPoc_(record) {
     );
 }
 
-/** Deriva 32 bytes com o perfil fixo da POC, sem expor o hash no log. */
-async function poc03DerivePasswordBytesForPoc_(password, saltBytes) {
+/** Deriva bytes a partir de uma string já normalizada/validada. */
+async function poc03DeriveNormalizedPasswordBytesForPoc_(
+    normalizedPassword,
+    saltBytes
+) {
     if (
         typeof hashwasm !== "object"
         || hashwasm === null
@@ -681,12 +1148,15 @@ async function poc03DerivePasswordBytesForPoc_(password, saltBytes) {
         throw new Error("Biblioteca Argon2id não carregada.");
     }
 
-    if (typeof password !== "string" || !(saltBytes instanceof Uint8Array)) {
+    if (
+        typeof normalizedPassword !== "string"
+        || !(saltBytes instanceof Uint8Array)
+    ) {
         throw new Error("Entrada inválida para derivação Argon2id.");
     }
 
     return await hashwasm.argon2id({
-        password: poc03Utf8BytesForArgon2_(password),
+        password: poc03Utf8BytesForArgon2_(normalizedPassword),
         salt: saltBytes,
         secret: new Uint8Array(0),
         parallelism: POC03_ARGON2_RECORD_PARALLELISM,
@@ -697,18 +1167,27 @@ async function poc03DerivePasswordBytesForPoc_(password, saltBytes) {
     });
 }
 
+/** Valida entrada e deriva 32 bytes com o perfil fixo da POC. */
+async function poc03DerivePasswordBytesForPoc_(password, saltBytes) {
+    var validation = poc03NormalizeAndValidatePasswordForPoc_(password);
+    return await poc03DeriveNormalizedPasswordBytesForPoc_(
+        validation.normalizedPassword,
+        saltBytes
+    );
+}
+
 /**
  * Cria um registro fictício em memória, sem gravar em Sheets/Properties.
  * O formato é candidato e ainda não foi aprovado para produção.
  */
 async function poc03CreatePasswordRecordForPoc_(password) {
-    if (typeof password !== "string") {
-        throw new Error("A senha fictícia da POC precisa ser uma string.");
-    }
-
+    var validation = poc03NormalizeAndValidatePasswordForPoc_(password);
     var saltHex = poc03GenerateSaltHex_();
     var saltBytes = poc03HexToBytesForArgon2_(saltHex);
-    var derived = await poc03DerivePasswordBytesForPoc_(password, saltBytes);
+    var derived = await poc03DeriveNormalizedPasswordBytesForPoc_(
+        validation.normalizedPassword,
+        saltBytes
+    );
 
     return {
         senha_algoritmo: POC03_ARGON2_RECORD_ALGORITHM,
@@ -733,10 +1212,18 @@ async function poc03VerifyPasswordForPoc_(candidatePassword, record) {
         return false;
     }
 
+    var validation;
+
+    try {
+        validation = poc03NormalizeAndValidatePasswordForPoc_(candidatePassword);
+    } catch (error) {
+        return false;
+    }
+
     var saltBytes = poc03HexToBytesForArgon2_(record.senha_salt);
     var expectedBytes = poc03HexToBytesForArgon2_(record.senha_hash);
-    var actualBytes = await poc03DerivePasswordBytesForPoc_(
-        candidatePassword,
+    var actualBytes = await poc03DeriveNormalizedPasswordBytesForPoc_(
+        validation.normalizedPassword,
         saltBytes
     );
 
