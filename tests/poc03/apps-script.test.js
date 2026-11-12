@@ -142,6 +142,33 @@ test("POC-03: bundle Argon2id está fixado e íntegro", () => {
   assert.match(vendorSource, /argon2id/);
 });
 
+
+test("POC-03: cria registro Argon2id em memória, verifica senha e recusa adulterações", async () => {
+  const { context, logs } = createAppsScriptHarness();
+
+  assert.equal(typeof context.TextEncoder, "undefined");
+
+  const result = await context.poc03RunPasswordRecordVerificationTests();
+
+  assert.equal(result.status, "PASS");
+  assert.equal(result.testsPassed, 8);
+  assert.equal(result.testsTotal, 8);
+  assert.equal(result.saltBytes, 16);
+  assert.equal(result.hashBytes, 32);
+  assert.equal(result.storage, "MEMORY_ONLY_NOT_SAVED");
+  assert.equal(
+    result.comparison,
+    "FIXED_LENGTH_XOR_ACCUMULATOR_NOT_PROVEN_CONSTANT_TIME",
+  );
+  assert.ok(
+    logs.some((line) =>
+      line.includes('"test":"Argon2id password record create/verify — isolated POC","status":"PASS"'),
+    ),
+    logs.join("\\n"),
+  );
+  assert.doesNotMatch(logs.join("\\n"), /POC03 synthetic password for verification/);
+});
+
 test("POC-03: Argon2id WASM passa vetores independentes e perfil OWASP", async () => {
   const { context, logs } = createAppsScriptHarness();
 
