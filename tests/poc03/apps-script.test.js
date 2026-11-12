@@ -17,12 +17,37 @@ const vendorSource = vendorSourceBuffer.toString("utf8");
 const expectedVendorSha256 =
   "acfe11b015852f593aaddc51116f71dc7850e4551e6b34d42c1f88cf39635f03";
 
-function createAppsScriptHarness() {
+function createAppsScriptHarness({
+  lockUnavailable = false,
+  propertiesUnavailable = false,
+} = {}) {
   const logs = [];
+  const propertyStore = new Map();
+  let lockHeld = false;
+
+  const scriptProperties = {
+    getProperty(key) {
+      return propertyStore.has(key) ? propertyStore.get(key) : null;
+    },
+    setProperty(key, value) {
+      propertyStore.set(String(key), String(value));
+      return scriptProperties;
+    },
+    deleteProperty(key) {
+      propertyStore.delete(String(key));
+      return scriptProperties;
+    },
+    getKeys() {
+      return [...propertyStore.keys()];
+    },
+  };
 
   const utilities = {
     getUuid() {
       return randomUUID();
+    },
+    sleep() {
+      // No real delay in CI; actual Apps Script contention is tested manually.
     },
     newBlob(value) {
       const bytes = Buffer.from(String(value), "utf8");
@@ -44,8 +69,35 @@ function createAppsScriptHarness() {
     },
   };
 
+  const lock = {
+    tryLock() {
+      if (lockUnavailable || lockHeld) return false;
+      lockHeld = true;
+      return true;
+    },
+    hasLock() {
+      return lockHeld;
+    },
+    releaseLock() {
+      lockHeld = false;
+    },
+  };
+
   const context = vm.createContext({
     Utilities: utilities,
+    PropertiesService: {
+      getScriptProperties() {
+        if (propertiesUnavailable) {
+          throw new Error("PropertiesService unavailable in test harness");
+        }
+        return scriptProperties;
+      },
+    },
+    LockService: {
+      getScriptLock() {
+        return lock;
+      },
+    },
     WebAssembly,
     Logger: {
       log(message) {
@@ -64,7 +116,7 @@ function createAppsScriptHarness() {
     timeout: 10_000,
   });
 
-  return { context, logs };
+  return { context, logs, propertyStore };
 }
 
 test("POC-03: vetores rápidos (RFC, UTF-8 e senha acima de 64 bytes)", () => {
@@ -215,6 +267,90 @@ test("POC-03: simula limite de 5 falhas/15 min e bloqueio de 15 min", () => {
     ),
     logs.join("\\n"),
   );
+});
+
+
+test("POC-03: throttling persistente usa Script Properties e ScriptLock", () => {
+  const { context, logs, propertyStore } = createAppsScriptHarness();
+
+  const result = context.poc03RunPersistentThrottlePolicyTests();
+
+  assert.equal(result.status, "PASS");
+  assert.equal(result.testsPassed, 6);
+  assert.equal(result.testsTotal, 6);
+  assert.equal(result.threshold, 5);
+  assert.equal(result.observationWindowMs, 15 * 60 * 1000);
+  assert.equal(result.lockDurationMs, 15 * 60 * 1000);
+  assert.equal(result.persistence, "SCRIPT_PROPERTIES_TEST_ONLY");
+  assert.equal(result.synchronization, "SCRIPT_LOCK");
+  assert.equal(result.failClosedOnCorruptState, true);
+  assert.equal(result.realAccountsUsed, false);
+  assert.equal(
+    [...propertyStore.keys()].some((key) => key.startsWith("POC03_THROTTLE_TEST_")),
+    false,
+    "POC-03 test properties should be removed after the suite",
+  );
+  assert.ok(
+    logs.some((line) =>
+      line.includes('"test":"Persistent login throttling — isolated Apps Script POC","status":"PASS"'),
+    ),
+    logs.join("\\n"),
+  );
+  assert.doesNotMatch(logs.join("\\n"), /poc03-synthetic-account@invalid\\.example/);
+});
+
+test("POC-03: throttling falha fechado quando ScriptLock não pode ser adquirido", () => {
+  const { context, propertyStore } = createAppsScriptHarness({
+    lockUnavailable: true,
+  });
+
+  const result = context.poc03RegisterPersistentThrottleFailureForPoc_(
+    "poc03-synthetic-account@invalid.example",
+    Date.now(),
+  );
+
+  assert.equal(result.status, "LOCK_TIMEOUT");
+  assert.equal(result.allowed, false);
+  assert.equal(propertyStore.size, 0);
+});
+
+test("POC-03: throttling falha fechado quando PropertiesService está indisponível", () => {
+  const { context } = createAppsScriptHarness({
+    propertiesUnavailable: true,
+  });
+
+  const result = context.poc03RegisterPersistentThrottleFailureForPoc_(
+    "poc03-synthetic-account@invalid.example",
+    Date.now(),
+  );
+
+  assert.equal(result.status, "PERSISTENCE_UNAVAILABLE");
+  assert.equal(result.allowed, false);
+});
+
+test("POC-03: workers de throttling mantêm limite sob execuções simuladas sequenciais", () => {
+  const { context, propertyStore } = createAppsScriptHarness();
+
+  const reset = context.poc03ResetPersistentThrottleConcurrencyProbe();
+  assert.equal(reset.status, "READY");
+
+  for (let index = 0; index < 10; index += 1) {
+    context.poc03RunPersistentThrottleConcurrencyWorker();
+  }
+
+  const summary = context.poc03RunPersistentThrottleConcurrencySummary();
+
+  assert.equal(summary.status, "PASS");
+  assert.equal(summary.expectedWorkers, 10);
+  assert.equal(summary.observedWorkers, 10);
+  assert.equal(summary.countedBeforeLimit, 4);
+  assert.equal(summary.lockedAtLimit, 1);
+  assert.equal(summary.rejectedWhileLocked, 5);
+  assert.equal(summary.finalFailureCount, 5);
+  assert.equal(summary.finalStateBlocked, true);
+
+  context.poc03CleanupPersistentThrottleTestData();
+  assert.equal(propertyStore.size, 0);
 });
 
 test("POC-03: Argon2id WASM passa vetores independentes e perfil OWASP", async () => {
