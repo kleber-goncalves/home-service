@@ -297,9 +297,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** c52750d641deda78e3c9b56801bb271b8f34400d
-- **Data do commit:** 2026-11-12T16:25:21-03:00
-- **Mensagem do commit:** debug(poc-03): identificar casos que falham na política de senha
+- **Commit de referência:** 2fecc7283c322fc5df4ae3a5956a636ef3f39770
+- **Data do commit:** 2026-11-12T16:25:35-03:00
+- **Mensagem do commit:** test(poc-03): corrigir contagem e expor diagnóstico dos casos
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -394,13 +394,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 2fecc72 | 2026-11-12 | test(poc-03): corrigir contagem e expor diagnóstico dos casos |
+| c215946 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | c52750d | 2026-11-12 | debug(poc-03): identificar casos que falham na política de senha |
 | 3598611 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 2a1c3ca | 2026-11-12 | test(poc-03): cobrir senha Unicode e modelo de throttling |
 | 284fb53 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 52dac44 | 2026-11-12 | fix(poc-03): tornar teste de política async |
 | b92eb14 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| 4e942c0 | 2026-11-12 | test(poc-03): revisar política de senha e throttling |
-| c9a2619 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
