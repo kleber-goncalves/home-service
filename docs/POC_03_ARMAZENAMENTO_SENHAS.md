@@ -375,3 +375,34 @@ A documentação do Apps Script V8 lista `crypto` e `SubtleCrypto` entre as APIs
 
 **Opção arquitetural a avaliar:** executar somente a comparação constante de dois buffers de 32 bytes na Function Node da Vercel, mantendo no Apps Script a leitura do registro, derivação Argon2id, regras da conta e emissão/validação da sessão. Isso exige que os valores derivados trafeguem apenas entre Apps Script e Function, nunca para o navegador/logs, e que a Function devolva o resultado de comparação por chamada assinada. Essa opção amplia a responsabilidade da Function além do gateway de transporte e **não está aprovada**. Alternativa: avaliar um comparador WASM pequeno e revisado, executado dentro do Apps Script. Não implementar login até essa decisão ser resolvida.
 
+
+
+### 8.16. Throttling persistente com PropertiesService + ScriptLock
+
+Foi preparada uma segunda etapa para ir além do modelo in-memory da seção 8.14. A função `poc03RunPersistentThrottlePolicyTests` usa o serviço real `PropertiesService.getScriptProperties()` e o lock real `LockService.getScriptLock()` no projeto isolado do Apps Script.
+
+**Comportamento implementado:**
+- O identificador de teste é fixo e sintético, no domínio reservado `.invalid.example`; nunca é um e-mail real.
+- Uma chave HMAC-SHA-256 do identificador normalizado compõe a chave de armazenamento. A chave HMAC é exclusiva da POC, gerada e guardada nas Script Properties e nunca registrada nos logs.
+- A leitura, validação, transição e gravação do estado acontecem dentro de um `ScriptLock`; o lock é liberado no bloco `finally`.
+- O estado contém versão de esquema, contador, início da janela, instante de bloqueio e última atualização.
+- Erro de aquisição do lock, indisponibilidade do Properties Service ou estado inválido/corrompido falha fechado. O estado corrompido não é zerado silenciosamente.
+- A tentativa durante bloqueio não incrementa nem sobrescreve o estado.
+- Login bem-sucedido remove o registro sintético de controle.
+- O prefixo `POC03_THROTTLE_TEST_` isola as propriedades. A limpeza nunca usa `deleteAllProperties()` e não toca nas propriedades da POC-02.
+
+**Resultado automatizado:** CI de push #231 — SUCCESS. Foram adicionados testes do harness Node/VM para estado persistido simulado, falha fechada quando o lock não pode ser adquirido ou o serviço de propriedades está indisponível, e dez workers sequenciais. Essa bateria automatizada não simula contenção real entre execuções independentes do Google.
+
+**Execução manual no Apps Script — pendente:**
+1. Executar `poc03RunPersistentThrottlePolicyTests()`. Esperado: PASS 6/6. Essa bateria usa Properties Service e ScriptLock reais, e remove as propriedades de teste ao final.
+2. Executar `poc03ResetPersistentThrottleConcurrencyProbe()` uma vez.
+3. Iniciar **dez execuções separadas** de `poc03RunPersistentThrottleConcurrencyWorker()` com poucos segundos de diferença. O worker mantém o lock por 150 ms artificialmente para ampliar a disputa. Cada execução registra apenas o resultado lógico, nunca o identificador/HMAC.
+4. Executar `poc03RunPersistentThrottleConcurrencySummary()`. Resultado esperado, se todas as dez execuções forem registradas: quatro `COUNTED`, uma `LOCKED_AFTER_FAILURE`, cinco `BLOCKED`, contador final 5 e bloqueio ainda ativo.
+5. Após registrar o resumo, executar `poc03CleanupPersistentThrottleTestData()`.
+
+Se alguma execução não conseguir o lock dentro do timeout, a operação falha fechada e o resumo fica incompleto; não tratar como sucesso.
+
+**Limite arquitetural:** este passo persiste estado em Script Properties para testar a primitiva key-value, não na aba `CONTROLE_AUTENTICACAO` da modelagem. Script Properties são compartilhadas por todos os usuários do mesmo projeto; `getScriptLock()` também serializa a seção crítica para todas as execuções desse projeto, não apenas para uma conta. Isso favorece consistência simples, mas cria um ponto global de contenção.
+
+O serviço de propriedades tem limites documentados: 9 KB por valor, 500 KB por armazenamento e cotas diárias de leitura/escrita de 50.000 para contas de consumidor ou 500.000 para Google Workspace. Portanto, **não é a decisão de armazenamento final para o cadastro real**. A implementação vinculada à modelagem ainda precisa ser validada com a aba `CONTROLE_AUTENTICACAO`, operações na planilha sob lock e concorrência entre execuções independentes. Fontes: [Properties Service](https://developers.google.com/apps-script/guides/properties) · [Apps Script quotas](https://developers.google.com/apps-script/guides/services/quotas) · [LockService](https://developers.google.com/apps-script/reference/lock/lock-service).
+
