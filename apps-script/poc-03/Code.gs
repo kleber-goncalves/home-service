@@ -495,6 +495,112 @@ async function poc03RunArgon2idTests() {
     }
 }
 
+
+// -----------------------------------------------------------------------------
+// Geração de salt — teste isolado com Utilities.getUuid()
+// -----------------------------------------------------------------------------
+
+/**
+ * Converte o UUID v4 fornecido pelo Apps Script em 16 bytes hexadecimais.
+ *
+ * Base documental:
+ * - Google documenta Utilities.getUuid() como equivalente a
+ *   java.util.UUID.randomUUID().
+ * - Java documenta UUID.randomUUID() como gerado por PRNG criptograficamente forte.
+ *
+ * A conversão preserva os 128 bits do UUID (122 bits aleatórios mais os bits
+ * fixos de versão/variante). O valor em hexadecimal tem 32 caracteres.
+ *
+ * Este helper não grava dados e não deve ser chamado pelo navegador.
+ */
+function poc03GenerateSaltHex_() {
+    var uuid = Utilities.getUuid();
+
+    if (
+        typeof uuid !== "string"
+        || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(uuid)
+    ) {
+        throw new Error(
+            "Utilities.getUuid() não retornou um UUID v4 RFC 9562 válido."
+        );
+    }
+
+    var saltHex = uuid.replace(/-/g, "").toLowerCase();
+
+    if (!/^[0-9a-f]{32}$/.test(saltHex)) {
+        throw new Error("Salt gerado não possui 16 bytes em hexadecimal.");
+    }
+
+    return saltHex;
+}
+
+/**
+ * Teste estrutural de geração de salt.
+ *
+ * Gera 256 amostras e valida:
+ * - UUID v4 / variante RFC;
+ * - conversão para 16 bytes (32 caracteres hex);
+ * - nenhuma repetição dentro desta amostra.
+ *
+ * ATENÇÃO: ausência de colisões numa amostra não prova CSPRNG.
+ * A qualidade criptográfica baseia-se no contrato documentado das APIs
+ * Google Utilities.getUuid() e Java UUID.randomUUID().
+ * Nenhum valor gerado é escrito no log.
+ */
+function poc03RunSaltGenerationTests() {
+    var sampleCount = 256;
+    var seen = Object.create(null);
+    var validCount = 0;
+    var duplicateCount = 0;
+
+    for (var i = 0; i < sampleCount; i += 1) {
+        var saltHex = poc03GenerateSaltHex_();
+        var saltBytes = poc03HexToBytesForArgon2_(saltHex);
+
+        if (
+            saltHex.length !== 32
+            || saltBytes.length !== 16
+        ) {
+            throw new Error("Salt não possui exatamente 16 bytes.");
+        }
+
+        if (seen[saltHex]) {
+            duplicateCount += 1;
+        } else {
+            seen[saltHex] = true;
+        }
+
+        validCount += 1;
+    }
+
+    var uniqueCount = Object.keys(seen).length;
+    var passed = (
+        validCount === sampleCount
+        && duplicateCount === 0
+        && uniqueCount === sampleCount
+    );
+
+    var result = {
+        test: "Apps Script UUID v4 salt generation",
+        status: passed ? "PASS" : "FAIL",
+        samples: sampleCount,
+        validUuidV4: validCount,
+        saltBytes: 16,
+        uniqueSamples: uniqueCount,
+        duplicateCount: duplicateCount,
+        cryptographicBasis: "Google Utilities.getUuid() -> Java UUID.randomUUID()",
+        statisticalProofOfCSPRNG: false
+    };
+
+    Logger.log(JSON.stringify(result));
+
+    if (!passed) {
+        throw new Error("Falha no teste estrutural de geração de salt.");
+    }
+
+    return result;
+}
+
 /** Converte texto para UTF-8 pelo serviço nativo do Apps Script. */
 function poc03Utf8BytesForArgon2_(value) {
     return new Uint8Array(
