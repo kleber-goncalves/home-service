@@ -293,9 +293,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 787d340d9d717e3185bb8cb66fd8232049e6ba16
-- **Data do commit:** 2026-11-12T15:49:06-03:00
-- **Mensagem do commit:** test(poc-03): avaliar geração de salt com UUID v4
+- **Commit de referência:** d3d04fdc3f26135440c27863a25b879393b27fab
+- **Data do commit:** 2026-11-12T15:49:25-03:00
+- **Mensagem do commit:** test(poc-03): validar formato e unicidade estrutural de salts
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -390,13 +390,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| d3d04fd | 2026-11-12 | test(poc-03): validar formato e unicidade estrutural de salts |
+| 02afbb1 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 787d340 | 2026-11-12 | test(poc-03): avaliar geração de salt com UUID v4 |
 | edd9afa | 2026-11-12 | docs(ai-context): atualizar cinco medições do Argon2id |
 | ac52538 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 0e3d3b7 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | b0af5e0 | 2026-11-12 | docs(architecture): consolidar estabilidade inicial de Argon2id |
 | ec62406 | 2026-11-12 | docs(poc-03): registrar cinco medições reais de Argon2id |
-| fb945a2 | 2026-11-12 | docs(ai-context): registrar resultado Argon2id no Apps Script |
-| 57185a5 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
