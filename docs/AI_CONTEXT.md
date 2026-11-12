@@ -156,7 +156,11 @@ O resultado demonstra compatibilidade funcional repetida e desempenho pontual pr
 
 **Prova manual de criação/verificação concluída:** `poc03RunPasswordRecordVerificationTests` passou 8/8 casos no Apps Script real em 1.031 ms. Criou um registro sintético somente em memória; aceitou a senha correta e rejeitou senha incorreta, salt/hash adulterados, algoritmo/parâmetros não permitidos e campos malformados. Não escreveu Sheets/Drive/Properties nem imprimiu credenciais. A comparação usa acumulador XOR de tamanho fixo, mas JavaScript/V8 não garante tempo constante; não está aprovada para autenticação. Os tempos individuais não constituem teste de side-channel.
 
-**Próximas validações:** avaliar concorrência controlada e consumo de recursos; aprovar formalmente formato/versionamento do hash; revisar limites de entrada e procedimento de verificação/comparação; definir rate limit e controles contra abuso; revisar dependência, licença e integridade do bundle. Nenhuma credencial real deve ser usada. Cadastro, login e sessões continuam bloqueados até concluir essas verificações e a POC-04.
+**Próxima revisão preparada na POC-03:** política de entrada candidata (15–128 code points Unicode, NFC, máximo 512 bytes UTF-8, preserva espaços/case, rejeita controles e UTF-16 malformado); `poc03RunPasswordInputPolicyTests` cobre 14 casos, incluindo equivalência de derivação após NFC. O NIST exige mínimo de 15 para fator único, permite pelo menos 64, recomenda NFC e proíbe truncamento; blocklist de senhas comuns/comprometidas permanece pendente. `poc03RunLoginThrottlePolicyTests` modela em memória a regra 5 falhas/15 min → bloqueio 15 min; não é armazenamento, não testa concorrência e não protege endpoint. Execução manual das duas funções no Apps Script ainda pendente.
+
+**Comparação:** acumulador XOR em JS não tem garantia formal de tempo constante; Apps Script V8 não oferece `crypto`/`SubtleCrypto`. Node/Vercel fornece `crypto.timingSafeEqual`, mas mover a comparação ampliaria o papel da Function; comparador WASM revisado é alternativa. Nenhuma opção foi aprovada. Login continua bloqueado.
+
+**Próximas validações:** executar manualmente os dois novos testes; avaliar concorrência e consumo; aprovar formato/versionamento do hash; decidir comparador; implementar blocklist adequada, limites e controles antiabuso; revisar dependência, licença e integridade do bundle. Nenhuma credencial real deve ser usada. Cadastro, login e sessões continuam bloqueados até concluir essas verificações e a POC-04.
 
 ### 5.3. Modelagem lógica e física de dados aprovada
 
