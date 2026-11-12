@@ -325,3 +325,47 @@ A execução automatizada em Node/VM é complementar e não substitui o resultad
 - **Autenticação/login: continua bloqueado.** Ainda faltam aprovação formal do formato de armazenamento, revisão independente da comparação/rotina de verificação, limites de entrada, controle contra abuso, ensaio de concorrência e revisão de segurança da dependência e da integração.
 
 O próximo passo da POC é revisar limites de entrada e o mecanismo de comparação/verificação, planejar controles antiabuso e executar testes controlados de concorrência. O ciclo manual não implementa cadastro, login, sessão ou operações de negócio.
+
+
+### 8.13. Política de entrada de senha — preparada, execução manual pendente
+
+A função `poc03RunPasswordInputPolicyTests` testa a política de entrada antes de chamar Argon2id. Critérios candidatos:
+
+- Mínimo: **15 pontos de código Unicode** (não unidades UTF-16).
+- Máximo: **128 pontos de código Unicode**, portanto aceita pelo menos os 64 caracteres recomendados pelo NIST.
+- Teto absoluto: **512 bytes UTF-8** após normalização NFC; isso permite 128 pontos de código que ocupem até quatro bytes cada e limita entradas excessivas.
+- Unicode é normalizado para **NFC antes de derivar o hash**, tanto na criação quanto na verificação.
+- Espaços iniciais/finais e diferenças entre maiúsculas/minúsculas são preservados; não aplicar `trim`, lowercase ou remoção de espaços.
+- Caracteres imprimíveis ASCII, espaços e Unicode são aceitos; controles C0/C1 e sequências UTF-16 malformadas são rejeitados.
+- Senhas não são truncadas.
+
+A função cobre 14 casos: 14/15 caracteres, comprimentos de 64/128/129, emoji contado como ponto de código, 128 emojis/512 bytes, 129 emojis, NFC composto/decomposto, preservação de espaços, controles, surrogate isolado e tipo de entrada inválido. Também deriva as duas formas NFC com o mesmo salt sintético para conferir a igualdade binária das saídas. Não registra a senha ou os bytes derivados.
+
+**Referência:** NIST SP 800-63B-4 (2025), seção 3.1.1.2 recomenda mínimo de 15 caracteres para senha como fator único, permitir pelo menos 64, contar code points Unicode, não truncar e aplicar NFC antes do hash quando Unicode for aceito. Também exige blocklist de senhas comuns/esperadas/comprometidas. [NIST SP 800-63B-4 — Password Verifiers](https://pages.nist.gov/800-63-4/sp800-63b.html#passwordver).
+
+**Limites:** o máximo de 128 code points/512 bytes é uma decisão de engenharia candidata desta POC, não um número determinado pelo NIST. A execução manual no Apps Script ainda está pendente. A blocklist de senhas comuns/comprometidas ainda não foi integrada; não declarar a política completa até escolher e validar a fonte/lista e a comparação do segredo inteiro.
+
+### 8.14. Throttling de login — modelo lógico preparado, execução manual pendente
+
+A função `poc03RunLoginThrottlePolicyTests` simula em memória a regra já aprovada na especificação:
+
+- 5 falhas dentro de uma janela de 15 minutos;
+- após a quinta falha, bloqueio por 15 minutos;
+- tentativas durante o bloqueio não avançam o contador;
+- ao expirar, o contador reinicia;
+- uma autenticação bem-sucedida limpa o estado.
+
+São seis cenários determinísticos com relógio simulado. Nenhuma planilha, Properties Service, LockService, e-mail, IP ou conta real é acessada.
+
+**Limite importante:** o modelo apenas testa a lógica de transição. Não é um rate limiter operacional, não persiste estado, não comprova atomicidade concorrente e não protege endpoint algum. A implementação real precisará consultar/atualizar `CONTROLE_AUTENTICACAO` sob LockService antes de executar o KDF e testar concorrência com chamadas reais.
+
+A OWASP observa que contadores por conta evitam a evasão por troca de IP, mas alerta que bloqueios de conta podem ser abusados para causar negação de serviço. É necessário combinar a regra aprovada com proteção de frequência na borda e resposta genérica, sem confiar em um `Map` em memória numa Function serverless como controle durável. [OWASP Authentication Cheat Sheet — Login Throttling](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#login-throttling).
+
+### 8.15. Comparação segura do hash — bloqueio arquitetural aberto
+
+O harness ainda usa comparação byte a byte com acumulador XOR em JavaScript. O loop percorre todos os 32 bytes e não termina no primeiro byte divergente, mas **não há garantia formal de tempo constante no JavaScript/V8**. A OWASP recomenda comparação por função segura/constante quando possível e exige limitar o tamanho, definir tipos e evitar diferenças de tempo. [OWASP Authentication Cheat Sheet — Compare Password Hashes Using Safe Functions](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#compare-password-hashes-using-safe-functions).
+
+A documentação do Apps Script V8 lista `crypto` e `SubtleCrypto` entre as APIs indisponíveis. O runtime Node.js da Vercel expõe APIs Node completas; Node fornece `crypto.timingSafeEqual`, documentada como comparação de tempo constante para buffers de mesmo tamanho. Fontes: [Apps Script V8](https://developers.google.com/apps-script/guides/v8-runtime) · [Vercel Node.js Runtime](https://vercel.com/docs/functions/runtimes/node-js) · [Node.js crypto.timingSafeEqual](https://nodejs.org/api/crypto.html#cryptotimingsafeequala-b).
+
+**Opção arquitetural a avaliar:** executar somente a comparação constante de dois buffers de 32 bytes na Function Node da Vercel, mantendo no Apps Script a leitura do registro, derivação Argon2id, regras da conta e emissão/validação da sessão. Isso exige que os valores derivados trafeguem apenas entre Apps Script e Function, nunca para o navegador/logs, e que a Function devolva o resultado de comparação por chamada assinada. Essa opção amplia a responsabilidade da Function além do gateway de transporte e **não está aprovada**. Alternativa: avaliar um comparador WASM pequeno e revisado, executado dentro do Apps Script. Não implementar login até essa decisão ser resolvida.
+
