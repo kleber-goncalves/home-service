@@ -277,11 +277,31 @@ Formato de armazenamento candidato, ainda não aprovado para uso:
 
 A separação corresponde aos três campos já modelados na entidade `USUARIOS`. A aprovação desse formato depende da revisão da rotina de verificação, codificação de senha e limites de entrada. Nenhum dado deve ser escrito na planilha nesta POC.
 
+
+### 8.12. Prova de criação/verificação do registro — preparada, execução manual pendente
+
+Foi adicionada ao harness uma prova de ciclo completo sem persistência:
+
+- `poc03CreatePasswordRecordForPoc_`: gera salt novo por meio do helper UUIDv4 e deriva 32 bytes com o perfil fixo Argon2id.
+- `poc03VerifyPasswordForPoc_`: exige metadados estritamente allowlisted, salta de 16 bytes e hash de 32 bytes; deriva novamente a senha candidata e compara todos os 32 bytes com acumulador XOR.
+- `poc03RunPasswordRecordVerificationTests`: cria um registro fictício apenas em memória e executa oito casos: estrutura válida, senha correta, senha errada, salt alterado, hash alterado, algoritmo/parâmetros desconhecidos, salt malformado e hash malformado.
+
+Formato candidato utilizado na prova:
+- `senha_algoritmo = argon2id$v=19$m=19456,t=2,p=1`
+- `senha_salt`: 16 bytes, 32 caracteres hexadecimais minúsculos.
+- `senha_hash`: 32 bytes, 64 caracteres hexadecimais minúsculos.
+
+A função não grava em Sheets, Drive ou Properties e não registra senha, salt ou hash. O metadata allowlist mantém os parâmetros de custo fixos; não aceita memória/iterações/paralelismo arbitrários vindos do registro, evitando que metadados adulterados solicitem custo excessivo.
+
+**Limite importante da comparação:** a rotina percorre todos os bytes com acumulador XOR e só decide ao final, mas JavaScript/V8 não fornece garantia formal de tempo constante. Portanto, este teste avalia comportamento funcional e rejeição de adulteração; não certifica resistência a side-channel e não aprova a rotina para autenticação.
+
+A execução automatizada em Node/VM será apenas complementar. Ainda é necessária a execução manual de `poc03RunPasswordRecordVerificationTests` no Apps Script real, sem publicar o harness como Web App, sem planilha de negócio e usando somente senha sintética.
+
 ### 8.10. Decisão após a execução real
 
 - **PBKDF2 sobre `Utilities`: reprovado** por desempenho operacional inconclusivo e margem insuficiente.
 - **Argon2id via `hash-wasm@4.13.0`: aprovado somente como candidato tecnicamente viável para continuar a POC.** Os dois vetores passaram em cinco baterias manuais; o perfil de referência apresentou média de 139,8 ms, mediana de 130 ms e intervalo observado de 61–280 ms. O resultado é promissor, mas a amostra ainda é pequena e não avalia concorrência ou carga.
 - **Fonte candidata de salt:** execução manual concluída com PASS em 256/256 UUIDs v4, 16 bytes cada e zero colisões observadas. A documentação Google → Java oferece a base criptográfica; a amostra não prova CSPRNG.
-- **Autenticação/login: continua bloqueado.** Ainda faltam aprovação do formato de armazenamento, verificação/comparação, controle contra abuso, ensaio de concorrência e revisão de segurança da dependência e da integração.
+- **Autenticação/login: continua bloqueado.** Ainda faltam execução manual do novo teste de ciclo criar/verificar, aprovação do formato de armazenamento, revisão da comparação, controle contra abuso, ensaio de concorrência e revisão de segurança da dependência e da integração.
 
-O próximo passo é concluir essas validações complementares, sem implementar cadastro, login, sessão ou operações de negócio nesta etapa.
+O próximo passo é executar manualmente `poc03RunPasswordRecordVerificationTests` no Apps Script isolado. O teste cria um registro fictício somente em memória e cobre senha correta/incorreta, salt/hash adulterados e metadados malformados. Não implementa cadastro, login, sessão ou operações de negócio.
