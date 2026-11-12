@@ -36,6 +36,7 @@ function createAppsScriptHarness() {
 
   const context = vm.createContext({
     Utilities: utilities,
+    WebAssembly,
     Logger: {
       log(message) {
         logs.push(String(message));
@@ -72,5 +73,19 @@ test("POC-03: vetor PBKDF2-HMAC-SHA-256 RFC 7914 com 80.000 iterações", () => 
   assert.ok(
     logs.some((line) => line.includes('"status":"PASS"')),
     logs.join("\n"),
+  );
+});
+
+test("POC-03: probe WebAssembly e alocação de 19 MiB", () => {
+  const { context, logs } = createAppsScriptHarness();
+
+  const result = context.poc03ProbeWebAssembly();
+
+  assert.equal(result.wasmAvailable, true);
+  assert.equal(result.functionResult, 42);
+  assert.equal(result.memoryBytes, 19 * 1024 * 1024);
+  assert.ok(
+    logs.some((line) => line.includes('"status":"PASS"')),
+    logs.join("\\n"),
   );
 });
