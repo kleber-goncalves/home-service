@@ -19,6 +19,12 @@ var POC03_HMAC_SHA256_BYTES = 32;
 var POC03_RFC_80000_ITERATIONS = 80000;
 var POC03_TARGET_ITERATIONS = 600000;
 var POC03_MAX_BENCHMARK_MS = 180000;
+var POC03_ARGON2_RECORD_ALGORITHM = "argon2id$v=19$m=19456,t=2,p=1";
+var POC03_ARGON2_RECORD_MEMORY_KIB = 19456;
+var POC03_ARGON2_RECORD_ITERATIONS = 2;
+var POC03_ARGON2_RECORD_PARALLELISM = 1;
+var POC03_ARGON2_RECORD_HASH_BYTES = 32;
+
 
 /**
  * Testes rápidos de compatibilidade:
@@ -625,6 +631,268 @@ function poc03HexToBytesForArgon2_(hex) {
     }
 
     return bytes;
+}
+
+
+/**
+ * Converte bytes Argon2id para hexadecimal minúsculo, sem Buffer/atob.
+ */
+function poc03BytesToHexForArgon2_(bytes) {
+    if (!(bytes instanceof Uint8Array)) {
+        throw new Error("A saída Argon2id precisa ser Uint8Array.");
+    }
+
+    var output = "";
+
+    for (var i = 0; i < bytes.length; i += 1) {
+        var hex = bytes[i].toString(16);
+        output += hex.length === 1 ? "0" + hex : hex;
+    }
+
+    return output;
+}
+
+/**
+ * Verifica estritamente o formato candidato do registro.
+ *
+ * Os parâmetros são fixos/allowlisted. Não aceitar memória, iterações ou
+ * paralelismo arbitrários vindos do registro, pois isso poderia permitir
+ * consumo excessivo de recursos.
+ */
+function poc03IsValidArgon2PasswordRecordForPoc_(record) {
+    return Boolean(
+        record
+        && typeof record === "object"
+        && record.senha_algoritmo === POC03_ARGON2_RECORD_ALGORITHM
+        && typeof record.senha_salt === "string"
+        && /^[0-9a-f]{32}$/.test(record.senha_salt)
+        && typeof record.senha_hash === "string"
+        && /^[0-9a-f]{64}$/.test(record.senha_hash)
+    );
+}
+
+/** Deriva 32 bytes com o perfil fixo da POC, sem expor o hash no log. */
+async function poc03DerivePasswordBytesForPoc_(password, saltBytes) {
+    if (
+        typeof hashwasm !== "object"
+        || hashwasm === null
+        || typeof hashwasm.argon2id !== "function"
+    ) {
+        throw new Error("Biblioteca Argon2id não carregada.");
+    }
+
+    if (typeof password !== "string" || !(saltBytes instanceof Uint8Array)) {
+        throw new Error("Entrada inválida para derivação Argon2id.");
+    }
+
+    return await hashwasm.argon2id({
+        password: poc03Utf8BytesForArgon2_(password),
+        salt: saltBytes,
+        secret: new Uint8Array(0),
+        parallelism: POC03_ARGON2_RECORD_PARALLELISM,
+        iterations: POC03_ARGON2_RECORD_ITERATIONS,
+        memorySize: POC03_ARGON2_RECORD_MEMORY_KIB,
+        hashLength: POC03_ARGON2_RECORD_HASH_BYTES,
+        outputType: "binary"
+    });
+}
+
+/**
+ * Cria um registro fictício em memória, sem gravar em Sheets/Properties.
+ * O formato é candidato e ainda não foi aprovado para produção.
+ */
+async function poc03CreatePasswordRecordForPoc_(password) {
+    if (typeof password !== "string") {
+        throw new Error("A senha fictícia da POC precisa ser uma string.");
+    }
+
+    var saltHex = poc03GenerateSaltHex_();
+    var saltBytes = poc03HexToBytesForArgon2_(saltHex);
+    var derived = await poc03DerivePasswordBytesForPoc_(password, saltBytes);
+
+    return {
+        senha_algoritmo: POC03_ARGON2_RECORD_ALGORITHM,
+        senha_salt: saltHex,
+        senha_hash: poc03BytesToHexForArgon2_(derived)
+    };
+}
+
+/**
+ * Verifica uma senha candidata contra um registro com formato estritamente
+ * allowlisted. Retorna false para metadados malformados ou não suportados.
+ *
+ * A comparação percorre todos os 32 bytes com acumulador XOR, mas JavaScript/V8
+ * não oferece uma garantia formal de tempo constante. Não usar esta POC como
+ * rotina de autenticação sem revisão independente.
+ */
+async function poc03VerifyPasswordForPoc_(candidatePassword, record) {
+    if (
+        typeof candidatePassword !== "string"
+        || !poc03IsValidArgon2PasswordRecordForPoc_(record)
+    ) {
+        return false;
+    }
+
+    var saltBytes = poc03HexToBytesForArgon2_(record.senha_salt);
+    var expectedBytes = poc03HexToBytesForArgon2_(record.senha_hash);
+    var actualBytes = await poc03DerivePasswordBytesForPoc_(
+        candidatePassword,
+        saltBytes
+    );
+
+    return poc03BytesEqualForArgon2_(actualBytes, expectedBytes);
+}
+
+/**
+ * Prova de ponta a ponta em memória:
+ * - cria um registro sintético com salt novo;
+ * - aceita a senha correta;
+ * - rejeita senha incorreta;
+ * - rejeita salt/hash adulterados;
+ * - recusa algoritmo e campos malformados.
+ *
+ * Não escreve Sheets/Drive/Properties, não registra senha, salt ou hash.
+ */
+async function poc03RunPasswordRecordVerificationTests() {
+    var suiteStartedAt = Date.now();
+    var dummyPassword = "POC03 synthetic password for verification";
+    var results = [];
+
+    try {
+        var record = await poc03CreatePasswordRecordForPoc_(dummyPassword);
+
+        var cases = [
+            {
+                name: "registro usa algoritmo/salt/hash no formato esperado",
+                expected: true,
+                action: function () {
+                    return poc03IsValidArgon2PasswordRecordForPoc_(record);
+                }
+            },
+            {
+                name: "senha correta é aceita",
+                expected: true,
+                action: async function () {
+                    return await poc03VerifyPasswordForPoc_(dummyPassword, record);
+                }
+            },
+            {
+                name: "senha incorreta é rejeitada",
+                expected: false,
+                action: async function () {
+                    return await poc03VerifyPasswordForPoc_(
+                        dummyPassword + " wrong",
+                        record
+                    );
+                }
+            },
+            {
+                name: "salt adulterado é rejeitado",
+                expected: false,
+                action: async function () {
+                    var altered = {
+                        senha_algoritmo: record.senha_algoritmo,
+                        senha_salt: (record.senha_salt.charAt(0) === "0" ? "1" : "0")
+                            + record.senha_salt.substring(1),
+                        senha_hash: record.senha_hash
+                    };
+                    return await poc03VerifyPasswordForPoc_(dummyPassword, altered);
+                }
+            },
+            {
+                name: "hash adulterado é rejeitado",
+                expected: false,
+                action: async function () {
+                    var altered = {
+                        senha_algoritmo: record.senha_algoritmo,
+                        senha_salt: record.senha_salt,
+                        senha_hash: (record.senha_hash.charAt(0) === "0" ? "1" : "0")
+                            + record.senha_hash.substring(1)
+                    };
+                    return await poc03VerifyPasswordForPoc_(dummyPassword, altered);
+                }
+            },
+            {
+                name: "algoritmo/parâmetros não permitidos são rejeitados",
+                expected: false,
+                action: async function () {
+                    var altered = {
+                        senha_algoritmo: "argon2id$v=19$m=999999,t=99,p=99",
+                        senha_salt: record.senha_salt,
+                        senha_hash: record.senha_hash
+                    };
+                    return await poc03VerifyPasswordForPoc_(dummyPassword, altered);
+                }
+            },
+            {
+                name: "salt malformado é rejeitado",
+                expected: false,
+                action: async function () {
+                    var altered = {
+                        senha_algoritmo: record.senha_algoritmo,
+                        senha_salt: "not-a-salt",
+                        senha_hash: record.senha_hash
+                    };
+                    return await poc03VerifyPasswordForPoc_(dummyPassword, altered);
+                }
+            },
+            {
+                name: "hash malformado é rejeitado",
+                expected: false,
+                action: async function () {
+                    var altered = {
+                        senha_algoritmo: record.senha_algoritmo,
+                        senha_salt: record.senha_salt,
+                        senha_hash: "bad-hash"
+                    };
+                    return await poc03VerifyPasswordForPoc_(dummyPassword, altered);
+                }
+            }
+        ];
+
+        for (var i = 0; i < cases.length; i += 1) {
+            var startedAt = Date.now();
+            var actual = await cases[i].action();
+            var passed = actual === cases[i].expected;
+
+            var result = {
+                test: cases[i].name,
+                status: passed ? "PASS" : "FAIL",
+                elapsedMs: Date.now() - startedAt
+            };
+
+            results.push(result);
+            Logger.log(JSON.stringify(result));
+
+            if (!passed) {
+                throw new Error("Falha no teste de verificação: " + cases[i].name);
+            }
+        }
+
+        var summary = {
+            test: "Argon2id password record create/verify — isolated POC",
+            status: "PASS",
+            testsPassed: results.length,
+            testsTotal: cases.length,
+            totalElapsedMs: Date.now() - suiteStartedAt,
+            algorithm: POC03_ARGON2_RECORD_ALGORITHM,
+            saltBytes: 16,
+            hashBytes: POC03_ARGON2_RECORD_HASH_BYTES,
+            storage: "MEMORY_ONLY_NOT_SAVED",
+            comparison: "FIXED_LENGTH_XOR_ACCUMULATOR_NOT_PROVEN_CONSTANT_TIME"
+        };
+
+        Logger.log(JSON.stringify(summary));
+        return summary;
+    } catch (error) {
+        Logger.log(JSON.stringify({
+            test: "Argon2id password record create/verify — isolated POC",
+            status: "FAIL",
+            elapsedMs: Date.now() - suiteStartedAt,
+            message: String(error && error.message ? error.message : error)
+        }));
+        throw error;
+    }
 }
 
 /** Comparação byte a byte para o teste de vetor conhecido. */
