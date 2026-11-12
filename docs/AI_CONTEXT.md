@@ -289,14 +289,14 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 0b5f0f5053f72ccf3d9339789cdd029656141460
-- **Data do commit:** 2026-11-12T15:03:56-03:00
-- **Mensagem do commit:** docs(arquitetura): registrar execução candidata Argon2id
+- **Commit de referência:** e5e4c0fa2533e4dadac061d6950872acf47806a7
+- **Data do commit:** 2026-11-12T15:07:38-03:00
+- **Mensagem do commit:** build(test): pin hash-wasm for Argon2id POC tests
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
 - **Dependências de runtime:** 5
-- **Dependências de desenvolvimento:** 9
+- **Dependências de desenvolvimento:** 10
 - **Workflows:** 2
 - **Scripts de automação:** 3
 
@@ -343,6 +343,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | eslint-plugin-react-hooks | ^7.1.1 |
 | eslint-plugin-react-refresh | ^0.5.7 |
 | globals | ^17.13.0 |
+| hash-wasm | 4.13.0 |
 | vite | ^8.3.6 |
 
 ### Workflows do GitHub Actions
@@ -385,13 +386,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| e5e4c0f | 2026-11-12 | build(test): pin hash-wasm for Argon2id POC tests |
+| 93dffff | 2026-11-12 | docs(ai-context): registrar Argon2id preparado e pendente no GAS |
+| c2d4ce1 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 0b5f0f5 | 2026-11-12 | docs(arquitetura): registrar execução candidata Argon2id |
 | 42461ae | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 4525484 | 2026-11-12 | docs(poc-03): registrar bundle fixado e teste Argon2id |
 | f291e2c | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | c984455 | 2026-11-12 | test(poc-03): execute pinned Argon2id WASM vectors in CI |
-| f0c184c | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| 9d508b1 | 2026-11-12 | build(poc-03): vendor pinned hash-wasm Argon2 bundle |
-| 443b8c2 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
