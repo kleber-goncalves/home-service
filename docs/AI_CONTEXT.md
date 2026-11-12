@@ -283,9 +283,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 31fd74839e304bce7581e76b2b88be50000dd4ac
-- **Data do commit:** 2026-11-12T13:37:56-03:00
-- **Mensagem do commit:** docs(arquitetura): atualizar POC-02 e bloqueio de KDF
+- **Commit de referência:** 2cc02304e173185f85ef3d93740bb2601b3d1b86
+- **Data do commit:** 2026-11-12T13:38:27-03:00
+- **Mensagem do commit:** fix(poc-03): simplificar vetor RFC de 80 mil iterações
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -379,13 +379,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 2cc0230 | 2026-11-12 | fix(poc-03): simplificar vetor RFC de 80 mil iterações |
+| 8543149 | 2026-11-12 | docs(ai-context): registrar POC-02 integrada e POC-03 |
+| 82b4192 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 31fd748 | 2026-11-12 | docs(arquitetura): atualizar POC-02 e bloqueio de KDF |
 | bf4b1d5 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 1cbd3b5 | 2026-11-12 | ci(poc-03): executar testes de compatibilidade do KDF |
 | 14e2f30 | 2026-11-12 | build(poc-03): adicionar comando de testes da POC-03 |
 | 50814b6 | 2026-11-12 | test(poc-03): verificar vetores PBKDF2 em harness Node |
-| 4353257 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| 3212883 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| 4545756 | 2026-11-12 | test(poc-03): adicionar harness isolado PBKDF2 |
 
 <!-- END AUTO-GENERATED SECTION -->
