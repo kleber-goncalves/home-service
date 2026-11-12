@@ -295,12 +295,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 45457567ea55082235578c2616324d70ff6cb7c2
-- **Data do commit:** 2026-11-12T13:35:34-03:00
-- **Mensagem do commit:** test(poc-03): adicionar harness isolado PBKDF2
+- **Commit de referência:** 1cbd3b5bd9a53ab2926bbd78dbf80ef85769e2d2
+- **Data do commit:** 2026-11-12T13:36:30-03:00
+- **Mensagem do commit:** ci(poc-03): executar testes de compatibilidade do KDF
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 8
+- **Scripts npm:** 9
 - **Dependências de runtime:** 5
 - **Dependências de desenvolvimento:** 9
 - **Workflows:** 2
@@ -318,6 +318,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run update:ai-context | node scripts/update-ai-context.mjs |
 | npm run test:poc01 | node --test tests/poc01/backend.test.js |
 | npm run test:poc02 | node --test tests/poc02/backend.test.js tests/poc02/apps-script.test.js |
+| npm run test:poc03 | node --test tests/poc03/apps-script.test.js |
 
 ### Variáveis declaradas no .env.example
 
@@ -390,13 +391,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 1cbd3b5 | 2026-11-12 | ci(poc-03): executar testes de compatibilidade do KDF |
+| 14e2f30 | 2026-11-12 | build(poc-03): adicionar comando de testes da POC-03 |
+| 50814b6 | 2026-11-12 | test(poc-03): verificar vetores PBKDF2 em harness Node |
+| 4353257 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
+| 3212883 | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 4545756 | 2026-11-12 | test(poc-03): adicionar harness isolado PBKDF2 |
 | 462f2f8 | 2026-11-12 | docs(poc-03): definir ensaio isolado de KDF |
 | e348e14 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
-| aa1a98c | 2026-11-11 | Merge pull request #11 from kleber-goncalves/feat/poc-02-hmac-replay |
-| 1d05ff1 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
-| 5096f9f | 2026-11-11 | docs(arquitetura): registrar validação real da assinatura HMAC |
-| fcdf882 | 2026-11-11 | docs(ai-context): registrar validação manual da POC-02 |
-| 0532395 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
