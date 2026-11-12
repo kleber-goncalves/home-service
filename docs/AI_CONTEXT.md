@@ -82,7 +82,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 
 ## 4. Estado atual do repositório
 
-**Estado atualizado em 2026-11-11 após integração da POC-01 e validação manual da POC-02 em branch isolada:**
+**Estado atualizado em 2026-11-12 após integração da POC-02 em `dev` e início da POC-03:**
 
 - A branch `dev` contém a homepage pública demonstrativa do Conecta Local, integrada por Pull Request.
 - `src/pages/HomePage.jsx` coordena a composição das seções e o estado local da busca e dos filtros.
@@ -99,11 +99,11 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 - O arquivo Google Sheets estrutural foi criado pelo responsável pelo projeto com as 12 abas e os 102 cabeçalhos aprovados. A exportação XLSX foi inspecionada e a conferência manual de proteções e compartilhamento restrito foi confirmada pelo responsável.
 - A planilha permanece uma estrutura inicial vazia, ainda sem uso como armazenamento operacional integrado.
 - A POC-01 de comunicação React → Vercel Function → Apps Script foi integrada à branch `dev` pelo PR #10 em 2026-11-11 e validada manualmente em Preview: HTTP 200 (eco), 422 (erro lógico Apps Script), 502 (resposta upstream inválida), 400 (JSON inválido no navegador) e 405 (método não permitido). O merge commit foi `837f7c6172764ee27ac835c81e1224640d78478d`; o registro está em `docs/POC_01_COMUNICACAO.md`.
-- A POC-02 de assinatura HMAC-SHA-256 e proteção contra replay está implementada na branch `feat/poc-02-hmac-replay`, no PR #11 aberto para `dev`. Em 2026-11-11, o responsável confirmou cinco cenários no Preview, cinco testes diretos contra o Apps Script isolado e um teste concorrente com duas chamadas idênticas, no qual somente uma foi aceita e a outra recebeu `REPLAY_DETECTED`. O código ainda não foi integrado à `dev`; a descrição e os resultados estão em `docs/POC_02_ASSINATURA_GATEWAY.md`.
+- A POC-02 de assinatura HMAC-SHA-256 e proteção contra replay foi integrada à `dev` pelo PR #11 em 2026-11-11 (merge commit `aa1a98c130369892e6727dda90e97ca4c0f7d2a6`). Os cinco cenários de Preview, cinco testes diretos contra o Apps Script isolado e o teste concorrente com duas chamadas idênticas passaram; somente uma chamada concorrente foi aceita e a outra recebeu `REPLAY_DETECTED`. O workflow pós-merge #93 passou. O Preview mais recente de `dev` foi redeployado após ajustar as variáveis para Preview; a confirmação manual final do Echo nesse deployment permanece pendente. Consulte `docs/POC_02_ASSINATURA_GATEWAY.md`.
 - Não há backend de negócio operacional integrado ao frontend, cadastro, autenticação, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo.
 - A homepage não processa pagamentos, agendamentos ou contratação.
 
-A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a arquitetura e seus limites. O gateway Vercel → Apps Script da POC-01 está integrado à `dev`; a camada HMAC/anti-replay da POC-02 foi validada manualmente na branch `feat/poc-02-hmac-replay`, mas ainda aguarda integração. Isso não significa que operações de negócio, autenticação de usuários, sessões, Sheets ou Drive estejam integrados.
+A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a arquitetura e seus limites. POC-01 e POC-02 estão integradas à `dev`; a POC-02 continua restrita a ações sintéticas. A POC-03 está em branch isolada e investiga a viabilidade de KDF no runtime Apps Script, sem login, endpoint ou armazenamento de usuários. Isso não significa que operações de negócio, autenticação de usuários, sessões, Sheets ou Drive estejam integrados.
 
 ## 5. Arquitetura e decisões tecnológicas
 
@@ -121,7 +121,7 @@ Não foi escolhida uma aplicação Next.js. Não adicionar Express por padrão: 
 ### 5.2. Backend e dados planejados
 
 - **Google Apps Script:** backend de negócio planejado para autenticação, autorização, regras, integridade e acesso a Sheets/Drive. O Web App isolado da POC-02 executa somente ações sintéticas `poc.*`; operações de negócio e acesso a dados ainda não estão integrados.
-- **Vercel Functions:** o gateway HTTP server-side da POC-01 está implementado na branch `dev`. A assinatura HMAC-SHA-256 e a proteção contra replay da POC-02 estão implementadas e validadas na branch `feat/poc-02-hmac-replay`, aguardando merge do PR #11.
+- **Vercel Functions:** o gateway HTTP server-side da POC-01 e a assinatura HMAC-SHA-256 com proteção contra replay da POC-02 estão integrados à branch `dev`. A chamada Echo do Preview de `dev` redeployado ainda aguarda confirmação manual final.
 - **Google Sheets:** arquivo estrutural já criado pelo responsável, com 12 abas e 102 cabeçalhos aprovados; ainda não está integrado como armazenamento operacional.
 - **Google Drive:** armazenamento futuro das imagens enviadas pelos profissionais; fluxo de upload e permissões ainda não implementado.
 
@@ -135,27 +135,15 @@ A POC-01 foi integrada à branch `dev` pelo PR #10 em 2026-11-11. O merge commit
 
 A implementação usa React → POST same-origin `/api/backend` → Vercel Function → Apps Script via form-urlencoded → redirecionamento para `script.googleusercontent.com`. O frontend não chama Apps Script diretamente. A POC-01, isoladamente, não autenticava a Function perante o Apps Script e não está aprovada para produção. Uma implantação antiga sem assinatura deve ser atualizada para o código protegido ou desativada.
 
-### POC-02 — assinatura HMAC e proteção contra replay validadas em branch isolada
+### POC-02 — assinatura HMAC e proteção contra replay integradas à dev
 
-A branch de trabalho é `feat/poc-02-hmac-replay`, criada a partir de `dev` após a integração do PR #10. O PR #11 está aberto e tem como destino `dev`; não foi integrado. O desenho e os resultados manuais estão documentados em `docs/POC_02_ASSINATURA_GATEWAY.md`.
+O PR #11 foi integrado em 2026-11-11 e o workflow pós-merge #93 passou. A POC permanece restrita a chamadas sintéticas `poc.*`, sem login, sessão ou acesso a dados de negócio. Os testes manuais da branch e o teste concorrente com duas chamadas idênticas passaram. A execução Echo no último Preview de `dev`, redeployado após a configuração de variáveis exclusivas de Preview, ainda precisa de confirmação manual final.
 
-Decisões implementadas:
-- HMAC-SHA-256 com mensagem canônica versionada `v1`, domínio `CONECTA_LOCAL_GATEWAY`, método lógico, timestamp, nonce, ação, requestId e SHA-256 do payload UTF-8.
-- Timestamp Unix em milissegundos com tolerância máxima de 5 minutos.
-- Nonce de 32 bytes aleatórios (64 caracteres hexadecimais), gerado na Vercel Function com `node:crypto`.
-- Registro de nonces no Apps Script com Script Properties e Script Lock, retenção de 10 minutos e 30 segundos, capacidade limitada a 2.500 nonces ativos e comportamento fail closed.
-- Segredo de 32 bytes gerado fora do repositório: `APPS_SCRIPT_HMAC_SECRET` somente no ambiente Preview da Vercel e `POC02_HMAC_SECRET` em Script Properties do Apps Script. Os valores devem ser idênticos e não podem aparecer no React, Git, documentação, logs ou chat.
-- `apps-script/poc-02/Code.gs` contém a versão protegida implantada no Web App Apps Script isolado usado nos testes.
-- `tests/poc02/` contém os testes automatizados do gateway e um harness local que simula as APIs do Apps Script. `scripts/poc02-replay-check.mjs` executa testes reais diretos de chamada sem assinatura, timestamp expirado, assinatura válida, repetição de nonce e payload adulterado.
+### POC-03 — viabilidade de armazenamento de senhas em avaliação
 
-**Validação manual em 2026-11-11, executada pelo responsável do projeto:**
-- Preview: eco HTTP 200; erro lógico HTTP 422; resposta upstream inválida HTTP 502; JSON inválido HTTP 400; GET HTTP 405.
-- Apps Script direto: chamada sem assinatura `AUTHENTICATION_FAILED`; timestamp expirado `REQUEST_EXPIRED`; chamada assinada aceita; repetição `REPLAY_DETECTED`; payload adulterado `AUTHENTICATION_FAILED`.
-- Concorrência: duas chamadas idênticas enviadas em paralelo; uma aceita e outra recusada com `REPLAY_DETECTED`.
-- GitHub Actions: validação automatizada anterior da branch concluída com sucesso; a atualização documental e da interface deve disparar nova validação antes de integrar.
+A branch de trabalho é `feat/poc-03-password-kdf`. O harness isolado `apps-script/poc-03/Code.gs` avalia PBKDF2-HMAC-SHA-256 sobre `Utilities.computeHmacSha256Signature`, com vetores RFC/UTF-8/chave longa e benchmark controlado. Não há endpoint HTTP, cadastro, login, sessão, leitura/escrita de Sheets ou armazenamento de credenciais. A documentação está em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
 
-A validação concorrente realizada com duas chamadas comprova o comportamento básico de uso único, não capacidade de carga ou concorrência em escala. A POC continua restrita a dados sintéticos e ações `poc.*`; não habilita login, sessão, Sheets, Drive ou operações de negócio. Não é solução aprovada para produção.
-
+A OWASP prioriza Argon2id e scrypt; PBKDF2 é indicado em contexto específico FIPS. O runtime V8 do Apps Script não disponibiliza `crypto` nem `SubtleCrypto`. Os testes automatizados em Node simulam `Utilities` e não substituem execução no Google Apps Script real. Nenhum KDF, salt ou mecanismo de autenticação está aprovado. Não usar contas ou senhas reais.
 ### 5.3. Modelagem lógica e física de dados aprovada
 
 A modelagem lógica e o esquema físico estão consolidados em [`docs/MODELAGEM_DADOS.md`](./MODELAGEM_DADOS.md): 12 entidades e 102 campos lógicos, com 12 abas e 102 colunas físicas. O documento define UUIDs, PKs/FKs lógicas, cardinalidades, ordem de abas e colunas, tipos de célula, campos opcionais, valores controlados, unicidade, integridade, estados, visibilidade, privacidade e persistência no Sheets/Drive.
