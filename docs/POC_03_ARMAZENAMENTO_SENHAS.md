@@ -278,7 +278,7 @@ Formato de armazenamento candidato, ainda não aprovado para uso:
 A separação corresponde aos três campos já modelados na entidade `USUARIOS`. A aprovação desse formato depende da revisão da rotina de verificação, codificação de senha e limites de entrada. Nenhum dado deve ser escrito na planilha nesta POC.
 
 
-### 8.12. Prova de criação/verificação do registro — preparada, execução manual pendente
+### 8.12. Prova de criação/verificação do registro — execução manual concluída
 
 Foi adicionada ao harness uma prova de ciclo completo sem persistência:
 
@@ -295,13 +295,33 @@ A função não grava em Sheets, Drive ou Properties e não registra senha, salt
 
 **Limite importante da comparação:** a rotina percorre todos os bytes com acumulador XOR e só decide ao final, mas JavaScript/V8 não fornece garantia formal de tempo constante. Portanto, este teste avalia comportamento funcional e rejeição de adulteração; não certifica resistência a side-channel e não aprova a rotina para autenticação.
 
-A execução automatizada em Node/VM será apenas complementar. Ainda é necessária a execução manual de `poc03RunPasswordRecordVerificationTests` no Apps Script real, sem publicar o harness como Web App, sem planilha de negócio e usando somente senha sintética.
+**Resultado manual no Apps Script — 2026-11-12: PASS 8/8.** O responsável executou a função no projeto isolado. O Execution Log registrou:
+
+| Caso | Resultado | Tempo interno |
+|---|---:|---:|
+| Registro no formato esperado | PASS | 0 ms |
+| Senha correta | PASS | 202 ms |
+| Senha incorreta | PASS | 285 ms |
+| Salt adulterado | PASS (rejeitado) | 149 ms |
+| Hash adulterado | PASS (rejeitado) | 183 ms |
+| Algoritmo/parâmetros não permitidos | PASS (rejeitado) | 0 ms |
+| Salt malformado | PASS (rejeitado) | 3 ms |
+| Hash malformado | PASS (rejeitado) | 0 ms |
+
+Resumo: `testsPassed=8`, `testsTotal=8`, `totalElapsedMs=1031`, `saltBytes=16`, `hashBytes=32`, `storage=MEMORY_ONLY_NOT_SAVED` e `comparison=FIXED_LENGTH_XOR_ACCUMULATOR_NOT_PROVEN_CONSTANT_TIME`.
+
+**Interpretação:** o registro sintético foi criado em memória; a senha correta foi aceita; senha incorreta, salt/hash adulterados, algoritmo desconhecido e campos malformados foram rejeitados. O teste confirma o comportamento funcional esperado para esses oito cenários. O tempo de 1.031 ms é a soma medida internamente para a bateria inteira; não deve ser confundido com os cinco segundos aproximados entre os avisos de início/conclusão do editor.
+
+**Limites:** esta é uma execução manual de teste, não um ensaio de carga, auditoria criptográfica ou certificação de comparação em tempo constante. Os tempos individuais não constituem medição controlada de side-channel. O registro não foi persistido em Sheets, Drive ou Properties e os logs não exibiram senha, salt ou hash. A implementação de comparação continua experimental.
+
+A execução automatizada em Node/VM é complementar e não substitui o resultado manual no Apps Script real. O projeto permaneceu isolado, sem publicação como Web App, sem planilha de negócio e usando apenas uma senha sintética.
 
 ### 8.10. Decisão após a execução real
 
 - **PBKDF2 sobre `Utilities`: reprovado** por desempenho operacional inconclusivo e margem insuficiente.
 - **Argon2id via `hash-wasm@4.13.0`: aprovado somente como candidato tecnicamente viável para continuar a POC.** Os dois vetores passaram em cinco baterias manuais; o perfil de referência apresentou média de 139,8 ms, mediana de 130 ms e intervalo observado de 61–280 ms. O resultado é promissor, mas a amostra ainda é pequena e não avalia concorrência ou carga.
 - **Fonte candidata de salt:** execução manual concluída com PASS em 256/256 UUIDs v4, 16 bytes cada e zero colisões observadas. A documentação Google → Java oferece a base criptográfica; a amostra não prova CSPRNG.
-- **Autenticação/login: continua bloqueado.** Ainda faltam execução manual do novo teste de ciclo criar/verificar, aprovação do formato de armazenamento, revisão da comparação, controle contra abuso, ensaio de concorrência e revisão de segurança da dependência e da integração.
+- **Ciclo de criação/verificação:** PASS 8/8 no Apps Script real, em 1.031 ms; registro apenas em memória. Senha correta aceita e senha incorreta/adulterações/metadados malformados rejeitados.
+- **Autenticação/login: continua bloqueado.** Ainda faltam aprovação formal do formato de armazenamento, revisão independente da comparação/rotina de verificação, limites de entrada, controle contra abuso, ensaio de concorrência e revisão de segurança da dependência e da integração.
 
-O próximo passo é executar manualmente `poc03RunPasswordRecordVerificationTests` no Apps Script isolado. O teste cria um registro fictício somente em memória e cobre senha correta/incorreta, salt/hash adulterados e metadados malformados. Não implementa cadastro, login, sessão ou operações de negócio.
+O próximo passo da POC é revisar limites de entrada e o mecanismo de comparação/verificação, planejar controles antiabuso e executar testes controlados de concorrência. O ciclo manual não implementa cadastro, login, sessão ou operações de negócio.
