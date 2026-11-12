@@ -301,9 +301,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 69869a57192435d19e62ef9796cea09b6bed8306
-- **Data do commit:** 2026-11-12T16:39:48-03:00
-- **Mensagem do commit:** docs(poc-03): registrar testes manuais de senha e throttling
+- **Commit de referência:** c04fcf78e20faa081fe1e66c929ceb0e82de26fd
+- **Data do commit:** 2026-11-12T16:39:51-03:00
+- **Mensagem do commit:** docs(architecture): registrar resultados manuais da POC-03
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -398,6 +398,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| c04fcf7 | 2026-11-12 | docs(architecture): registrar resultados manuais da POC-03 |
 | 69869a5 | 2026-11-12 | docs(poc-03): registrar testes manuais de senha e throttling |
 | 2d05d1b | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 8ae04dc | 2026-11-12 | docs(ai-context): atualizar política de senha e controles de abuso |
@@ -405,6 +406,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 7a60d1d | 2026-11-12 | docs(poc-03): documentar política de senha e controles de abuso |
 | 0038e6b | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 | 17577e7 | 2026-11-12 | fix(poc-03): isolar teste de derivação Unicode NFC |
-| c8b48bd | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
