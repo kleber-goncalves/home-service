@@ -184,7 +184,7 @@ Referências:
 - O runtime não possui `TextEncoder`, que a biblioteca usa quando recebe strings.
 - O código-fonte da biblioteca aceita `Uint8Array`; portanto, a POC poderá converter senha/salt para bytes UTF-8 por meio de `Utilities.newBlob(...).getBytes()` e passar arrays tipados, sem depender de `TextEncoder`.
 - O pacote usa Promises e compilação/instanciação WebAssembly assíncrona. Isso precisa ser testado no fluxo real do editor Apps Script, sem presumir compatibilidade apenas porque a sonda simples passou.
-- O arquivo enviado pelo responsável foi validado: `hash-wasm-4.13.0.tgz`, SHA-256 `237a2735a3bb8725603a797fea1ba3e455d70e11f338518a65d42dab60182b68`. A listagem real do tarball confirma `package/dist/argon2.umd.min.js` (30.094 bytes) e `package/LICENSE`. SHA-256 do bundle UMD: `acfe11b015852f593aaddc51116f71dc7850e4551e6b34d42c1f88cf39635f03`. Bundle compactado para versionamento no repositório: `apps-script/poc-03/vendor/hash-wasm-argon2-4.13.0.umd.min.js.gz`, SHA-256 `5363994b073eb309d0608242c50cb019dfa682f63bb69cc1bd7f0f2093fd40ef`. O bundle contém o módulo WebAssembly incorporado como Base64; não é necessário arquivo `.wasm` externo. Não carregar CDN ou versão flutuante durante autenticação.
+- O arquivo enviado pelo responsável foi validado: `hash-wasm-4.13.0.tgz`, SHA-256 `237a2735a3bb8725603a797fea1ba3e455d70e11f338518a65d42dab60182b68`. A listagem real do tarball confirma `package/dist/argon2.umd.min.js` (30.094 bytes) e `package/LICENSE`. SHA-256 do bundle UMD: `acfe11b015852f593aaddc51116f71dc7850e4551e6b34d42c1f88cf39635f03`. A dependência `hash-wasm` foi adicionada somente em `devDependencies`, fixada em `4.13.0` no `package.json` e `package-lock.json` para que a CI teste exatamente o mesmo bundle. O código do produto não importa essa dependência. O bundle contém o módulo WebAssembly incorporado como Base64; não é necessário arquivo `.wasm` externo. Não carregar CDN ou versão flutuante durante autenticação.
 - O helper `argon2Verify` do código consultado compara strings com `===`. Não adotá-lo automaticamente para autenticação. A etapa seguinte precisa revisar a comparação do resultado derivado e a forma como o hash codificado é validado.
 - A documentação do pacote apresenta benchmarks do navegador/Node, não do Apps Script. Esses números não serão usados para estimar desempenho no Google.
 
@@ -229,11 +229,11 @@ A função preparada no harness é `poc03RunArgon2idTests`. Ela executa sequenci
 Para executar no projeto Apps Script isolado:
 
 1. Criar um arquivo de script chamado `HashWasmArgon2.gs`.
-2. Extrair do tarball exatamente o bundle `package/dist/argon2.umd.min.js` e colar todo o conteúdo nesse arquivo. O caminho pode ser extraído no PowerShell com:
+2. Extrair do tarball exatamente o bundle `package/dist/argon2.umd.min.js` e colar todo o conteúdo nesse arquivo. No PowerShell, a partir da pasta onde está o `.tgz`, execute:
    ```powershell
    tar -xzf .\\hash-wasm-4.13.0.tgz package/dist/argon2.umd.min.js
    ```
-   Depois abrir `package\\dist\\argon2.umd.min.js`, copiar seu conteúdo integral e colar em `HashWasmArgon2.gs`.
+   Depois abra `package\\dist\\argon2.umd.min.js`, copie o conteúdo integral e cole em `HashWasmArgon2.gs`. O bundle extraído deve ter SHA-256 `acfe11b015852f593aaddc51116f71dc7850e4551e6b34d42c1f88cf39635f03`.
 3. Substituir o conteúdo de `Code.gs` pela versão desta branch, que contém `poc03RunArgon2idTests`.
 4. Selecionar e executar somente `poc03RunArgon2idTests`.
 
