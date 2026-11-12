@@ -1,14 +1,26 @@
 import assert from "node:assert/strict";
-import { createHmac } from "node:crypto";
+import { createHash, createHmac } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import test from "node:test";
+import { gunzipSync } from "node:zlib";
 
 const scriptPath = fileURLToPath(
   new URL("../../apps-script/poc-03/Code.gs", import.meta.url),
 );
 const scriptSource = readFileSync(scriptPath, "utf8");
+const vendorGzipPath = fileURLToPath(
+  new URL(
+    "../../apps-script/poc-03/vendor/hash-wasm-argon2-4.13.0.umd.min.js.gz",
+    import.meta.url,
+  ),
+);
+const vendorGzip = readFileSync(vendorGzipPath);
+const vendorSourceBuffer = gunzipSync(vendorGzip);
+const vendorSource = vendorSourceBuffer.toString("utf8");
+const expectedVendorSha256 =
+  "acfe11b015852f593aaddc51116f71dc7850e4551e6b34d42c1f88cf39635f03";
 
 function createAppsScriptHarness() {
   const logs = [];
@@ -42,6 +54,11 @@ function createAppsScriptHarness() {
         logs.push(String(message));
       },
     },
+  });
+
+  vm.runInContext(vendorSource, context, {
+    filename: "apps-script/poc-03/HashWasmArgon2.gs (hash-wasm 4.13.0)",
+    timeout: 10_000,
   });
 
   vm.runInContext(scriptSource, context, {
@@ -86,6 +103,33 @@ test("POC-03: probe WebAssembly e alocação de 19 MiB", () => {
   assert.equal(result.memoryBytes, 19 * 1024 * 1024);
   assert.ok(
     logs.some((line) => line.includes('"status":"PASS"')),
+    logs.join("\\n"),
+  );
+});
+
+
+test("POC-03: bundle Argon2id está fixado e íntegro", () => {
+  const actual = createHash("sha256").update(vendorSourceBuffer).digest("hex");
+
+  assert.equal(actual, expectedVendorSha256);
+  assert.match(vendorSource, /hashwasm/);
+  assert.match(vendorSource, /argon2id/);
+});
+
+test("POC-03: Argon2id WASM passa vetores independentes e perfil OWASP", async () => {
+  const { context, logs } = createAppsScriptHarness();
+
+  assert.equal(typeof context.TextEncoder, "undefined");
+
+  const result = await context.poc03RunArgon2idTests();
+
+  assert.equal(result.status, "PASS");
+  assert.equal(result.testsPassed, 2);
+  assert.equal(result.testsTotal, 2);
+  assert.ok(
+    logs.some((line) =>
+      line.includes('"test":"Argon2id WASM — hash-wasm 4.13.0","status":"PASS"'),
+    ),
     logs.join("\\n"),
   );
 });
