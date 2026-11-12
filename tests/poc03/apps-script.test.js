@@ -4,20 +4,15 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import test from "node:test";
-import { gunzipSync } from "node:zlib";
 
 const scriptPath = fileURLToPath(
   new URL("../../apps-script/poc-03/Code.gs", import.meta.url),
 );
 const scriptSource = readFileSync(scriptPath, "utf8");
-const vendorGzipPath = fileURLToPath(
-  new URL(
-    "../../apps-script/poc-03/vendor/hash-wasm-argon2-4.13.0.umd.min.js.gz",
-    import.meta.url,
-  ),
+const vendorPath = fileURLToPath(
+  new URL("../../node_modules/hash-wasm/dist/argon2.umd.min.js", import.meta.url),
 );
-const vendorGzip = readFileSync(vendorGzipPath);
-const vendorSourceBuffer = gunzipSync(vendorGzip);
+const vendorSourceBuffer = readFileSync(vendorPath);
 const vendorSource = vendorSourceBuffer.toString("utf8");
 const expectedVendorSha256 =
   "acfe11b015852f593aaddc51116f71dc7850e4551e6b34d42c1f88cf39635f03";
