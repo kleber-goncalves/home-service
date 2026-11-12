@@ -169,6 +169,49 @@ test("POC-03: cria registro Argon2id em memória, verifica senha e recusa adulte
   assert.doesNotMatch(logs.join("\\n"), /POC03 synthetic password for verification/);
 });
 
+
+test("POC-03: valida tamanho, Unicode NFC, espaços e limites de bytes da senha", async () => {
+  const { context, logs } = createAppsScriptHarness();
+
+  const result = await context.poc03RunPasswordInputPolicyTests();
+
+  assert.equal(result.status, "PASS");
+  assert.equal(result.testsPassed, 14);
+  assert.equal(result.testsTotal, 14);
+  assert.equal(result.minimumCodePoints, 15);
+  assert.equal(result.maximumCodePoints, 128);
+  assert.equal(result.maximumUtf8Bytes, 512);
+  assert.equal(result.unicodeNormalization, "NFC");
+  assert.equal(result.spacesTrimmed, false);
+  assert.ok(
+    logs.some((line) =>
+      line.includes('"test":"Password input policy — isolated POC","status":"PASS"'),
+    ),
+    logs.join("\\n"),
+  );
+});
+
+test("POC-03: simula limite de 5 falhas/15 min e bloqueio de 15 min", () => {
+  const { context, logs } = createAppsScriptHarness();
+
+  const result = context.poc03RunLoginThrottlePolicyTests();
+
+  assert.equal(result.status, "PASS");
+  assert.equal(result.testsPassed, 5);
+  assert.equal(result.testsTotal, 5);
+  assert.equal(result.threshold, 5);
+  assert.equal(result.observationWindowMs, 15 * 60 * 1000);
+  assert.equal(result.lockDurationMs, 15 * 60 * 1000);
+  assert.equal(result.storage, "MEMORY_ONLY_NOT_PERSISTED");
+  assert.equal(result.concurrency, "NOT_TESTED");
+  assert.ok(
+    logs.some((line) =>
+      line.includes('"test":"Login throttling policy — in-memory model only","status":"PASS"'),
+    ),
+    logs.join("\\n"),
+  );
+});
+
 test("POC-03: Argon2id WASM passa vetores independentes e perfil OWASP", async () => {
   const { context, logs } = createAppsScriptHarness();
 
