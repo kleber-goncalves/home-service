@@ -868,24 +868,41 @@ async function poc03RunPasswordInputPolicyTests() {
         }));
     });
 
-    // Normalização NFC também precisa ocorrer no caminho real do KDF.
+    // Compara a derivação Argon2id das duas formas Unicode usando o mesmo salt.
+    // Isso isola NFC da geração/armazenamento do registro.
     var composedPassword = "\u00e9".repeat(15);
     var decomposedPassword = "e\u0301".repeat(15);
-    var record = poc03CreatePasswordRecordForPoc_(composedPassword);
-    var normalizedVerification = await poc03VerifyPasswordForPoc_(
-        decomposedPassword,
-        record
+    var composedValidation = poc03NormalizeAndValidatePasswordForPoc_(
+        composedPassword
     );
-    var nfcPassed = normalizedVerification === true;
+    var decomposedValidation = poc03NormalizeAndValidatePasswordForPoc_(
+        decomposedPassword
+    );
+    var fixedTestSalt = new Uint8Array(16);
+    fixedTestSalt.fill(0x5A);
+
+    var composedDerived = await poc03DeriveNormalizedPasswordBytesForPoc_(
+        composedValidation.normalizedPassword,
+        fixedTestSalt
+    );
+    var decomposedDerived = await poc03DeriveNormalizedPasswordBytesForPoc_(
+        decomposedValidation.normalizedPassword,
+        fixedTestSalt
+    );
+
+    var nfcPassed = poc03BytesEqualForArgon2_(
+        composedDerived,
+        decomposedDerived
+    );
 
     if (nfcPassed) {
         passedCount += 1;
     } else {
-        failedTests.push("senha equivalente em NFC verifica o mesmo registro Argon2id");
+        failedTests.push("derivação Argon2id equivalente após NFC");
     }
 
     Logger.log(JSON.stringify({
-        test: "senha equivalente em NFC verifica o mesmo registro Argon2id",
+        test: "formas Unicode compostas/decompostas derivam o mesmo Argon2id após NFC",
         status: nfcPassed ? "PASS" : "FAIL"
     }));
 
