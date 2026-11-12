@@ -194,7 +194,7 @@ A execução manual comprovou que a biblioteca e o algoritmo funcionam no runtim
 
 1. Repetir a medição do perfil `m=19456 KiB,t=2,p=1` em pelo menos cinco execuções separadas, registrando cada duração e variação.
 2. Avaliar o comportamento com execuções concorrentes controladas, observando falhas, consumo de recursos e limites/quota do Apps Script. Não iniciar carga agressiva nem usar a conta de produção.
-3. Definir e comprovar uma fonte criptograficamente segura para salts exclusivos. Não assumir que UUID ou outro identificador é CSPRNG sem garantia técnica suficiente.
+3. Validar no Apps Script a estrutura e conversão de `Utilities.getUuid()` para um salt de 16 bytes. A base documental candidata é a equivalência oficial com `java.util.UUID.randomUUID()`, cuja especificação Java descreve PRNG criptograficamente forte; a execução manual deve confirmar formato v4 e conversão, sem alegar que uma amostra estatística prova CSPRNG.
 4. Revisar o formato de armazenamento/versionamento (algoritmo, versão, parâmetros, salt e hash), os limites de entrada e a política de atualização dos parâmetros.
 5. Criar e revisar o procedimento de verificação: não usar automaticamente `argon2Verify` do pacote, que compara strings com `===`; avaliar comparação de tamanho fixo e limitações de garantias de tempo constante em JavaScript.
 6. Definir controles de abuso/rate limit no servidor antes de expor qualquer endpoint que execute um KDF memory-hard.
@@ -245,10 +245,29 @@ O perfil de referência derivou 32 bytes e correspondeu exatamente ao vetor inde
 
 O projeto Apps Script continuou isolado, sem publicação como Web App, sem planilha de negócio e sem credenciais reais. A execução não autoriza copiar o harness para autenticação.
 
+### 8.11. Fonte candidata para salt — Utilities.getUuid()
+
+A documentação oficial do Google declara que `Utilities.getUuid()` é equivalente ao método `java.util.UUID.randomUUID()` ([Google Apps Script Utilities](https://developers.google.com/apps-script/reference/utilities/utilities#getUuid)). A especificação Java declara que `UUID.randomUUID()` gera um UUID versão 4 usando um gerador pseudoaleatório criptograficamente forte ([Java SE — UUID.randomUUID](https://docs.oracle.com/en/java/javase/26/docs/api/java.base/java/util/UUID.html#randomUUID())). Essa cadeia documental oferece uma base técnica para utilizar `Utilities.getUuid()` como fonte candidata de salt aleatório no Apps Script.
+
+A ressalva do Google sobre não garantir unicidade absoluta em todo o tempo/espaço permanece aplicável: UUID é uma fonte aleatória probabilística, não um mecanismo de unicidade global garantida. Para salts, a exigência é um valor aleatório individual por senha; a OWASP descreve o salt como uma string única e aleatoriamente gerada ([OWASP Password Storage Cheat Sheet — Salting](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#salting)).
+
+O harness recebeu dois helpers:
+- `poc03GenerateSaltHex_()`: obtém um UUID pelo serviço oficial do Apps Script, exige formato UUID v4/RFC, remove os hífens e retorna 32 caracteres hexadecimais (16 bytes).
+- `poc03RunSaltGenerationTests()`: gera 256 amostras, verifica formato v4/variante, tamanho de 16 bytes e ausência de repetição dentro da amostra. Os valores nunca são impressos no log.
+
+**Limite:** o teste estrutural/colisão não mede entropia nem prova CSPRNG. A justificativa criptográfica decorre do contrato documental Google → Java, não de frequência estatística observada. Falta ainda executar essa função no Apps Script real.
+
+Formato de armazenamento candidato, ainda não aprovado para uso:
+- `senha_algoritmo`: `argon2id$v=19$m=19456,t=2,p=1`.
+- `senha_salt`: 32 caracteres hex minúsculos (16 bytes).
+- `senha_hash`: 64 caracteres hex minúsculos (32 bytes).
+
+A separação corresponde aos três campos já modelados na entidade `USUARIOS`. A aprovação desse formato depende da revisão da rotina de verificação, codificação de senha e limites de entrada. Nenhum dado deve ser escrito na planilha nesta POC.
+
 ### 8.10. Decisão após a execução real
 
 - **PBKDF2 sobre `Utilities`: reprovado** por desempenho operacional inconclusivo e margem insuficiente.
 - **Argon2id via `hash-wasm@4.13.0`: aprovado somente como candidato tecnicamente viável para continuar a POC.** Os dois vetores passaram em cinco baterias manuais; o perfil de referência apresentou média de 139,8 ms, mediana de 130 ms e intervalo observado de 61–280 ms. O resultado é promissor, mas a amostra ainda é pequena e não avalia concorrência ou carga.
-- **Autenticação/login: continua bloqueado.** Ainda faltam salt seguro, formato de armazenamento, verificação/comparação, controle contra abuso, ensaio de concorrência e revisão de segurança da dependência e da integração.
+- **Autenticação/login: continua bloqueado.** Ainda faltam execução manual do teste de salt, aprovação do formato de armazenamento, verificação/comparação, controle contra abuso, ensaio de concorrência e revisão de segurança da dependência e da integração.
 
 O próximo passo é concluir essas validações complementares, sem implementar cadastro, login, sessão ou operações de negócio nesta etapa.
