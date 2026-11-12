@@ -173,7 +173,12 @@ test("POC-03: cria registro Argon2id em memória, verifica senha e recusa adulte
 test("POC-03: valida tamanho, Unicode NFC, espaços e limites de bytes da senha", async () => {
   const { context, logs } = createAppsScriptHarness();
 
-  const result = await context.poc03RunPasswordInputPolicyTests();
+  let result;
+  try {
+    result = await context.poc03RunPasswordInputPolicyTests();
+  } catch (error) {
+    assert.fail(`${error.message}\\n${logs.join("\\n")}`);
+  }
 
   assert.equal(result.status, "PASS");
   assert.equal(result.testsPassed, 14);
@@ -197,8 +202,8 @@ test("POC-03: simula limite de 5 falhas/15 min e bloqueio de 15 min", () => {
   const result = context.poc03RunLoginThrottlePolicyTests();
 
   assert.equal(result.status, "PASS");
-  assert.equal(result.testsPassed, 5);
-  assert.equal(result.testsTotal, 5);
+  assert.equal(result.testsPassed, 6);
+  assert.equal(result.testsTotal, 6);
   assert.equal(result.threshold, 5);
   assert.equal(result.observationWindowMs, 15 * 60 * 1000);
   assert.equal(result.lockDurationMs, 15 * 60 * 1000);
