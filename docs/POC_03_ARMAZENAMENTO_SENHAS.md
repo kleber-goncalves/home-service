@@ -1,6 +1,6 @@
 # POC-03 — viabilidade de derivação e armazenamento de senhas
 
-> **Status:** vetores executados manualmente no Apps Script em 2026-11-12; compatibilidade aprovada somente para os vetores testados. O custo operacional do PBKDF2 candidato não foi aprovado. Nenhuma conta/login está implementada.
+> **Status:** PBKDF2 sobre `Utilities` reprovado como candidato para implementação após os ensaios de 2026-11-12. Uma sonda separada de WebAssembly e memória mínima para Argon2id foi adicionada; ainda precisa ser executada manualmente no Apps Script. Nenhum KDF foi aprovado e nenhuma conta/login está implementada.
 > **Escopo:** comprovar primitivas, compatibilidade, vetores de referência e custo de execução no runtime real do Google Apps Script.
 > **Ambiente:** projeto Apps Script separado, sem implantação como Web App, sem planilha de negócio e sem credenciais reais.
 
@@ -47,7 +47,7 @@ O harness cobre somente:
 3. Entrada UTF-8, inclusive caracteres acentuados e emoji.
 4. Senha de teste maior que 64 bytes, verificando o comportamento do HMAC com chave longa.
 5. Tempo de execução do vetor RFC de 80.000 iterações.
-6. Tempo de execução de um ensaio de 600.000 iterações, com interrupção controlada após três minutos.
+6. Tempo de execução de um ensaio de 600.000 iterações, com interrupção controlada após três minutos.\n7. Disponibilidade de WebAssembly no runtime e alocação de 19 MiB de memória linear, sem executar ainda um KDF Argon2id.
 
 As strings e salts do código são dados de teste públicos/fictícios. Não inserir senha pessoal, senha reaproveitada, e-mail, token ou segredo no código, no editor ou nos logs.
 
@@ -81,7 +81,7 @@ Todos os itens abaixo precisam ser verificados; nenhum resultado isolado é sufi
 - O resultado e os parâmetros serão versionados. Uma representação futura pode seguir formato explícito, por exemplo `pbkdf2-sha256$v1$600000$...`, mas não está aprovada nesta etapa.
 - O tempo do KDF será medido no runtime real, incluindo concorrência e carga prevista. Não baixar o work factor somente para fazer a demonstração parecer rápida.
 - A comparação de hashes, o limite de bytes da senha, a política de senha comum/comprometida, os segredos auxiliares e o controle de abuso permanecerão sob revisão própria.
-- A solução será revisada antes de qualquer integração. Se não atender ao nível de segurança e operação exigido, interromper a autenticação própria no Apps Script e reabrir a arquitetura.
+- A solução será revisada antes de qualquer integração. Se não atender ao nível de segurança e operação exigido, interromper a autenticação própria no Apps Script e reabrir a arquitetura.\n- A sonda WebAssembly deve confirmar apenas capacidades básicas do runtime: módulo mínimo executável e reserva de 19 MiB. Mesmo que passe, ainda será necessário avaliar uma implementação Argon2id WASM mantida/revisada, integridade da distribuição do binário, limites reais de memória, concorrência e tempo de execução.
 
 ## 7. Bloqueios que continuam fora desta POC
 
