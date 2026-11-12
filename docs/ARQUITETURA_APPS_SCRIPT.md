@@ -437,7 +437,9 @@ A sonda básica WebAssembly passou: módulo mínimo retornou 42 e foi possível 
 
 Formato de armazenamento candidato, ainda não aprovado: `senha_algoritmo=argon2id$v=19$m=19456,t=2,p=1`, `senha_salt` com 32 caracteres hex (16 bytes) e `senha_hash` com 64 caracteres hex (32 bytes), separados nos três campos já previstos na aba `USUARIOS`. Nada será gravado na planilha durante a POC.
 
-**Bloqueios remanescentes:** avaliar concorrência e consumo de recursos sob carga controlada; aprovar o formato/versionamento do hash; revisar limites de entrada e procedimento de verificação/comparação; definir controles de abuso/rate limit; revisar dependência, licença e integridade do bundle. Não implementar cadastro, login, sessão ou armazenamento de credenciais até essas validações e a POC-04 de sessão serem concluídas e aprovadas. O projeto continua acadêmico e deve usar somente dados sintéticos.
+**Prova de verificação em preparação:** o harness agora cria um registro fictício somente em memória usando o formato candidato `senha_algoritmo=argon2id$v=19$m=19456,t=2,p=1`, salt 16 bytes e hash 32 bytes. A função `poc03RunPasswordRecordVerificationTests` cobre oito cenários (senha correta/incorreta, adulteração de salt/hash e metadados malformados), sem persistência e sem imprimir segredos. A comparação percorre o tamanho fixo com acumulador XOR, mas não há garantia formal de tempo constante em JavaScript/V8; não está aprovada para autenticação. A execução manual no Apps Script ainda está pendente.
+
+**Bloqueios remanescentes:** executar a prova manual de criação/verificação; avaliar concorrência e consumo de recursos sob carga controlada; aprovar o formato/versionamento do hash; revisar limites de entrada e procedimento de verificação/comparação; definir controles de abuso/rate limit; revisar dependência, licença e integridade do bundle. Não implementar cadastro, login, sessão ou armazenamento de credenciais até essas validações e a POC-04 de sessão serem concluídas e aprovadas. O projeto continua acadêmico e deve usar somente dados sintéticos.
 
 ### 10.2. Sessões
 
