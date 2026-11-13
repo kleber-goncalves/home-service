@@ -403,6 +403,27 @@ Foi preparada uma segunda etapa para ir além do modelo in-memory da seção 8.1
 
 **Interpretação e limite da evidência:** o histórico do Apps Script apresenta os horários de início somente com precisão de segundos, enquanto as durações são fracionárias. A maioria dos intervalos aparenta ser sequencial. O par mais próximo foi o worker exibido às 14:26:16, com duração de 1,419 s, seguido pelo próximo início exibido às 14:26:18. Como o histórico não informa a fração de segundo dos inícios, esse par não permite concluir se houve ou não uma pequena sobreposição. Portanto, os dados disponíveis **não comprovam contenção simultânea pelo ScriptLock**, mas também não permitem afirmar categoricamente que nenhuma sobreposição ocorreu. O resumo PASS comprova que dez execuções independentes compartilharam o estado persistido e produziram a distribuição esperada. Registrar separadamente: persistência e transições entre execuções independentes validadas; contenção concorrente ainda inconclusiva. A próxima sonda deve registrar timestamps em milissegundos para início da chamada, aquisição do lock, liberação do lock e conclusão, além do tempo gasto aguardando o lock.
 
+**Nova sonda coordenada — implementação preparada; execução manual pendente:**
+
+A tentativa anterior usou dez execuções iniciadas manualmente, sem evidência suficiente de sobreposição. Para eliminar essa dependência de cliques, foi adicionada uma segunda sonda:
+
+- `poc03LaunchPersistentThrottleCoordinatedConcurrencyProbe()` cria dez gatilhos de relógio de execução única, cada um associado a um handler exclusivo.
+- O horário real de disparo pode variar; por isso, os workers registram a chegada em Script Properties e aguardam uma barreira comum de dez participantes, com timeout de 60 segundos. Só depois da chegada de todos eles a fase crítica é liberada.
+- Cada worker chama a mesma atualização persistente sob `ScriptLock`, mantendo o lock por 350 ms artificialmente para tornar a contenção mensurável.
+- Os dados de cada worker registram timestamps em milissegundos para início da execução, passagem pela barreira, solicitação/aquisição/liberação do lock e conclusão; também registram tempo de espera e tempo segurando o lock.
+- `poc03RunPersistentThrottleCoordinatedConcurrencySummary()` calcula intervalos de execução, máximo de workers simultaneamente ativos, sobreposição entre intervalos e quantidade de workers que esperaram pelo lock. Só retorna PASS se os dez intervalos se sobrepuserem em algum instante, houver contenção mensurável e a distribuição persistida continuar 4 COUNTED, 1 LOCKED_AFTER_FAILURE e 5 BLOCKED.
+- `poc03CleanupPersistentThrottleCoordinatedConcurrencyProbe()` remove somente os gatilhos dos dez handlers exclusivos e propriedades sob o prefixo de teste POC-03.
+
+**Procedimento manual:**
+1. Atualizar o `Code.gs` do projeto isolado com a versão desta branch.
+2. Executar uma única vez `poc03LaunchPersistentThrottleCoordinatedConcurrencyProbe()`. Na primeira execução, autorizar o gerenciamento de gatilhos solicitado pelo Google.
+3. Não abrir dez abas nem executar os workers manualmente. A função cria os dez gatilhos.
+4. Acompanhar em **Execuções** os dez handlers `poc03RunPersistentThrottleCoordinatedWorker00_` até `poc03RunPersistentThrottleCoordinatedWorker09_` e aguardar todos terminarem.
+5. Executar `poc03RunPersistentThrottleCoordinatedConcurrencySummary()` e guardar o log completo.
+6. Executar `poc03CleanupPersistentThrottleCoordinatedConcurrencyProbe()` após guardar o resumo.
+
+O builder `after(1000)` define uma duração mínima, não um horário exato; a barreira é que sincroniza a fase crítica. O lançador verifica a cota documentada de até 20 gatilhos por usuário por projeto e recusa a preparação se não houver espaço para dez, sem apagar gatilhos de outras funções. A execução coordenada permanece pendente no Apps Script real; o harness Node/VM valida apenas o cálculo dos intervalos e a instrumentação opcional do lock, não substitui essa execução manual.
+
 **Limite arquitetural:** este passo persiste estado em Script Properties para testar a primitiva key-value, não na aba `CONTROLE_AUTENTICACAO` da modelagem. Script Properties são compartilhadas por todos os usuários do mesmo projeto; `getScriptLock()` também serializa a seção crítica para todas as execuções desse projeto, não apenas para uma conta. Isso favorece consistência simples, mas cria um ponto global de contenção.
 
 O serviço de propriedades tem limites documentados: 9 KB por valor, 500 KB por armazenamento e cotas diárias de leitura/escrita de 50.000 para contas de consumidor ou 500.000 para Google Workspace. Portanto, **não é a decisão de armazenamento final para o cadastro real**. A implementação vinculada à modelagem ainda precisa ser validada com a aba `CONTROLE_AUTENTICACAO`, operações na planilha sob lock e concorrência entre execuções independentes. Fontes: [Properties Service](https://developers.google.com/apps-script/guides/properties) · [Apps Script quotas](https://developers.google.com/apps-script/guides/services/quotas) · [LockService](https://developers.google.com/apps-script/reference/lock/lock-service).
