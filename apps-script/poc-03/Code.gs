@@ -3805,7 +3805,7 @@ function poc03RegisterSheetsThrottleFailureForPoc_(meta, nowMs, timing) {
             windowStartedAtMs: located.record.state.windowStartedAtMs,
             blockedUntilMs: located.record.state.blockedUntilMs
         };
-        var transition = poc03RegisterLoginFailureForPoc_(state, nowMs);
+        var transition = poc03RegisterLoginFailureForPoc_(state, operationNowMs);
         var persistedWrite = false;
 
         if (transition.status !== "BLOCKED") {
