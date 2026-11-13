@@ -403,7 +403,7 @@ Foi preparada uma segunda etapa para ir além do modelo in-memory da seção 8.1
 
 **Interpretação e limite da evidência:** o histórico do Apps Script apresenta os horários de início somente com precisão de segundos, enquanto as durações são fracionárias. A maioria dos intervalos aparenta ser sequencial. O par mais próximo foi o worker exibido às 14:26:16, com duração de 1,419 s, seguido pelo próximo início exibido às 14:26:18. Como o histórico não informa a fração de segundo dos inícios, esse par não permite concluir se houve ou não uma pequena sobreposição. Portanto, os dados disponíveis **não comprovam contenção simultânea pelo ScriptLock**, mas também não permitem afirmar categoricamente que nenhuma sobreposição ocorreu. O resumo PASS comprova que dez execuções independentes compartilharam o estado persistido e produziram a distribuição esperada. Registrar separadamente: persistência e transições entre execuções independentes validadas; contenção concorrente ainda inconclusiva. A próxima sonda deve registrar timestamps em milissegundos para início da chamada, aquisição do lock, liberação do lock e conclusão, além do tempo gasto aguardando o lock.
 
-**Nova sonda coordenada — implementação preparada; execução manual pendente:**
+**Nova sonda coordenada — execução manual concluída no Apps Script real em 2026-11-13, por volta de 15:10:**
 
 A tentativa anterior usou dez execuções iniciadas manualmente, sem evidência suficiente de sobreposição. Para eliminar essa dependência de cliques, foi adicionada uma segunda sonda:
 
@@ -422,7 +422,16 @@ A tentativa anterior usou dez execuções iniciadas manualmente, sem evidência 
 5. Executar `poc03RunPersistentThrottleCoordinatedConcurrencySummary()` e guardar o log completo.
 6. Executar `poc03CleanupPersistentThrottleCoordinatedConcurrencyProbe()` após guardar o resumo.
 
-O builder `after(1000)` define uma duração mínima, não um horário exato; a barreira é que sincroniza a fase crítica. O lançador verifica a cota documentada de até 20 gatilhos por usuário por projeto e recusa a preparação se não houver espaço para dez, sem apagar gatilhos de outras funções. A execução coordenada permanece pendente no Apps Script real; o harness Node/VM valida apenas o cálculo dos intervalos e a instrumentação opcional do lock, não substitui essa execução manual.
+O builder `after(1000)` define uma duração mínima, não um horário exato; a barreira é que sincroniza a fase crítica. O lançador verifica a cota documentada de até 20 gatilhos por usuário por projeto e recusa a preparação se não houver espaço para dez, sem apagar gatilhos de outras funções. **Resultado manual da execução coordenada: PASS.** O lançador concluiu em aproximadamente 6,241 s e criou dez gatilhos exclusivos. O histórico mostrou os dez handlers como execuções controladas por relógio, com início entre 15:08:20 e 15:09:56. O resumo, executado às 15:10:38, coletou os dez registros e retornou:
+- `observedWorkers=10`, `maxConcurrentWorkers=10`, `pairwiseOverlapCount=45`, `allWorkersOverlapAtOneInstant=true` e `commonOverlapWindowMs=1308`.
+- Distribuição persistida: 4 `COUNTED`, 1 `LOCKED_AFTER_FAILURE`, 5 `BLOCKED`; contador final 5 e bloqueio ativo.
+- Zero `LOCK_TIMEOUT/LOCK_UNAVAILABLE`, zero timeout de barreira e zero erros de worker.
+- Todos os dez workers tiveram espera pelo lock acima do limiar de 25 ms; espera mínima 88 ms, máxima 5.599 ms.
+- Retenção artificial por worker: 350 ms; armazenamento: `SCRIPT_PROPERTIES_TEST_ONLY`; sincronização: `SCRIPT_LOCK_WITH_ALL_WORKERS_BARRIER`.
+
+**Conclusão técnica:** a telemetria baseada em `Date.now()` demonstrou que os dez intervalos de execução tiveram uma janela comum de sobreposição de 1.308 ms. Os 45 pares possíveis se sobrepuseram. A contenção do ScriptLock foi observada em todos os dez workers, com os tempos de espera registrados. Portanto, a sonda coordenada comprova concorrência real entre execuções independentes no runtime Apps Script e consistência do contador no armazenamento Script Properties.
+
+**Limite e limpeza:** esta evidência cobre Script Properties + ScriptLock, não gravação concorrente em Sheets. O log da limpeza final da sonda coordenada ainda não foi apresentado; executar `poc03CleanupPersistentThrottleCoordinatedConcurrencyProbe()` depois de guardar o resumo e conferir que os dez workers terminaram. O harness Node/VM continua sendo uma validação complementar, não substitui o teste manual no Google.
 
 Referências oficiais: [ClockTriggerBuilder.after](https://developers.google.com/apps-script/reference/script/clock-trigger-builder#after(Integer)) · [Gatilhos instaláveis](https://developers.google.com/apps-script/guides/triggers/installable) · [Objeto de evento para gatilhos](https://developers.google.com/apps-script/guides/triggers/events) · [Cotas e limite de 20 gatilhos por usuário/projeto](https://developers.google.com/apps-script/guides/services/quotas).
 
