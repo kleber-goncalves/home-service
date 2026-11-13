@@ -441,3 +441,50 @@ Referências oficiais: [ClockTriggerBuilder.after](https://developers.google.com
 
 O serviço de propriedades tem limites documentados: 9 KB por valor, 500 KB por armazenamento e cotas diárias de leitura/escrita de 50.000 para contas de consumidor ou 500.000 para Google Workspace. Portanto, **não é a decisão de armazenamento final para o cadastro real**. A implementação vinculada à modelagem ainda precisa ser validada com a aba `CONTROLE_AUTENTICACAO`, operações na planilha sob lock e concorrência entre execuções independentes. Fontes: [Properties Service](https://developers.google.com/apps-script/guides/properties) · [Apps Script quotas](https://developers.google.com/apps-script/guides/services/quotas) · [LockService](https://developers.google.com/apps-script/reference/lock/lock-service).
 
+
+### 8.17. POC-03B — leitura-modificação-gravação concorrente em Google Sheets
+
+**Estado do código:** implementado na branch `feat/poc-03-password-kdf`; validação automatizada concluída. A execução manual no Apps Script real permanece pendente. Esta prova é separada do ensaio anterior em Script Properties.
+
+**Objetivo:** comprovar no serviço real do Google Sheets que dez execuções independentes conseguem atualizar o mesmo registro sintético de controle de autenticação sem perder incrementos, com leitura, transição e gravação protegidas por `LockService.getScriptLock()`.
+
+**Isolamento:**
+- `poc03LaunchSheetsPersistentThrottleConcurrencyProbe()` cria um arquivo novo via `SpreadsheetApp.create`, com nome `POC-03 TEMPORARIA - CONTROLE_AUTENTICACAO - <runId>`.
+- O arquivo contém uma única aba `CONTROLE_AUTENTICACAO_POC` e uma linha sintética. A função não chama `getActiveSpreadsheet()`, não recebe ID de planilha de negócio e não abre a planilha estrutural.
+- Os seis cabeçalhos reproduzem a ordem física aprovada: `id_controle`, `identificador_hash`, `tentativas_falhas`, `inicio_janela_em`, `bloqueado_ate`, `atualizado_em`.
+- O identificador é um UUID de teste; `identificador_hash` é um HMAC-SHA-256 de um identificador reservado `.invalid.example`. Nenhum e-mail real é escrito ou logado.
+- Datas são armazenadas como texto ISO 8601 UTC. A leitura valida rigorosamente os campos, formato, contador entre 0 e 5 e coerência dos instantes; estado inválido falha fechado e não é zerado.
+- Script Properties guarda somente metadados de coordenação, IDs de gatilhos e telemetria sob `POC03_SHEETS_THROTTLE_`. O estado do throttling é persistido na linha da planilha temporária.
+
+**Concorrência e atomicidade:**
+- Dez gatilhos de execução única usam handlers exclusivos e validam o `triggerUid`.
+- Os dez workers registram chegada e aguardam uma barreira; somente depois disputam o mesmo ScriptLock.
+- Dentro do lock, cada worker abre o arquivo pelo ID guardado na metadata, valida o cabeçalho e encontra exatamente um registro por `id_controle`/`identificador_hash`.
+- O worker lê os seis campos, aplica `poc03RegisterLoginFailureForPoc_`, atualiza a mesma linha e chama `SpreadsheetApp.flush()` antes de liberar o lock.
+- A retenção artificial de 350 ms dentro da seção crítica existe apenas para tornar a contenção mensurável. Não representa latência normal ou benchmark.
+- A aquisição do lock nesta prova usa timeout de 45 segundos para acomodar as chamadas de serviço do Sheets. O limite não altera o algoritmo funcional de cinco falhas em 15 minutos e bloqueio por 15 minutos.
+
+**Critérios de aprovação do resumo manual:**
+- 10 workers concluídos e observados.
+- 4 resultados `COUNTED`, 1 `LOCKED_AFTER_FAILURE` e 5 `BLOCKED`.
+- 5 gravações bem-sucedidas na linha; os cinco workers bloqueados não reescrevem o estado.
+- Contador final 5 e `bloqueado_ate` ainda no futuro.
+- Dez intervalos de execução com uma janela comum de sobreposição; 45 pares sobrepostos.
+- Pelo menos dois workers com espera observável de lock de 25 ms ou mais.
+- Zero timeout de barreira, falha de lock ou erro de worker.
+
+**Funções e procedimento manual no projeto Apps Script isolado:**
+1. Atualizar somente `Code.gs` com a versão desta branch. Manter o arquivo `HashWasmArgon2.gs` que já contém o bundle da POC-03; não alterar o projeto Apps Script de negócio.
+2. Executar `poc03RunSheetsThrottleRecordMappingTests()` e conferir `PASS`, `testsPassed=8`, `testsTotal=8`.
+3. Executar uma única vez `poc03LaunchSheetsPersistentThrottleConcurrencyProbe()`. Autorizar os serviços do Google solicitados. A função cria o arquivo temporário e dez gatilhos; o log retorna a URL da planilha descartável.
+4. Em **Execuções**, acompanhar `poc03RunSheetsThrottleWorker00_` até `poc03RunSheetsThrottleWorker09_` e aguardar as dez execuções terminarem. Não executar os workers manualmente.
+5. Executar `poc03RunSheetsPersistentThrottleConcurrencySummary()` e guardar o JSON completo e a URL da planilha. Conferir os critérios de aprovação acima.
+6. Somente após guardar o resumo, executar `poc03CleanupSheetsPersistentThrottleProbe()`. A limpeza exige que o resumo tenha sido executado e que os dez workers tenham registros de conclusão. Ela valida o ID e o nome exatos do arquivo temporário, move esse arquivo para a lixeira via `DriveApp` e remove apenas gatilhos registrados para esta execução e propriedades com o prefixo `POC03_SHEETS_THROTTLE_`.
+
+O método `File.setTrashed(true)` move o arquivo para a lixeira do Drive; não é exclusão permanente. A primeira execução que usa o Drive poderá solicitar autorização adicional. Se o resumo estiver incompleto ou algum worker não tiver concluído, a limpeza recusa a remoção para preservar a planilha e a evidência para inspeção.
+
+**Validação automatizada:** o harness Node/VM verifica oito casos puros de mapeamento/validação das seis colunas e dez transições sequenciais sobre um mock de Sheets, incluindo cinco gravações e o contador final. Isso não comprova concorrência nem persistência no serviço Google real.
+
+**Limites:** a aprovação desta POC só demonstrará o comportamento em uma planilha temporária pequena, sob `ScriptLock` global do projeto. Não demonstra throughput, SLA, escala de produção, integridade relacional completa ou mitigação contra lockout DoS. Não autoriza login nem uso de dados reais.
+
+Referências oficiais: [SpreadsheetApp.create](https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet-app#create(String)) · [LockService](https://developers.google.com/apps-script/reference/lock/lock-service) · [File.setTrashed](https://developers.google.com/apps-script/reference/drive/file#setTrashed(Boolean)) · [Cotas e limites do Apps Script](https://developers.google.com/apps-script/guides/services/quotas).
