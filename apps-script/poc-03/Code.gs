@@ -2902,8 +2902,9 @@ function poc03DeletePersistentThrottleCoordinatedTriggerByUid_(
     return false;
 }
 
-// Cada gatilho tem um handler distinto: isso evita depender da conversão
-// numérica/string do triggerUid entregue pelo objeto de evento do Google.
+// Cada gatilho tem um handler distinto para obter o índice do worker.
+// O triggerUid do evento é convertido em string e comparado com o ID registrado
+// ao criar o gatilho, impedindo que uma execução antiga entre em uma sonda nova.
 function poc03RunPersistentThrottleCoordinatedWorker00_(event) {
     return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(0, event);
 }
