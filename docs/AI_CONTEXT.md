@@ -309,9 +309,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 62b35a750783c80bebefa4ade3e9e8f25b61ef9c
-- **Data do commit:** 2026-11-13T15:12:16-03:00
-- **Mensagem do commit:** docs(poc-03): registrar concorrência coordenada 10 workers
+- **Commit de referência:** 0125695f3a0a5b099c2865b5c94be4b6532da793
+- **Data do commit:** 2026-11-13T15:12:19-03:00
+- **Mensagem do commit:** docs(arquitetura): registrar concorrência real do throttling
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -406,6 +406,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 0125695 | 2026-11-13 | docs(arquitetura): registrar concorrência real do throttling |
 | 62b35a7 | 2026-11-13 | docs(poc-03): registrar concorrência coordenada 10 workers |
 | c1a5f66 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 6b4df49 | 2026-11-13 | docs(ai-context): registrar limites separados de timeout |
@@ -413,6 +414,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 3e2d07d | 2026-11-13 | docs(poc-03): documentar timeout de configuração separado |
 | ad04993 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | e3edf1d | 2026-11-13 | test(poc-03): separar timeout de configuração e barreira |
-| d4ef4f4 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
