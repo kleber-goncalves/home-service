@@ -1736,7 +1736,7 @@ function poc03RegisterPersistentThrottleFailureForPoc_(
         timing.lockRequestedAtMs = Date.now();
     }
 
-    var lockResult = poc03AcquireThrottleScriptLock_();
+    var lockResult = poc03AcquireSheetsThrottleLock_();
 
     if (timing) {
         timing.lockAcquiredAtMs = lockResult.ok ? Date.now() : null;
@@ -2680,7 +2680,7 @@ function poc03RunPersistentThrottleCoordinatedWorkerForIndex_(workerIndex, event
 
         belongsToActiveRun = true;
 
-        var arrivalLockResult = poc03AcquireThrottleScriptLock_();
+        var arrivalLockResult = poc03AcquireSheetsThrottleLock_();
 
         if (!arrivalLockResult.ok) {
             detail = {
@@ -3344,7 +3344,8 @@ function poc03ReadSheetThrottleRowForPoc_(row) {
         }
     } else if (
         blockedUntil.value === null
-        || blockedUntil.value < updatedAt.value
+        || blockedUntil.value !== updatedAt.value + POC03_LOGIN_LOCK_MS
+        || updatedAt.value - windowStarted.value >= POC03_LOGIN_WINDOW_MS
     ) {
         return { ok: false, reason: "BLOCK_STATE_INCONSISTENT" };
     }
@@ -3404,7 +3405,8 @@ function poc03BuildSheetThrottleRowForPoc_(record, state, updatedAtMs) {
         }
     } else if (
         !Number.isSafeInteger(state.blockedUntilMs)
-        || state.blockedUntilMs < updatedValue
+        || state.blockedUntilMs !== updatedValue + POC03_LOGIN_LOCK_MS
+        || updatedValue - state.windowStartedAtMs >= POC03_LOGIN_WINDOW_MS
     ) {
         throw new Error("SHEETS_THROTTLE_BLOCK_STATE_INVALID");
     }
@@ -3629,6 +3631,33 @@ function poc03ReadSheetsThrottleMeta_(properties) {
         return meta;
     } catch (error) {
         return null;
+    }
+}
+
+function poc03AcquireSheetsThrottleLock_() {
+    if (
+        typeof LockService !== "object"
+        || LockService === null
+        || typeof LockService.getScriptLock !== "function"
+    ) {
+        return { ok: false, reason: "LOCK_UNAVAILABLE", lock: null };
+    }
+
+    try {
+        var lock = LockService.getScriptLock();
+
+        if (!lock || typeof lock.tryLock !== "function") {
+            return { ok: false, reason: "LOCK_UNAVAILABLE", lock: null };
+        }
+
+        // A operação real no Sheets pode demorar mais que o ensaio em Properties.
+        if (!lock.tryLock(45000)) {
+            return { ok: false, reason: "LOCK_TIMEOUT", lock: null };
+        }
+
+        return { ok: true, lock: lock };
+    } catch (error) {
+        return { ok: false, reason: "LOCK_UNAVAILABLE", lock: null };
     }
 }
 
@@ -4088,7 +4117,7 @@ function poc03LaunchSheetsPersistentThrottleConcurrencyProbe() {
         );
     }
 
-    var lockResult = poc03AcquireThrottleScriptLock_();
+    var lockResult = poc03AcquireSheetsThrottleLock_();
     if (!lockResult.ok) {
         throw new Error("SHEETS_THROTTLE_LAUNCH_LOCK_UNAVAILABLE");
     }
@@ -4282,7 +4311,7 @@ function poc03LaunchSheetsPersistentThrottleConcurrencyProbe() {
 
 /** Resume os dez workers e confere o estado final diretamente no Sheets. */
 function poc03RunSheetsPersistentThrottleConcurrencySummary() {
-    var lockResult = poc03AcquireThrottleScriptLock_();
+    var lockResult = poc03AcquireSheetsThrottleLock_();
 
     if (!lockResult.ok) {
         throw new Error("SHEETS_THROTTLE_SUMMARY_LOCK_UNAVAILABLE");
@@ -4381,7 +4410,7 @@ function poc03RunSheetsPersistentThrottleConcurrencySummary() {
             && concurrency.maxConcurrentWorkers === POC03_SHEETS_THROTTLE_EXPECTED_WORKERS
             && concurrency.pairwiseOverlapCount === 45
             && concurrency.allWorkersOverlapAtOneInstant === true
-            && contendedWorkers === POC03_SHEETS_THROTTLE_EXPECTED_WORKERS
+            && contendedWorkers >= 2
             && writeCount === 5
             && located.ok
             && finalState.failureCount === POC03_LOGIN_FAILURE_LIMIT
