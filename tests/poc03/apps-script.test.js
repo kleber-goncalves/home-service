@@ -353,6 +353,62 @@ test("POC-03: workers de throttling mantêm limite sob execuções simuladas seq
   assert.equal(propertyStore.size, 0);
 });
 
+
+test("POC-03: analyzer detects overlapping worker execution intervals", () => {
+  const { context } = createAppsScriptHarness();
+
+  const overlapping = Array.from({ length: 10 }, (_, index) => ({
+    invocationStartedAtMs: 1000 + index * 10,
+    workerCompletedAtMs: 4000 + index * 10,
+  }));
+
+  const overlapResult =
+    context.poc03AnalyzeThrottleConcurrencyIntervalsForPoc_(overlapping);
+
+  assert.equal(overlapResult.validIntervals, 10);
+  assert.equal(overlapResult.maxConcurrentWorkers, 10);
+  assert.equal(overlapResult.pairwiseOverlapCount, 45);
+  assert.equal(overlapResult.allWorkersOverlapAtOneInstant, true);
+  assert.ok(overlapResult.commonOverlapWindowMs > 0);
+
+  const sequential = Array.from({ length: 10 }, (_, index) => ({
+    invocationStartedAtMs: 1000 + index * 500,
+    workerCompletedAtMs: 1500 + index * 500,
+  }));
+
+  const sequentialResult =
+    context.poc03AnalyzeThrottleConcurrencyIntervalsForPoc_(sequential);
+
+  assert.equal(sequentialResult.validIntervals, 10);
+  assert.equal(sequentialResult.maxConcurrentWorkers, 1);
+  assert.equal(sequentialResult.pairwiseOverlapCount, 0);
+  assert.equal(sequentialResult.allWorkersOverlapAtOneInstant, false);
+});
+
+test("POC-03: persistent throttle exposes lock timing telemetry when requested", () => {
+  const { context } = createAppsScriptHarness();
+  const timing = {};
+
+  const result = context.poc03RegisterPersistentThrottleFailureForPoc_(
+    "poc03-coordinated-timing@invalid.example",
+    Date.now(),
+    { timing },
+  );
+
+  assert.equal(result.status, "COUNTED");
+  assert.equal(Number.isSafeInteger(timing.lockRequestedAtMs), true);
+  assert.equal(Number.isSafeInteger(timing.lockAcquiredAtMs), true);
+  assert.equal(Number.isSafeInteger(timing.lockReleasedAtMs), true);
+  assert.equal(Number.isSafeInteger(timing.lockWaitMs), true);
+  assert.equal(Number.isSafeInteger(timing.lockHeldMs), true);
+  assert.ok(timing.lockAcquiredAtMs >= timing.lockRequestedAtMs);
+  assert.ok(timing.lockReleasedAtMs >= timing.lockAcquiredAtMs);
+  assert.ok(timing.lockWaitMs >= 0);
+  assert.ok(timing.lockHeldMs >= 0);
+
+  context.poc03CleanupPersistentThrottleTestData();
+});
+
 test("POC-03: Argon2id WASM passa vetores independentes e perfil OWASP", async () => {
   const { context, logs } = createAppsScriptHarness();
 
