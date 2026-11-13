@@ -305,9 +305,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 2f983757737065cd6d3fa6c9b3d882450a583116
-- **Data do commit:** 2026-11-13T14:35:25-03:00
-- **Mensagem do commit:** docs(arquitetura): qualificar evidência de concorrência POC-03
+- **Commit de referência:** 837bd917fdc035c2e474a998abe8d96f4527014d
+- **Data do commit:** 2026-11-13T14:40:23-03:00
+- **Mensagem do commit:** test(poc-03): coordenar sonda concorrente com barreira e métricas
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -402,13 +402,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 837bd91 | 2026-11-13 | test(poc-03): coordenar sonda concorrente com barreira e métricas |
+| 91de2ca | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
+| cb5c552 | 2026-11-13 | docs(ai-context): qualificar precisão do histórico POC-03 |
 | 2f98375 | 2026-11-13 | docs(arquitetura): qualificar evidência de concorrência POC-03 |
 | cc7281e | 2026-11-13 | docs(poc-03): qualificar precisão do histórico de concorrência |
 | f7e8325 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 1eebeb6 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | dd441f3 | 2026-11-13 | docs(ai-context): esclarecer workers sequenciais na POC-03 |
-| 5154e7b | 2026-11-13 | docs(arquitetura): corrigir evidência de concorrência POC-03 |
-| d0754fb | 2026-11-13 | docs(poc-03): esclarecer ausência de sobreposição nos workers |
-| d6963ea | 2026-11-13 | docs(ai-context): registrar testes reais de throttling persistente |
 
 <!-- END AUTO-GENERATED SECTION -->
