@@ -305,9 +305,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 9fe2461799906c557e4de46fe3cb83bf8aa824a5
-- **Data do commit:** 2026-11-13T14:42:24-03:00
-- **Mensagem do commit:** test(poc-03): identificar workers por handlers de gatilho dedicados
+- **Commit de referência:** 804834784dc0cef408f0a191b3d3b54a61be868a
+- **Data do commit:** 2026-11-13T14:43:18-03:00
+- **Mensagem do commit:** test(poc-03): finalizar telemetria do lock após liberação
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -402,13 +402,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 8048347 | 2026-11-13 | test(poc-03): finalizar telemetria do lock após liberação |
+| 43b5533 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 9fe2461 | 2026-11-13 | test(poc-03): identificar workers por handlers de gatilho dedicados |
 | 884e932 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | d612dcd | 2026-11-13 | test(poc-03): validar métricas de lock e detecção de sobreposição |
 | 7b19284 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | a2078a3 | 2026-11-13 | test(poc-03): isolar limpeza dos gatilhos da sonda coordenada |
 | 10a2c15 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| 837bd91 | 2026-11-13 | test(poc-03): coordenar sonda concorrente com barreira e métricas |
-| 91de2ca | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
