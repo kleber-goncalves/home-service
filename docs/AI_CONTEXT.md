@@ -305,9 +305,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 837bd917fdc035c2e474a998abe8d96f4527014d
-- **Data do commit:** 2026-11-13T14:40:23-03:00
-- **Mensagem do commit:** test(poc-03): coordenar sonda concorrente com barreira e métricas
+- **Commit de referência:** a2078a37ec29b3e822da5f3946273f5753ae519d
+- **Data do commit:** 2026-11-13T14:41:08-03:00
+- **Mensagem do commit:** test(poc-03): isolar limpeza dos gatilhos da sonda coordenada
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -402,13 +402,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| a2078a3 | 2026-11-13 | test(poc-03): isolar limpeza dos gatilhos da sonda coordenada |
+| 10a2c15 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 837bd91 | 2026-11-13 | test(poc-03): coordenar sonda concorrente com barreira e métricas |
 | 91de2ca | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | cb5c552 | 2026-11-13 | docs(ai-context): qualificar precisão do histórico POC-03 |
 | 2f98375 | 2026-11-13 | docs(arquitetura): qualificar evidência de concorrência POC-03 |
 | cc7281e | 2026-11-13 | docs(poc-03): qualificar precisão do histórico de concorrência |
 | f7e8325 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| 1eebeb6 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| dd441f3 | 2026-11-13 | docs(ai-context): esclarecer workers sequenciais na POC-03 |
 
 <!-- END AUTO-GENERATED SECTION -->
