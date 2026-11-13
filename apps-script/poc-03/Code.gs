@@ -1855,17 +1855,17 @@ function poc03RegisterPersistentThrottleFailureForPoc_(
             blockedUntilMs: null
         };
     } finally {
+        try {
+            lock.releaseLock();
+        } catch (error) {
+            // Nenhum detalhe interno ou dado de teste é registrado.
+        }
+
         if (timing) {
             timing.lockReleasedAtMs = Date.now();
             timing.lockHeldMs = timing.lockAcquiredAtMs === null
                 ? null
                 : timing.lockReleasedAtMs - timing.lockAcquiredAtMs;
-        }
-
-        try {
-            lock.releaseLock();
-        } catch (error) {
-            // Nenhum detalhe interno ou dado de teste é registrado.
         }
     }
 }
@@ -2270,7 +2270,7 @@ function poc03RunPersistentThrottleConcurrencyWorker() {
 
 
 /**
- * Remove somente gatilhos cujo handler é exclusivo desta sonda coordenada.
+ * Remove somente gatilhos cujos handlers são exclusivos desta sonda coordenada.
  * Não toca em gatilhos de outras funções/projetos.
  */
 function poc03DeletePersistentThrottleCoordinatedTriggers_() {
@@ -2346,6 +2346,12 @@ function poc03ReadCoordinatedThrottleMeta_(properties) {
             || meta.workerHandlers.length !== POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS
         ) {
             return null;
+        }
+
+        for (var index = 0; index < POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS; index += 1) {
+            if (meta.workerHandlers[index] !== POC03_THROTTLE_COORDINATED_WORKER_HANDLERS[index]) {
+                return null;
+            }
         }
 
         return meta;
