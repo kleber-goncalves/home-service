@@ -1,3 +1,4 @@
+import { Buffer } from "node:buffer";
 import { timingSafeEqual } from "node:crypto";
 
 const ARGON2_HASH_BYTES = 32;
