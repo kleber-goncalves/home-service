@@ -312,9 +312,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 7f1211a904ebf3d42376d11d4f6d47a5d78725f7
-- **Data do commit:** 2026-11-13T15:44:20-03:00
-- **Mensagem do commit:** docs(architecture): registrar suite POC03 aprovada
+- **Commit de referência:** 9165e4e8c03bfb33b09949b23ae90035a1fbf832
+- **Data do commit:** 2026-11-13T16:06:39-03:00
+- **Mensagem do commit:** docs(poc-03): registrar execucao real de concorrencia em sheets
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -409,13 +409,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 9165e4e | 2026-11-13 | docs(poc-03): registrar execucao real de concorrencia em sheets |
+| bc1145c | 2026-11-13 | docs(ai-context): registrar CI e status manual de sheets |
+| cbe4c17 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
+| 56d50c2 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
+| 0a48484 | 2026-11-13 | docs(ai-context): apontar teste manual POC03B como proxima etapa |
 | 7f1211a | 2026-11-13 | docs(architecture): registrar suite POC03 aprovada |
 | e8c6e2c | 2026-11-13 | docs(poc-03): registrar ci verde para POC de sheets |
 | e0947ff | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| ccb65d7 | 2026-11-13 | fix(poc-03): usar timestamp único na transição do throttle em sheets |
-| dbe6d03 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| 2762b41 | 2026-11-13 | fix(poc-03): restaurar isolamento do throttle em script properties |
-| ef54d2f | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| 134a050 | 2026-11-13 | fix(poc-03): capturar horario sob lock e validar arquivo sheets |
 
 <!-- END AUTO-GENERATED SECTION -->
