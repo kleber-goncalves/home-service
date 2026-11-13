@@ -408,7 +408,7 @@ Foi preparada uma segunda etapa para ir além do modelo in-memory da seção 8.1
 A tentativa anterior usou dez execuções iniciadas manualmente, sem evidência suficiente de sobreposição. Para eliminar essa dependência de cliques, foi adicionada uma segunda sonda:
 
 - `poc03LaunchPersistentThrottleCoordinatedConcurrencyProbe()` cria dez gatilhos de relógio de execução única, cada um associado a um handler exclusivo.
-- O horário real de disparo pode variar; por isso, os workers registram a chegada em Script Properties e aguardam uma barreira comum de dez participantes, com timeout de 60 segundos. Só depois da chegada de todos eles a fase crítica é liberada.
+- O horário real de disparo pode variar; por isso, os workers registram a chegada em Script Properties e aguardam uma barreira comum de dez participantes, com timeout de 60 segundos. Só depois da chegada de todos eles a fase crítica é liberada. Cada handler recebe o objeto de evento instalável; o `triggerUid` recebido é convertido para string e comparado ao ID único registrado na criação. Isso impede que um gatilho antigo/atrasado seja aceito como worker de uma nova execução da sonda.
 - Cada worker chama a mesma atualização persistente sob `ScriptLock`, mantendo o lock por 350 ms artificialmente para tornar a contenção mensurável.
 - Os dados de cada worker registram timestamps em milissegundos para início da execução, passagem pela barreira, solicitação/aquisição/liberação do lock e conclusão; também registram tempo de espera e tempo segurando o lock.
 - `poc03RunPersistentThrottleCoordinatedConcurrencySummary()` calcula intervalos de execução, máximo de workers simultaneamente ativos, sobreposição entre intervalos e quantidade de workers que esperaram pelo lock. Só retorna PASS se os dez intervalos se sobrepuserem em algum instante, houver contenção mensurável e a distribuição persistida continuar 4 COUNTED, 1 LOCKED_AFTER_FAILURE e 5 BLOCKED.
@@ -416,7 +416,7 @@ A tentativa anterior usou dez execuções iniciadas manualmente, sem evidência 
 
 **Procedimento manual:**
 1. Atualizar o `Code.gs` do projeto isolado com a versão desta branch.
-2. Executar uma única vez `poc03LaunchPersistentThrottleCoordinatedConcurrencyProbe()`. Na primeira execução, autorizar o gerenciamento de gatilhos solicitado pelo Google.
+2. Executar uma única vez `poc03LaunchPersistentThrottleCoordinatedConcurrencyProbe()`. Na primeira execução, autorizar o gerenciamento de gatilhos solicitado pelo Google. A função verifica a cota disponível, cria dez gatilhos e associa cada `triggerUid` ao respectivo handler.
 3. Não abrir dez abas nem executar os workers manualmente. A função cria os dez gatilhos.
 4. Acompanhar em **Execuções** os dez handlers `poc03RunPersistentThrottleCoordinatedWorker00_` até `poc03RunPersistentThrottleCoordinatedWorker09_` e aguardar todos terminarem.
 5. Executar `poc03RunPersistentThrottleCoordinatedConcurrencySummary()` e guardar o log completo.
