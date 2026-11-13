@@ -312,9 +312,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 134a0509ad6ca84f39b5a5262a57ea3ca107bcde
-- **Data do commit:** 2026-11-13T15:37:48-03:00
-- **Mensagem do commit:** fix(poc-03): capturar horario sob lock e validar arquivo sheets
+- **Commit de referência:** 2762b411f1639f3ff713f545f90950b9fca44340
+- **Data do commit:** 2026-11-13T15:40:37-03:00
+- **Mensagem do commit:** fix(poc-03): restaurar isolamento do throttle em script properties
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -409,13 +409,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 2762b41 | 2026-11-13 | fix(poc-03): restaurar isolamento do throttle em script properties |
+| ef54d2f | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 134a050 | 2026-11-13 | fix(poc-03): capturar horario sob lock e validar arquivo sheets |
 | b773728 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | addaa52 | 2026-11-13 | fix(poc-03): preservar datas iso e identificadores como texto no sheets |
 | db6bd2f | 2026-11-13 | docs(ai-context): registrar POC de persistencia concorrente em sheets |
 | 44390fc | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | f09047c | 2026-11-13 | docs(architecture): descrever POC de persistencia concorrente em sheets |
-| f275540 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| 327756a | 2026-11-13 | docs(poc-03): documentar prova concorrente de persistencia em sheets |
 
 <!-- END AUTO-GENERATED SECTION -->
