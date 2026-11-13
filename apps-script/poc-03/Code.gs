@@ -1448,6 +1448,21 @@ var POC03_THROTTLE_TEST_IDENTIFIER =
 var POC03_THROTTLE_CONCURRENCY_HOLD_MS = 150;
 var POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS = 10;
 
+// Sonda coordenada: dez gatilhos de execução única aguardam uma barreira comum.
+var POC03_THROTTLE_COORD_META_KEY =
+    POC03_THROTTLE_TEST_PREFIX + "COORD_META_V1";
+var POC03_THROTTLE_COORD_ARRIVAL_COUNT_KEY =
+    POC03_THROTTLE_TEST_PREFIX + "COORD_ARRIVAL_COUNT_V1";
+var POC03_THROTTLE_COORD_ARRIVAL_PREFIX =
+    POC03_THROTTLE_TEST_PREFIX + "COORD_ARRIVAL_V1_";
+var POC03_THROTTLE_COORD_DETAIL_PREFIX =
+    POC03_THROTTLE_TEST_PREFIX + "COORD_DETAIL_V1_";
+var POC03_THROTTLE_COORDINATED_WORKER_HANDLER =
+    "poc03RunPersistentThrottleCoordinatedConcurrencyWorker_";
+var POC03_THROTTLE_COORDINATED_HOLD_MS = 350;
+var POC03_THROTTLE_COORDINATED_BARRIER_TIMEOUT_MS = 60000;
+var POC03_THROTTLE_COORDINATED_TRIGGER_DELAY_MS = 1000;
+
 /**
  * Retorna somente o Script Properties do projeto isolado.
  * Nunca usar este armazenamento como substituto definitivo da entidade
@@ -1703,7 +1718,19 @@ function poc03RegisterPersistentThrottleFailureForPoc_(
         };
     }
 
+    var timing = safeOptions.timing && typeof safeOptions.timing === "object"
+        ? safeOptions.timing
+        : null;
+    if (timing) {
+        timing.lockRequestedAtMs = Date.now();
+    }
+
     var lockResult = poc03AcquireThrottleScriptLock_();
+
+    if (timing) {
+        timing.lockAcquiredAtMs = lockResult.ok ? Date.now() : null;
+        timing.lockWaitMs = Date.now() - timing.lockRequestedAtMs;
+    }
 
     if (!lockResult.ok) {
         return {
@@ -1818,6 +1845,13 @@ function poc03RegisterPersistentThrottleFailureForPoc_(
             blockedUntilMs: null
         };
     } finally {
+        if (timing) {
+            timing.lockReleasedAtMs = Date.now();
+            timing.lockHeldMs = timing.lockAcquiredAtMs === null
+                ? null
+                : timing.lockReleasedAtMs - timing.lockAcquiredAtMs;
+        }
+
         try {
             lock.releaseLock();
         } catch (error) {
@@ -1960,6 +1994,7 @@ function poc03CorruptPersistentThrottleForPoc_(identifier) {
  * Não chama deleteAllProperties e não toca nas propriedades de POC-02.
  */
 function poc03CleanupPersistentThrottleTestData() {
+    var removedCoordinatedTriggers = poc03DeletePersistentThrottleCoordinatedTriggers_();
     var lockResult = poc03AcquireThrottleScriptLock_();
 
     if (!lockResult.ok) {
@@ -1984,6 +2019,7 @@ function poc03CleanupPersistentThrottleTestData() {
             test: "POC-03 persistent throttle cleanup",
             status: "PASS",
             removedPoc03Properties: removedCount,
+            removedCoordinatedTriggers: removedCoordinatedTriggers,
             scope: "POC03_THROTTLE_TEST_PREFIX_ONLY"
         };
 
@@ -2222,6 +2258,696 @@ function poc03RunPersistentThrottleConcurrencyWorker() {
     }));
 
     return result;
+}
+
+
+/**
+ * Remove somente gatilhos cujo handler é exclusivo desta sonda coordenada.
+ * Não toca em gatilhos de outras funções/projetos.
+ */
+function poc03DeletePersistentThrottleCoordinatedTriggers_() {
+    if (
+        typeof ScriptApp !== "object"
+        || ScriptApp === null
+        || typeof ScriptApp.getProjectTriggers !== "function"
+        || typeof ScriptApp.deleteTrigger !== "function"
+    ) {
+        return 0;
+    }
+
+    var removed = 0;
+    var triggers = ScriptApp.getProjectTriggers();
+
+    triggers.forEach(function (trigger) {
+        try {
+            if (
+                trigger.getHandlerFunction()
+                === POC03_THROTTLE_COORDINATED_WORKER_HANDLER
+            ) {
+                ScriptApp.deleteTrigger(trigger);
+                removed += 1;
+            }
+        } catch (error) {
+            // A limpeza continua para os demais gatilhos da própria sonda.
+        }
+    });
+
+    return removed;
+}
+
+/** Lê e valida os metadados da sonda coordenada. */
+function poc03ReadCoordinatedThrottleMeta_(properties) {
+    var raw = properties.getProperty(POC03_THROTTLE_COORD_META_KEY);
+
+    if (typeof raw !== "string" || raw.length > 8192) {
+        return null;
+    }
+
+    try {
+        var meta = JSON.parse(raw);
+
+        if (
+            !meta
+            || typeof meta !== "object"
+            || meta.schemaVersion !== 1
+            || typeof meta.runId !== "string"
+            || !/^[0-9a-f]{32}$/.test(meta.runId)
+            || meta.expectedWorkers !== POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS
+            || !Array.isArray(meta.triggerIds)
+        ) {
+            return null;
+        }
+
+        return meta;
+    } catch (error) {
+        return null;
+    }
+}
+
+/**
+ * Calcula sobreposição real entre intervalos de execução.
+ * A função é pura para permitir teste automatizado no harness Node/VM.
+ */
+function poc03AnalyzeThrottleConcurrencyIntervalsForPoc_(details) {
+    var valid = (Array.isArray(details) ? details : []).filter(function (item) {
+        return item
+            && Number.isSafeInteger(item.invocationStartedAtMs)
+            && Number.isSafeInteger(item.workerCompletedAtMs)
+            && item.workerCompletedAtMs > item.invocationStartedAtMs;
+    });
+
+    var events = [];
+    valid.forEach(function (item) {
+        events.push({
+            at: item.invocationStartedAtMs,
+            delta: 1
+        });
+        events.push({
+            at: item.workerCompletedAtMs,
+            delta: -1
+        });
+    });
+
+    events.sort(function (left, right) {
+        if (left.at !== right.at) {
+            return left.at - right.at;
+        }
+
+        // Em um mesmo milissegundo, término vem antes de início.
+        return left.delta - right.delta;
+    });
+
+    var active = 0;
+    var maxConcurrentWorkers = 0;
+
+    events.forEach(function (event) {
+        active += event.delta;
+        if (active > maxConcurrentWorkers) {
+            maxConcurrentWorkers = active;
+        }
+    });
+
+    var pairwiseOverlapCount = 0;
+    for (var i = 0; i < valid.length; i += 1) {
+        for (var j = i + 1; j < valid.length; j += 1) {
+            var overlaps = (
+                valid[i].invocationStartedAtMs < valid[j].workerCompletedAtMs
+                && valid[j].invocationStartedAtMs < valid[i].workerCompletedAtMs
+            );
+
+            if (overlaps) {
+                pairwiseOverlapCount += 1;
+            }
+        }
+    }
+
+    var latestStart = null;
+    var earliestEnd = null;
+
+    if (valid.length > 0) {
+        latestStart = Math.max.apply(
+            null,
+            valid.map(function (item) {
+                return item.invocationStartedAtMs;
+            })
+        );
+        earliestEnd = Math.min.apply(
+            null,
+            valid.map(function (item) {
+                return item.workerCompletedAtMs;
+            })
+        );
+    }
+
+    return {
+        validIntervals: valid.length,
+        maxConcurrentWorkers: maxConcurrentWorkers,
+        pairwiseOverlapCount: pairwiseOverlapCount,
+        allWorkersOverlapAtOneInstant: valid.length === details.length
+            && valid.length > 0
+            && latestStart < earliestEnd,
+        commonOverlapWindowMs: (
+            valid.length > 0 && latestStart < earliestEnd
+        ) ? earliestEnd - latestStart : 0
+    };
+}
+
+/**
+ * Cria dez gatilhos de execução única. Cada worker aguarda a chegada de todos
+ * os dez antes de disputar o ScriptLock. O horário real dos gatilhos pode variar;
+ * a barreira elimina a dependência de disparos no mesmo instante.
+ */
+function poc03LaunchPersistentThrottleCoordinatedConcurrencyProbe() {
+    if (
+        typeof ScriptApp !== "object"
+        || ScriptApp === null
+        || typeof ScriptApp.newTrigger !== "function"
+        || typeof ScriptApp.getProjectTriggers !== "function"
+    ) {
+        throw new Error("SCRIPT_TRIGGER_SERVICE_UNAVAILABLE");
+    }
+
+    // Limpa somente gatilhos do handler exclusivo e propriedades sintéticas antigas.
+    poc03CleanupPersistentThrottleTestData();
+
+    var currentTriggers = ScriptApp.getProjectTriggers();
+    var maxTriggers = 20;
+
+    if (
+        currentTriggers.length
+        + POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS
+        > maxTriggers
+    ) {
+        throw new Error(
+            "TRIGGER_QUOTA_CAPACITY_INSUFFICIENT: remova ou aguarde gatilhos deste projeto."
+        );
+    }
+
+    var lockResult = poc03AcquireThrottleScriptLock_();
+
+    if (!lockResult.ok) {
+        throw new Error("Não foi possível obter lock para preparar a sonda coordenada.");
+    }
+
+    var lock = lockResult.lock;
+    var createdTriggers = [];
+
+    try {
+        var properties = poc03GetThrottleTestProperties_();
+        poc03GetOrCreateThrottleTestSecretLocked_(properties);
+
+        var runId = Utilities.getUuid().replace(/-/g, "").toLowerCase();
+
+        if (!/^[0-9a-f]{32}$/.test(runId)) {
+            throw new Error("Identificador da sonda coordenada inválido.");
+        }
+
+        var meta = {
+            schemaVersion: 1,
+            runId: runId,
+            ready: false,
+            expectedWorkers: POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS,
+            triggerIds: [],
+            createdAtMs: Date.now()
+        };
+
+        properties.setProperty(
+            POC03_THROTTLE_COORD_META_KEY,
+            JSON.stringify(meta)
+        );
+        properties.setProperty(POC03_THROTTLE_COORD_ARRIVAL_COUNT_KEY, "0");
+        properties.setProperty(POC03_THROTTLE_PROBE_RUN_ID_KEY, runId);
+        properties.setProperty(POC03_THROTTLE_PROBE_RESULTS_KEY, "[]");
+
+        for (
+            var index = 0;
+            index < POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS;
+            index += 1
+        ) {
+            var trigger = ScriptApp
+                .newTrigger(POC03_THROTTLE_COORDINATED_WORKER_HANDLER)
+                .timeBased()
+                .after(POC03_THROTTLE_COORDINATED_TRIGGER_DELAY_MS)
+                .create();
+
+            var triggerId = String(trigger.getUniqueId());
+
+            if (!/^[0-9]+$/.test(triggerId)) {
+                throw new Error("TRIGGER_ID_INVALID");
+            }
+
+            createdTriggers.push(trigger);
+            meta.triggerIds.push(triggerId);
+        }
+
+        meta.ready = true;
+        meta.armedAtMs = Date.now();
+
+        properties.setProperty(
+            POC03_THROTTLE_COORD_META_KEY,
+            JSON.stringify(meta)
+        );
+
+        var summary = {
+            test: "Persistent throttle coordinated concurrency probe",
+            status: "READY",
+            expectedWorkers: meta.expectedWorkers,
+            createdTriggers: createdTriggers.length,
+            triggerDelayMinimumMs: POC03_THROTTLE_COORDINATED_TRIGGER_DELAY_MS,
+            barrierTimeoutMs: POC03_THROTTLE_COORDINATED_BARRIER_TIMEOUT_MS,
+            artificialLockHoldMs: POC03_THROTTLE_COORDINATED_HOLD_MS,
+            synchronization: "ALL_WORKERS_ARRIVAL_BARRIER",
+            triggerSchedule: "ONE_SHOT_TIME_DRIVEN_MINIMUM_DELAY"
+        };
+
+        Logger.log(JSON.stringify(summary));
+        return summary;
+    } catch (error) {
+        createdTriggers.forEach(function (trigger) {
+            try {
+                ScriptApp.deleteTrigger(trigger);
+            } catch (deleteError) {
+                // A limpeza das demais execuções continua.
+            }
+        });
+
+        throw error;
+    } finally {
+        try {
+            lock.releaseLock();
+        } catch (error) {
+            // No-op.
+        }
+    }
+}
+
+/**
+ * Worker acionado por um gatilho de execução única.
+ * Ele registra chegada, espera os dez workers na barreira e então disputa
+ * o ScriptLock com espera artificial de 350 ms dentro da seção crítica.
+ */
+function poc03RunPersistentThrottleCoordinatedConcurrencyWorker_(event) {
+    var invocationStartedAtMs = Date.now();
+    var triggerUid = event && event.triggerUid !== undefined
+        ? String(event.triggerUid)
+        : null;
+    var properties = null;
+    var meta = null;
+    var workerIndex = -1;
+    var detail = null;
+
+    try {
+        properties = poc03GetThrottleTestProperties_();
+
+        var metadataDeadline = Date.now()
+            + POC03_THROTTLE_COORDINATED_BARRIER_TIMEOUT_MS;
+
+        while (Date.now() < metadataDeadline) {
+            meta = poc03ReadCoordinatedThrottleMeta_(properties);
+
+            if (meta && meta.ready === true) {
+                break;
+            }
+
+            Utilities.sleep(100);
+        }
+
+        if (!meta || meta.ready !== true || !triggerUid) {
+            throw new Error("COORDINATED_PROBE_METADATA_UNAVAILABLE");
+        }
+
+        workerIndex = meta.triggerIds.indexOf(triggerUid);
+
+        if (workerIndex < 0) {
+            throw new Error("COORDINATED_PROBE_TRIGGER_NOT_REGISTERED");
+        }
+
+        var arrivalLockResult = poc03AcquireThrottleScriptLock_();
+
+        if (!arrivalLockResult.ok) {
+            detail = {
+                status: arrivalLockResult.reason,
+                workerIndex: workerIndex,
+                invocationStartedAtMs: invocationStartedAtMs,
+                workerCompletedAtMs: Date.now(),
+                runId: meta.runId
+            };
+            properties.setProperty(
+                POC03_THROTTLE_COORD_DETAIL_PREFIX + workerIndex,
+                JSON.stringify(detail)
+            );
+            return detail;
+        }
+
+        var arrivalLock = arrivalLockResult.lock;
+
+        try {
+            var currentMeta = poc03ReadCoordinatedThrottleMeta_(properties);
+
+            if (!currentMeta || currentMeta.runId !== meta.runId) {
+                throw new Error("COORDINATED_PROBE_RUN_MISMATCH");
+            }
+
+            var arrivalKey = POC03_THROTTLE_COORD_ARRIVAL_PREFIX + workerIndex;
+
+            if (properties.getProperty(arrivalKey) !== null) {
+                throw new Error("COORDINATED_PROBE_DUPLICATE_ARRIVAL");
+            }
+
+            properties.setProperty(arrivalKey, String(Date.now()));
+
+            var arrivalCount = Number(
+                properties.getProperty(POC03_THROTTLE_COORD_ARRIVAL_COUNT_KEY)
+            );
+
+            if (
+                !Number.isInteger(arrivalCount)
+                || arrivalCount < 0
+                || arrivalCount >= POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS
+            ) {
+                throw new Error("COORDINATED_PROBE_ARRIVAL_COUNT_INVALID");
+            }
+
+            properties.setProperty(
+                POC03_THROTTLE_COORD_ARRIVAL_COUNT_KEY,
+                String(arrivalCount + 1)
+            );
+        } finally {
+            try {
+                arrivalLock.releaseLock();
+            } catch (error) {
+                // No-op.
+            }
+        }
+
+        var barrierStartedAtMs = Date.now();
+        var barrierDeadline = barrierStartedAtMs
+            + POC03_THROTTLE_COORDINATED_BARRIER_TIMEOUT_MS;
+        var arrivedCount = 0;
+
+        while (Date.now() < barrierDeadline) {
+            arrivedCount = Number(
+                properties.getProperty(POC03_THROTTLE_COORD_ARRIVAL_COUNT_KEY)
+            );
+
+            if (
+                Number.isInteger(arrivedCount)
+                && arrivedCount === POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS
+            ) {
+                break;
+            }
+
+            Utilities.sleep(100);
+        }
+
+        if (arrivedCount !== POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS) {
+            detail = {
+                status: "BARRIER_TIMEOUT",
+                workerIndex: workerIndex,
+                invocationStartedAtMs: invocationStartedAtMs,
+                barrierStartedAtMs: barrierStartedAtMs,
+                workerCompletedAtMs: Date.now(),
+                observedArrivals: arrivedCount,
+                runId: meta.runId
+            };
+
+            properties.setProperty(
+                POC03_THROTTLE_COORD_DETAIL_PREFIX + workerIndex,
+                JSON.stringify(detail)
+            );
+
+            return detail;
+        }
+
+        var barrierPassedAtMs = Date.now();
+        var workerCallStartedAtMs = Date.now();
+        var timing = {};
+
+        var result = poc03RegisterPersistentThrottleFailureForPoc_(
+            POC03_THROTTLE_TEST_IDENTIFIER,
+            workerCallStartedAtMs,
+            {
+                holdLockMs: POC03_THROTTLE_COORDINATED_HOLD_MS,
+                timing: timing
+            }
+        );
+
+        var workerCompletedAtMs = Date.now();
+
+        detail = {
+            runId: meta.runId,
+            workerIndex: workerIndex,
+            status: result.status,
+            allowed: result.allowed,
+            failureCount: result.failureCount,
+            invocationStartedAtMs: invocationStartedAtMs,
+            barrierStartedAtMs: barrierStartedAtMs,
+            barrierPassedAtMs: barrierPassedAtMs,
+            workerCallStartedAtMs: workerCallStartedAtMs,
+            workerCompletedAtMs: workerCompletedAtMs,
+            barrierWaitMs: barrierPassedAtMs - barrierStartedAtMs,
+            lockRequestedAtMs: timing.lockRequestedAtMs || null,
+            lockAcquiredAtMs: timing.lockAcquiredAtMs || null,
+            lockReleasedAtMs: timing.lockReleasedAtMs || null,
+            lockWaitMs: timing.lockWaitMs === undefined ? null : timing.lockWaitMs,
+            lockHeldMs: timing.lockHeldMs === undefined ? null : timing.lockHeldMs
+        };
+
+        properties.setProperty(
+            POC03_THROTTLE_COORD_DETAIL_PREFIX + workerIndex,
+            JSON.stringify(detail)
+        );
+
+        Logger.log(JSON.stringify({
+            test: "Persistent throttle coordinated worker",
+            workerIndex: workerIndex,
+            status: detail.status,
+            lockWaitMs: detail.lockWaitMs,
+            lockHeldMs: detail.lockHeldMs
+        }));
+
+        return detail;
+    } catch (error) {
+        detail = detail || {
+            status: "WORKER_EXCEPTION",
+            workerIndex: workerIndex,
+            invocationStartedAtMs: invocationStartedAtMs,
+            workerCompletedAtMs: Date.now(),
+            runId: meta && meta.runId ? meta.runId : null,
+            errorName: error && error.name ? String(error.name) : "Error"
+        };
+
+        if (properties && workerIndex >= 0 && meta && meta.runId) {
+            try {
+                properties.setProperty(
+                    POC03_THROTTLE_COORD_DETAIL_PREFIX + workerIndex,
+                    JSON.stringify(detail)
+                );
+            } catch (writeError) {
+                // O resumo identificará o worker ausente.
+            }
+        }
+
+        Logger.log(JSON.stringify({
+            test: "Persistent throttle coordinated worker",
+            workerIndex: workerIndex,
+            status: detail.status
+        }));
+
+        return detail;
+    } finally {
+        if (triggerUid) {
+            poc03DeletePersistentThrottleCoordinatedTriggerByUid_(triggerUid);
+        }
+    }
+}
+
+/** Remove um único gatilho pertencente ao handler exclusivo da sonda. */
+function poc03DeletePersistentThrottleCoordinatedTriggerByUid_(triggerUid) {
+    if (
+        !triggerUid
+        || typeof ScriptApp !== "object"
+        || ScriptApp === null
+        || typeof ScriptApp.getProjectTriggers !== "function"
+        || typeof ScriptApp.deleteTrigger !== "function"
+    ) {
+        return false;
+    }
+
+    var triggers = ScriptApp.getProjectTriggers();
+
+    for (var i = 0; i < triggers.length; i += 1) {
+        try {
+            if (
+                String(triggers[i].getUniqueId()) === String(triggerUid)
+                && triggers[i].getHandlerFunction()
+                    === POC03_THROTTLE_COORDINATED_WORKER_HANDLER
+            ) {
+                ScriptApp.deleteTrigger(triggers[i]);
+                return true;
+            }
+        } catch (error) {
+            // Segue para os demais gatilhos.
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Resume a execução coordenada e só aprova concorrência se os intervalos
+ * de execução realmente se sobrepuserem e houver espera mensurável pelo lock.
+ */
+function poc03RunPersistentThrottleCoordinatedConcurrencySummary() {
+    var lockResult = poc03AcquireThrottleScriptLock_();
+
+    if (!lockResult.ok) {
+        throw new Error("Não foi possível obter lock para consultar a sonda coordenada.");
+    }
+
+    var lock = lockResult.lock;
+
+    try {
+        var properties = poc03GetThrottleTestProperties_();
+        var meta = poc03ReadCoordinatedThrottleMeta_(properties);
+
+        if (!meta || meta.ready !== true) {
+            throw new Error("Sonda coordenada não foi inicializada.");
+        }
+
+        var details = [];
+
+        for (
+            var index = 0;
+            index < POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS;
+            index += 1
+        ) {
+            var rawDetail = properties.getProperty(
+                POC03_THROTTLE_COORD_DETAIL_PREFIX + index
+            );
+
+            if (typeof rawDetail !== "string") {
+                continue;
+            }
+
+            try {
+                var detail = JSON.parse(rawDetail);
+
+                if (
+                    detail
+                    && detail.runId === meta.runId
+                    && detail.workerIndex === index
+                ) {
+                    details.push(detail);
+                }
+            } catch (error) {
+                // Detalhe inválido é contado como worker ausente.
+            }
+        }
+
+        var counted = details.filter(function (item) {
+            return item.status === "COUNTED";
+        }).length;
+        var locked = details.filter(function (item) {
+            return item.status === "LOCKED_AFTER_FAILURE";
+        }).length;
+        var blocked = details.filter(function (item) {
+            return item.status === "BLOCKED";
+        }).length;
+        var lockUnavailable = details.filter(function (item) {
+            return item.status === "LOCK_TIMEOUT"
+                || item.status === "LOCK_UNAVAILABLE";
+        }).length;
+        var barrierTimeouts = details.filter(function (item) {
+            return item.status === "BARRIER_TIMEOUT";
+        }).length;
+        var workerErrors = details.filter(function (item) {
+            return item.status === "WORKER_EXCEPTION"
+                || item.status === "PERSISTENCE_UNAVAILABLE"
+                || item.status === "PERSISTED_STATE_CORRUPT";
+        }).length;
+
+        var waitSamples = details
+            .filter(function (item) {
+                return Number.isSafeInteger(item.lockWaitMs);
+            })
+            .map(function (item) {
+                return item.lockWaitMs;
+            })
+            .sort(function (left, right) {
+                return left - right;
+            });
+
+        var contendedWorkers = waitSamples.filter(function (value) {
+            return value >= 25;
+        }).length;
+        var maxLockWaitMs = waitSamples.length > 0
+            ? waitSamples[waitSamples.length - 1]
+            : null;
+        var concurrency = poc03AnalyzeThrottleConcurrencyIntervalsForPoc_(details);
+
+        var stateKey = poc03GetThrottleTestStateKeyLocked_(
+            properties,
+            POC03_THROTTLE_TEST_IDENTIFIER
+        );
+        var stored = poc03ReadPersistentThrottleStateLocked_(
+            properties,
+            stateKey
+        );
+
+        if (!stored.ok || !stored.exists) {
+            throw new Error("Estado final persistido não está disponível.");
+        }
+
+        var passed = details.length === POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS
+            && counted === 4
+            && locked === 1
+            && blocked === 5
+            && lockUnavailable === 0
+            && barrierTimeouts === 0
+            && workerErrors === 0
+            && concurrency.maxConcurrentWorkers > 1
+            && concurrency.allWorkersOverlapAtOneInstant === true
+            && contendedWorkers >= 2
+            && stored.state.failureCount === POC03_LOGIN_FAILURE_LIMIT
+            && stored.state.blockedUntilMs > Date.now();
+
+        var summary = {
+            test: "Persistent throttle — coordinated concurrent execution",
+            status: passed ? "PASS" : "INCOMPLETE_OR_FAIL",
+            expectedWorkers: POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS,
+            observedWorkers: details.length,
+            countedBeforeLimit: counted,
+            lockedAtLimit: locked,
+            rejectedWhileLocked: blocked,
+            lockUnavailable: lockUnavailable,
+            barrierTimeouts: barrierTimeouts,
+            workerErrors: workerErrors,
+            maxConcurrentWorkers: concurrency.maxConcurrentWorkers,
+            pairwiseOverlapCount: concurrency.pairwiseOverlapCount,
+            allWorkersOverlapAtOneInstant: concurrency.allWorkersOverlapAtOneInstant,
+            commonOverlapWindowMs: concurrency.commonOverlapWindowMs,
+            contendedWorkers: contendedWorkers,
+            maxLockWaitMs: maxLockWaitMs,
+            minLockWaitMs: waitSamples.length > 0 ? waitSamples[0] : null,
+            finalFailureCount: stored.state.failureCount,
+            finalStateBlocked: stored.state.blockedUntilMs > Date.now(),
+            synchronization: "SCRIPT_LOCK_WITH_ALL_WORKERS_BARRIER",
+            persistence: "SCRIPT_PROPERTIES_TEST_ONLY",
+            artificialLockHoldMs: POC03_THROTTLE_COORDINATED_HOLD_MS,
+            barrierTimeoutMs: POC03_THROTTLE_COORDINATED_BARRIER_TIMEOUT_MS,
+            intervalResolution: "DATE_NOW_MILLISECONDS"
+        };
+
+        Logger.log(JSON.stringify(summary));
+        return summary;
+    } finally {
+        try {
+            lock.releaseLock();
+        } catch (error) {
+            // No-op.
+        }
+    }
 }
 
 /**
