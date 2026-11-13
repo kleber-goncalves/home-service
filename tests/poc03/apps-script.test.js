@@ -409,6 +409,41 @@ test("POC-03: persistent throttle exposes lock timing telemetry when requested",
   context.poc03CleanupPersistentThrottleTestData();
 });
 
+
+test("POC-03: coordinated worker rejects a stale trigger UID", () => {
+  const { context, propertyStore } = createAppsScriptHarness();
+
+  const handlers = Array.from({ length: 10 }, (_, index) =>
+    `poc03RunPersistentThrottleCoordinatedWorker${String(index).padStart(2, "0")}_`,
+  );
+  const triggerIds = Array.from({ length: 10 }, (_, index) =>
+    String(900000 + index),
+  );
+
+  propertyStore.set(
+    "POC03_THROTTLE_TEST_COORD_META_V1",
+    JSON.stringify({
+      schemaVersion: 1,
+      runId: "a".repeat(32),
+      ready: true,
+      expectedWorkers: 10,
+      workerHandlers: handlers,
+      triggerIds,
+    }),
+  );
+
+  const result = context.poc03RunPersistentThrottleCoordinatedWorker00_({
+    triggerUid: "123456789",
+  });
+
+  assert.equal(result.status, "STALE_OR_UNMATCHED_TRIGGER");
+  assert.equal(
+    propertyStore.has("POC03_THROTTLE_TEST_COORD_DETAIL_V1_0"),
+    false,
+    "a stale trigger must not write into the current probe run",
+  );
+});
+
 test("POC-03: Argon2id WASM passa vetores independentes e perfil OWASP", async () => {
   const { context, logs } = createAppsScriptHarness();
 
