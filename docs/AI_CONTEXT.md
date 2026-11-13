@@ -309,9 +309,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 0301da7e5bc7b10b38adfa6f3c4afc92c02cea56
-- **Data do commit:** 2026-11-13T15:32:24-03:00
-- **Mensagem do commit:** fix(poc-03): usar lock dedicado e flush unico no sheets
+- **Commit de referência:** 327756ad9809d18249e98284140c10010a2b2c5a
+- **Data do commit:** 2026-11-13T15:33:47-03:00
+- **Mensagem do commit:** docs(poc-03): documentar prova concorrente de persistencia em sheets
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -406,13 +406,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 327756a | 2026-11-13 | docs(poc-03): documentar prova concorrente de persistencia em sheets |
+| 6a365cf | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 0301da7 | 2026-11-13 | fix(poc-03): usar lock dedicado e flush unico no sheets |
 | a22cde9 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | ff0a512 | 2026-11-13 | test(poc-03): cobrir mapeamento e read-write de throttle em sheets |
 | 1202d57 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 89e8490 | 2026-11-13 | fix(poc-03): endurecer validação e espera de lock para sheets |
 | 5d64865 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| 28244a2 | 2026-11-13 | test(poc-03): adicionar prova de persistencia concorrente em sheets |
-| a84872b | 2026-11-13 | docs(ai-context): registrar limpeza da sonda coordenada |
 
 <!-- END AUTO-GENERATED SECTION -->
