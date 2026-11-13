@@ -314,9 +314,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 9bb062b545a800684a35944d9b0186e3b4c7ca63
-- **Data do commit:** 2026-11-13T16:41:31-03:00
-- **Mensagem do commit:** docs(poc-03): registrar CI do comparador 22 de 22
+- **Commit de referência:** 95d9ae38dbfe36c7ad38b972ba955f266ae02b49
+- **Data do commit:** 2026-11-13T17:02:53-03:00
+- **Mensagem do commit:** test(poc-03): cobrir comparador XOR experimental
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -411,13 +411,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 95d9ae3 | 2026-11-13 | test(poc-03): cobrir comparador XOR experimental |
+| 9b3d913 | 2026-11-13 | docs(ai-context): registrar CI do comparador |
+| eb388ea | 2026-11-13 | docs(architecture): registrar testes do comparador |
+| 06783f6 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 9bb062b | 2026-11-13 | docs(poc-03): registrar CI do comparador 22 de 22 |
 | f55d27e | 2026-11-13 | docs(ai-context): registrar comparador Node candidato |
 | ef75c45 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | b42c36a | 2026-11-13 | docs(architecture): registrar comparador Node candidato |
-| bbfd6f3 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| 6d77b9e | 2026-11-13 | docs(poc-03): registrar candidato timingSafeEqual |
-| b3cc0e4 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| 9f6682b | 2026-11-13 | fix(poc-03): explicitar Buffer do runtime Node |
 
 <!-- END AUTO-GENERATED SECTION -->
