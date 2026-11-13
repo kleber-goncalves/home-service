@@ -1736,7 +1736,7 @@ function poc03RegisterPersistentThrottleFailureForPoc_(
         timing.lockRequestedAtMs = Date.now();
     }
 
-    var lockResult = poc03AcquireSheetsThrottleLock_();
+    var lockResult = poc03AcquireThrottleScriptLock_();
 
     if (timing) {
         timing.lockAcquiredAtMs = lockResult.ok ? Date.now() : null;
@@ -1782,7 +1782,7 @@ function poc03RegisterPersistentThrottleFailureForPoc_(
         }
 
         var state = stored.state;
-        var transition = poc03RegisterLoginFailureForPoc_(state, operationNowMs);
+        var transition = poc03RegisterLoginFailureForPoc_(state, nowMs);
 
         if (transition.status !== "BLOCKED") {
             state.updatedAtMs = nowMs;
