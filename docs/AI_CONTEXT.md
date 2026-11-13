@@ -314,9 +314,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** f1e20d184c1147331a146baaa78f9cc223007680
-- **Data do commit:** 2026-11-13T16:35:45-03:00
-- **Mensagem do commit:** test(poc-03): adicionar comparador nativo para hashes Argon2id
+- **Commit de referência:** 38a497b611b30427e7bdca6189de6f832db0c5fa
+- **Data do commit:** 2026-11-13T16:36:09-03:00
+- **Mensagem do commit:** test(poc-03): cobrir comparador timingSafeEqual
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -411,13 +411,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 38a497b | 2026-11-13 | test(poc-03): cobrir comparador timingSafeEqual |
+| 7cbf127 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | f1e20d1 | 2026-11-13 | test(poc-03): adicionar comparador nativo para hashes Argon2id |
 | 506f50f | 2026-11-13 | docs(ai-context): registrar limpeza concluida da POC-03B |
 | c9aa3ce | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 37efd2d | 2026-11-13 | docs(architecture): fechar registro da POC-03B |
 | 94412ac | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 5cc4c9c | 2026-11-13 | docs(poc-03): registrar limpeza final da POC-03B |
-| 769c954 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| d1a7ffd | 2026-11-13 | docs(architecture): refletir validacao real de sheets |
 
 <!-- END AUTO-GENERATED SECTION -->
