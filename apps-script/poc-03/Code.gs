@@ -4169,6 +4169,10 @@ function poc03LaunchSheetsPersistentThrottleConcurrencyProbe() {
             throw new Error("SHEETS_THROTTLE_IDENTIFIER_HASH_INVALID");
         }
 
+        // IDs, hash e instantes ISO permanecem texto; o contador continua numérico.
+        sheet.getRange(1, 1, 2, 2).setNumberFormat("@");
+        sheet.getRange(1, 4, 2, 3).setNumberFormat("@");
+
         sheet.getRange(
             1,
             1,
