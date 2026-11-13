@@ -309,9 +309,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 98c8ca3cb8ef0073a1e98468d3d0997244fa598c
-- **Data do commit:** 2026-11-13T15:21:48-03:00
-- **Mensagem do commit:** docs(poc-03): registrar limpeza coordenada concluida
+- **Commit de referência:** 8335c4bc010307d5b266433c2925c0eedb91fe79
+- **Data do commit:** 2026-11-13T15:21:50-03:00
+- **Mensagem do commit:** docs(architecture): confirmar limpeza da sonda coordenada
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -406,6 +406,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 8335c4b | 2026-11-13 | docs(architecture): confirmar limpeza da sonda coordenada |
 | 98c8ca3 | 2026-11-13 | docs(poc-03): registrar limpeza coordenada concluida |
 | 4c3ae1e | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 13210c6 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
@@ -413,6 +414,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 0125695 | 2026-11-13 | docs(arquitetura): registrar concorrência real do throttling |
 | 62b35a7 | 2026-11-13 | docs(poc-03): registrar concorrência coordenada 10 workers |
 | c1a5f66 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| 6b4df49 | 2026-11-13 | docs(ai-context): registrar limites separados de timeout |
 
 <!-- END AUTO-GENERATED SECTION -->
