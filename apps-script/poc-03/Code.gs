@@ -1457,8 +1457,18 @@ var POC03_THROTTLE_COORD_ARRIVAL_PREFIX =
     POC03_THROTTLE_TEST_PREFIX + "COORD_ARRIVAL_V1_";
 var POC03_THROTTLE_COORD_DETAIL_PREFIX =
     POC03_THROTTLE_TEST_PREFIX + "COORD_DETAIL_V1_";
-var POC03_THROTTLE_COORDINATED_WORKER_HANDLER =
-    "poc03RunPersistentThrottleCoordinatedConcurrencyWorker_";
+var POC03_THROTTLE_COORDINATED_WORKER_HANDLERS = [
+    "poc03RunPersistentThrottleCoordinatedWorker00_",
+    "poc03RunPersistentThrottleCoordinatedWorker01_",
+    "poc03RunPersistentThrottleCoordinatedWorker02_",
+    "poc03RunPersistentThrottleCoordinatedWorker03_",
+    "poc03RunPersistentThrottleCoordinatedWorker04_",
+    "poc03RunPersistentThrottleCoordinatedWorker05_",
+    "poc03RunPersistentThrottleCoordinatedWorker06_",
+    "poc03RunPersistentThrottleCoordinatedWorker07_",
+    "poc03RunPersistentThrottleCoordinatedWorker08_",
+    "poc03RunPersistentThrottleCoordinatedWorker09_"
+];
 var POC03_THROTTLE_COORDINATED_HOLD_MS = 350;
 var POC03_THROTTLE_COORDINATED_BARRIER_TIMEOUT_MS = 60000;
 var POC03_THROTTLE_COORDINATED_TRIGGER_DELAY_MS = 1000;
@@ -2279,8 +2289,9 @@ function poc03DeletePersistentThrottleCoordinatedTriggers_() {
     triggers.forEach(function (trigger) {
         try {
             if (
-                trigger.getHandlerFunction()
-                === POC03_THROTTLE_COORDINATED_WORKER_HANDLER
+                POC03_THROTTLE_COORDINATED_WORKER_HANDLERS.indexOf(
+                    trigger.getHandlerFunction()
+                ) >= 0
             ) {
                 ScriptApp.deleteTrigger(trigger);
                 removed += 1;
@@ -2331,7 +2342,8 @@ function poc03ReadCoordinatedThrottleMeta_(properties) {
             || typeof meta.runId !== "string"
             || !/^[0-9a-f]{32}$/.test(meta.runId)
             || meta.expectedWorkers !== POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS
-            || !Array.isArray(meta.triggerIds)
+            || !Array.isArray(meta.workerHandlers)
+            || meta.workerHandlers.length !== POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS
         ) {
             return null;
         }
@@ -2485,7 +2497,7 @@ function poc03LaunchPersistentThrottleCoordinatedConcurrencyProbe() {
             runId: runId,
             ready: false,
             expectedWorkers: POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS,
-            triggerIds: [],
+            workerHandlers: POC03_THROTTLE_COORDINATED_WORKER_HANDLERS.slice(),
             createdAtMs: Date.now()
         };
 
@@ -2502,20 +2514,14 @@ function poc03LaunchPersistentThrottleCoordinatedConcurrencyProbe() {
             index < POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS;
             index += 1
         ) {
+            var handlerName = POC03_THROTTLE_COORDINATED_WORKER_HANDLERS[index];
             var trigger = ScriptApp
-                .newTrigger(POC03_THROTTLE_COORDINATED_WORKER_HANDLER)
+                .newTrigger(handlerName)
                 .timeBased()
                 .after(POC03_THROTTLE_COORDINATED_TRIGGER_DELAY_MS)
                 .create();
 
-            var triggerId = String(trigger.getUniqueId());
-
-            if (!/^[0-9]+$/.test(triggerId)) {
-                throw new Error("TRIGGER_ID_INVALID");
-            }
-
             createdTriggers.push(trigger);
-            meta.triggerIds.push(triggerId);
         }
 
         meta.ready = true;
@@ -2575,17 +2581,22 @@ function poc03LaunchPersistentThrottleCoordinatedConcurrencyProbe() {
  * Ele registra chegada, espera os dez workers na barreira e então disputa
  * o ScriptLock com espera artificial de 350 ms dentro da seção crítica.
  */
-function poc03RunPersistentThrottleCoordinatedConcurrencyWorker_(event) {
+function poc03RunPersistentThrottleCoordinatedWorkerForIndex_(workerIndex) {
     var invocationStartedAtMs = Date.now();
-    var triggerUid = event && event.triggerUid !== undefined
-        ? String(event.triggerUid)
+    var workerHandler = Number.isInteger(workerIndex)
+        && workerIndex >= 0
+        && workerIndex < POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS
+        ? POC03_THROTTLE_COORDINATED_WORKER_HANDLERS[workerIndex]
         : null;
     var properties = null;
     var meta = null;
-    var workerIndex = -1;
     var detail = null;
 
     try {
+        if (!workerHandler) {
+            throw new Error("COORDINATED_PROBE_WORKER_INDEX_INVALID");
+        }
+
         properties = poc03GetThrottleTestProperties_();
 
         var metadataDeadline = Date.now()
@@ -2601,14 +2612,12 @@ function poc03RunPersistentThrottleCoordinatedConcurrencyWorker_(event) {
             Utilities.sleep(100);
         }
 
-        if (!meta || meta.ready !== true || !triggerUid) {
+        if (
+            !meta
+            || meta.ready !== true
+            || meta.workerHandlers[workerIndex] !== workerHandler
+        ) {
             throw new Error("COORDINATED_PROBE_METADATA_UNAVAILABLE");
-        }
-
-        workerIndex = meta.triggerIds.indexOf(triggerUid);
-
-        if (workerIndex < 0) {
-            throw new Error("COORDINATED_PROBE_TRIGGER_NOT_REGISTERED");
         }
 
         var arrivalLockResult = poc03AcquireThrottleScriptLock_();
@@ -2785,16 +2794,16 @@ function poc03RunPersistentThrottleCoordinatedConcurrencyWorker_(event) {
 
         return detail;
     } finally {
-        if (triggerUid) {
-            poc03DeletePersistentThrottleCoordinatedTriggerByUid_(triggerUid);
+        if (workerHandler) {
+            poc03DeletePersistentThrottleCoordinatedTriggerByHandler_(workerHandler);
         }
     }
 }
 
-/** Remove um único gatilho pertencente ao handler exclusivo da sonda. */
-function poc03DeletePersistentThrottleCoordinatedTriggerByUid_(triggerUid) {
+/** Remove um único gatilho pelo handler exclusivo do worker. */
+function poc03DeletePersistentThrottleCoordinatedTriggerByHandler_(handlerName) {
     if (
-        !triggerUid
+        POC03_THROTTLE_COORDINATED_WORKER_HANDLERS.indexOf(handlerName) < 0
         || typeof ScriptApp !== "object"
         || ScriptApp === null
         || typeof ScriptApp.getProjectTriggers !== "function"
@@ -2807,11 +2816,7 @@ function poc03DeletePersistentThrottleCoordinatedTriggerByUid_(triggerUid) {
 
     for (var i = 0; i < triggers.length; i += 1) {
         try {
-            if (
-                String(triggers[i].getUniqueId()) === String(triggerUid)
-                && triggers[i].getHandlerFunction()
-                    === POC03_THROTTLE_COORDINATED_WORKER_HANDLER
-            ) {
+            if (triggers[i].getHandlerFunction() === handlerName) {
                 ScriptApp.deleteTrigger(triggers[i]);
                 return true;
             }
@@ -2821,6 +2826,39 @@ function poc03DeletePersistentThrottleCoordinatedTriggerByUid_(triggerUid) {
     }
 
     return false;
+}
+
+// Cada gatilho tem um handler distinto: isso evita depender da conversão
+// numérica/string do triggerUid entregue pelo objeto de evento do Google.
+function poc03RunPersistentThrottleCoordinatedWorker00_() {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(0);
+}
+function poc03RunPersistentThrottleCoordinatedWorker01_() {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(1);
+}
+function poc03RunPersistentThrottleCoordinatedWorker02_() {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(2);
+}
+function poc03RunPersistentThrottleCoordinatedWorker03_() {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(3);
+}
+function poc03RunPersistentThrottleCoordinatedWorker04_() {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(4);
+}
+function poc03RunPersistentThrottleCoordinatedWorker05_() {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(5);
+}
+function poc03RunPersistentThrottleCoordinatedWorker06_() {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(6);
+}
+function poc03RunPersistentThrottleCoordinatedWorker07_() {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(7);
+}
+function poc03RunPersistentThrottleCoordinatedWorker08_() {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(8);
+}
+function poc03RunPersistentThrottleCoordinatedWorker09_() {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(9);
 }
 
 /**
