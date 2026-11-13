@@ -308,9 +308,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** e85d7b167b2cc3941859ad9ed9a21ee509924c56
-- **Data do commit:** 2026-11-13T14:50:23-03:00
-- **Mensagem do commit:** docs(arquitetura): ampliar barreira da sonda coordenada
+- **Commit de referência:** e3edf1d9476fa870256f33cb6907b417ad3254f6
+- **Data do commit:** 2026-11-13T14:50:46-03:00
+- **Mensagem do commit:** test(poc-03): separar timeout de configuração e barreira
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -405,13 +405,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| e3edf1d | 2026-11-13 | test(poc-03): separar timeout de configuração e barreira |
+| d4ef4f4 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
+| df74178 | 2026-11-13 | docs(ai-context): registrar timeout da barreira concorrente |
 | e85d7b1 | 2026-11-13 | docs(arquitetura): ampliar barreira da sonda coordenada |
 | 388f249 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | de15449 | 2026-11-13 | docs(poc-03): ampliar timeout da barreira coordenada |
 | c1e2799 | 2026-11-13 | test(poc-03): ampliar tolerância da barreira concorrente |
 | 07e4d16 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| 374b8ce | 2026-11-13 | docs(ai-context): registrar validação de triggerUid e próximos passos |
-| 39ce0fb | 2026-11-13 | docs(arquitetura): documentar validação de triggerUid |
-| fb88e5e | 2026-11-13 | docs(poc-03): registrar vínculo seguro dos gatilhos coordenados |
 
 <!-- END AUTO-GENERATED SECTION -->
