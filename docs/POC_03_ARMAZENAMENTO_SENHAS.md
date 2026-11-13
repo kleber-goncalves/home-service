@@ -483,7 +483,7 @@ O serviço de propriedades tem limites documentados: 9 KB por valor, 500 KB por 
 
 O método `File.setTrashed(true)` move o arquivo para a lixeira do Drive; não é exclusão permanente. A primeira execução que usa o Drive poderá solicitar autorização adicional. Se o resumo estiver incompleto ou algum worker não tiver concluído, a limpeza recusa a remoção para preservar a planilha e a evidência para inspeção.
 
-**Validação automatizada:** o harness Node/VM verifica oito casos puros de mapeamento/validação das seis colunas e dez transições sequenciais sobre um mock de Sheets, incluindo cinco gravações e o contador final. Isso não comprova concorrência nem persistência no serviço Google real.
+**Validação automatizada:** o harness Node/VM verifica oito casos puros de mapeamento/validação das seis colunas e dez transições sequenciais sobre um mock de Sheets, incluindo cinco gravações e o contador final. No CI de 2026-11-13, a suíte POC-03 executou **19 testes, 19 PASS, 0 FAIL**; os workflows de push #350 e PR #351 concluíram com **SUCCESS**, incluindo auditoria de dependências, testes POC-01/02/03, validação do registro de ocorrências, ESLint e build de produção. Isso valida o código e o mock, mas **não** comprova concorrência nem persistência no serviço Google real.
 
 **Limites:** a aprovação desta POC só demonstrará o comportamento em uma planilha temporária pequena, sob `ScriptLock` global do projeto. Não demonstra throughput, SLA, escala de produção, integridade relacional completa ou mitigação contra lockout DoS. Não autoriza login nem uso de dados reais.
 
