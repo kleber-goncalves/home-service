@@ -444,7 +444,7 @@ O serviço de propriedades tem limites documentados: 9 KB por valor, 500 KB por 
 
 ### 8.17. POC-03B — leitura-modificação-gravação concorrente em Google Sheets
 
-**Estado do código:** implementado na branch `feat/poc-03-password-kdf`; validação automatizada concluída. A execução manual no Apps Script real permanece pendente. Esta prova é separada do ensaio anterior em Script Properties.
+**Estado da POC:** código, CI e execução manual no Apps Script/Google Sheets real concluídos com PASS em 2026-11-13. A planilha temporária e os metadados de coordenação ainda aguardam a limpeza final; não iniciar uma nova execução antes de executar a função de cleanup desta POC.
 
 **Objetivo:** comprovar no serviço real do Google Sheets que dez execuções independentes conseguem atualizar o mesmo registro sintético de controle de autenticação sem perder incrementos, com leitura, transição e gravação protegidas por `LockService.getScriptLock()`.
 
@@ -463,6 +463,12 @@ O serviço de propriedades tem limites documentados: 9 KB por valor, 500 KB por 
 - O worker lê os seis campos, aplica `poc03RegisterLoginFailureForPoc_`, atualiza a mesma linha e chama `SpreadsheetApp.flush()` antes de liberar o lock.
 - A retenção artificial de 350 ms dentro da seção crítica existe apenas para tornar a contenção mensurável. Não representa latência normal ou benchmark.
 - A aquisição do lock nesta prova usa timeout de 45 segundos para acomodar as chamadas de serviço do Sheets. O limite não altera o algoritmo funcional de cinco falhas em 15 minutos e bloqueio por 15 minutos.
+
+**Execução manual real — 2026-11-13, resumo às 16:04:04: PASS.** O teste de mapeamento físico executado às 15:50:01 passou 8/8 (PURE_MAPPING_ONLY_NO_GOOGLE_SERVICE). O lançador executado às 15:51:51 retornou READY, criou dez gatilhos e uma planilha independente denominada POC-03 TEMPORARIA - CONTROLE_AUTENTICACAO - 7f23c5998ac943fb95c0b67243529be8, com a aba CONTROLE_AUTENTICACAO_POC, seis colunas e um registro sintético. O log confirmou businessSpreadsheetUsed=false.
+
+O histórico de Execuções mostrou os dez handlers poc03RunSheetsThrottleWorker00_ a poc03RunSheetsThrottleWorker09_ concluídos. O resumo manual retornou observedWorkers=10; maxConcurrentWorkers=10; pairwiseOverlapCount=45; allWorkersOverlapAtOneInstant=true; commonOverlapWindowMs=1760; contendedWorkers=10; espera pelo lock entre 57 ms e 17.155 ms; successfulSheetWrites=5; distribuição 4 COUNTED, 1 LOCKED_AFTER_FAILURE, 5 BLOCKED; contador final 5 e finalStateBlocked=true; lockUnavailable=0, barrierTimeouts=0 e workerErrors=0. O armazenamento de estado foi GOOGLE_SHEETS_TEMP_SPREADSHEET; Script Properties guardou somente metadados de coordenação/telemetria. businessSpreadsheetUsed=false.
+
+**Conclusão da evidência:** esta execução comprova que, neste teste isolado e com dez execuções concorrentes, o ScriptLock protegeu a leitura-modificação-gravação da mesma linha no Google Sheets temporário, sem perda dos incrementos e com estado final esperado. A contenção significativa (espera máxima de 17,155 s) também evidencia custo de serialização; a seção crítica incluiu retenção artificial de 350 ms. Não é benchmark, SLA, teste de escala nem aprovação para produção. **Limpeza final ainda pendente:** preservar o resumo e executar poc03CleanupSheetsPersistentThrottleProbe(); não apagar manualmente a planilha nem as propriedades antes dessa confirmação.
 
 **Critérios de aprovação do resumo manual:**
 - 10 workers concluídos e observados.
