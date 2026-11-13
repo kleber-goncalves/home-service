@@ -20,6 +20,7 @@ const expectedVendorSha256 =
 function createAppsScriptHarness({
   lockUnavailable = false,
   propertiesUnavailable = false,
+  spreadsheetApp = {},
 } = {}) {
   const logs = [];
   const propertyStore = new Map();
@@ -99,6 +100,7 @@ function createAppsScriptHarness({
       },
     },
     WebAssembly,
+    SpreadsheetApp: spreadsheetApp,
     Logger: {
       log(message) {
         logs.push(String(message));
@@ -460,4 +462,130 @@ test("POC-03: Argon2id WASM passa vetores independentes e perfil OWASP", async (
     ),
     logs.join("\\n"),
   );
+});
+
+
+test("POC-03: mapeamento físico de CONTROLE_AUTENTICACAO preserva regras e ISO UTC", () => {
+  const { context, logs } = createAppsScriptHarness();
+
+  const result = context.poc03RunSheetsThrottleRecordMappingTests();
+
+  assert.equal(result.status, "PASS");
+  assert.equal(result.testsPassed, 8);
+  assert.equal(result.testsTotal, 8);
+  assert.equal(result.columns, 6);
+  assert.equal(result.dateStorage, "ISO_8601_UTC_TEXT");
+  assert.ok(
+    logs.some((line) =>
+      line.includes('"test":"CONTROLE_AUTENTICACAO Sheets row mapping — isolated POC","status":"PASS"'),
+    ),
+    logs.join("\n"),
+  );
+});
+
+test("POC-03: read-modify-write do throttle mantém limite no mock do Sheets", () => {
+  const headers = [
+    "id_controle",
+    "identificador_hash",
+    "tentativas_falhas",
+    "inicio_janela_em",
+    "bloqueado_ate",
+    "atualizado_em",
+  ];
+  const recordId = "550e8400-e29b-41d4-a716-446655440000";
+  const identifierHash = "a".repeat(64);
+  const rows = [
+    headers.slice(),
+    [recordId, identifierHash, 0, "", "", ""],
+  ];
+
+  const sheet = {
+    getLastColumn() {
+      return 6;
+    },
+    getLastRow() {
+      return rows.length;
+    },
+    getRange(row, column, numRows = 1, numColumns = 1) {
+      return {
+        getValues() {
+          return rows
+            .slice(row - 1, row - 1 + numRows)
+            .map((line) => line.slice(column - 1, column - 1 + numColumns));
+        },
+        setValues(values) {
+          for (let rowIndex = 0; rowIndex < values.length; rowIndex += 1) {
+            const target = row - 1 + rowIndex;
+            if (!rows[target]) rows[target] = [];
+            for (
+              let columnIndex = 0;
+              columnIndex < values[rowIndex].length;
+              columnIndex += 1
+            ) {
+              rows[target][column - 1 + columnIndex] =
+                values[rowIndex][columnIndex];
+            }
+          }
+        },
+      };
+    },
+  };
+
+  const spreadsheet = {
+    getName() {
+      return "POC-03 TEMPORARIA - CONTROLE_AUTENTICACAO - " + "b".repeat(32);
+    },
+    getSheetByName(name) {
+      return name === "CONTROLE_AUTENTICACAO_POC" ? sheet : null;
+    },
+  };
+
+  let flushCalls = 0;
+  const spreadsheetApp = {
+    openById(id) {
+      assert.equal(id, "spreadsheet-id-synthetic");
+      return spreadsheet;
+    },
+    flush() {
+      flushCalls += 1;
+    },
+  };
+
+  const { context } = createAppsScriptHarness({ spreadsheetApp });
+  const meta = {
+    spreadsheetId: "spreadsheet-id-synthetic",
+    spreadsheetName: spreadsheet.getName(),
+    sheetName: "CONTROLE_AUTENTICACAO_POC",
+    recordId,
+    identifierHash,
+  };
+  const start = Date.UTC(2026, 10, 13, 18, 0, 0, 0);
+  const results = [];
+
+  for (let index = 0; index < 10; index += 1) {
+    results.push(
+      context.poc03RegisterSheetsThrottleFailureForPoc_(
+        meta,
+        start + index * 1000,
+        {},
+      ),
+    );
+  }
+
+  assert.equal(results.filter((item) => item.status === "COUNTED").length, 4);
+  assert.equal(
+    results.filter((item) => item.status === "LOCKED_AFTER_FAILURE").length,
+    1,
+  );
+  assert.equal(results.filter((item) => item.status === "BLOCKED").length, 5);
+  assert.equal(results.filter((item) => item.persistedWrite).length, 5);
+
+  const finalRow = context.poc03ReadSheetThrottleRowForPoc_(rows[1]);
+  assert.equal(finalRow.ok, true);
+  assert.equal(finalRow.record.state.failureCount, 5);
+  assert.equal(
+    finalRow.record.state.blockedUntilMs,
+    finalRow.record.updatedAtMs + 15 * 60 * 1000,
+  );
+  assert.ok(flushCalls >= 10, "flush must run before each lock release");
 });
