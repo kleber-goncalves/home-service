@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
 import test from "node:test";
+import { compareArgon2HashHex } from "../../server/password-hash-compare.js";
 
 const scriptPath = fileURLToPath(
   new URL("../../apps-script/poc-03/Code.gs", import.meta.url),
@@ -588,4 +589,51 @@ test("POC-03: read-modify-write do throttle mantém limite no mock do Sheets", (
     finalRow.record.updatedAtMs + 15 * 60 * 1000,
   );
   assert.ok(flushCalls >= 10, "flush must run before each lock release");
+});
+
+
+test("POC-03: comparador Node aceita somente hashes Argon2id hexadecimais iguais de 32 bytes", () => {
+  const knownHash = "0123456789abcdef".repeat(4);
+
+  assert.equal(compareArgon2HashHex(knownHash, knownHash), true);
+});
+
+test("POC-03: comparador Node rejeita diferenças no primeiro, meio e último byte", () => {
+  const expected = "0123456789abcdef".repeat(4);
+  const mutateByte = (value, index) => {
+    const offset = index * 2;
+    const original = Number.parseInt(value.slice(offset, offset + 2), 16);
+    const replacement = (original ^ 1).toString(16).padStart(2, "0");
+    return value.slice(0, offset) + replacement + value.slice(offset + 2);
+  };
+
+  for (const index of [0, 15, 31]) {
+    assert.equal(
+      compareArgon2HashHex(mutateByte(expected, index), expected),
+      false,
+      `must reject mismatch at byte ${index}`,
+    );
+  }
+});
+
+test("POC-03: comparador Node falha fechado para tamanho, tipo ou hexadecimal inválido", () => {
+  const validHash = "a".repeat(64);
+  const invalidInputs = [
+    [null, validHash],
+    [validHash, undefined],
+    [42, validHash],
+    [validHash, Buffer.alloc(32)],
+    ["", validHash],
+    ["a".repeat(62), validHash],
+    ["a".repeat(66), validHash],
+    [validHash, "b".repeat(62)],
+    [validHash, "g".repeat(64)],
+    [validHash.toUpperCase(), validHash],
+    [validHash, validHash.toUpperCase()],
+  ];
+
+  for (const [candidate, stored] of invalidInputs) {
+    assert.doesNotThrow(() => compareArgon2HashHex(candidate, stored));
+    assert.equal(compareArgon2HashHex(candidate, stored), false);
+  }
 });
