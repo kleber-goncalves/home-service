@@ -592,6 +592,31 @@ test("POC-03: read-modify-write do throttle mantém limite no mock do Sheets", (
 });
 
 
+test("POC-03: comparador XOR do Apps Script valida igualdade e rejeita diferenças em posições distintas", () => {
+  const { context } = createAppsScriptHarness();
+  const createBytes = () => vm.runInContext("new Uint8Array(32)", context);
+  const expected = createBytes();
+  expected.fill(0x5a);
+
+  const identical = createBytes();
+  identical.set(expected);
+  assert.equal(context.poc03BytesEqualForArgon2_(identical, expected), true);
+
+  for (const index of [0, 15, 31]) {
+    const candidate = createBytes();
+    candidate.set(expected);
+    candidate[index] ^= 0x01;
+    assert.equal(
+      context.poc03BytesEqualForArgon2_(candidate, expected),
+      false,
+      "must reject mismatch at byte " + index,
+    );
+  }
+
+  const short = vm.runInContext("new Uint8Array(31)", context);
+  assert.equal(context.poc03BytesEqualForArgon2_(short, expected), false);
+  assert.equal(context.poc03BytesEqualForArgon2_([], expected), false);
+});
 test("POC-03: comparador Node aceita somente hashes Argon2id hexadecimais iguais de 32 bytes", () => {
   const knownHash = "0123456789abcdef".repeat(4);
 
