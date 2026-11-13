@@ -308,9 +308,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 61306ce42651590698448052ddf223d09ce0a683
-- **Data do commit:** 2026-11-13T14:47:33-03:00
-- **Mensagem do commit:** test(poc-03): validar UID do gatilho na sonda coordenada
+- **Commit de referência:** b1aaa85c4e2eb87c3ed53d0447eba50e81ee50d2
+- **Data do commit:** 2026-11-13T14:47:52-03:00
+- **Mensagem do commit:** test(poc-03): rejeitar gatilho antigo na sonda coordenada
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -405,13 +405,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| b1aaa85 | 2026-11-13 | test(poc-03): rejeitar gatilho antigo na sonda coordenada |
+| eb57503 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 61306ce | 2026-11-13 | test(poc-03): validar UID do gatilho na sonda coordenada |
 | a3502cc | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 5894c8a | 2026-11-13 | docs(poc-03): referenciar limites oficiais da sonda por gatilhos |
 | 3853417 | 2026-11-13 | docs(ai-context): registrar sonda coordenada e critérios concorrentes |
 | a86310b | 2026-11-13 | docs(arquitetura): documentar sonda coordenada do throttling |
 | bb329b5 | 2026-11-13 | docs(poc-03): documentar sonda coordenada de concorrência |
-| 52c60a7 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| 8048347 | 2026-11-13 | test(poc-03): finalizar telemetria do lock após liberação |
 
 <!-- END AUTO-GENERATED SECTION -->
