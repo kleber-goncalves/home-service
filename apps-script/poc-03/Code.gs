@@ -3189,3 +3189,1374 @@ function poc03RunPersistentThrottleConcurrencySummary() {
         }
     }
 }
+
+
+// ============================================================================
+// POC-03B — persistência de CONTROLE_AUTENTICACAO em Google Sheets
+// ============================================================================
+// Estado de throttling: SOMENTE na planilha temporária criada por esta POC.
+// Script Properties guardam exclusivamente metadados/barreira/telemetria.
+// Não abrir a planilha estrutural de negócio nem usar identificadores reais.
+
+var POC03_SHEETS_THROTTLE_PREFIX = "POC03_SHEETS_THROTTLE_";
+var POC03_SHEETS_THROTTLE_META_KEY =
+    POC03_SHEETS_THROTTLE_PREFIX + "META_V1";
+var POC03_SHEETS_THROTTLE_ARRIVAL_COUNT_KEY =
+    POC03_SHEETS_THROTTLE_PREFIX + "ARRIVAL_COUNT_V1";
+var POC03_SHEETS_THROTTLE_ARRIVAL_PREFIX =
+    POC03_SHEETS_THROTTLE_PREFIX + "ARRIVAL_V1_";
+var POC03_SHEETS_THROTTLE_DETAIL_PREFIX =
+    POC03_SHEETS_THROTTLE_PREFIX + "DETAIL_V1_";
+var POC03_SHEETS_THROTTLE_SHEET_NAME = "CONTROLE_AUTENTICACAO_POC";
+var POC03_SHEETS_THROTTLE_FILE_PREFIX =
+    "POC-03 TEMPORARIA - CONTROLE_AUTENTICACAO - ";
+var POC03_SHEETS_THROTTLE_EXPECTED_WORKERS = 10;
+var POC03_SHEETS_THROTTLE_HOLD_MS = 350;
+var POC03_SHEETS_THROTTLE_META_TIMEOUT_MS = 30000;
+var POC03_SHEETS_THROTTLE_BARRIER_TIMEOUT_MS = 180000;
+var POC03_SHEETS_THROTTLE_TRIGGER_DELAY_MS = 1000;
+var POC03_SHEETS_THROTTLE_COLUMNS = [
+    "id_controle",
+    "identificador_hash",
+    "tentativas_falhas",
+    "inicio_janela_em",
+    "bloqueado_ate",
+    "atualizado_em"
+];
+var POC03_SHEETS_THROTTLE_WORKER_HANDLERS = [
+    "poc03RunSheetsThrottleWorker00_",
+    "poc03RunSheetsThrottleWorker01_",
+    "poc03RunSheetsThrottleWorker02_",
+    "poc03RunSheetsThrottleWorker03_",
+    "poc03RunSheetsThrottleWorker04_",
+    "poc03RunSheetsThrottleWorker05_",
+    "poc03RunSheetsThrottleWorker06_",
+    "poc03RunSheetsThrottleWorker07_",
+    "poc03RunSheetsThrottleWorker08_",
+    "poc03RunSheetsThrottleWorker09_"
+];
+
+/** Converte um timestamp de milissegundos para texto ISO 8601 UTC. */
+function poc03SheetThrottleIsoFromMsForPoc_(value) {
+    if (value === null || typeof value === "undefined") {
+        return "";
+    }
+
+    if (!Number.isSafeInteger(value) || value <= 0) {
+        throw new Error("SHEETS_THROTTLE_TIMESTAMP_INVALID");
+    }
+
+    return new Date(value).toISOString();
+}
+
+/** Lê somente ISO 8601 UTC canônico; célula vazia representa NULL. */
+function poc03SheetThrottleMsFromIsoForPoc_(value) {
+    if (value === "" || value === null || typeof value === "undefined") {
+        return {
+            ok: true,
+            value: null
+        };
+    }
+
+    if (
+        typeof value !== "string"
+        || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)
+    ) {
+        return { ok: false, value: null };
+    }
+
+    var timestamp = Date.parse(value);
+
+    if (
+        !Number.isSafeInteger(timestamp)
+        || timestamp <= 0
+        || new Date(timestamp).toISOString() !== value
+    ) {
+        return { ok: false, value: null };
+    }
+
+    return {
+        ok: true,
+        value: timestamp
+    };
+}
+
+/**
+ * Converte uma linha física de seis células para o modelo de estado.
+ * A validação é estrita para evitar que dado malformado seja zerado.
+ */
+function poc03ReadSheetThrottleRowForPoc_(row) {
+    if (!Array.isArray(row) || row.length !== 6) {
+        return { ok: false, reason: "ROW_SHAPE_INVALID" };
+    }
+
+    var idControle = row[0];
+    var identifierHash = row[1];
+    var failureCount = row[2];
+
+    if (
+        typeof idControle !== "string"
+        || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idControle)
+    ) {
+        return { ok: false, reason: "CONTROL_ID_INVALID" };
+    }
+
+    if (
+        typeof identifierHash !== "string"
+        || !/^[0-9a-f]{64}$/.test(identifierHash)
+    ) {
+        return { ok: false, reason: "IDENTIFIER_HASH_INVALID" };
+    }
+
+    if (
+        !Number.isInteger(failureCount)
+        || failureCount < 0
+        || failureCount > POC03_LOGIN_FAILURE_LIMIT
+    ) {
+        return { ok: false, reason: "FAILURE_COUNT_INVALID" };
+    }
+
+    var windowStarted = poc03SheetThrottleMsFromIsoForPoc_(row[3]);
+    var blockedUntil = poc03SheetThrottleMsFromIsoForPoc_(row[4]);
+    var updatedAt = poc03SheetThrottleMsFromIsoForPoc_(row[5]);
+
+    if (!windowStarted.ok || !blockedUntil.ok || !updatedAt.ok) {
+        return { ok: false, reason: "DATETIME_INVALID" };
+    }
+
+    if (failureCount === 0) {
+        if (
+            windowStarted.value !== null
+            || blockedUntil.value !== null
+            || updatedAt.value !== null
+        ) {
+            return { ok: false, reason: "EMPTY_STATE_INCONSISTENT" };
+        }
+    } else if (
+        windowStarted.value === null
+        || updatedAt.value === null
+        || updatedAt.value < windowStarted.value
+    ) {
+        return { ok: false, reason: "ACTIVE_STATE_INCONSISTENT" };
+    } else if (failureCount < POC03_LOGIN_FAILURE_LIMIT) {
+        if (blockedUntil.value !== null) {
+            return { ok: false, reason: "PREMATURE_BLOCK_INVALID" };
+        }
+    } else if (
+        blockedUntil.value === null
+        || blockedUntil.value < updatedAt.value
+    ) {
+        return { ok: false, reason: "BLOCK_STATE_INCONSISTENT" };
+    }
+
+    return {
+        ok: true,
+        record: {
+            idControle: idControle,
+            identifierHash: identifierHash,
+            state: {
+                failureCount: failureCount,
+                windowStartedAtMs: windowStarted.value,
+                blockedUntilMs: blockedUntil.value
+            },
+            updatedAtMs: updatedAt.value
+        }
+    };
+}
+
+/** Serializa estado validado para as seis colunas físicas aprovadas. */
+function poc03BuildSheetThrottleRowForPoc_(record, state, updatedAtMs) {
+    if (
+        !record
+        || typeof record.idControle !== "string"
+        || typeof record.identifierHash !== "string"
+        || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(record.idControle)
+        || !/^[0-9a-f]{64}$/.test(record.identifierHash)
+        || !state
+        || !Number.isInteger(state.failureCount)
+        || state.failureCount < 0
+        || state.failureCount > POC03_LOGIN_FAILURE_LIMIT
+    ) {
+        throw new Error("SHEETS_THROTTLE_RECORD_INVALID");
+    }
+
+    var updatedValue = state.failureCount === 0
+        ? null
+        : updatedAtMs;
+
+    if (state.failureCount === 0) {
+        if (
+            state.windowStartedAtMs !== null
+            || state.blockedUntilMs !== null
+        ) {
+            throw new Error("SHEETS_THROTTLE_EMPTY_STATE_INVALID");
+        }
+    } else if (
+        !Number.isSafeInteger(state.windowStartedAtMs)
+        || state.windowStartedAtMs <= 0
+        || !Number.isSafeInteger(updatedValue)
+        || updatedValue < state.windowStartedAtMs
+    ) {
+        throw new Error("SHEETS_THROTTLE_ACTIVE_STATE_INVALID");
+    } else if (state.failureCount < POC03_LOGIN_FAILURE_LIMIT) {
+        if (state.blockedUntilMs !== null) {
+            throw new Error("SHEETS_THROTTLE_PREMATURE_BLOCK_INVALID");
+        }
+    } else if (
+        !Number.isSafeInteger(state.blockedUntilMs)
+        || state.blockedUntilMs < updatedValue
+    ) {
+        throw new Error("SHEETS_THROTTLE_BLOCK_STATE_INVALID");
+    }
+
+    return [
+        record.idControle,
+        record.identifierHash,
+        state.failureCount,
+        poc03SheetThrottleIsoFromMsForPoc_(state.windowStartedAtMs),
+        poc03SheetThrottleIsoFromMsForPoc_(state.blockedUntilMs),
+        poc03SheetThrottleIsoFromMsForPoc_(updatedValue)
+    ];
+}
+
+/** Testes puros do mapeamento físico sem acessar Google Sheets/Drive. */
+function poc03RunSheetsThrottleRecordMappingTests() {
+    var now = Date.UTC(2026, 10, 13, 18, 0, 0, 0);
+    var record = {
+        idControle: "550e8400-e29b-41d4-a716-446655440000",
+        identifierHash: new Array(65).join("a")
+    };
+    var emptyState = {
+        failureCount: 0,
+        windowStartedAtMs: null,
+        blockedUntilMs: null
+    };
+    var initialRow = poc03BuildSheetThrottleRowForPoc_(
+        record,
+        emptyState,
+        null
+    );
+    var initialRead = poc03ReadSheetThrottleRowForPoc_(initialRow);
+    var fourFailureState = {
+        failureCount: 4,
+        windowStartedAtMs: now - 4000,
+        blockedUntilMs: null
+    };
+    var fourRow = poc03BuildSheetThrottleRowForPoc_(
+        record,
+        fourFailureState,
+        now
+    );
+    var fourRead = poc03ReadSheetThrottleRowForPoc_(fourRow);
+    var blockedState = {
+        failureCount: 5,
+        windowStartedAtMs: now - 4000,
+        blockedUntilMs: now + POC03_LOGIN_LOCK_MS
+    };
+    var blockedRow = poc03BuildSheetThrottleRowForPoc_(
+        record,
+        blockedState,
+        now
+    );
+    var blockedRead = poc03ReadSheetThrottleRowForPoc_(blockedRow);
+    var invalidCounter = initialRow.slice();
+    invalidCounter[2] = 6;
+    var invalidDate = fourRow.slice();
+    invalidDate[3] = "13/11/2026 18:00";
+    var missingBlockDate = blockedRow.slice();
+    missingBlockDate[4] = "";
+
+    var cases = [
+        {
+            name: "linha inicial vazia é serializada e lida",
+            passed: initialRead.ok
+                && initialRead.record.state.failureCount === 0
+                && initialRead.record.updatedAtMs === null
+        },
+        {
+            name: "quatro falhas preservam janela e ausência de bloqueio",
+            passed: fourRead.ok
+                && fourRead.record.state.failureCount === 4
+                && fourRead.record.state.windowStartedAtMs === now - 4000
+                && fourRead.record.state.blockedUntilMs === null
+        },
+        {
+            name: "quinta falha persiste bloqueio e instante de atualização",
+            passed: blockedRead.ok
+                && blockedRead.record.state.failureCount === 5
+                && blockedRead.record.state.blockedUntilMs === now + POC03_LOGIN_LOCK_MS
+                && blockedRead.record.updatedAtMs === now
+        },
+        {
+            name: "contador acima do limite é recusado",
+            passed: poc03ReadSheetThrottleRowForPoc_(invalidCounter).reason
+                === "FAILURE_COUNT_INVALID"
+        },
+        {
+            name: "data fora do formato ISO 8601 UTC é recusada",
+            passed: poc03ReadSheetThrottleRowForPoc_(invalidDate).reason
+                === "DATETIME_INVALID"
+        },
+        {
+            name: "bloqueio sem instante final é recusado",
+            passed: poc03ReadSheetThrottleRowForPoc_(missingBlockDate).reason
+                === "BLOCK_STATE_INCONSISTENT"
+        },
+        {
+            name: "hash do identificador fora do formato é recusado",
+            passed: poc03ReadSheetThrottleRowForPoc_(
+                [record.idControle, "invalid", 0, "", "", ""]
+            ).reason === "IDENTIFIER_HASH_INVALID"
+        },
+        {
+            name: "data ISO 8601 UTC é convertida sem perda de milissegundos",
+            passed: poc03SheetThrottleMsFromIsoForPoc_(
+                poc03SheetThrottleIsoFromMsForPoc_(now)
+            ).value === now
+        }
+    ];
+
+    var passed = cases.filter(function (item) {
+        return item.passed;
+    }).length;
+    var summary = {
+        test: "CONTROLE_AUTENTICACAO Sheets row mapping — isolated POC",
+        status: passed === cases.length ? "PASS" : "FAIL",
+        testsPassed: passed,
+        testsTotal: cases.length,
+        columns: POC03_SHEETS_THROTTLE_COLUMNS.length,
+        dateStorage: "ISO_8601_UTC_TEXT",
+        persistence: "PURE_MAPPING_ONLY_NO_GOOGLE_SERVICE"
+    };
+
+    cases.forEach(function (item) {
+        Logger.log(JSON.stringify({
+            test: item.name,
+            status: item.passed ? "PASS" : "FAIL"
+        }));
+    });
+    Logger.log(JSON.stringify(summary));
+    return summary;
+}
+
+function poc03GetSheetsThrottleProperties_() {
+    if (
+        typeof PropertiesService !== "object"
+        || PropertiesService === null
+        || typeof PropertiesService.getScriptProperties !== "function"
+    ) {
+        throw new Error("SHEETS_THROTTLE_PROPERTIES_UNAVAILABLE");
+    }
+
+    var properties = PropertiesService.getScriptProperties();
+
+    if (
+        !properties
+        || typeof properties.getProperty !== "function"
+        || typeof properties.setProperty !== "function"
+        || typeof properties.deleteProperty !== "function"
+        || typeof properties.getKeys !== "function"
+    ) {
+        throw new Error("SHEETS_THROTTLE_PROPERTIES_UNAVAILABLE");
+    }
+
+    return properties;
+}
+
+function poc03ReadSheetsThrottleMeta_(properties) {
+    var raw = properties.getProperty(POC03_SHEETS_THROTTLE_META_KEY);
+
+    if (typeof raw !== "string" || raw.length > 8192) {
+        return null;
+    }
+
+    try {
+        var meta = JSON.parse(raw);
+
+        if (
+            !meta
+            || typeof meta !== "object"
+            || meta.schemaVersion !== 1
+            || typeof meta.runId !== "string"
+            || !/^[0-9a-f]{32}$/.test(meta.runId)
+            || meta.expectedWorkers !== POC03_SHEETS_THROTTLE_EXPECTED_WORKERS
+            || !Array.isArray(meta.workerHandlers)
+            || meta.workerHandlers.length !== POC03_SHEETS_THROTTLE_EXPECTED_WORKERS
+            || !Array.isArray(meta.triggerIds)
+            || meta.triggerIds.length !== POC03_SHEETS_THROTTLE_EXPECTED_WORKERS
+            || typeof meta.spreadsheetId !== "string"
+            || typeof meta.spreadsheetName !== "string"
+            || typeof meta.sheetName !== "string"
+            || typeof meta.recordId !== "string"
+            || typeof meta.identifierHash !== "string"
+        ) {
+            return null;
+        }
+
+        for (
+            var index = 0;
+            index < POC03_SHEETS_THROTTLE_EXPECTED_WORKERS;
+            index += 1
+        ) {
+            if (
+                meta.workerHandlers[index]
+                    !== POC03_SHEETS_THROTTLE_WORKER_HANDLERS[index]
+                || typeof meta.triggerIds[index] !== "string"
+                || meta.triggerIds[index].length < 1
+            ) {
+                return null;
+            }
+        }
+
+        if (Object.keys(meta.triggerIds.reduce(function (seen, id) {
+            seen[id] = true;
+            return seen;
+        }, {})).length !== POC03_SHEETS_THROTTLE_EXPECTED_WORKERS) {
+            return null;
+        }
+
+        if (
+            !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(meta.recordId)
+            || !/^[0-9a-f]{64}$/.test(meta.identifierHash)
+            || meta.sheetName !== POC03_SHEETS_THROTTLE_SHEET_NAME
+            || meta.spreadsheetName !== (
+                POC03_SHEETS_THROTTLE_FILE_PREFIX + meta.runId
+            )
+        ) {
+            return null;
+        }
+
+        return meta;
+    } catch (error) {
+        return null;
+    }
+}
+
+function poc03SheetsThrottleReadRecordLocked_(meta) {
+    var spreadsheet = SpreadsheetApp.openById(meta.spreadsheetId);
+
+    if (spreadsheet.getName() !== meta.spreadsheetName) {
+        return { ok: false, reason: "SPREADSHEET_NAME_MISMATCH" };
+    }
+
+    var sheet = spreadsheet.getSheetByName(meta.sheetName);
+
+    if (!sheet || sheet.getLastColumn() !== POC03_SHEETS_THROTTLE_COLUMNS.length) {
+        return { ok: false, reason: "SHEET_STRUCTURE_INVALID" };
+    }
+
+    var headers = sheet.getRange(
+        1,
+        1,
+        1,
+        POC03_SHEETS_THROTTLE_COLUMNS.length
+    ).getValues()[0];
+
+    for (var column = 0; column < POC03_SHEETS_THROTTLE_COLUMNS.length; column += 1) {
+        if (headers[column] !== POC03_SHEETS_THROTTLE_COLUMNS[column]) {
+            return { ok: false, reason: "SHEET_HEADERS_INVALID" };
+        }
+    }
+
+    var lastRow = sheet.getLastRow();
+
+    if (lastRow < 2) {
+        return { ok: false, reason: "CONTROL_ROW_NOT_FOUND" };
+    }
+
+    var rows = sheet.getRange(
+        2,
+        1,
+        lastRow - 1,
+        POC03_SHEETS_THROTTLE_COLUMNS.length
+    ).getValues();
+
+    var matchingRows = [];
+    rows.forEach(function (row, index) {
+        if (row[0] === meta.recordId || row[1] === meta.identifierHash) {
+            matchingRows.push({
+                rowNumber: index + 2,
+                values: row
+            });
+        }
+    });
+
+    if (matchingRows.length !== 1) {
+        return {
+            ok: false,
+            reason: matchingRows.length === 0
+                ? "CONTROL_ROW_NOT_FOUND"
+                : "CONTROL_ROW_DUPLICATED"
+        };
+    }
+
+    var match = matchingRows[0];
+
+    if (
+        match.values[0] !== meta.recordId
+        || match.values[1] !== meta.identifierHash
+    ) {
+        return { ok: false, reason: "CONTROL_IDENTITY_MISMATCH" };
+    }
+
+    var parsed = poc03ReadSheetThrottleRowForPoc_(match.values);
+
+    if (!parsed.ok) {
+        return parsed;
+    }
+
+    return {
+        ok: true,
+        sheet: sheet,
+        rowNumber: match.rowNumber,
+        record: parsed.record
+    };
+}
+
+/**
+ * Read-modify-write real no Sheets. A seção inteira fica protegida por
+ * ScriptLock; flush ocorre antes de liberar o lock para confirmar a gravação.
+ */
+function poc03RegisterSheetsThrottleFailureForPoc_(meta, nowMs, timing) {
+    if (!Number.isSafeInteger(nowMs) || nowMs <= 0) {
+        return {
+            status: "INVALID_TIMESTAMP",
+            failureCount: null,
+            persistedWrite: false
+        };
+    }
+
+    if (timing) {
+        timing.lockRequestedAtMs = Date.now();
+    }
+
+    var lockResult = poc03AcquireThrottleScriptLock_();
+
+    if (timing) {
+        timing.lockAcquiredAtMs = lockResult.ok ? Date.now() : null;
+        timing.lockWaitMs = Date.now() - timing.lockRequestedAtMs;
+    }
+
+    if (!lockResult.ok) {
+        return {
+            status: lockResult.reason,
+            failureCount: null,
+            persistedWrite: false
+        };
+    }
+
+    var lock = lockResult.lock;
+
+    try {
+        var located = poc03SheetsThrottleReadRecordLocked_(meta);
+
+        if (!located.ok) {
+            return {
+                status: located.reason,
+                failureCount: null,
+                persistedWrite: false
+            };
+        }
+
+        // Retenção deliberada, exclusiva da POC, para observar contenção.
+        Utilities.sleep(POC03_SHEETS_THROTTLE_HOLD_MS);
+
+        var state = {
+            failureCount: located.record.state.failureCount,
+            windowStartedAtMs: located.record.state.windowStartedAtMs,
+            blockedUntilMs: located.record.state.blockedUntilMs
+        };
+        var transition = poc03RegisterLoginFailureForPoc_(state, nowMs);
+        var persistedWrite = false;
+
+        if (transition.status !== "BLOCKED") {
+            var row = poc03BuildSheetThrottleRowForPoc_(
+                located.record,
+                state,
+                nowMs
+            );
+
+            located.sheet.getRange(
+                located.rowNumber,
+                1,
+                1,
+                POC03_SHEETS_THROTTLE_COLUMNS.length
+            ).setValues([row]);
+
+            SpreadsheetApp.flush();
+            persistedWrite = true;
+        }
+
+        return {
+            status: transition.status,
+            failureCount: transition.failureCount,
+            blockedUntilMs: transition.blockedUntilMs,
+            persistedWrite: persistedWrite
+        };
+    } catch (error) {
+        return {
+            status: "SHEETS_PERSISTENCE_UNAVAILABLE",
+            failureCount: null,
+            persistedWrite: false
+        };
+    } finally {
+        if (timing) {
+            timing.lockReleasedAtMs = null;
+        }
+
+        try {
+            SpreadsheetApp.flush();
+        } catch (flushError) {
+            // A falha do serviço será percebida na leitura/resumo; não logar detalhes.
+        }
+
+        try {
+            lock.releaseLock();
+        } catch (releaseError) {
+            // O lock também é liberado pelo Apps Script ao encerrar a execução.
+        }
+
+        if (timing) {
+            timing.lockReleasedAtMs = Date.now();
+            timing.lockHeldMs = timing.lockAcquiredAtMs === null
+                ? null
+                : timing.lockReleasedAtMs - timing.lockAcquiredAtMs;
+        }
+    }
+}
+
+function poc03DeleteSheetsThrottleTriggerByUid_(handlerName, triggerUid) {
+    if (
+        POC03_SHEETS_THROTTLE_WORKER_HANDLERS.indexOf(handlerName) < 0
+        || !triggerUid
+        || typeof ScriptApp !== "object"
+        || ScriptApp === null
+        || typeof ScriptApp.getProjectTriggers !== "function"
+        || typeof ScriptApp.deleteTrigger !== "function"
+    ) {
+        return false;
+    }
+
+    var triggers = ScriptApp.getProjectTriggers();
+
+    for (var index = 0; index < triggers.length; index += 1) {
+        try {
+            if (
+                triggers[index].getHandlerFunction() === handlerName
+                && String(triggers[index].getUniqueId()) === String(triggerUid)
+            ) {
+                ScriptApp.deleteTrigger(triggers[index]);
+                return true;
+            }
+        } catch (error) {
+            // Continua a procurar apenas o gatilho exato.
+        }
+    }
+
+    return false;
+}
+
+function poc03RunSheetsThrottleWorkerForIndex_(workerIndex, event) {
+    var invocationStartedAtMs = Date.now();
+    var handler = Number.isInteger(workerIndex)
+        && workerIndex >= 0
+        && workerIndex < POC03_SHEETS_THROTTLE_EXPECTED_WORKERS
+        ? POC03_SHEETS_THROTTLE_WORKER_HANDLERS[workerIndex]
+        : null;
+    var triggerUid = event && event.triggerUid !== undefined
+        ? String(event.triggerUid)
+        : null;
+    var properties = null;
+    var meta = null;
+    var belongsToRun = false;
+    var detail = null;
+
+    try {
+        if (!handler) {
+            throw new Error("SHEETS_THROTTLE_WORKER_INDEX_INVALID");
+        }
+
+        properties = poc03GetSheetsThrottleProperties_();
+        var metaDeadline = Date.now() + POC03_SHEETS_THROTTLE_META_TIMEOUT_MS;
+
+        while (Date.now() < metaDeadline) {
+            meta = poc03ReadSheetsThrottleMeta_(properties);
+            if (meta && meta.ready === true) {
+                break;
+            }
+            Utilities.sleep(100);
+        }
+
+        if (
+            !meta
+            || meta.ready !== true
+            || meta.workerHandlers[workerIndex] !== handler
+        ) {
+            throw new Error("SHEETS_THROTTLE_METADATA_UNAVAILABLE");
+        }
+
+        if (!triggerUid || meta.triggerIds[workerIndex] !== triggerUid) {
+            detail = {
+                status: "STALE_OR_UNMATCHED_TRIGGER",
+                workerIndex: workerIndex,
+                invocationStartedAtMs: invocationStartedAtMs,
+                workerCompletedAtMs: Date.now(),
+                runId: meta.runId
+            };
+            return detail;
+        }
+
+        belongsToRun = true;
+
+        // Cada worker registra uma única chegada, protegida pelo mesmo lock.
+        var arrivalLockResult = poc03AcquireThrottleScriptLock_();
+
+        if (!arrivalLockResult.ok) {
+            throw new Error("SHEETS_THROTTLE_ARRIVAL_LOCK_UNAVAILABLE");
+        }
+
+        var arrivalLock = arrivalLockResult.lock;
+
+        try {
+            var currentMeta = poc03ReadSheetsThrottleMeta_(properties);
+            var arrivalKey = POC03_SHEETS_THROTTLE_ARRIVAL_PREFIX + workerIndex;
+
+            if (
+                !currentMeta
+                || currentMeta.runId !== meta.runId
+                || properties.getProperty(arrivalKey) !== null
+            ) {
+                throw new Error("SHEETS_THROTTLE_ARRIVAL_INVALID");
+            }
+
+            var arrivalCount = Number(
+                properties.getProperty(POC03_SHEETS_THROTTLE_ARRIVAL_COUNT_KEY)
+            );
+
+            if (
+                !Number.isInteger(arrivalCount)
+                || arrivalCount < 0
+                || arrivalCount >= POC03_SHEETS_THROTTLE_EXPECTED_WORKERS
+            ) {
+                throw new Error("SHEETS_THROTTLE_ARRIVAL_COUNT_INVALID");
+            }
+
+            properties.setProperty(arrivalKey, String(Date.now()));
+            properties.setProperty(
+                POC03_SHEETS_THROTTLE_ARRIVAL_COUNT_KEY,
+                String(arrivalCount + 1)
+            );
+        } finally {
+            try {
+                arrivalLock.releaseLock();
+            } catch (error) {
+                // No-op.
+            }
+        }
+
+        var barrierStartedAtMs = Date.now();
+        var barrierDeadline = barrierStartedAtMs
+            + POC03_SHEETS_THROTTLE_BARRIER_TIMEOUT_MS;
+        var arrivedCount = 0;
+
+        while (Date.now() < barrierDeadline) {
+            arrivedCount = Number(
+                properties.getProperty(POC03_SHEETS_THROTTLE_ARRIVAL_COUNT_KEY)
+            );
+
+            if (arrivedCount === POC03_SHEETS_THROTTLE_EXPECTED_WORKERS) {
+                break;
+            }
+
+            Utilities.sleep(100);
+        }
+
+        var barrierPassedAtMs = Date.now();
+
+        if (arrivedCount !== POC03_SHEETS_THROTTLE_EXPECTED_WORKERS) {
+            throw new Error("SHEETS_THROTTLE_BARRIER_TIMEOUT");
+        }
+
+        var timing = {};
+        var result = poc03RegisterSheetsThrottleFailureForPoc_(
+            meta,
+            Date.now(),
+            timing
+        );
+
+        detail = {
+            status: result.status,
+            workerIndex: workerIndex,
+            runId: meta.runId,
+            invocationStartedAtMs: invocationStartedAtMs,
+            barrierStartedAtMs: barrierStartedAtMs,
+            barrierPassedAtMs: barrierPassedAtMs,
+            workerCompletedAtMs: Date.now(),
+            barrierWaitMs: barrierPassedAtMs - barrierStartedAtMs,
+            lockRequestedAtMs: timing.lockRequestedAtMs || null,
+            lockAcquiredAtMs: timing.lockAcquiredAtMs || null,
+            lockReleasedAtMs: timing.lockReleasedAtMs || null,
+            lockWaitMs: timing.lockWaitMs === undefined ? null : timing.lockWaitMs,
+            lockHeldMs: timing.lockHeldMs === undefined ? null : timing.lockHeldMs,
+            failureCount: result.failureCount,
+            persistedWrite: result.persistedWrite === true
+        };
+    } catch (error) {
+        detail = detail || {
+            status: error && error.message === "SHEETS_THROTTLE_BARRIER_TIMEOUT"
+                ? "BARRIER_TIMEOUT"
+                : "WORKER_EXCEPTION",
+            workerIndex: workerIndex,
+            runId: meta && meta.runId ? meta.runId : null,
+            invocationStartedAtMs: invocationStartedAtMs,
+            workerCompletedAtMs: Date.now()
+        };
+    } finally {
+        if (belongsToRun && properties && detail) {
+            try {
+                properties.setProperty(
+                    POC03_SHEETS_THROTTLE_DETAIL_PREFIX + workerIndex,
+                    JSON.stringify(detail)
+                );
+            } catch (error) {
+                // O resumo detectará o worker sem telemetria.
+            }
+        }
+
+        if (handler && triggerUid) {
+            poc03DeleteSheetsThrottleTriggerByUid_(handler, triggerUid);
+        }
+    }
+
+    Logger.log(JSON.stringify({
+        test: "Sheets throttle coordinated worker",
+        workerIndex: workerIndex,
+        status: detail ? detail.status : "NO_DETAIL",
+        lockWaitMs: detail ? detail.lockWaitMs : null,
+        persistedWrite: detail ? detail.persistedWrite === true : false
+    }));
+
+    return detail;
+}
+
+// Cada gatilho possui handler dedicado; o evento triggerUid vincula a execução.
+function poc03RunSheetsThrottleWorker00_(event) { return poc03RunSheetsThrottleWorkerForIndex_(0, event); }
+function poc03RunSheetsThrottleWorker01_(event) { return poc03RunSheetsThrottleWorkerForIndex_(1, event); }
+function poc03RunSheetsThrottleWorker02_(event) { return poc03RunSheetsThrottleWorkerForIndex_(2, event); }
+function poc03RunSheetsThrottleWorker03_(event) { return poc03RunSheetsThrottleWorkerForIndex_(3, event); }
+function poc03RunSheetsThrottleWorker04_(event) { return poc03RunSheetsThrottleWorkerForIndex_(4, event); }
+function poc03RunSheetsThrottleWorker05_(event) { return poc03RunSheetsThrottleWorkerForIndex_(5, event); }
+function poc03RunSheetsThrottleWorker06_(event) { return poc03RunSheetsThrottleWorkerForIndex_(6, event); }
+function poc03RunSheetsThrottleWorker07_(event) { return poc03RunSheetsThrottleWorkerForIndex_(7, event); }
+function poc03RunSheetsThrottleWorker08_(event) { return poc03RunSheetsThrottleWorkerForIndex_(8, event); }
+function poc03RunSheetsThrottleWorker09_(event) { return poc03RunSheetsThrottleWorkerForIndex_(9, event); }
+
+/**
+ * Cria uma planilha temporária, prepara uma linha sintética e agenda dez
+ * workers. A planilha estrutural do Conecta Local nunca é aberta.
+ */
+function poc03LaunchSheetsPersistentThrottleConcurrencyProbe() {
+    if (
+        typeof SpreadsheetApp !== "object"
+        || SpreadsheetApp === null
+        || typeof SpreadsheetApp.create !== "function"
+        || typeof ScriptApp !== "object"
+        || ScriptApp === null
+        || typeof ScriptApp.newTrigger !== "function"
+        || typeof ScriptApp.getProjectTriggers !== "function"
+    ) {
+        throw new Error("SHEETS_OR_TRIGGER_SERVICE_UNAVAILABLE");
+    }
+
+    var properties = poc03GetSheetsThrottleProperties_();
+    var existingKeys = properties.getKeys().filter(function (key) {
+        return key.indexOf(POC03_SHEETS_THROTTLE_PREFIX) === 0;
+    });
+
+    if (existingKeys.length > 0) {
+        throw new Error(
+            "PREVIOUS_SHEETS_PROBE_STATE_EXISTS: execute a limpeza da POC anterior antes de iniciar outra."
+        );
+    }
+
+    var existingTriggers = ScriptApp.getProjectTriggers();
+    if (
+        existingTriggers.length + POC03_SHEETS_THROTTLE_EXPECTED_WORKERS > 20
+    ) {
+        throw new Error(
+            "TRIGGER_QUOTA_CAPACITY_INSUFFICIENT: é necessário espaço para dez gatilhos sem remover gatilhos de outras funções."
+        );
+    }
+
+    var lockResult = poc03AcquireThrottleScriptLock_();
+    if (!lockResult.ok) {
+        throw new Error("SHEETS_THROTTLE_LAUNCH_LOCK_UNAVAILABLE");
+    }
+
+    var lock = lockResult.lock;
+    var spreadsheet = null;
+    var createdTriggers = [];
+
+    try {
+        var runId = Utilities.getUuid().replace(/-/g, "").toLowerCase();
+
+        if (!/^[0-9a-f]{32}$/.test(runId)) {
+            throw new Error("SHEETS_THROTTLE_RUN_ID_INVALID");
+        }
+
+        var spreadsheetName = POC03_SHEETS_THROTTLE_FILE_PREFIX + runId;
+        spreadsheet = SpreadsheetApp.create(spreadsheetName);
+        var sheets = spreadsheet.getSheets();
+
+        if (!sheets || sheets.length !== 1) {
+            throw new Error("SHEETS_THROTTLE_NEW_SPREADSHEET_SHAPE_INVALID");
+        }
+
+        var sheet = sheets[0];
+        sheet.setName(POC03_SHEETS_THROTTLE_SHEET_NAME);
+        sheet.clear();
+
+        var idControle = Utilities.getUuid();
+        var firstUuid = Utilities.getUuid().replace(/-/g, "");
+        var secondUuid = Utilities.getUuid().replace(/-/g, "");
+        var testSecret = (firstUuid + secondUuid).toLowerCase();
+
+        if (
+            !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idControle)
+            || !/^[0-9a-f]{64}$/.test(testSecret)
+        ) {
+            throw new Error("SHEETS_THROTTLE_SYNTHETIC_ID_GENERATION_FAILED");
+        }
+
+        var digest = Utilities.computeHmacSha256Signature(
+            "poc03-sheets-throttle@invalid.example",
+            testSecret
+        );
+        var identifierHash = bytesToHexForPoc_(digest);
+
+        if (!/^[0-9a-f]{64}$/.test(identifierHash)) {
+            throw new Error("SHEETS_THROTTLE_IDENTIFIER_HASH_INVALID");
+        }
+
+        sheet.getRange(
+            1,
+            1,
+            1,
+            POC03_SHEETS_THROTTLE_COLUMNS.length
+        ).setValues([POC03_SHEETS_THROTTLE_COLUMNS]);
+
+        var record = {
+            idControle: idControle,
+            identifierHash: identifierHash
+        };
+        var initialRow = poc03BuildSheetThrottleRowForPoc_(
+            record,
+            poc03CreateLoginThrottleStateForPoc_(),
+            null
+        );
+
+        sheet.getRange(
+            2,
+            1,
+            1,
+            POC03_SHEETS_THROTTLE_COLUMNS.length
+        ).setValues([initialRow]);
+        sheet.setFrozenRows(1);
+        SpreadsheetApp.flush();
+
+        var meta = {
+            schemaVersion: 1,
+            runId: runId,
+            ready: false,
+            expectedWorkers: POC03_SHEETS_THROTTLE_EXPECTED_WORKERS,
+            workerHandlers: POC03_SHEETS_THROTTLE_WORKER_HANDLERS.slice(),
+            triggerIds: [],
+            spreadsheetId: spreadsheet.getId(),
+            spreadsheetName: spreadsheetName,
+            sheetName: POC03_SHEETS_THROTTLE_SHEET_NAME,
+            recordId: idControle,
+            identifierHash: identifierHash,
+            createdAtMs: Date.now(),
+            summaryCompletedAtMs: null,
+            summaryStatus: null
+        };
+
+        properties.setProperty(
+            POC03_SHEETS_THROTTLE_META_KEY,
+            JSON.stringify(meta)
+        );
+        properties.setProperty(POC03_SHEETS_THROTTLE_ARRIVAL_COUNT_KEY, "0");
+
+        for (
+            var index = 0;
+            index < POC03_SHEETS_THROTTLE_EXPECTED_WORKERS;
+            index += 1
+        ) {
+            var handler = POC03_SHEETS_THROTTLE_WORKER_HANDLERS[index];
+            var trigger = ScriptApp
+                .newTrigger(handler)
+                .timeBased()
+                .after(POC03_SHEETS_THROTTLE_TRIGGER_DELAY_MS)
+                .create();
+            var triggerId = String(trigger.getUniqueId());
+
+            if (
+                !triggerId
+                || meta.triggerIds.indexOf(triggerId) >= 0
+            ) {
+                ScriptApp.deleteTrigger(trigger);
+                throw new Error("SHEETS_THROTTLE_TRIGGER_ID_INVALID_OR_DUPLICATE");
+            }
+
+            createdTriggers.push(trigger);
+            meta.triggerIds.push(triggerId);
+        }
+
+        meta.ready = true;
+        meta.armedAtMs = Date.now();
+        properties.setProperty(
+            POC03_SHEETS_THROTTLE_META_KEY,
+            JSON.stringify(meta)
+        );
+
+        var summary = {
+            test: "CONTROLE_AUTENTICACAO Sheets concurrent persistence probe",
+            status: "READY",
+            expectedWorkers: meta.expectedWorkers,
+            createdTriggers: createdTriggers.length,
+            spreadsheetName: spreadsheetName,
+            spreadsheetUrl: spreadsheet.getUrl(),
+            sheetName: POC03_SHEETS_THROTTLE_SHEET_NAME,
+            rowCount: 1,
+            columns: POC03_SHEETS_THROTTLE_COLUMNS.length,
+            holdLockMs: POC03_SHEETS_THROTTLE_HOLD_MS,
+            barrierTimeoutMs: POC03_SHEETS_THROTTLE_BARRIER_TIMEOUT_MS,
+            persistence: "GOOGLE_SHEETS_TEMP_SPREADSHEET",
+            coordinationMetadata: "SCRIPT_PROPERTIES_TEST_ONLY",
+            synchronization: "SCRIPT_LOCK_WITH_ALL_WORKERS_BARRIER",
+            businessSpreadsheetUsed: false
+        };
+
+        Logger.log(JSON.stringify(summary));
+        return summary;
+    } catch (error) {
+        createdTriggers.forEach(function (trigger) {
+            try {
+                ScriptApp.deleteTrigger(trigger);
+            } catch (deleteError) {
+                // A criação do arquivo será revertida abaixo.
+            }
+        });
+
+        properties.getKeys().forEach(function (key) {
+            if (key.indexOf(POC03_SHEETS_THROTTLE_PREFIX) === 0) {
+                properties.deleteProperty(key);
+            }
+        });
+
+        if (spreadsheet) {
+            try {
+                var createdFile = DriveApp.getFileById(spreadsheet.getId());
+                if (createdFile.getName() === spreadsheet.getName()) {
+                    createdFile.setTrashed(true);
+                }
+            } catch (trashError) {
+                // Preserva a exceção original; o arquivo terá nome POC identificável.
+            }
+        }
+
+        throw error;
+    } finally {
+        try {
+            SpreadsheetApp.flush();
+        } catch (flushError) {
+            // No-op.
+        }
+        try {
+            lock.releaseLock();
+        } catch (releaseError) {
+            // No-op.
+        }
+    }
+}
+
+/** Resume os dez workers e confere o estado final diretamente no Sheets. */
+function poc03RunSheetsPersistentThrottleConcurrencySummary() {
+    var lockResult = poc03AcquireThrottleScriptLock_();
+
+    if (!lockResult.ok) {
+        throw new Error("SHEETS_THROTTLE_SUMMARY_LOCK_UNAVAILABLE");
+    }
+
+    var lock = lockResult.lock;
+
+    try {
+        var properties = poc03GetSheetsThrottleProperties_();
+        var meta = poc03ReadSheetsThrottleMeta_(properties);
+
+        if (!meta || meta.ready !== true) {
+            throw new Error("SHEETS_THROTTLE_PROBE_NOT_INITIALIZED");
+        }
+
+        var details = [];
+
+        for (
+            var index = 0;
+            index < POC03_SHEETS_THROTTLE_EXPECTED_WORKERS;
+            index += 1
+        ) {
+            var raw = properties.getProperty(
+                POC03_SHEETS_THROTTLE_DETAIL_PREFIX + index
+            );
+
+            if (typeof raw !== "string" || raw.length > 4096) {
+                continue;
+            }
+
+            try {
+                var detail = JSON.parse(raw);
+                if (
+                    detail
+                    && detail.runId === meta.runId
+                    && detail.workerIndex === index
+                ) {
+                    details.push(detail);
+                }
+            } catch (error) {
+                // Worker ausente/inválido será refletido no resumo.
+            }
+        }
+
+        var counted = details.filter(function (item) {
+            return item.status === "COUNTED";
+        }).length;
+        var locked = details.filter(function (item) {
+            return item.status === "LOCKED_AFTER_FAILURE";
+        }).length;
+        var blocked = details.filter(function (item) {
+            return item.status === "BLOCKED";
+        }).length;
+        var lockUnavailable = details.filter(function (item) {
+            return item.status === "LOCK_TIMEOUT"
+                || item.status === "LOCK_UNAVAILABLE";
+        }).length;
+        var barrierTimeouts = details.filter(function (item) {
+            return item.status === "BARRIER_TIMEOUT";
+        }).length;
+        var workerErrors = details.filter(function (item) {
+            return item.status !== "COUNTED"
+                && item.status !== "LOCKED_AFTER_FAILURE"
+                && item.status !== "BLOCKED";
+        }).length;
+        var writeCount = details.filter(function (item) {
+            return item.persistedWrite === true;
+        }).length;
+        var waitSamples = details
+            .filter(function (item) {
+                return Number.isSafeInteger(item.lockWaitMs);
+            })
+            .map(function (item) {
+                return item.lockWaitMs;
+            })
+            .sort(function (left, right) {
+                return left - right;
+            });
+        var contendedWorkers = waitSamples.filter(function (value) {
+            return value >= 25;
+        }).length;
+        var concurrency = poc03AnalyzeThrottleConcurrencyIntervalsForPoc_(details);
+        var located = poc03SheetsThrottleReadRecordLocked_(meta);
+        var finalState = located.ok ? located.record.state : null;
+        var finalBlocked = finalState
+            && finalState.blockedUntilMs !== null
+            && finalState.blockedUntilMs > Date.now();
+
+        var passed = details.length === POC03_SHEETS_THROTTLE_EXPECTED_WORKERS
+            && counted === 4
+            && locked === 1
+            && blocked === 5
+            && lockUnavailable === 0
+            && barrierTimeouts === 0
+            && workerErrors === 0
+            && concurrency.maxConcurrentWorkers === POC03_SHEETS_THROTTLE_EXPECTED_WORKERS
+            && concurrency.pairwiseOverlapCount === 45
+            && concurrency.allWorkersOverlapAtOneInstant === true
+            && contendedWorkers === POC03_SHEETS_THROTTLE_EXPECTED_WORKERS
+            && writeCount === 5
+            && located.ok
+            && finalState.failureCount === POC03_LOGIN_FAILURE_LIMIT
+            && finalBlocked === true;
+
+        var summary = {
+            test: "CONTROLE_AUTENTICACAO Sheets — coordinated concurrent persistence",
+            status: passed ? "PASS" : "INCOMPLETE_OR_FAIL",
+            expectedWorkers: POC03_SHEETS_THROTTLE_EXPECTED_WORKERS,
+            observedWorkers: details.length,
+            countedBeforeLimit: counted,
+            lockedAtLimit: locked,
+            rejectedWhileLocked: blocked,
+            successfulSheetWrites: writeCount,
+            lockUnavailable: lockUnavailable,
+            barrierTimeouts: barrierTimeouts,
+            workerErrors: workerErrors,
+            maxConcurrentWorkers: concurrency.maxConcurrentWorkers,
+            pairwiseOverlapCount: concurrency.pairwiseOverlapCount,
+            allWorkersOverlapAtOneInstant: concurrency.allWorkersOverlapAtOneInstant,
+            commonOverlapWindowMs: concurrency.commonOverlapWindowMs,
+            contendedWorkers: contendedWorkers,
+            maxLockWaitMs: waitSamples.length > 0
+                ? waitSamples[waitSamples.length - 1]
+                : null,
+            minLockWaitMs: waitSamples.length > 0 ? waitSamples[0] : null,
+            finalFailureCount: finalState ? finalState.failureCount : null,
+            finalStateBlocked: finalBlocked === true,
+            persistence: "GOOGLE_SHEETS_TEMP_SPREADSHEET",
+            coordinationMetadata: "SCRIPT_PROPERTIES_TEST_ONLY",
+            synchronization: "SCRIPT_LOCK_WITH_ALL_WORKERS_BARRIER",
+            artificialLockHoldMs: POC03_SHEETS_THROTTLE_HOLD_MS,
+            sheetName: meta.sheetName,
+            spreadsheetUrl: "https://docs.google.com/spreadsheets/d/"
+                + meta.spreadsheetId + "/edit",
+            businessSpreadsheetUsed: false
+        };
+
+        meta.summaryCompletedAtMs = Date.now();
+        meta.summaryStatus = summary.status;
+        properties.setProperty(
+            POC03_SHEETS_THROTTLE_META_KEY,
+            JSON.stringify(meta)
+        );
+
+        Logger.log(JSON.stringify(summary));
+        return summary;
+    } finally {
+        try {
+            lock.releaseLock();
+        } catch (error) {
+            // No-op.
+        }
+    }
+}
+
+/**
+ * Limpeza destrutiva reversível: move para a lixeira somente a planilha cujo
+ * nome/ID foram registrados nesta execução e remove só o prefixo desta POC.
+ * Exige que o resumo tenha sido executado e os dez workers tenham terminado.
+ */
+function poc03CleanupSheetsPersistentThrottleProbe() {
+    var properties = poc03GetSheetsThrottleProperties_();
+    var meta = poc03ReadSheetsThrottleMeta_(properties);
+
+    if (!meta) {
+        var remaining = properties.getKeys().filter(function (key) {
+            return key.indexOf(POC03_SHEETS_THROTTLE_PREFIX) === 0;
+        });
+
+        if (remaining.length === 0) {
+            var emptySummary = {
+                test: "CONTROLE_AUTENTICACAO Sheets POC cleanup",
+                status: "PASS",
+                removedSheetsTriggers: 0,
+                trashedSpreadsheet: false,
+                removedSheetsProperties: 0,
+                scope: "POC03_SHEETS_THROTTLE_PREFIX_ONLY"
+            };
+            Logger.log(JSON.stringify(emptySummary));
+            return emptySummary;
+        }
+
+        throw new Error("SHEETS_THROTTLE_METADATA_INVALID; limpeza cancelada.");
+    }
+
+    if (!Number.isSafeInteger(meta.summaryCompletedAtMs) || meta.summaryCompletedAtMs <= 0) {
+        throw new Error(
+            "SHEETS_THROTTLE_SUMMARY_REQUIRED: execute e guarde o resumo antes da limpeza."
+        );
+    }
+
+    for (
+        var index = 0;
+        index < POC03_SHEETS_THROTTLE_EXPECTED_WORKERS;
+        index += 1
+    ) {
+        var rawDetail = properties.getProperty(
+            POC03_SHEETS_THROTTLE_DETAIL_PREFIX + index
+        );
+
+        if (typeof rawDetail !== "string") {
+            throw new Error(
+                "SHEETS_THROTTLE_WORKERS_INCOMPLETE: limpeza cancelada para preservar a evidência."
+            );
+        }
+
+        try {
+            var detail = JSON.parse(rawDetail);
+            if (
+                !detail
+                || detail.runId !== meta.runId
+                || detail.workerIndex !== index
+                || !Number.isSafeInteger(detail.workerCompletedAtMs)
+            ) {
+                throw new Error("DETAIL_INVALID");
+            }
+        } catch (error) {
+            throw new Error(
+                "SHEETS_THROTTLE_WORKERS_INCOMPLETE: limpeza cancelada para preservar a evidência."
+            );
+        }
+    }
+
+    var removedTriggers = 0;
+    var triggers = ScriptApp.getProjectTriggers();
+
+    triggers.forEach(function (trigger) {
+        try {
+            var handler = trigger.getHandlerFunction();
+            var triggerId = String(trigger.getUniqueId());
+            var handlerIndex = POC03_SHEETS_THROTTLE_WORKER_HANDLERS.indexOf(handler);
+
+            if (
+                handlerIndex >= 0
+                && meta.triggerIds[handlerIndex] === triggerId
+            ) {
+                ScriptApp.deleteTrigger(trigger);
+                removedTriggers += 1;
+            }
+        } catch (error) {
+            // A validação do arquivo ainda ocorrerá; não apagar propriedades.
+        }
+    });
+
+    var file = DriveApp.getFileById(meta.spreadsheetId);
+
+    if (
+        file.getName() !== meta.spreadsheetName
+        || file.getName().indexOf(POC03_SHEETS_THROTTLE_FILE_PREFIX) !== 0
+    ) {
+        throw new Error(
+            "SHEETS_THROTTLE_FILE_IDENTITY_MISMATCH: arquivo não foi enviado à lixeira."
+        );
+    }
+
+    file.setTrashed(true);
+
+    var removedProperties = 0;
+    properties.getKeys().forEach(function (key) {
+        if (key.indexOf(POC03_SHEETS_THROTTLE_PREFIX) === 0) {
+            properties.deleteProperty(key);
+            removedProperties += 1;
+        }
+    });
+
+    var summary = {
+        test: "CONTROLE_AUTENTICACAO Sheets POC cleanup",
+        status: "PASS",
+        removedSheetsTriggers: removedTriggers,
+        trashedSpreadsheet: true,
+        removedSheetsProperties: removedProperties,
+        scope: "EXACT_REGISTERED_TRIGGER_IDS_AND_POC03_SHEETS_THROTTLE_PREFIX_ONLY"
+    };
+
+    Logger.log(JSON.stringify(summary));
+    return summary;
+}
