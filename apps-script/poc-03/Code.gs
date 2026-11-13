@@ -1782,7 +1782,7 @@ function poc03RegisterPersistentThrottleFailureForPoc_(
         }
 
         var state = stored.state;
-        var transition = poc03RegisterLoginFailureForPoc_(state, nowMs);
+        var transition = poc03RegisterLoginFailureForPoc_(state, operationNowMs);
 
         if (transition.status !== "BLOCKED") {
             state.updatedAtMs = nowMs;
@@ -3793,6 +3793,10 @@ function poc03RegisterSheetsThrottleFailureForPoc_(meta, nowMs, timing) {
             };
         }
 
+        // O instante da tentativa é capturado dentro da seção crítica.
+        // Assim a ordem temporal acompanha a ordem efetiva de atualização.
+        var operationNowMs = Date.now();
+
         // Retenção deliberada, exclusiva da POC, para observar contenção.
         Utilities.sleep(POC03_SHEETS_THROTTLE_HOLD_MS);
 
@@ -3808,7 +3812,7 @@ function poc03RegisterSheetsThrottleFailureForPoc_(meta, nowMs, timing) {
             var row = poc03BuildSheetThrottleRowForPoc_(
                 located.record,
                 state,
-                nowMs
+                operationNowMs
             );
 
             located.sheet.getRange(
@@ -4567,6 +4571,7 @@ function poc03CleanupSheetsPersistentThrottleProbe() {
     if (
         file.getName() !== meta.spreadsheetName
         || file.getName().indexOf(POC03_SHEETS_THROTTLE_FILE_PREFIX) !== 0
+        || file.getMimeType() !== "application/vnd.google-apps.spreadsheet"
     ) {
         throw new Error(
             "SHEETS_THROTTLE_FILE_IDENTITY_MISMATCH: arquivo não foi enviado à lixeira."
