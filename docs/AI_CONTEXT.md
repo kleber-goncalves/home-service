@@ -308,9 +308,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** a13510cfaf6b74a3c716ab4e8ca468d8bb994e3d
-- **Data do commit:** 2026-11-13T14:48:11-03:00
-- **Mensagem do commit:** docs(poc-03): corrigir comentário sobre UID do gatilho
+- **Commit de referência:** 39ce0fbeb71a087fba0cd8606b58b41943bc3271
+- **Data do commit:** 2026-11-13T14:48:40-03:00
+- **Mensagem do commit:** docs(arquitetura): documentar validação de triggerUid
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -405,13 +405,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 39ce0fb | 2026-11-13 | docs(arquitetura): documentar validação de triggerUid |
+| fb88e5e | 2026-11-13 | docs(poc-03): registrar vínculo seguro dos gatilhos coordenados |
+| 7eb47e4 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | a13510c | 2026-11-13 | docs(poc-03): corrigir comentário sobre UID do gatilho |
 | fa894a6 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | b1aaa85 | 2026-11-13 | test(poc-03): rejeitar gatilho antigo na sonda coordenada |
 | eb57503 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 61306ce | 2026-11-13 | test(poc-03): validar UID do gatilho na sonda coordenada |
-| a3502cc | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| 5894c8a | 2026-11-13 | docs(poc-03): referenciar limites oficiais da sonda por gatilhos |
-| 3853417 | 2026-11-13 | docs(ai-context): registrar sonda coordenada e critérios concorrentes |
 
 <!-- END AUTO-GENERATED SECTION -->
