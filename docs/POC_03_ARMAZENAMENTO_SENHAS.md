@@ -497,3 +497,26 @@ O método `File.setTrashed(true)` move o arquivo para a lixeira do Drive; não �
 **Limites:** a aprovação desta POC só demonstrará o comportamento em uma planilha temporária pequena, sob `ScriptLock` global do projeto. Não demonstra throughput, SLA, escala de produção, integridade relacional completa ou mitigação contra lockout DoS. Não autoriza login nem uso de dados reais.
 
 Referências oficiais: [SpreadsheetApp.create](https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet-app#create(String)) · [LockService](https://developers.google.com/apps-script/reference/lock/lock-service) · [File.setTrashed](https://developers.google.com/apps-script/reference/drive/file#setTrashed(Boolean)) · [Cotas e limites do Apps Script](https://developers.google.com/apps-script/guides/services/quotas).
+
+
+### 8.18. Comparação de hash — candidato Node/Vercel validado isoladamente
+
+**Problema original:** a função Apps Script `poc03BytesEqualForArgon2_` percorre 32 bytes com acumulador XOR. Isso evita encerrar no primeiro byte diferente, mas o JavaScript/V8 não oferece contrato formal de tempo constante. Ela permanece somente no harness de vetores e na prova experimental; não foi aprovada para autenticação.
+
+**Alternativa testada:** o módulo server-only `server/password-hash-compare.js` exporta `compareArgon2HashHex(candidateHashHex, storedHashHex)`. O helper:
+1. Exige duas strings no formato hexadecimal minúsculo exato de 64 caracteres (32 bytes).
+2. Recusa tipos, comprimentos ou caracteres inválidos antes da comparação.
+3. Decodifica os valores para dois `Buffer` de 32 bytes.
+4. Usa `timingSafeEqual` de `node:crypto` para comparar os bytes.
+
+A validação estrutural antecipada é aceitável porque a representação e o tamanho do hash são campos de formato, não o conteúdo secreto que a comparação precisa proteger. A primitiva recebe somente buffers com o mesmo tamanho. Não há fallback para `===`, comparação textual, XOR ou retorno de conteúdo sensível. O helper não registra hashes, não recebe chamadas do navegador e não é uma rota HTTP.
+
+**Cobertura automatizada adicionada:** três testes em `tests/poc03/apps-script.test.js` cobrem igualdade de hashes, diferenças no primeiro/meio/último byte e falha fechada para tipo, codificação hexadecimal ou tamanho inválido. Não foi criado benchmark estatístico de tempos: medir pequenas diferenças em um teste de unidade não comprova nem refuta tempo constante.
+
+**Base documental:** a documentação do Node.js descreve `crypto.timingSafeEqual(a, b)` como comparação dos bytes subjacentes por algoritmo de tempo constante e exige operandos de mesmo tamanho; também alerta que o restante do código pode introduzir vazamentos temporais. O Apps Script V8 não disponibiliza `crypto` nem `SubtleCrypto`. A documentação da Vercel confirma que o runtime Node.js oferece compatibilidade com as APIs Node. Fontes: [Node.js — crypto.timingSafeEqual](https://nodejs.org/api/crypto.html#cryptotimingsafeequala-b) · [Google — limitações do Apps Script V8](https://developers.google.com/apps-script/guides/v8-runtime#v8_runtime_limitations) · [Vercel — Node.js Runtime](https://vercel.com/docs/functions/runtimes/node-js).
+
+**Decisão parcial:** `node:crypto.timingSafeEqual` foi aceito como candidato técnico preferencial para uma futura comparação server-side de hashes Argon2id de 32 bytes. O helper está isolado fora de `api/` e de `src/`, e não foi ligado à Function nem ao fluxo Apps Script. O teste da primitiva não valida a integração, o canal de confiança ou o comportamento total do login.
+
+**Bloqueio arquitetural que permanece:** para manter o Apps Script como autoridade de domínio, ainda é necessário definir como a comparação será invocada sem transferir a decisão de autenticação para o cliente ou criar uma rota pública de comparação. A próxima decisão deverá especificar uma comunicação interna autenticada, proteção contra replay, falha fechada, dados mínimos transmitidos, ausência de hashes em logs/respostas ao navegador e como o Apps Script autoriza a emissão da sessão somente após a comparação válida. Não enviar hashes derivados ou armazenados ao React. Não implementar cadastro/login/sessões nesta etapa.
+
+**Estado:** primitiva Node implementada e coberta por testes automatizados; CI desta revisão ainda precisa confirmar a execução. Comparação no Apps Script e integração ponta a ponta continuam não aprovadas.
