@@ -49,6 +49,9 @@ jobs:
       - name: Run POC-02 gateway security tests
         run: npm run test:poc02
 
+      - name: Run POC-03 password KDF compatibility tests
+        run: npm run test:poc03
+
       - name: Validate occurrence register
         run: npm run check:occurrences
 
