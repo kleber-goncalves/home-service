@@ -1994,7 +1994,6 @@ function poc03CorruptPersistentThrottleForPoc_(identifier) {
  * Não chama deleteAllProperties e não toca nas propriedades de POC-02.
  */
 function poc03CleanupPersistentThrottleTestData() {
-    var removedCoordinatedTriggers = poc03DeletePersistentThrottleCoordinatedTriggers_();
     var lockResult = poc03AcquireThrottleScriptLock_();
 
     if (!lockResult.ok) {
@@ -2019,7 +2018,6 @@ function poc03CleanupPersistentThrottleTestData() {
             test: "POC-03 persistent throttle cleanup",
             status: "PASS",
             removedPoc03Properties: removedCount,
-            removedCoordinatedTriggers: removedCoordinatedTriggers,
             scope: "POC03_THROTTLE_TEST_PREFIX_ONLY"
         };
 
@@ -2295,6 +2293,26 @@ function poc03DeletePersistentThrottleCoordinatedTriggers_() {
     return removed;
 }
 
+/**
+ * Limpa a sonda coordenada: remove apenas os gatilhos do handler exclusivo
+ * e depois as propriedades sintéticas com o prefixo POC03_THROTTLE_TEST_.
+ */
+function poc03CleanupPersistentThrottleCoordinatedConcurrencyProbe() {
+    var removedTriggers = poc03DeletePersistentThrottleCoordinatedTriggers_();
+    var cleanup = poc03CleanupPersistentThrottleTestData();
+
+    var summary = {
+        test: "POC-03 coordinated concurrency probe cleanup",
+        status: cleanup.status,
+        removedCoordinatedTriggers: removedTriggers,
+        removedPoc03Properties: cleanup.removedPoc03Properties,
+        scope: "COORDINATED_HANDLER_AND_POC03_THROTTLE_TEST_PREFIX_ONLY"
+    };
+
+    Logger.log(JSON.stringify(summary));
+    return summary;
+}
+
 /** Lê e valida os metadados da sonda coordenada. */
 function poc03ReadCoordinatedThrottleMeta_(properties) {
     var raw = properties.getProperty(POC03_THROTTLE_COORD_META_KEY);
@@ -2427,8 +2445,8 @@ function poc03LaunchPersistentThrottleCoordinatedConcurrencyProbe() {
         throw new Error("SCRIPT_TRIGGER_SERVICE_UNAVAILABLE");
     }
 
-    // Limpa somente gatilhos do handler exclusivo e propriedades sintéticas antigas.
-    poc03CleanupPersistentThrottleTestData();
+    // Limpa apenas gatilhos do handler exclusivo e propriedades sintéticas antigas.
+    poc03CleanupPersistentThrottleCoordinatedConcurrencyProbe();
 
     var currentTriggers = ScriptApp.getProjectTriggers();
     var maxTriggers = 20;
@@ -2530,6 +2548,17 @@ function poc03LaunchPersistentThrottleCoordinatedConcurrencyProbe() {
                 // A limpeza das demais execuções continua.
             }
         });
+
+        try {
+            var failedProperties = poc03GetThrottleTestProperties_();
+            failedProperties.getKeys().forEach(function (key) {
+                if (key.indexOf(POC03_THROTTLE_TEST_PREFIX) === 0) {
+                    failedProperties.deleteProperty(key);
+                }
+            });
+        } catch (cleanupError) {
+            // O erro original da preparação é preservado.
+        }
 
         throw error;
     } finally {
@@ -2895,11 +2924,10 @@ function poc03RunPersistentThrottleCoordinatedConcurrencySummary() {
             stateKey
         );
 
-        if (!stored.ok || !stored.exists) {
-            throw new Error("Estado final persistido não está disponível.");
-        }
+        var stateAvailable = stored.ok && stored.exists;
 
-        var passed = details.length === POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS
+        var passed = stateAvailable
+            && details.length === POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS
             && counted === 4
             && locked === 1
             && blocked === 5
@@ -2930,13 +2958,15 @@ function poc03RunPersistentThrottleCoordinatedConcurrencySummary() {
             contendedWorkers: contendedWorkers,
             maxLockWaitMs: maxLockWaitMs,
             minLockWaitMs: waitSamples.length > 0 ? waitSamples[0] : null,
-            finalFailureCount: stored.state.failureCount,
-            finalStateBlocked: stored.state.blockedUntilMs > Date.now(),
+            finalFailureCount: stateAvailable ? stored.state.failureCount : null,
+            finalStateBlocked: stateAvailable
+                && stored.state.blockedUntilMs > Date.now(),
             synchronization: "SCRIPT_LOCK_WITH_ALL_WORKERS_BARRIER",
             persistence: "SCRIPT_PROPERTIES_TEST_ONLY",
             artificialLockHoldMs: POC03_THROTTLE_COORDINATED_HOLD_MS,
             barrierTimeoutMs: POC03_THROTTLE_COORDINATED_BARRIER_TIMEOUT_MS,
-            intervalResolution: "DATE_NOW_MILLISECONDS"
+            intervalResolution: "DATE_NOW_MILLISECONDS",
+            stateAvailable: stateAvailable
         };
 
         Logger.log(JSON.stringify(summary));
