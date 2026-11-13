@@ -312,9 +312,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 5cc4c9c535af86d396df50a060ee0b2f9b6d81ec
-- **Data do commit:** 2026-11-13T16:15:08-03:00
-- **Mensagem do commit:** docs(poc-03): registrar limpeza final da POC-03B
+- **Commit de referência:** 37efd2de81bd217593f054a8bdb6761c12b12ba6
+- **Data do commit:** 2026-11-13T16:15:42-03:00
+- **Mensagem do commit:** docs(architecture): fechar registro da POC-03B
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -409,13 +409,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 37efd2d | 2026-11-13 | docs(architecture): fechar registro da POC-03B |
+| 94412ac | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 5cc4c9c | 2026-11-13 | docs(poc-03): registrar limpeza final da POC-03B |
 | 769c954 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | d1a7ffd | 2026-11-13 | docs(architecture): refletir validacao real de sheets |
 | 9c89726 | 2026-11-13 | docs(ai-context): registrar POC-03B sheets real PASS |
 | 404227c | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 8722469 | 2026-11-13 | docs(architecture): registrar prova real de sheets PASS |
-| 90e4aaa | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| 9165e4e | 2026-11-13 | docs(poc-03): registrar execucao real de concorrencia em sheets |
 
 <!-- END AUTO-GENERATED SECTION -->
