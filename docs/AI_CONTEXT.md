@@ -308,9 +308,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** de15449e61e0ba5e716b74040836198a8d9ce30f
-- **Data do commit:** 2026-11-13T14:50:07-03:00
-- **Mensagem do commit:** docs(poc-03): ampliar timeout da barreira coordenada
+- **Commit de referência:** e85d7b167b2cc3941859ad9ed9a21ee509924c56
+- **Data do commit:** 2026-11-13T14:50:23-03:00
+- **Mensagem do commit:** docs(arquitetura): ampliar barreira da sonda coordenada
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -405,13 +405,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| e85d7b1 | 2026-11-13 | docs(arquitetura): ampliar barreira da sonda coordenada |
+| 388f249 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | de15449 | 2026-11-13 | docs(poc-03): ampliar timeout da barreira coordenada |
 | c1e2799 | 2026-11-13 | test(poc-03): ampliar tolerância da barreira concorrente |
 | 07e4d16 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 374b8ce | 2026-11-13 | docs(ai-context): registrar validação de triggerUid e próximos passos |
 | 39ce0fb | 2026-11-13 | docs(arquitetura): documentar validação de triggerUid |
 | fb88e5e | 2026-11-13 | docs(poc-03): registrar vínculo seguro dos gatilhos coordenados |
-| 7eb47e4 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| a13510c | 2026-11-13 | docs(poc-03): corrigir comentário sobre UID do gatilho |
 
 <!-- END AUTO-GENERATED SECTION -->
