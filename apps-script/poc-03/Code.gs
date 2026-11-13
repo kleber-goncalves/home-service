@@ -1470,6 +1470,7 @@ var POC03_THROTTLE_COORDINATED_WORKER_HANDLERS = [
     "poc03RunPersistentThrottleCoordinatedWorker09_"
 ];
 var POC03_THROTTLE_COORDINATED_HOLD_MS = 350;
+var POC03_THROTTLE_COORDINATED_META_TIMEOUT_MS = 30000;
 var POC03_THROTTLE_COORDINATED_BARRIER_TIMEOUT_MS = 180000;
 var POC03_THROTTLE_COORDINATED_TRIGGER_DELAY_MS = 1000;
 
@@ -2569,6 +2570,7 @@ function poc03LaunchPersistentThrottleCoordinatedConcurrencyProbe() {
             expectedWorkers: meta.expectedWorkers,
             createdTriggers: createdTriggers.length,
             triggerDelayMinimumMs: POC03_THROTTLE_COORDINATED_TRIGGER_DELAY_MS,
+            metadataTimeoutMs: POC03_THROTTLE_COORDINATED_META_TIMEOUT_MS,
             barrierTimeoutMs: POC03_THROTTLE_COORDINATED_BARRIER_TIMEOUT_MS,
             artificialLockHoldMs: POC03_THROTTLE_COORDINATED_HOLD_MS,
             synchronization: "ALL_WORKERS_ARRIVAL_BARRIER",
@@ -2635,7 +2637,7 @@ function poc03RunPersistentThrottleCoordinatedWorkerForIndex_(workerIndex, event
         properties = poc03GetThrottleTestProperties_();
 
         var metadataDeadline = Date.now()
-            + POC03_THROTTLE_COORDINATED_BARRIER_TIMEOUT_MS;
+            + POC03_THROTTLE_COORDINATED_META_TIMEOUT_MS;
 
         while (Date.now() < metadataDeadline) {
             meta = poc03ReadCoordinatedThrottleMeta_(properties);
@@ -3077,6 +3079,7 @@ function poc03RunPersistentThrottleCoordinatedConcurrencySummary() {
             synchronization: "SCRIPT_LOCK_WITH_ALL_WORKERS_BARRIER",
             persistence: "SCRIPT_PROPERTIES_TEST_ONLY",
             artificialLockHoldMs: POC03_THROTTLE_COORDINATED_HOLD_MS,
+            metadataTimeoutMs: POC03_THROTTLE_COORDINATED_META_TIMEOUT_MS,
             barrierTimeoutMs: POC03_THROTTLE_COORDINATED_BARRIER_TIMEOUT_MS,
             intervalResolution: "DATE_NOW_MILLISECONDS",
             stateAvailable: stateAvailable
