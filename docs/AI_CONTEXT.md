@@ -305,9 +305,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** d0754fbefa7424c900342958a7246ba88cf298c0
-- **Data do commit:** 2026-11-13T14:34:21-03:00
-- **Mensagem do commit:** docs(poc-03): esclarecer ausência de sobreposição nos workers
+- **Commit de referência:** 5154e7b4c8c187f3c8d3f1143b29c8fd66932041
+- **Data do commit:** 2026-11-13T14:34:24-03:00
+- **Mensagem do commit:** docs(arquitetura): corrigir evidência de concorrência POC-03
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -402,6 +402,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 5154e7b | 2026-11-13 | docs(arquitetura): corrigir evidência de concorrência POC-03 |
 | d0754fb | 2026-11-13 | docs(poc-03): esclarecer ausência de sobreposição nos workers |
 | d6963ea | 2026-11-13 | docs(ai-context): registrar testes reais de throttling persistente |
 | 3177816 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
@@ -409,6 +410,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | d955cdf | 2026-11-13 | docs(arquitetura): registrar validação manual do throttling POC-03 |
 | 728d0c6 | 2026-11-13 | docs(poc-03): registrar throttling persistente e sonda de concorrência |
 | 7fd993f | 2026-11-12 | docs(ai-context): atualizar snapshot automaticamente |
-| 5c81d4d | 2026-11-12 | docs(ai-context): atualizar próxima etapa de throttling persistente |
 
 <!-- END AUTO-GENERATED SECTION -->
