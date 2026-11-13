@@ -2344,14 +2344,27 @@ function poc03ReadCoordinatedThrottleMeta_(properties) {
             || meta.expectedWorkers !== POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS
             || !Array.isArray(meta.workerHandlers)
             || meta.workerHandlers.length !== POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS
+            || !Array.isArray(meta.triggerIds)
+            || meta.triggerIds.length !== POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS
         ) {
             return null;
         }
 
         for (var index = 0; index < POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS; index += 1) {
-            if (meta.workerHandlers[index] !== POC03_THROTTLE_COORDINATED_WORKER_HANDLERS[index]) {
+            if (
+                meta.workerHandlers[index] !== POC03_THROTTLE_COORDINATED_WORKER_HANDLERS[index]
+                || typeof meta.triggerIds[index] !== "string"
+                || meta.triggerIds[index].length < 1
+            ) {
                 return null;
             }
+        }
+
+        if (Object.keys(meta.triggerIds.reduce(function (seen, id) {
+            seen[id] = true;
+            return seen;
+        }, {})).length !== POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS) {
+            return null;
         }
 
         return meta;
@@ -2504,6 +2517,7 @@ function poc03LaunchPersistentThrottleCoordinatedConcurrencyProbe() {
             ready: false,
             expectedWorkers: POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS,
             workerHandlers: POC03_THROTTLE_COORDINATED_WORKER_HANDLERS.slice(),
+            triggerIds: [],
             createdAtMs: Date.now()
         };
 
@@ -2527,7 +2541,18 @@ function poc03LaunchPersistentThrottleCoordinatedConcurrencyProbe() {
                 .after(POC03_THROTTLE_COORDINATED_TRIGGER_DELAY_MS)
                 .create();
 
+            var triggerId = String(trigger.getUniqueId());
+
+            if (
+                !triggerId
+                || meta.triggerIds.indexOf(triggerId) >= 0
+            ) {
+                ScriptApp.deleteTrigger(trigger);
+                throw new Error("COORDINATED_PROBE_TRIGGER_ID_INVALID_OR_DUPLICATE");
+            }
+
             createdTriggers.push(trigger);
+            meta.triggerIds.push(triggerId);
         }
 
         meta.ready = true;
@@ -2587,16 +2612,20 @@ function poc03LaunchPersistentThrottleCoordinatedConcurrencyProbe() {
  * Ele registra chegada, espera os dez workers na barreira e então disputa
  * o ScriptLock com espera artificial de 350 ms dentro da seção crítica.
  */
-function poc03RunPersistentThrottleCoordinatedWorkerForIndex_(workerIndex) {
+function poc03RunPersistentThrottleCoordinatedWorkerForIndex_(workerIndex, event) {
     var invocationStartedAtMs = Date.now();
     var workerHandler = Number.isInteger(workerIndex)
         && workerIndex >= 0
         && workerIndex < POC03_THROTTLE_CONCURRENCY_EXPECTED_WORKERS
         ? POC03_THROTTLE_COORDINATED_WORKER_HANDLERS[workerIndex]
         : null;
+    var eventTriggerUid = event && event.triggerUid !== undefined
+        ? String(event.triggerUid)
+        : null;
     var properties = null;
     var meta = null;
     var detail = null;
+    var belongsToActiveRun = false;
 
     try {
         if (!workerHandler) {
@@ -2625,6 +2654,29 @@ function poc03RunPersistentThrottleCoordinatedWorkerForIndex_(workerIndex) {
         ) {
             throw new Error("COORDINATED_PROBE_METADATA_UNAVAILABLE");
         }
+
+        if (
+            !eventTriggerUid
+            || meta.triggerIds[workerIndex] !== eventTriggerUid
+        ) {
+            detail = {
+                status: "STALE_OR_UNMATCHED_TRIGGER",
+                workerIndex: workerIndex,
+                invocationStartedAtMs: invocationStartedAtMs,
+                workerCompletedAtMs: Date.now(),
+                runId: meta.runId
+            };
+
+            Logger.log(JSON.stringify({
+                test: "Persistent throttle coordinated worker",
+                workerIndex: workerIndex,
+                status: detail.status
+            }));
+
+            return detail;
+        }
+
+        belongsToActiveRun = true;
 
         var arrivalLockResult = poc03AcquireThrottleScriptLock_();
 
@@ -2781,7 +2833,13 @@ function poc03RunPersistentThrottleCoordinatedWorkerForIndex_(workerIndex) {
             errorName: error && error.name ? String(error.name) : "Error"
         };
 
-        if (properties && workerIndex >= 0 && meta && meta.runId) {
+        if (
+            belongsToActiveRun
+            && properties
+            && workerIndex >= 0
+            && meta
+            && meta.runId
+        ) {
             try {
                 properties.setProperty(
                     POC03_THROTTLE_COORD_DETAIL_PREFIX + workerIndex,
@@ -2800,16 +2858,23 @@ function poc03RunPersistentThrottleCoordinatedWorkerForIndex_(workerIndex) {
 
         return detail;
     } finally {
-        if (workerHandler) {
-            poc03DeletePersistentThrottleCoordinatedTriggerByHandler_(workerHandler);
+        if (workerHandler && eventTriggerUid) {
+            poc03DeletePersistentThrottleCoordinatedTriggerByUid_(
+                workerHandler,
+                eventTriggerUid
+            );
         }
     }
 }
 
-/** Remove um único gatilho pelo handler exclusivo do worker. */
-function poc03DeletePersistentThrottleCoordinatedTriggerByHandler_(handlerName) {
+/** Remove apenas o gatilho exato que acionou este worker. */
+function poc03DeletePersistentThrottleCoordinatedTriggerByUid_(
+    handlerName,
+    triggerUid
+) {
     if (
         POC03_THROTTLE_COORDINATED_WORKER_HANDLERS.indexOf(handlerName) < 0
+        || !triggerUid
         || typeof ScriptApp !== "object"
         || ScriptApp === null
         || typeof ScriptApp.getProjectTriggers !== "function"
@@ -2822,7 +2887,10 @@ function poc03DeletePersistentThrottleCoordinatedTriggerByHandler_(handlerName) 
 
     for (var i = 0; i < triggers.length; i += 1) {
         try {
-            if (triggers[i].getHandlerFunction() === handlerName) {
+            if (
+                triggers[i].getHandlerFunction() === handlerName
+                && String(triggers[i].getUniqueId()) === String(triggerUid)
+            ) {
                 ScriptApp.deleteTrigger(triggers[i]);
                 return true;
             }
@@ -2836,35 +2904,35 @@ function poc03DeletePersistentThrottleCoordinatedTriggerByHandler_(handlerName) 
 
 // Cada gatilho tem um handler distinto: isso evita depender da conversão
 // numérica/string do triggerUid entregue pelo objeto de evento do Google.
-function poc03RunPersistentThrottleCoordinatedWorker00_() {
-    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(0);
+function poc03RunPersistentThrottleCoordinatedWorker00_(event) {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(0, event);
 }
-function poc03RunPersistentThrottleCoordinatedWorker01_() {
-    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(1);
+function poc03RunPersistentThrottleCoordinatedWorker01_(event) {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(1, event);
 }
-function poc03RunPersistentThrottleCoordinatedWorker02_() {
-    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(2);
+function poc03RunPersistentThrottleCoordinatedWorker02_(event) {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(2, event);
 }
-function poc03RunPersistentThrottleCoordinatedWorker03_() {
-    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(3);
+function poc03RunPersistentThrottleCoordinatedWorker03_(event) {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(3, event);
 }
-function poc03RunPersistentThrottleCoordinatedWorker04_() {
-    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(4);
+function poc03RunPersistentThrottleCoordinatedWorker04_(event) {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(4, event);
 }
-function poc03RunPersistentThrottleCoordinatedWorker05_() {
-    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(5);
+function poc03RunPersistentThrottleCoordinatedWorker05_(event) {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(5, event);
 }
-function poc03RunPersistentThrottleCoordinatedWorker06_() {
-    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(6);
+function poc03RunPersistentThrottleCoordinatedWorker06_(event) {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(6, event);
 }
-function poc03RunPersistentThrottleCoordinatedWorker07_() {
-    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(7);
+function poc03RunPersistentThrottleCoordinatedWorker07_(event) {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(7, event);
 }
-function poc03RunPersistentThrottleCoordinatedWorker08_() {
-    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(8);
+function poc03RunPersistentThrottleCoordinatedWorker08_(event) {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(8, event);
 }
-function poc03RunPersistentThrottleCoordinatedWorker09_() {
-    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(9);
+function poc03RunPersistentThrottleCoordinatedWorker09_(event) {
+    return poc03RunPersistentThrottleCoordinatedWorkerForIndex_(9, event);
 }
 
 /**
