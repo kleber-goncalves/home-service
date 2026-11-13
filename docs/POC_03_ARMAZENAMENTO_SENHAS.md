@@ -393,14 +393,15 @@ Foi preparada uma segunda etapa para ir além do modelo in-memory da seção 8.1
 
 **Resultado automatizado:** CI de push #231 — SUCCESS. Foram adicionados testes do harness Node/VM para estado persistido simulado, falha fechada quando o lock não pode ser adquirido ou o serviço de propriedades está indisponível, e dez workers sequenciais. Essa bateria automatizada não simula contenção real entre execuções independentes do Google.
 
-**Execução manual no Apps Script — pendente:**
-1. Executar `poc03RunPersistentThrottlePolicyTests()`. Esperado: PASS 6/6. Essa bateria usa Properties Service e ScriptLock reais, e remove as propriedades de teste ao final.
-2. Executar `poc03ResetPersistentThrottleConcurrencyProbe()` uma vez.
-3. Iniciar **dez execuções separadas** de `poc03RunPersistentThrottleConcurrencyWorker()` com poucos segundos de diferença. O worker mantém o lock por 150 ms artificialmente para ampliar a disputa. Cada execução registra apenas o resultado lógico, nunca o identificador/HMAC.
-4. Executar `poc03RunPersistentThrottleConcurrencySummary()`. Resultado esperado, se todas as dez execuções forem registradas: quatro `COUNTED`, uma `LOCKED_AFTER_FAILURE`, cinco `BLOCKED`, contador final 5 e bloqueio ainda ativo.
-5. Após registrar o resumo, executar `poc03CleanupPersistentThrottleTestData()`.
+**Execução manual no Apps Script — concluída em 2026-11-13:**
 
-Se alguma execução não conseguir o lock dentro do timeout, a operação falha fechada e o resumo fica incompleto; não tratar como sucesso.
+- **poc03RunPersistentThrottlePolicyTests(): PASS 6/6** no runtime real. O resumo confirmou threshold=5, observationWindowMs=900000, lockDurationMs=900000, persistence=SCRIPT_PROPERTIES_TEST_ONLY e synchronization=SCRIPT_LOCK. Também confirmou falha fechada para estado corrompido e ausência de contas reais. A limpeza automática removeu duas propriedades exclusivas do prefixo POC-03.
+- **poc03ResetPersistentThrottleConcurrencyProbe(): READY**, com dez workers esperados e espera artificial de 150 ms dentro da seção crítica.
+- **poc03RunPersistentThrottleConcurrencyWorker():** foram iniciadas dez execuções separadas do projeto Apps Script. O consolidado registrou os dez resultados.
+- **poc03RunPersistentThrottleConcurrencySummary(): PASS**, com observedWorkers=10, countedBeforeLimit=4, lockedAtLimit=1, rejectedWhileLocked=5, lockUnavailable=0, finalFailureCount=5 e finalStateBlocked=true.
+- **poc03CleanupPersistentThrottleTestData(): PASS**, removeu quatro propriedades da sonda; o escopo informado foi somente POC03_THROTTLE_TEST_.
+
+**Interpretação e limite da evidência:** a execução manual validou a persistência em Script Properties e a consistência do contador entre dez execuções independentes, usando o ScriptLock real. O resumo demonstra a distribuição esperada e nenhuma falha de aquisição do lock. Entretanto, os logs fornecidos não incluem os horários individuais de início/término dos dez workers; portanto, não bastam isoladamente para demonstrar sobreposição temporal entre todas as execuções. A confirmação de concorrência temporal deve ser feita no painel **Execuções** do Apps Script, comparando os intervalos de início e término. Até essa conferência, registrar o resultado como **PASS da sonda e do estado compartilhado; sobreposição temporal não comprovada pelos logs apresentados**.
 
 **Limite arquitetural:** este passo persiste estado em Script Properties para testar a primitiva key-value, não na aba `CONTROLE_AUTENTICACAO` da modelagem. Script Properties são compartilhadas por todos os usuários do mesmo projeto; `getScriptLock()` também serializa a seção crítica para todas as execuções desse projeto, não apenas para uma conta. Isso favorece consistência simples, mas cria um ponto global de contenção.
 
