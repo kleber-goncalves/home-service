@@ -3339,7 +3339,10 @@ function poc03ReadSheetThrottleRowForPoc_(row) {
     ) {
         return { ok: false, reason: "ACTIVE_STATE_INCONSISTENT" };
     } else if (failureCount < POC03_LOGIN_FAILURE_LIMIT) {
-        if (blockedUntil.value !== null) {
+        if (
+            blockedUntil.value !== null
+            || updatedAt.value - windowStarted.value >= POC03_LOGIN_WINDOW_MS
+        ) {
             return { ok: false, reason: "PREMATURE_BLOCK_INVALID" };
         }
     } else if (
@@ -3400,7 +3403,10 @@ function poc03BuildSheetThrottleRowForPoc_(record, state, updatedAtMs) {
     ) {
         throw new Error("SHEETS_THROTTLE_ACTIVE_STATE_INVALID");
     } else if (state.failureCount < POC03_LOGIN_FAILURE_LIMIT) {
-        if (state.blockedUntilMs !== null) {
+        if (
+            state.blockedUntilMs !== null
+            || updatedValue - state.windowStartedAtMs >= POC03_LOGIN_WINDOW_MS
+        ) {
             throw new Error("SHEETS_THROTTLE_PREMATURE_BLOCK_INVALID");
         }
     } else if (
@@ -3759,7 +3765,7 @@ function poc03RegisterSheetsThrottleFailureForPoc_(meta, nowMs, timing) {
         timing.lockRequestedAtMs = Date.now();
     }
 
-    var lockResult = poc03AcquireThrottleScriptLock_();
+    var lockResult = poc03AcquireSheetsThrottleLock_();
 
     if (timing) {
         timing.lockAcquiredAtMs = lockResult.ok ? Date.now() : null;
@@ -3812,9 +3818,11 @@ function poc03RegisterSheetsThrottleFailureForPoc_(meta, nowMs, timing) {
                 POC03_SHEETS_THROTTLE_COLUMNS.length
             ).setValues([row]);
 
-            SpreadsheetApp.flush();
             persistedWrite = true;
         }
+
+        // Confirma qualquer alteração enquanto o ScriptLock ainda está retido.
+        SpreadsheetApp.flush();
 
         return {
             status: transition.status,
@@ -3831,12 +3839,6 @@ function poc03RegisterSheetsThrottleFailureForPoc_(meta, nowMs, timing) {
     } finally {
         if (timing) {
             timing.lockReleasedAtMs = null;
-        }
-
-        try {
-            SpreadsheetApp.flush();
-        } catch (flushError) {
-            // A falha do serviço será percebida na leitura/resumo; não logar detalhes.
         }
 
         try {
@@ -3938,7 +3940,7 @@ function poc03RunSheetsThrottleWorkerForIndex_(workerIndex, event) {
         belongsToRun = true;
 
         // Cada worker registra uma única chegada, protegida pelo mesmo lock.
-        var arrivalLockResult = poc03AcquireThrottleScriptLock_();
+        var arrivalLockResult = poc03AcquireSheetsThrottleLock_();
 
         if (!arrivalLockResult.ok) {
             throw new Error("SHEETS_THROTTLE_ARRIVAL_LOCK_UNAVAILABLE");
