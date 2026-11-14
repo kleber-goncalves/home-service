@@ -1,10 +1,10 @@
 # Arquitetura da integração Vercel Functions + Google Apps Script — Conecta Local
 
-> **Versão:** 0.1  
-> **Data:** 2026-11-10  
-> **Status:** POC-01 (#10) e POC-02 (#11) estão integradas à `dev`; a interface visual de acesso foi integrada pelo PR #13; a investigação experimental POC-03 foi incorporada pelo PR #12, incluindo harness Apps Script, testes e documentação. Login, cadastro, sessão e armazenamento operacional de credenciais continuam não implementados. A POC-04 de sessão permanece pendente. Nenhuma validação aprova o sistema para produção.  
+> **Versão:** 0.2  
+> **Data da revisão:** 2026-11-14  
+> **Status:** POC-01 (#10), POC-02 (#11), interface demonstrativa (#13) e investigação experimental POC-03 (#12) estão integradas à `dev`. Os PRs #12 e #13 foram efetivamente merged em 2026-11-14; CI pós-merge de ambos concluiu SUCCESS. A interface continua visual, sem envio/persistência de credenciais. Cadastro, login, recuperação, sessão e armazenamento operacional de credenciais continuam não implementados. **POC-04 é a próxima etapa planejada e ainda não foi iniciada.** Nenhuma validação aprova o sistema para produção.  
 > **Escopo:** integração React/Vite, Google Apps Script, Google Sheets e Google Drive para a demonstração acadêmica.  
-> **Premissa:** manter Apps Script como backend inicial e autenticação própria por e-mail e senha, conforme decisão funcional aprovada. Transporte, sessão e armazenamento seguro de senhas continuam pendentes de prova de conceito.
+> **Premissa:** manter Apps Script como autoridade de domínio e sessão; Vercel Functions atua apenas como gateway HTTP. Qualquer fluxo de autenticação e sessão deverá ser aprovado em provas isoladas com dados sintéticos.
 
 ## 1. Objetivo e estado real
 
@@ -106,7 +106,7 @@ Portanto, a proposta exige autenticação própria da comunicação entre a Func
 - Um segredo fixo enviado como parâmetro sem assinatura, timestamp ou controle de replay não será considerado solução final.
 - A chave fica em variável de ambiente server-side da Vercel e em Script Properties do projeto Apps Script. Não deve aparecer no repositório, no frontend, em logs ou em respostas.
 
-A POC-02 implementa HMAC-SHA-256 com mensagem canônica versionada, timestamp em milissegundos, nonce aleatório de 256 bits, hash SHA-256 do payload e segredo compartilhado de 32 bytes. O contrato, os limites e os resultados manuais estão em `docs/POC_02_ASSINATURA_GATEWAY.md`. A implementação foi validada na branch `feat/poc-02-hmac-replay` em Preview e contra o Web App Apps Script isolado; o PR #11 ainda aguarda integração em `dev`. A assinatura autentica a comunicação entre servidores, não os usuários finais, e não substitui autorização. A POC permanece restrita a ações sintéticas e não está aprovada para produção.
+A POC-02 implementa HMAC-SHA-256 com mensagem canônica versionada, timestamp em milissegundos, nonce aleatório de 256 bits, hash SHA-256 do payload e segredo compartilhado de 32 bytes. O contrato, os limites e os resultados manuais estão em `docs/POC_02_ASSINATURA_GATEWAY.md`. O PR #11 foi integrado à `dev` em 2026-11-11 e os testes manuais foram aprovados. A assinatura autentica a comunicação entre servidores, não os usuários finais, e não substitui autorização. A integração continua restrita a ações sintéticas `poc.*` e não está aprovada para produção.
 
 ### 4.4. Sessão do usuário e cookie do navegador
 
@@ -444,9 +444,9 @@ Ainda não está decidido:
 - como Apps Script validará o hash do token, expiração e revogação;
 - como o fluxo funcionará em domínio de Preview e produção.
 
-**Caminho candidato:** a Vercel Function emitir um cookie HttpOnly, Secure e SameSite adequado no domínio da aplicação. Em chamadas posteriores, a Function lê o cookie no servidor e encaminha o token ao Apps Script, que continua sendo a autoridade da sessão e valida o hash armazenado na aba SESSOES.
+**Caminho candidato, ainda sem aprovação:** a Vercel Function emitir um cookie `HttpOnly`, `Secure` e `SameSite` adequado no domínio da aplicação. Em chamadas posteriores, a Function lê o cookie somente no servidor e encaminha o token ao Apps Script por envelope HMAC; o Apps Script permanece como autoridade da sessão e valida o hash armazenado na aba `SESSOES`.
 
-Não escolher os atributos finais nem considerar o cookie seguro sem testar CSRF, validação de Origin, expiração por inatividade e absoluta, logout, revogação, XSS, Preview e produção. Não expor o token à aplicação React, à URL ou aos logs.
+A POC-04 está planejada, mas ainda não foi iniciada. O escopo, os estágios, o modelo de ameaça e os critérios de aceite estão em [`docs/POC_04_SESSOES.md`](./POC_04_SESSOES.md). Não escolher os atributos finais nem considerar o cookie seguro sem testar CSRF, validação estrita de `Origin`, expiração por inatividade e absoluta, logout, revogação, XSS, Preview e produção. Não expor o token à aplicação React, à URL ou aos logs.
 
 A limitação de TextOutput continua relevante para respostas diretas do Apps Script, mas o cookie seria emitido pela Function, não pelo Apps Script.
 
@@ -535,15 +535,14 @@ Nenhuma implementação de autenticação, publicação anônima ou escrita oper
 
 ## 15. Ordem de trabalho proposta
 
-1. Revisar e aprovar esta arquitetura de gateway.
-2. **POC-01 — comunicação:** criar uma Function mínima de teste e comprovar React/Vercel → Function → Apps Script, incluindo redirect, resposta JSON, timeout e erros.
-3. **POC-02 — assinatura do gateway:** comprovar que só chamadas server-to-server assinadas são processadas e que chamadas diretas/replay são recusadas.
-4. **POC-03 — senha e aleatoriedade:** avaliar primitivas, KDF e desempenho no ambiente disponível.
-5. **POC-04 — sessão:** testar cookie emitido pela Vercel Function, ciclo de vida e proteção CSRF; Apps Script continua validando a sessão.
-6. **POC-05 — Sheets, locks e auditoria:** confirmar lote atômico, concorrência e falhas.
-7. **POC-06/07 — Drive e arquivos:** confirmar permissões, validações e limites.
-8. **POC-08/09 — implantação, abuso e quotas:** testar limites do ambiente de demonstração.
-9. Somente após aprovações: implementar módulos progressivamente, começando por leitura pública e operações não privilegiadas; autenticação permanece bloqueada até POC-03/04.
+1. **POC-01 — comunicação:** concluída e integrada pelo PR #10; testes manuais registrados em `docs/POC_01_COMUNICACAO.md`.
+2. **POC-02 — assinatura do gateway:** concluída e integrada pelo PR #11; permanece restrita a ações sintéticas `poc.*`, com evidências em `docs/POC_02_ASSINATURA_GATEWAY.md`.
+3. **POC-03 — KDF, política de entrada, blocklist e throttling:** investigação concluída e integrada pelo PR #12; nenhuma solução de senha/comparador foi aprovada para autenticação. Evidências e limites em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
+4. **Próxima etapa: POC-04 — sessão com cookie via gateway.** Primeiro revisar e aprovar o plano em `docs/POC_04_SESSOES.md`; depois executar somente provas isoladas com tokens e contas sintéticos. Não conectar login nem credenciais reais.
+5. **POC-05 — Sheets, locks e auditoria:** confirmar lote atômico, concorrência e falhas.
+6. **POC-06/07 — Drive e arquivos:** confirmar permissões, validações e limites.
+7. **POC-08/09 — implantação, abuso e quotas:** testar limites do ambiente de demonstração.
+8. Somente após aprovações separadas: implementar módulos progressivamente. Cadastro/login permanecem bloqueados até que armazenamento/validação de senha e sessão tenham decisões técnicas aprovadas.
 
 Não criar endpoints administrativos, painel autenticado, upload público ou escrita operacional antes das etapas e critérios correspondentes.
 
