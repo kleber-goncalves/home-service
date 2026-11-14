@@ -16,7 +16,7 @@ A demonstração **não** representa um marketplace operacional: não há cadast
 - **Componentes:** primitivas locais editáveis no padrão visual shadcn/ui, configuradas para JavaScript.
 - **Ícones:** Lucide React.
 - **Backend de negócio planejado:** Google Apps Script.
-- **Gateway HTTP:** Vercel Functions; a primeira integração está isolada na POC-01 e ainda depende da implantação de teste do Apps Script.
+- **Gateway HTTP:** Vercel Functions. As POCs-01/02 estão integradas à `dev` e permanecem restritas a ações sintéticas; a POC-04 está em implementação isolada na branch `feat/poc-04-session-cookie`, sem integração ao fluxo visual de acesso.
 - **Dados planejados:** Google Sheets.
 - **Imagens:** fotografias ilustrativas externas do Pexels; fontes e créditos abaixo.
 
@@ -47,6 +47,9 @@ O GitHub Actions executa essas verificações em pushes e Pull Requests direcion
 - [Modelagem lógica e física dos dados](docs/MODELAGEM_DADOS.md)
 - [Arquitetura de integração Vercel Functions + Apps Script](docs/ARQUITETURA_APPS_SCRIPT.md)
 - [POC-01 — Comunicação React, Vercel Functions e Apps Script](docs/POC_01_COMUNICACAO.md)
+- [POC-02 — Assinatura do gateway e proteção contra replay](docs/POC_02_ASSINATURA_GATEWAY.md)
+- [POC-03 — Investigação de armazenamento de senhas](docs/POC_03_ARMAZENAMENTO_SENHAS.md)
+- [POC-04 — Sessão sintética via cookie](docs/POC_04_SESSOES.md)
 - [Registro público de ocorrências](docs/REGISTRO_DE_OCORRENCIAS.md)
 
 ## Créditos das imagens

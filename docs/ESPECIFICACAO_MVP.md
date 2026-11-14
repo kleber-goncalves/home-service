@@ -31,7 +31,7 @@ Ainda não estão implementados ou integrados:
 - denúncias e moderação operacionais;
 - envio de e-mails.
 
-A arquitetura planejada é React/Vite → Vercel Function (gateway HTTP) → Google Apps Script (backend de negócio) → Google Sheets/Drive. A Function ainda não existe no repositório; a arquitetura e principalmente a autenticação exigem provas de conceito técnicas antes da implementação.
+A arquitetura técnica em prova de conceito é React/Vite → Vercel Function (gateway HTTP) → Google Apps Script → Google Sheets/Drive. A rota `/api/backend` e a assinatura HMAC das POCs-01/02 estão integradas à `dev` e restritas a ações sintéticas. A rota isolada de sessão `/api/poc04/session` existe somente na branch `feat/poc-04-session-cookie`, ainda sem validação manual no Preview e sem integração ao produto. Nenhuma dessas provas implementa autenticação de usuários ou armazenamento operacional.
 
 ## 3. Classificação e leitura dos requisitos
 

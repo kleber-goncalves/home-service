@@ -104,7 +104,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 - Não há backend de negócio operacional integrado ao frontend, autenticação real, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo; a tela de acesso é somente demonstrativa.
 - **PR #13 — interface demonstrativa:** merge commit `770560f93b6a1ee44c31a1990ea4b64454fb1b23`, integrado em 2026-11-14. `src/pages/AuthDemoPage.jsx` fica acessível por `/?auth=demo`; cadastro por `/?auth=demo&mode=register`. Os formulários validam localmente, não chamam API nem persistem valores e limpam os campos de senha após a submissão. Cadastro, verificação por código, login e recuperação ainda não são operações de backend.
 - As CI pós-merge de #13 (`Validate Home Service` #43623828275 e `AI Context — Synchronize` #43623828384) e #12 (`Validate Home Service` #43624907349 e `AI Context — Synchronize` #43624907085) concluíram SUCCESS em 2026-11-14. Não havia PRs abertos na última consulta. `main` permaneceu em `45412ad4f1c082590d9f800d8e6b707cfa35c5ed`; não recebeu esses merges.
-- A POC-04 ainda não começou. O plano de escopo, modelo de ameaça e critérios de aceite foi criado em `docs/POC_04_SESSOES.md`; a próxima conversa deve lê-lo antes de alterar código. A POC-04 deve usar token/conta sintéticos e provar cookie, encaminhamento server-side, autoridade Apps Script, expiração, logout/revogação e CSRF/Origin. Ela não libera login nem credenciais reais.
+- A POC-04 está em implementação isolada na branch `feat/poc-04-session-cookie`, criada a partir da `dev` em 2026-11-14. A branch contém uma rota dedicada `/api/poc04/session`, gateway server-side, Apps Script temporário, harness de teste e documentação; ainda não há deployment Apps Script nem validação manual de navegador. O endpoint exige `VERCEL_ENV=preview`, `POC04_ENABLED=true` e Origin HTTPS exata; usa conta e tokens sintéticos; não altera `api/backend.js` nem a allowlist das POCs-01/02. O cookie candidato é `__Host-conecta_poc04_session`; a emissão depende da confirmação do Apps Script. A POC inclui rotação CSRF, validação de sessão, expiração de 30 minutos/8 horas e logout com revogação confirmada. Não conectar `AuthDemoPage`, não usar a planilha estrutural e não habilitar autenticação ou credenciais reais. Consultar `docs/POC_04_SESSOES.md` para etapas manuais pendentes.
 - A homepage não processa pagamentos, agendamentos ou contratação.
 
 A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a arquitetura e seus limites. POC-01 (#10), POC-02 (#11), interface visual (#13) e POC-03 experimental (#12) estão integradas à `dev`. Nenhuma dessas entregas cria autenticação de usuários, sessão ou operações de negócio; credenciais reais continuam proibidas. Para retomar o trabalho, leia também `docs/POC_04_SESSOES.md` antes de iniciar a próxima POC.
@@ -270,7 +270,7 @@ Em falhas: informar estado de carregamento/sucesso/erro; não declarar sucesso a
 ## 11. Documentação e registro de problemas
 
 - Este `AI_CONTEXT.md` descreve o estado atual e as regras de continuidade. Em uma conversa nova, leia-o por inteiro antes de qualquer alteração.
-- `POC_04_SESSOES.md` é o plano da próxima etapa; está em estado PLANEJAMENTO, não iniciada, e não autoriza implementar autenticação.
+- `POC_04_SESSOES.md` documenta a prova isolada de sessão. Na branch `feat/poc-04-session-cookie`, a implementação automatizável foi iniciada; os testes de Node/VM não substituem implantação e validação manual no Google Apps Script e Vercel Preview. A POC não implementa autenticação de usuários.
 - `ESPECIFICACAO_MVP.md` v0.4 consolida requisitos funcionais e as Fases 3 e 4; `MODELAGEM_DADOS.md` contém a modelagem lógica e o esquema físico aprovado conceitualmente (12 entidades/102 campos e 12 abas/102 colunas). Validações técnicas e implementação continuam pendentes.
 - `REGISTRO_DE_OCORRENCIAS.md` preserva o histórico de bugs, erros, vulnerabilidades e incidentes. Não criar ocorrência apenas por haver pendência de projeto ou risco conhecido ainda não observado como falha.
 - Atualize o contexto narrativo no mesmo trabalho quando decisões ou comportamentos relevantes mudarem.
@@ -288,7 +288,7 @@ Os comandos de validação são mantidos em `package.json`. O workflow de qualid
 4. ESLint.
 5. Build de produção do Vite.
 
-Os testes das POCs devem permanecer nos scripts npm e no workflow: `npm run test:poc01`, `npm run test:poc02` e `npm run test:poc03`. Não criar etapas E2E ou Lighthouse só para imitar outro projeto; introduzi-las quando houver fluxos reais que justifiquem esses testes.
+Os testes das POCs devem permanecer nos scripts npm e no workflow: `npm run test:poc01`, `npm run test:poc02`, `npm run test:poc03` e, na branch da POC-04, `npm run test:poc04`. Não criar etapas E2E ou Lighthouse só para imitar outro projeto; introduzi-las quando houver fluxos reais que justifiquem esses testes.
 
 A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substitui a conferência do deployment, do SHA publicado e testes manuais de navegação/responsividade. Não afirmar que o Google Apps Script, Sheets ou Drive estão funcionando antes de validar sua integração real.
 

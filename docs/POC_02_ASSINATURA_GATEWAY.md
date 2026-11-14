@@ -1,6 +1,6 @@
 # POC-02 — Autenticidade do gateway Vercel → Apps Script
 
-> **Estado:** implementada e validada manualmente em Preview e no Web App Apps Script isolado em 2026-11-11. PR #11 aberto para integração em `dev`; não aprovada para produção.
+> **Estado:** integrada à `dev` pelo PR #11 em 2026-11-11 e validada manualmente em Preview e no Web App Apps Script isolado. Continua restrita a ações sintéticas `poc.*` e não aprovada para produção.
 > **Base:** branch `dev`, após integração da POC-01.
 > **Escopo:** autenticar cada chamada server-to-server, detectar adulteração, expiração e replay.
 

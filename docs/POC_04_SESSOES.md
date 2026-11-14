@@ -1,145 +1,190 @@
-# POC-04 — sessão com cookie via gateway
+# POC-04 — sessão sintética com cookie via gateway
 
-> **Status:** PLANEJAMENTO DOCUMENTADO — não iniciada. Este arquivo não implementa sessão, cookie ou rota autenticada.
-> **Data:** 2026-11-14
-> **Escopo:** prova isolada da emissão/transporte de cookie e do ciclo de vida de sessão entre navegador, Vercel Function e Google Apps Script.
-> **Ambiente obrigatório:** Vercel Preview e projeto/recursos Apps Script isolados, usando somente tokens, contas e registros sintéticos. Não usar credenciais, contas ou dados pessoais reais.
+> **Status nesta branch:** IMPLEMENTAÇÃO AUTOMATIZÁVEL INICIADA — não implantada e ainda sem validação manual em Preview ou no Apps Script real.
+> **Branch:** `feat/poc-04-session-cookie`
+> **Base:** HEAD de `dev` em 2026-11-14.
+> **Escopo:** provar emissão/recepção de cookie, encaminhamento server-side, autoridade Apps Script, expiração, CSRF/Origin e logout/revogação, exclusivamente com dados sintéticos.
+> **Fora do escopo:** cadastro, senha, login de usuários, recuperação, autorização de papéis, integração com `AuthDemoPage.jsx`, planilha estrutural e Production.
 
-## 1. Ponto de partida confirmado
+## 1. Segurança de escopo e ponto de partida
 
-- PR #10 (POC-01 — transporte React/Vercel Function/Apps Script) integrado à `dev`.
-- PR #11 (POC-02 — HMAC-SHA-256 e proteção contra replay) integrado à `dev`. O gateway continua restrito à allowlist de ações sintéticas `poc.*`; a POC-02 autentica a comunicação entre servidores, não o usuário final.
-- PR #12 (POC-03 — investigação de senhas) integrado à `dev` em 2026-11-14. PBKDF2 via `Utilities` foi reprovado; Argon2id é apenas candidato experimental; nenhum comparador foi aprovado.
-- PR #13 (interface visual demonstrativa de acesso) integrado à `dev` em 2026-11-14. `src/pages/AuthDemoPage.jsx` não envia credenciais, não persiste valores e não cria sessão.
-- Os workflows pós-merge de #12 e #13 (`Validate Home Service` e `AI Context — Synchronize`) concluíram SUCCESS.
-- `main` permanece fora do escopo e não deve receber alterações sem autorização expressa.
-- A planilha estrutural do produto existe, mas não é armazenamento operacional. Nenhuma conta, sessão ou credencial de negócio deve ser criada nela nesta POC.
+POC-01 (#10), POC-02 (#11), POC-03 (#12) e interface demonstrativa (#13) estão integradas à `dev`. A POC-03 não aprovou comparador de senha; o estado NO-GO da seção 8.19 permanece inalterado. A POC-04 não usa senha, KDF ou hash de senha.
 
-## 2. Objetivo
+A branch da POC-04 foi criada a partir do HEAD de `dev`. A rota nova é `/api/poc04/session`, separada de `/api/backend`; as três ações `poc.*` da POC-01/02 permanecem inalteradas.
 
-Comprovar, sem implementar autenticação, que uma sessão opaca pode ser transportada pelo cookie do domínio da aplicação sem expor o token ao JavaScript do React, à URL ou aos logs, enquanto o Apps Script continua como autoridade para criação, validação, expiração e revogação da sessão.
+A implementação usa exclusivamente a conta fixa `poc04-user-synthetic-001`, criada pela própria função de inicialização do Apps Script. Não recebe identificador de conta do navegador. O armazenamento é um arquivo Google Sheets temporário criado por `poc04InitializeTemporaryStore()`; a rotina de limpeza move para a lixeira somente o ID registrado pela POC-04 e remove somente o prefixo próprio de nonce.
 
-A prova deve separar quatro responsabilidades:
+## 2. Responsabilidades e fluxo
 
-1. **Navegador:** armazena e envia automaticamente o cookie; não lê o token `HttpOnly`.
-2. **Vercel Function:** gateway server-side; lê o cookie recebido, aplica controles de origem, encaminha o token ao Apps Script por envelope HMAC e define/expira o cookie na resposta HTTP. Não decide se a sessão é válida.
-3. **Apps Script:** autoridade da sessão; aceita somente chamadas assinadas, valida estado/expiração/revogação e mantém somente o hash do token no registro de sessão.
-4. **Google Sheets temporário:** pode ser usado como armazenamento de prova, em ambiente isolado. A aba estrutural `SESSOES` e o arquivo estrutural do produto não devem ser usados sem autorização e procedimento de teste específicos.
+1. O navegador chama somente `POST /api/poc04/session` na mesma origem.
+2. A Vercel valida método, JSON, tamanho, Origin HTTPS exata, `Sec-Fetch-Site` quando presente, ambiente Preview e flag explícita de habilitação.
+3. Na emissão, a Vercel gera 32 bytes de token de sessão e 32 bytes de token CSRF com `node:crypto.randomBytes`.
+4. A Function assina um envelope versionado com HMAC-SHA-256, timestamp, nonce aleatório de 256 bits, ação, requestId e SHA-256 do payload.
+5. O Apps Script valida assinatura, relógio, allowlist e nonce de uso único; depois calcula os hashes e armazena os registros sintéticos.
+6. Somente após confirmação de criação, a Vercel devolve `Set-Cookie`. O JSON de resposta contém o token CSRF, mas nunca o token de sessão.
+7. O navegador envia o cookie automaticamente; a aplicação não precisa ler nem copiar o token de sessão.
+8. O Apps Script valida a sessão, conta sintética, CSRF, estado, inatividade e validade absoluta; atualiza atividade somente numa validação autenticada válida.
+9. Logout é confirmado somente após o Apps Script registrar `revogada_em`; só então a Vercel expira o cookie.
 
-## 3. Limites e invariantes de segurança
+O token de sessão é encaminhado em claro somente no canal server-to-server protegido por TLS e HMAC. O Apps Script persiste somente SHA-256(token). O token CSRF também é mantido somente como hash no Apps Script; seu valor em claro é devolvido à aplicação para memória volátil e enviado no cabeçalho `X-CSRF-Token`.
 
-- **Não é login:** não implementar cadastro, senha, KDF, comparação de senha, confirmação de e-mail, recuperação ou autorização de papel.
-- **Somente valores sintéticos:** usar IDs de teste, tokens aleatórios de teste e registros descartáveis. Não coletar senha real nem pedir ao usuário que informe uma.
-- **Token opaco de alta entropia:** a POC deve definir e testar a fonte criptográfica. Uma possibilidade a avaliar é gerar 32 bytes aleatórios no runtime Node da Vercel (`node:crypto`), mas não assumir a decisão sem testar o runtime e documentar a fronteira. Não presumir que UUID comum seja, por si só, prova suficiente de CSPRNG.
-- **Hash de token:** se o token tiver alta entropia e for realmente aleatório, um digest rápido (por exemplo SHA-256) para indexar/validar o token é tecnicamente diferente do armazenamento de senha. Guardar somente o hash no lado Apps Script/Sheets; nunca persistir o token em claro.
-- **Emissão condicionada:** a Function só deve enviar `Set-Cookie` depois que o Apps Script confirmar a criação da sessão sintética. Não criar cookie local que o backend não reconheça.
-- **Sem exposição:** token em claro não pode aparecer no corpo JSON para o navegador, estado React, local/session storage, query string, fragmento, mensagens de erro, logs, telemetria ou commits.
-- **Autoridade única:** Vercel não decide expiração, papel, proprietário ou revogação. O Apps Script valida o hash e o estado da sessão em cada operação protegida.
-- **Fail closed:** assinatura ausente/inválida, token inválido, sessão inexistente/revogada/expirada, origem não permitida, resposta upstream malformada ou timeout não podem liberar acesso.
-- Não ampliar a allowlist atual do gateway para ações de negócio durante a fase de desenho. Qualquer nova ação `poc.session.*` exige protocolo e testes próprios, HMAC, proteção contra replay e limite de payload.
+## 3. Ações sintéticas e contrato público
 
-## 4. Modelo de cookie candidato — não aprovado antes dos testes
+Rota: `POST /api/poc04/session`  
+Content-Type: `application/json`  
+Campos públicos: `action`, `requestId`, `payload`. O payload público deve ser objeto vazio; tokens e dados de conta não podem ser enviados pelo navegador.
 
-Avaliar cookie host-only com nome prefixado `__Host-`, por exemplo `__Host-conecta_session`, e atributos:
+Ações permitidas:
 
-- `HttpOnly`: impede leitura direta por JavaScript.
-- `Secure`: exige HTTPS.
-- `Path=/` e sem atributo `Domain`: requisitos do prefixo `__Host-`; o cookie fica vinculado ao host da aplicação.
-- `SameSite=Lax` como ponto inicial de avaliação, não como defesa CSRF única.
-- `Max-Age`/`Expires`: alinhados ao timeout de inatividade. O limite absoluto de 8 horas deve ser imposto e verificado no backend, não apenas pelo navegador.
+| Ação | Requisito | Efeito |
+|---|---|---|
+| `poc.session.issue` | Sem cookie prévio | Gera sessão sintética e retorna cookie + CSRF |
+| `poc.session.csrf` | Cookie válido | Rotaciona CSRF, sem atualizar atividade |
+| `poc.session.validate` | Cookie + `X-CSRF-Token` | Valida e atualiza atividade |
+| `poc.session.revoke` | Cookie + `X-CSRF-Token` | Revoga sessão atual e expira cookie após confirmação |
 
-Os nomes e atributos definitivos dependem dos testes. Preview e produção possuem hosts diferentes; não tentar compartilhar cookie entre domínios. Validar o comportamento real em HTTPS no Preview Vercel.
+A ação `csrf` permite que uma página recarregada recupere um token CSRF em memória sem ler o cookie HttpOnly. Ela exige Origin exata, cookie válido, sessão não expirada e conta sintética ativa. A renovação não conta como atividade de sessão.
 
-## 5. Regras de ciclo de vida a provar
+## 4. Cookie candidato
 
-A modelagem aprovada prevê 30 minutos de inatividade e duração absoluta máxima de 8 horas. O Apps Script deve ser a fonte de verdade:
+Nome: `__Host-conecta_poc04_session`
 
-- criação: gerar token opaco, registrar hash, identificador sintético da conta, criação, última atividade, expiração absoluta, estado e metadados mínimos definidos pela modelagem;
-- validação: localizar pelo hash do token, verificar conta/session state, revogação, inatividade e expiração absoluta;
-- atividade: atualizar `ultima_atividade_em` apenas após operação válida; eventual renovação do cookie não pode ultrapassar a expiração absoluta;
-- logout: revogar a sessão atual no Apps Script e expirar o cookie na resposta da Function;
-- revogação em lote: provar a invalidação de outras sessões sintéticas da mesma conta quando aplicável;
-- expiração: demonstrar falha após 30 minutos sem atividade e após 8 horas absolutas, sem depender somente do navegador;
-- erros: mensagens genéricas e sem token/hash ou detalhes internos.
+Atributos emitidos nesta implementação:
 
-O comportamento quando o Apps Script não confirma a revogação deve ser explícito: não retornar sucesso de logout sem confirmação do backend. A limpeza do cookie no navegador não deve ser confundida com revogação efetiva no servidor.
+- `HttpOnly`
+- `Secure`
+- `Path=/`
+- sem `Domain`
+- `SameSite=Strict`
+- `Max-Age` de no máximo 1.800 segundos, limitado ao tempo absoluto restante.
 
-## 6. CSRF, Origin e fronteira browser → gateway
+A implementação depende dos requisitos de prefixo `__Host-`: HTTPS, Path=/ e ausência de Domain. O cookie é host-only por implantação; Preview e Production não compartilham cookies.
 
-SameSite é defesa em profundidade, não substitui validação no servidor. A POC deve testar:
+**Estado:** candidato em código; precisa ser comprovado em navegador real. A escolha Strict deverá ser comparada com o comportamento de navegação esperado. Não afirmar proteção contra XSS: HttpOnly impede leitura pelo JavaScript, mas não impede que um script injetado execute ações same-origin.
 
-- comparação exata do cabeçalho `Origin` com os hosts/origens permitidos para cada ambiente; não aceitar curingas amplos como todo `*.vercel.app`;
-- rejeição de origens externas, ausentes ou inesperadas nos métodos que alteram estado, com política documentada para chamadas sem `Origin`;
-- avaliação de `Sec-Fetch-Site` como sinal adicional, nunca como única autorização;
-- métodos não seguros apenas para ações de leitura; operações que alteram estado não podem usar GET;
-- `Content-Type` e formato de requisição estritos;
-- decidir e testar se será necessário token CSRF separado (por exemplo, padrão synchronizer ou double-submit); esse token não é o token de sessão e não pode substituí-lo;
-- cookie ausente, adulterado ou enviado de outra origem deve falhar fechado.
+## 5. Origin, Fetch Metadata e CSRF
 
-## 7. Sequência recomendada de execução
+A Function exige:
 
-1. **Revisão de código e desenho:** ler `api/backend.js`, funções de assinatura HMAC, contratos de POC-01/02 e o esquema de `SESSOES` em `docs/MODELAGEM_DADOS.md`. Confirmar o runtime Node real da Vercel e como a Function lê cabeçalhos/cookies e emite múltiplos cabeçalhos `Set-Cookie`.
-2. **Contrato de ações sintéticas:** desenhar ações mínimas, por exemplo `poc.session.issue`, `poc.session.validate`, `poc.session.revoke`, sem habilitá-las antes da revisão do envelope, HMAC, nonce/replay, autorização sintética, timeouts e allowlist.
-3. **Prova de cookie:** verificar em Preview que o navegador recebe o cookie com todos os atributos, envia-o automaticamente a uma rota same-origin e que o JavaScript não consegue ler o valor.
-4. **Encaminhamento servidor-servidor:** provar que a Function lê o cookie no servidor e transmite o token somente pelo envelope assinado ao Apps Script. Verificar que o corpo da resposta ao navegador não contém token.
-5. **Autoridade e persistência:** usar somente projeto Apps Script/planilha temporários e dados sintéticos. Testar hash do token, validação, atualização de atividade, revogação e expiração. Nunca usar o arquivo estrutural do negócio como bancada.
-6. **CSRF/Origin:** executar casos positivos e negativos em origens distintas e no Preview; provar que solicitações cross-site não alteram estado.
-7. **Falhas e observabilidade:** timeout, 4xx/5xx, upstream inválido, HMAC inválido, replay, token adulterado, cookie ausente, serviço indisponível e falha de revogação. Logs devem usar IDs de correlação não secretos.
-8. **Limpeza:** remover somente registros/recursos temporários registrados por esta POC e comprovar o escopo da limpeza.
-9. **CI e revisão:** adicionar testes automatizados para parsing de cookie, flags, origem, ciclo de vida e falha fechada; executar lint/build/POC-01/02/03 existentes; publicar Preview, revisar e obter aprovação antes de merge.
+- `Origin` presente e igual, byte a byte, a `POC04_ALLOWED_ORIGIN` configurada;
+- origem HTTPS, sem wildcard, caminho, query ou fragmento;
+- se `Sec-Fetch-Site` estiver presente, deve ser `same-origin`;
+- POST e JSON estrito;
+- sem cabeçalhos CORS permissivos.
 
-## 7.1. Matriz mínima de cenários e resultado esperado
+Origin ausente é rejeitado. `Sec-Fetch-Site` é defesa adicional, não autorização. Clientes HTTP arbitrários podem falsificar Origin; o limite é controle contra CSRF em navegadores, não autenticação do cliente.
+
+O token CSRF é independente do cookie, gerado por CSPRNG, retornado no JSON e mantido em memória pela aplicação de teste. Validação e logout exigem `X-CSRF-Token`; o Apps Script compara o hash armazenado para a sessão. O token não é colocado em URL, localStorage, sessionStorage ou logs.
+
+## 6. Ciclo de vida e armazenamento temporário
+
+O Apps Script é a autoridade. Regras:
+
+- token de sessão de 32 bytes aleatórios (256 bits), codificado Base64URL;
+- persistência exclusiva de SHA-256(token) em `SESSOES.token_hash`;
+- 30 minutos de inatividade;
+- 8 horas absolutas desde `criado_em`;
+- validade da conta sintética é verificada nas operações de sessão;
+- atualização de `ultima_atividade_em` apenas após validação e CSRF corretos;
+- revogação preenchendo `revogada_em`;
+- uso de `LockService.getScriptLock()` nas operações de nonce e ciclo de vida;
+- falha de lock, configuração, armazenamento, assinatura, replay ou resposta upstream: fail closed.
+
+A planilha temporária contém:
+- `POC04_CONTAS`: uma única conta de demonstração fixa e estado active;
+- `SESSOES`: os sete campos da modelagem aprovada, sem coluna adicional;
+- `POC04_CSRF`: `id_sessao` e `csrf_hash`, separado para preservar o esquema de sete campos de SESSOES.
+
+A criação grava CSRF e sessão sob lock. Se uma etapa falhar, o registro de CSRF é removido quando possível; sessão sem registro CSRF não valida. Sheets não fornece transação distribuída para estas duas abas; validar falhas parciais e documentar resíduos sintéticos antes de limpeza.
+
+## 7. Variáveis e isolamento de ambiente
+
+Variáveis server-side exclusivas:
+
+| Variável | Finalidade |
+|---|---|
+| `POC04_ENABLED` | Deve ser exatamente `true` para habilitar |
+| `POC04_ALLOWED_ORIGIN` | Origem HTTPS exata do Preview |
+| `POC04_APPS_SCRIPT_WEB_APP_URL` | URL do Web App isolado da POC-04 |
+| `POC04_APPS_SCRIPT_HMAC_SECRET` | Segredo distinto da POC-02, 32 bytes em 64 hex |
+
+A Function exige também `VERCEL_ENV=preview`. Em qualquer outro ambiente responde 404 mesmo se `POC04_ENABLED=true`. Não adicionar essas variáveis em Production. O segredo correspondente no Apps Script fica em Script Properties como `POC04_HMAC_SECRET`; nunca registrar ou documentar seu valor.
+
+## 8. Arquivos nesta branch
+
+- `api/poc04/session.js` — entrypoint da Vercel Function.
+- `server/poc04-session-gateway.js` — validação, HMAC, cookie, Origin, CSRF e transporte.
+- `apps-script/poc-04/Code.gs` — endpoint isolado, armazenamento sintético, sessão, CSRF, expiração, logout e limpeza.
+- `tests/poc04/gateway.test.js` — contrato HTTP, cookie, Origin, assinatura, falhas fechadas e ausência de token no JSON.
+- `tests/poc04/apps-script.test.js` — harness Node/VM para assinatura, persistência simulada, CSRF, expiração e revogação.
+- `package.json` / `validate.yml` — comando `npm run test:poc04` incluído na CI.
+- `.env.example` — nomes de variáveis sem valores.
+
+Os testes Node/VM não substituem chamadas reais ao Apps Script nem validação de cookies em navegador.
+
+## 9. Procedimento manual obrigatório
+
+Executar somente depois de revisar e aprovar o diff desta branch:
+
+1. Criar um projeto Google Apps Script independente. Não vincular à planilha estrutural ou a outro projeto Apps Script.
+2. Copiar `apps-script/poc-04/Code.gs` para o projeto isolado.
+3. Gerar um segredo novo de 32 bytes fora do repositório (por exemplo, `openssl rand -hex 32`). Configurar o mesmo valor em Script Properties (`POC04_HMAC_SECRET`) e na Vercel Preview (`POC04_APPS_SCRIPT_HMAC_SECRET`). Não enviar valores em chat, commit, documentação ou logs.
+4. Executar manualmente `poc04InitializeTemporaryStore()`. Confirmar que cria arquivo novo com exatamente três abas e uma conta sintética. Guardar a URL do arquivo para inspeção e limpeza.
+5. Criar implantação de Web App isolada, executar como implantador e permitir acesso anônimo somente para esta prova, se a política da conta permitir. A implantação deve conter exclusivamente a allowlist POC-04 e exigir HMAC.
+6. Configurar `POC04_APPS_SCRIPT_WEB_APP_URL`, `POC04_ENABLED=true`, `POC04_ALLOWED_ORIGIN` igual à origem exata do Preview e `POC04_APPS_SCRIPT_HMAC_SECRET` apenas no ambiente Preview da Vercel.
+7. Publicar a branch como Vercel Preview. Não criar Production deployment manual e não associar variáveis POC04 ao ambiente Production.
+8. Validar emissão do cookie, atributos, `document.cookie`, recuperação CSRF, validação, atividade, logout, revogação, replay, Origin ausente/externa, sessão ociosa, expiração absoluta e falhas upstream.
+9. Consultar somente metadados sanitizados no log; nunca copiar token, hash, cookie ou segredo.
+10. Após guardar evidências e confirmar que os testes terminaram, executar `poc04CleanupTemporaryStore()` no Apps Script. Conferir que moveu somente o arquivo registrado para a lixeira e removeu somente o prefixo `POC04_GATEWAY_NONCE_V1_`. A limpeza não remove o segredo HMAC; removê-lo manualmente depois, se o projeto for descartado.
+
+## 10. Matriz de cenários e critérios de aceite
 
 | Cenário | Resultado esperado |
 |---|---|
-| Emissão de sessão sintética confirmada pelo Apps Script | A Function responde com cookie, sem devolver o token no JSON. |
-| Emissão não confirmada, timeout ou resposta inválida do Apps Script | Nenhum cookie de sessão é emitido; resposta falha fechada. |
-| Cookie no host Preview correto | Navegador armazena cookie host-only com flags aprovadas; não é compartilhado com Production ou outro Preview. |
-| Inspeção por JavaScript (`document.cookie`) | Cookie de sessão não aparece, por ser `HttpOnly`. |
-| Requisição same-origin subsequente | Navegador envia o cookie automaticamente; React não lê nem copia o token. |
-| Cookie ausente, alterado ou desconhecido | Apps Script recusa a sessão; nenhum recurso protegido é liberado. |
-| Assinatura HMAC ausente/inválida ou nonce repetido | Apps Script recusa a chamada interna; não há fallback sem assinatura. |
-| Origin de outro host ou domínio | Gateway recusa operação que altera estado; nenhuma mutação ocorre. |
-| Origin ausente | Aplicação segue a política explícita documentada; não assumir autorização por ausência do cabeçalho. |
-| Sessão revogada | Validação seguinte falha mesmo que o navegador ainda possua cookie. |
-| Inatividade superior a 30 minutos | Backend recusa a sessão; o TTL do cookie não é a única fonte de verdade. |
-| Idade absoluta superior a 8 horas | Backend recusa a sessão mesmo que o cookie tenha sido renovado durante atividade. |
-| Logout com revogação confirmada | Sessão fica inválida no Apps Script e cookie é expirado na resposta HTTP. |
-| Logout sem confirmação do Apps Script | Interface não anuncia revogação concluída; falha é registrada sem token. |
-| Falha do serviço Sheets/Apps Script | Operação protegida falha fechada e não expõe informação interna. |
-| Consulta a logs e artefatos | Não há token, hash de token, cookie, segredo HMAC ou credencial; somente IDs de correlação não secretos. |
+| Emissão confirmada pelo Apps Script | Cookie definido; JSON contém CSRF, nunca token de sessão |
+| Emissão recusada/timeout/upstream inválido | Nenhum cookie de sessão |
+| Ambiente não Preview ou flag false | HTTP 404, sem chamada upstream |
+| Origin ausente/diferente | HTTP 403, sem chamada upstream |
+| Sec-Fetch-Site cross-site/site | HTTP 403 |
+| Cookie HttpOnly | Ausente de document.cookie |
+| Cookie de outro host | Não enviado pelo navegador ao host atual |
+| Cookie duplicado, ausente ou malformado | Falha fechada |
+| HMAC ausente/inválido ou nonce repetido | Apps Script recusa |
+| CSRF ausente/incorreto | HTTP 403 e nenhuma atualização de atividade |
+| Sessão revogada/desconhecida | HTTP 401 |
+| Inatividade de 30 minutos | Backend recusa e gateway expira cookie |
+| Idade absoluta superior a 8 horas | Backend recusa mesmo após atividade recente |
+| Logout confirmado | Apps Script revoga; gateway expira cookie |
+| Falha ao revogar | Gateway não confirma logout nem limpa cookie |
+| Falha de Sheets/lock | Fail closed |
+| Inspeção de JSON, URL, storage e logs | Nenhum token de sessão ou hash persistido é exposto |
 
-## 8. Critérios mínimos de aceite
+## 11. Limites e bloqueios que permanecem
 
-- Cookie recebido no host correto com `HttpOnly`, `Secure`, `SameSite`, `Path` e escopo host-only comprovados no navegador.
-- Token não aparece em JavaScript, JSON, URL, storage do navegador, logs ou artefatos.
-- A Function não emite cookie antes da confirmação do Apps Script.
-- Apps Script é a autoridade da sessão e guarda somente o hash do token.
-- Chamadas internas permanecem assinadas por HMAC e protegidas contra replay.
-- Sessão inválida, adulterada, revogada, ociosa ou absolutamente expirada é sempre recusada.
-- Logout só é reportado como concluído após confirmação da revogação pelo Apps Script; o cookie também é expirado.
-- Testes de CSRF/Origin demonstram bloqueio de solicitações externas e comportamento explícito para Origin ausente.
-- Nenhum recurso estrutural/de negócio é alterado; todos os dados de prova são sintéticos e a limpeza é comprovada.
-- CI, Preview e revisão manual passam. PASS em teste automatizado não equivale a auditoria ou certificação de segurança.
+- Esta POC não resolve o NO-GO da POC-03C. Não integrar KDF, comparador XOR ou helper Node de comparação de senha.
+- Não conectar a tela `AuthDemoPage.jsx`, não aceitar e-mails ou senhas e não usar contas de negócio.
+- Não usar a planilha estrutural do produto.
+- Não implementar operação administrativa, perfil, catálogo ou autorização real.
+- O teste automatizado não demonstra contenção real do ScriptLock; executar teste manual concorrente separado antes de alegar concorrência comprovada.
+- O token não é protegido contra XSS que execute código same-origin. A POC mede HttpOnly e CSRF, não certifica política CSP ou ausência de XSS.
+- A consulta de Origin não autentica clientes HTTP fora do modelo de navegador.
+- Nenhuma evidência aprova uso em Production ou escala comercial.
 
-## 9. Fora do escopo e bloqueios que permanecem
+**Regra de interrupção:** se o token precisar sair para React, se o cookie for emitido antes da confirmação do Apps Script, se a assinatura/replay puder ser contornada ou se a planilha de negócio for necessária para facilitar os testes, interromper e reabrir o desenho.
 
-- Esta POC não resolve o NO-GO da POC-03C sobre comparação de senha. O XOR continua não aprovado e `server/password-hash-compare.js` continua helper isolado; não integrar nenhum dos dois ao login.
-- Não ligar `AuthDemoPage.jsx` ao backend, não criar usuário real, não conectar a aba `USUARIOS`, não enviar e-mail e não ativar recuperação.
-- Não alterar `main`, não implantar em Production e não ampliar o Web App Apps Script atualmente isolado.
-- Não interpretar este plano como autorização para criar endpoints de negócio.
+## 12. Estado de validação nesta revisão
 
-**Regra de interrupção:** se o protocolo exigir transferir ao browser o token, confiar em estado controlado apenas pela Vercel, enfraquecer HMAC/replay, usar comparação de senha não aprovada ou expor recursos do projeto real para facilitar os testes, interromper a POC e reabrir o desenho.
+- [x] Branch dedicada criada a partir da `dev`.
+- [x] Rota independente, com allowlist POC-04 própria.
+- [x] Conta e armazenamento exclusivamente sintéticos no código.
+- [x] Testes automatizados adicionados à suíte e ao workflow.
+- [ ] Executar `npm run test:poc04` no GitHub Actions.
+- [ ] Executar lint, build e regressões POC-01/02/03.
+- [ ] Revisar Vercel Preview da rota aninhada.
+- [ ] Criar projeto Apps Script isolado e planilha temporária.
+- [ ] Validar cookie/CSRF/Origin no navegador real.
+- [ ] Validar expiração ociosa e absoluta, logout e revogação no Apps Script real.
+- [ ] Limpar o arquivo temporário e segredos do projeto de teste.
+- [ ] Revisão de segurança e PR para `dev`; não fazer merge sem aprovação.
 
-## 10. Instruções para o próximo chat
-
-Antes de executar qualquer mudança:
-
-1. Ler `docs/AI_CONTEXT.md` por inteiro.
-2. Ler este documento e `docs/ARQUITETURA_APPS_SCRIPT.md`.
-3. Ler `docs/POC_03_ARMAZENAMENTO_SENHAS.md` nas seções 8.19 e 8.20 para respeitar NO-GO e resultados finais.
-4. Confirmar o HEAD atual de `dev`, estado de `main`, PRs abertos, CI e deploys atuais; não confiar somente em SHAs salvos neste texto.
-5. Inspecionar os arquivos reais e confirmar se a allowlist de `api/backend.js` ainda aceita somente ações `poc.*`.
-6. Apresentar o desenho técnico da POC-04 antes de alterar código. Trabalhar em branch própria (sugestão: `feat/poc-04-session-cookie`) e usar exclusivamente valores sintéticos.
-7. Não fazer merge nem publicar em Production sem autorização explícita do responsável.
-
+A POC-04 ainda é um protótipo isolado, não uma autenticação de usuário.

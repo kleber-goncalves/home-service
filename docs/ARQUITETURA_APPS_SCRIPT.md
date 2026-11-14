@@ -2,7 +2,7 @@
 
 > **Versão:** 0.2  
 > **Data da revisão:** 2026-11-14  
-> **Status:** POC-01 (#10), POC-02 (#11), interface demonstrativa (#13) e investigação experimental POC-03 (#12) estão integradas à `dev`. Os PRs #12 e #13 foram efetivamente merged em 2026-11-14; CI pós-merge de ambos concluiu SUCCESS. A interface continua visual, sem envio/persistência de credenciais. Cadastro, login, recuperação, sessão e armazenamento operacional de credenciais continuam não implementados. **POC-04 é a próxima etapa planejada e ainda não foi iniciada.** Nenhuma validação aprova o sistema para produção.  
+> **Status na branch desta revisão:** POC-01 (#10), POC-02 (#11), interface demonstrativa (#13) e investigação experimental POC-03 (#12) estão integradas à `dev`. A POC-04 está em implementação isolada na branch `feat/poc-04-session-cookie`, com gateway, Apps Script e harness de testes versionados; ainda não foi implantada nem validada manualmente em Preview. A interface continua visual, sem envio/persistência de credenciais. Cadastro, login, recuperação e sessão de usuários reais continuam não implementados. Nenhuma validação aprova o sistema para produção.  
 > **Escopo:** integração React/Vite, Google Apps Script, Google Sheets e Google Drive para a demonstração acadêmica.  
 > **Premissa:** manter Apps Script como autoridade de domínio e sessão; Vercel Functions atua apenas como gateway HTTP. Qualquer fluxo de autenticação e sessão deverá ser aprovado em provas isoladas com dados sintéticos.
 
@@ -234,7 +234,7 @@ Limitações e regras:
 
 A POC deverá avaliar uma Function mínima na raiz do repositório, no diretório api/, com uma rota inicial como /api/backend.
 
-A documentação atual da Vercel descreve arquivos nesse diretório como Vercel Functions executadas no runtime Node.js. O projeto já utiliza JavaScript ES Modules (type: module), mas ainda não possui api/ nem vercel.json. A convenção de exportação e a descoberta da Function no projeto Vite atual deverão ser comprovadas com um Preview antes de qualquer implementação funcional.
+A documentação atual da Vercel descreve arquivos nesse diretório como Vercel Functions executadas no runtime Node.js. O projeto utiliza JavaScript ES Modules (type: module) e já possui `api/backend.js` para as POCs-01/02. A POC-04 adiciona `api/poc04/session.js` como rota separada. A descoberta da rota aninhada e o comportamento real da Function deverão ser confirmados em Vercel Preview antes de considerar o transporte validado.
 
 Diretrizes para o primeiro protótipo:
 
@@ -261,7 +261,7 @@ A POC-01, isoladamente, não protegia o Web App contra chamadas diretas. A vers�
 
 ### 5.8. POC-02 — assinatura HMAC e proteção contra replay
 
-A implementação está na branch `feat/poc-02-hmac-replay` e ainda não foi integrada à `dev`.
+A implementação está integrada à branch `dev` pelo PR #11. O gateway e o Apps Script continuam restritos a ações sintéticas `poc.*`.
 
 - `api/backend.js` gera timestamp, nonce aleatório de 32 bytes, hash SHA-256 do payload e HMAC-SHA-256 usando `APPS_SCRIPT_HMAC_SECRET` no servidor da Vercel.
 - A mensagem canônica usa domínio `CONECTA_LOCAL_GATEWAY`, versão `v1`, método lógico POST, timestamp, nonce, ação, requestId e hash do payload, separados por newline UTF-8.
@@ -446,7 +446,7 @@ Ainda não está decidido:
 
 **Caminho candidato, ainda sem aprovação:** a Vercel Function emitir um cookie `HttpOnly`, `Secure` e `SameSite` adequado no domínio da aplicação. Em chamadas posteriores, a Function lê o cookie somente no servidor e encaminha o token ao Apps Script por envelope HMAC; o Apps Script permanece como autoridade da sessão e valida o hash armazenado na aba `SESSOES`.
 
-A POC-04 está planejada, mas ainda não foi iniciada. O escopo, os estágios, o modelo de ameaça e os critérios de aceite estão em [`docs/POC_04_SESSOES.md`](./POC_04_SESSOES.md). Não escolher os atributos finais nem considerar o cookie seguro sem testar CSRF, validação estrita de `Origin`, expiração por inatividade e absoluta, logout, revogação, XSS, Preview e produção. Não expor o token à aplicação React, à URL ou aos logs.
+A POC-04 está em implementação isolada na branch `feat/poc-04-session-cookie`: `api/poc04/session.js`, `server/poc04-session-gateway.js` e `apps-script/poc-04/Code.gs` compõem a prova técnica; `tests/poc04/` contém os testes Node/VM. Ainda não houve implantação em Apps Script ou validação manual no Preview. O cookie candidato usa prefixo `__Host-`, `HttpOnly`, `Secure`, `Path=/`, sem `Domain` e `SameSite=Strict`; a decisão só poderá ser considerada validada após testes reais de navegador e CSRF/Origin. O token de sessão não deve aparecer no React, URL, JSON ou logs.
 
 A limitação de TextOutput continua relevante para respostas diretas do Apps Script, mas o cookie seria emitido pela Function, não pelo Apps Script.
 
@@ -538,7 +538,7 @@ Nenhuma implementação de autenticação, publicação anônima ou escrita oper
 1. **POC-01 — comunicação:** concluída e integrada pelo PR #10; testes manuais registrados em `docs/POC_01_COMUNICACAO.md`.
 2. **POC-02 — assinatura do gateway:** concluída e integrada pelo PR #11; permanece restrita a ações sintéticas `poc.*`, com evidências em `docs/POC_02_ASSINATURA_GATEWAY.md`.
 3. **POC-03 — KDF, política de entrada, blocklist e throttling:** investigação concluída e integrada pelo PR #12; nenhuma solução de senha/comparador foi aprovada para autenticação. Evidências e limites em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
-4. **Próxima etapa: POC-04 — sessão com cookie via gateway.** Primeiro revisar e aprovar o plano em `docs/POC_04_SESSOES.md`; depois executar somente provas isoladas com tokens e contas sintéticos. Não conectar login nem credenciais reais.
+4. **POC-04 — sessão com cookie via gateway:** implementação isolada iniciada na branch `feat/poc-04-session-cookie`. Concluir testes automatizados, criar projeto Apps Script temporário, implantar somente em Preview, validar no navegador e limpar os recursos sintéticos. Não conectar login nem credenciais reais.
 5. **POC-05 — Sheets, locks e auditoria:** confirmar lote atômico, concorrência e falhas.
 6. **POC-06/07 — Drive e arquivos:** confirmar permissões, validações e limites.
 7. **POC-08/09 — implantação, abuso e quotas:** testar limites do ambiente de demonstração.
