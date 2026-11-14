@@ -297,10 +297,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 92c50c02066ca113bd4071770aee5b870b3c610a
-- **Data do commit:** 2026-11-14T14:42:00-03:00
-- **Mensagem do commit:** fix(auth): validar caracteres de controle sem regex bloqueada pelo lint
-- **Branch desta execução:** feat/auth-demo-flow
+- **Commit de referência:** 770560f93b6a1ee44c31a1990ea4b64454fb1b23
+- **Data do commit:** 2026-11-14T14:56:41-03:00
+- **Mensagem do commit:** Merge pull request #13 from kleber-goncalves/feat/auth-demo-flow
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 8
 - **Dependências de runtime:** 5
@@ -393,13 +393,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 770560f | 2026-11-14 | Merge pull request #13 from kleber-goncalves/feat/auth-demo-flow |
+| 611cd76 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 92c50c0 | 2026-11-14 | fix(auth): validar caracteres de controle sem regex bloqueada pelo lint |
 | 82b532d | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | d264794 | 2026-11-14 | docs(architecture): separar interface visual da autenticação real |
 | 546c3f7 | 2026-11-14 | docs(auth): registrar escopo da interface demonstrativa |
 | 00bc81f | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 8785792 | 2026-11-14 | feat(auth): estilizar páginas de acesso demonstrativo |
-| b7b95f6 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 5e92001 | 2026-11-14 | feat(auth): ligar CTA profissional ao cadastro demonstrativo |
 
 <!-- END AUTO-GENERATED SECTION -->
