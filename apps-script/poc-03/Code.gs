@@ -27,6 +27,19 @@ var POC03_ARGON2_RECORD_HASH_BYTES = 32;
 var POC03_PASSWORD_MIN_CODE_POINTS = 15;
 var POC03_PASSWORD_MAX_CODE_POINTS = 128;
 var POC03_PASSWORD_MAX_UTF8_BYTES = 512;
+var POC03_PASSWORD_BLOCKLIST_VERSION = "local-demo-v1";
+var POC03_PWNED_PASSWORDS_RANGE_URL = "https://api.pwnedpasswords.com/range/";
+var POC03_PWNED_PASSWORDS_USER_AGENT = "ConectaLocal-POC03D/1.0";
+var POC03_PWNED_PASSWORDS_MAX_RESPONSE_CHARS = 262144;
+var POC03_LOCAL_COMMON_PASSWORDS = [
+    "123456789012345",
+    "password123456789",
+    "senhademonstracao123",
+    "conectalocal2026!",
+    "qwertyuiopasdfghj",
+    "bemvindoaoconectalocal"
+];
+
 var POC03_LOGIN_FAILURE_LIMIT = 5;
 var POC03_LOGIN_WINDOW_MS = 15 * 60 * 1000;
 var POC03_LOGIN_LOCK_MS = 15 * 60 * 1000;
@@ -926,6 +939,539 @@ async function poc03RunPasswordInputPolicyTests() {
             "Falha na política de entrada de senha da POC-03: "
             + failedTests.join("; ")
         );
+    }
+
+    return summary;
+}
+
+
+// -----------------------------------------------------------------------------
+// POC-03D — blocklist local + consulta Pwned Passwords por k-anonymity
+// -----------------------------------------------------------------------------
+
+/**
+ * Normaliza somente para comparação de blocklist. Não altera a senha usada
+ * pelo KDF e não remove espaços. A correspondência é exata, sem substring.
+ */
+function poc03NormalizeBlocklistTokenForPoc_(value) {
+    if (typeof value !== "string" || typeof value.normalize !== "function") {
+        return null;
+    }
+
+    return value.normalize("NFC").toLowerCase();
+}
+
+/**
+ * Blocklist local pequena e didática. Não é uma lista abrangente.
+ * ContextTerms deve conter somente valores sintéticos na POC.
+ */
+function poc03IsPasswordOnLocalBlocklistForPoc_(normalizedPassword, contextTerms) {
+    var candidate = poc03NormalizeBlocklistTokenForPoc_(normalizedPassword);
+    if (candidate === null) {
+        return false;
+    }
+
+    for (var i = 0; i < POC03_LOCAL_COMMON_PASSWORDS.length; i += 1) {
+        if (candidate === poc03NormalizeBlocklistTokenForPoc_(
+            POC03_LOCAL_COMMON_PASSWORDS[i]
+        )) {
+            return true;
+        }
+    }
+
+    if (Array.isArray(contextTerms)) {
+        for (var j = 0; j < contextTerms.length; j += 1) {
+            var contextToken = poc03NormalizeBlocklistTokenForPoc_(
+                contextTerms[j]
+            );
+
+            if (contextToken && candidate === contextToken) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+/**
+ * SHA-1 é usado aqui exclusivamente para consultar Pwned Passwords.
+ * Não usar SHA-1 para armazenar, verificar ou substituir o KDF da senha.
+ */
+function poc03Sha1HexForPwnedPasswordsForPoc_(password) {
+    if (typeof password !== "string" || !poc03IsWellFormedUnicodeForPoc_(password)) {
+        throw new Error("PWNED_PASSWORD_INPUT_INVALID");
+    }
+
+    var normalized = password.normalize("NFC");
+    var passwordBytes = Utilities.newBlob(
+        normalized,
+        "text/plain"
+    ).getBytes();
+    var digestBytes = Utilities.computeDigest(
+        Utilities.DigestAlgorithm.SHA_1,
+        passwordBytes
+    );
+
+    return poc03BytesToHexForArgon2_(new Uint8Array(digestBytes)).toUpperCase();
+}
+
+/**
+ * Valida o corpo text/plain retornado pelo endpoint range.
+ * Entradas padding com contagem zero são válidas, mas nunca contam como vazamento.
+ */
+function poc03ParsePwnedPasswordRangeForPoc_(body, expectedSuffix) {
+    if (
+        typeof body !== "string"
+        || body.length === 0
+        || body.length > POC03_PWNED_PASSWORDS_MAX_RESPONSE_CHARS
+        || typeof expectedSuffix !== "string"
+        || !/^[0-9A-F]{35}$/.test(expectedSuffix)
+    ) {
+        return { ok: false, reason: "INVALID_RESPONSE" };
+    }
+
+    var lines = body.split(/\r?\n/);
+    var seen = Object.create(null);
+    var parsedRows = 0;
+    var exposureCount = 0;
+
+    for (var i = 0; i < lines.length; i += 1) {
+        var line = lines[i].trim();
+        if (!line) {
+            continue;
+        }
+
+        var match = /^([0-9A-F]{35}):([0-9]+)$/i.exec(line);
+        if (!match) {
+            return { ok: false, reason: "INVALID_RESPONSE" };
+        }
+
+        var suffix = match[1].toUpperCase();
+        var count = Number(match[2]);
+        if (!Number.isSafeInteger(count) || count < 0 || seen[suffix]) {
+            return { ok: false, reason: "INVALID_RESPONSE" };
+        }
+
+        seen[suffix] = true;
+        parsedRows += 1;
+
+        if (suffix === expectedSuffix && count > 0) {
+            exposureCount = count;
+        }
+    }
+
+    if (parsedRows === 0) {
+        return { ok: false, reason: "INVALID_RESPONSE" };
+    }
+
+    return {
+        ok: true,
+        exposureCount: exposureCount
+    };
+}
+
+/**
+ * Consulta somente SHA-1 prefix (5 hex chars). O hash completo e a senha
+ * permanecem no Apps Script e não são retornados nem registrados.
+ * fetchImpl existe apenas para injeção de mocks nos testes.
+ */
+function poc03LookupPwnedPasswordsForPoc_(password, fetchImpl) {
+    if (typeof password !== "string" || !poc03IsWellFormedUnicodeForPoc_(password)) {
+        return { status: "INVALID_INPUT", exposureCount: 0 };
+    }
+
+    var sha1Hex;
+    try {
+        sha1Hex = poc03Sha1HexForPwnedPasswordsForPoc_(password);
+    } catch (error) {
+        return { status: "UNAVAILABLE", reasonCode: "LOCAL_HASH_ERROR", exposureCount: 0 };
+    }
+
+    var prefix = sha1Hex.substring(0, 5);
+    var suffix = sha1Hex.substring(5);
+    var fetcher = fetchImpl;
+
+    if (typeof fetcher !== "function") {
+        if (typeof UrlFetchApp !== "undefined" && UrlFetchApp
+            && typeof UrlFetchApp.fetch === "function") {
+            fetcher = function (url, options) {
+                return UrlFetchApp.fetch(url, options);
+            };
+        }
+    }
+
+    if (typeof fetcher !== "function") {
+        return { status: "UNAVAILABLE", reasonCode: "URL_FETCH_UNAVAILABLE", exposureCount: 0 };
+    }
+
+    var requestUrl = POC03_PWNED_PASSWORDS_RANGE_URL + prefix;
+    var requestOptions = {
+        method: "get",
+        headers: {
+            "User-Agent": POC03_PWNED_PASSWORDS_USER_AGENT,
+            "Add-Padding": "true"
+        },
+        muteHttpExceptions: true
+    };
+
+    var response;
+    try {
+        response = fetcher(requestUrl, requestOptions);
+    } catch (error) {
+        return { status: "UNAVAILABLE", reasonCode: "NETWORK_ERROR", exposureCount: 0 };
+    }
+
+    if (!response || typeof response.getResponseCode !== "function"
+        || typeof response.getContentText !== "function") {
+        return { status: "UNAVAILABLE", reasonCode: "INVALID_HTTP_RESPONSE", exposureCount: 0 };
+    }
+
+    var responseCode;
+    var responseBody;
+    try {
+        responseCode = response.getResponseCode();
+        if (responseCode !== 200) {
+            return { status: "UNAVAILABLE", reasonCode: "HTTP_STATUS", exposureCount: 0 };
+        }
+        responseBody = response.getContentText("UTF-8");
+    } catch (error) {
+        return { status: "UNAVAILABLE", reasonCode: "HTTP_RESPONSE_READ_ERROR", exposureCount: 0 };
+    }
+
+    var parsed = poc03ParsePwnedPasswordRangeForPoc_(responseBody, suffix);
+    if (!parsed.ok) {
+        return { status: "UNAVAILABLE", reasonCode: parsed.reason, exposureCount: 0 };
+    }
+
+    if (parsed.exposureCount > 0) {
+        return {
+            status: "COMPROMISED",
+            exposureCount: parsed.exposureCount,
+            source: "PWNED_PASSWORDS"
+        };
+    }
+
+    return {
+        status: "NOT_FOUND",
+        exposureCount: 0,
+        source: "PWNED_PASSWORDS"
+    };
+}
+
+/**
+ * Avaliador combinado. Em indisponibilidade externa, falha fechado na POC:
+ * allowed=false, status=UNAVAILABLE (não confundir com senha comprometida).
+ * Não é endpoint nem está conectado ao cadastro/login.
+ */
+function poc03CheckPasswordBlocklistForPoc_(password, contextTerms, fetchImpl) {
+    var validation;
+    try {
+        validation = poc03NormalizeAndValidatePasswordForPoc_(password);
+    } catch (error) {
+        return {
+            status: "INVALID_INPUT",
+            allowed: false,
+            reasonCode: String(error && error.message ? error.message : "PASSWORD_INVALID")
+        };
+    }
+
+    if (poc03IsPasswordOnLocalBlocklistForPoc_(
+        validation.normalizedPassword,
+        contextTerms
+    )) {
+        return {
+            status: "BLOCKED_LOCAL",
+            allowed: false,
+            blocklistVersion: POC03_PASSWORD_BLOCKLIST_VERSION
+        };
+    }
+
+    var remote = poc03LookupPwnedPasswordsForPoc_(
+        validation.normalizedPassword,
+        fetchImpl
+    );
+
+    if (remote.status === "COMPROMISED") {
+        return {
+            status: "BLOCKED_COMPROMISED",
+            allowed: false,
+            source: remote.source,
+            exposureCount: remote.exposureCount
+        };
+    }
+
+    if (remote.status === "NOT_FOUND") {
+        return {
+            status: "ALLOWED",
+            allowed: true,
+            source: remote.source,
+            blocklistVersion: POC03_PASSWORD_BLOCKLIST_VERSION
+        };
+    }
+
+    return {
+        status: "UNAVAILABLE",
+        allowed: false,
+        reasonCode: remote.reasonCode || "REMOTE_CHECK_UNAVAILABLE"
+    };
+}
+
+/** Gera uma resposta HTTP fictícia sem consultar o serviço externo. */
+function poc03BuildPwnedRangeFixtureForPoc_(password, includeMatch, count) {
+    var sha1Hex = poc03Sha1HexForPwnedPasswordsForPoc_(password);
+    var suffix = sha1Hex.substring(5);
+    var otherSuffix = (suffix.charAt(0) === "A" ? "B" : "A")
+        + suffix.substring(1);
+    var rows = [otherSuffix + ":1", "0".repeat(35) + ":0"];
+
+    if (includeMatch) {
+        rows.unshift(suffix + ":" + String(count));
+    }
+
+    return rows.join("\r\n") + "\r\n";
+}
+
+/**
+ * Testes determinísticos sem rede: blocklist local, k-anonymity, padding,
+ * parsing e falha fechada. Os logs contêm somente nome do cenário e status.
+ */
+function poc03RunPasswordBlocklistPolicyTests() {
+    var validPassword = "SenhaFicticiaParaTeste2026";
+    var tests = [];
+
+    tests.push({
+        name: "senha comum local é bloqueada sem chamada externa",
+        run: function () {
+            var calls = 0;
+            var result = poc03CheckPasswordBlocklistForPoc_(
+                "123456789012345",
+                [],
+                function () { calls += 1; throw new Error("unexpected network"); }
+            );
+            return result.status === "BLOCKED_LOCAL" && calls === 0;
+        }
+    });
+
+    tests.push({
+        name: "blocklist local não diferencia maiúsculas/minúsculas",
+        run: function () {
+            var result = poc03CheckPasswordBlocklistForPoc_(
+                "SENHADEMONSTRACAO123",
+                [],
+                function () { throw new Error("unexpected network"); }
+            );
+            return result.status === "BLOCKED_LOCAL";
+        }
+    });
+
+    tests.push({
+        name: "valor contextual sintético exato é bloqueado",
+        run: function () {
+            var contextual = "ContaDemonstracaoConecta2026";
+            var result = poc03CheckPasswordBlocklistForPoc_(
+                contextual,
+                [contextual],
+                function () { throw new Error("unexpected network"); }
+            );
+            return result.status === "BLOCKED_LOCAL";
+        }
+    });
+
+    tests.push({
+        name: "palavra da blocklist dentro de frase maior não é falso positivo local",
+        run: function () {
+            var result = poc03CheckPasswordBlocklistForPoc_(
+                "prefixo-conectalocal2026!-sufixo",
+                ["ConectaLocal2026!"],
+                function () {
+                    return {
+                        getResponseCode: function () { return 200; },
+                        getContentText: function () {
+                            return poc03BuildPwnedRangeFixtureForPoc_(
+                                "prefixo-conectalocal2026!-sufixo", false, 0
+                            );
+                        }
+                    };
+                }
+            );
+            return result.status === "ALLOWED" && result.allowed === true;
+        }
+    });
+
+    tests.push({
+        name: "senha encontrada no Pwned Passwords é bloqueada",
+        run: function () {
+            var optionsSeen = null;
+            var urlSeen = "";
+            var result = poc03CheckPasswordBlocklistForPoc_(
+                validPassword,
+                [],
+                function (url, options) {
+                    urlSeen = url;
+                    optionsSeen = options;
+                    return {
+                        getResponseCode: function () { return 200; },
+                        getContentText: function () {
+                            return poc03BuildPwnedRangeFixtureForPoc_(
+                                validPassword, true, 17
+                            );
+                        }
+                    };
+                }
+            );
+            var sha1Hex = poc03Sha1HexForPwnedPasswordsForPoc_(validPassword);
+            return result.status === "BLOCKED_COMPROMISED"
+                && result.allowed === false
+                && result.exposureCount === 17
+                && urlSeen === POC03_PWNED_PASSWORDS_RANGE_URL + sha1Hex.substring(0, 5)
+                && urlSeen.indexOf(sha1Hex) === -1
+                && urlSeen.indexOf(validPassword) === -1
+                && optionsSeen.headers["Add-Padding"] === "true"
+                && optionsSeen.headers["User-Agent"] === POC03_PWNED_PASSWORDS_USER_AGENT;
+        }
+    });
+
+    tests.push({
+        name: "entrada ausente no range é permitida e padding zero é ignorado",
+        run: function () {
+            var result = poc03CheckPasswordBlocklistForPoc_(
+                validPassword,
+                [],
+                function () {
+                    return {
+                        getResponseCode: function () { return 200; },
+                        getContentText: function () {
+                            return poc03BuildPwnedRangeFixtureForPoc_(
+                                validPassword, false, 0
+                            );
+                        }
+                    };
+                }
+            );
+            return result.status === "ALLOWED" && result.allowed === true;
+        }
+    });
+
+    tests.push({
+        name: "HTTP 503 falha fechado sem classificar senha como comprometida",
+        run: function () {
+            var result = poc03CheckPasswordBlocklistForPoc_(
+                validPassword, [], function () {
+                    return {
+                        getResponseCode: function () { return 503; },
+                        getContentText: function () { return "unavailable"; }
+                    };
+                }
+            );
+            return result.status === "UNAVAILABLE"
+                && result.allowed === false
+                && result.reasonCode === "HTTP_STATUS";
+        }
+    });
+
+    tests.push({
+        name: "resposta malformada falha fechado",
+        run: function () {
+            var result = poc03CheckPasswordBlocklistForPoc_(
+                validPassword, [], function () {
+                    return {
+                        getResponseCode: function () { return 200; },
+                        getContentText: function () { return "not-a-valid-range-row"; }
+                    };
+                }
+            );
+            return result.status === "UNAVAILABLE" && result.allowed === false;
+        }
+    });
+
+    tests.push({
+        name: "falha de rede falha fechado",
+        run: function () {
+            var result = poc03CheckPasswordBlocklistForPoc_(
+                validPassword, [], function () { throw new Error("synthetic network failure"); }
+            );
+            return result.status === "UNAVAILABLE"
+                && result.allowed === false
+                && result.reasonCode === "NETWORK_ERROR";
+        }
+    });
+
+    tests.push({
+        name: "senha curta é recusada antes de qualquer consulta externa",
+        run: function () {
+            var calls = 0;
+            var result = poc03CheckPasswordBlocklistForPoc_(
+                "curta", [], function () { calls += 1; }
+            );
+            return result.status === "INVALID_INPUT" && result.allowed === false && calls === 0;
+        }
+    });
+
+    var passed = 0;
+    var failures = [];
+    tests.forEach(function (testCase) {
+        var ok = false;
+        try {
+            ok = testCase.run() === true;
+        } catch (error) {
+            ok = false;
+        }
+
+        if (ok) {
+            passed += 1;
+        } else {
+            failures.push(testCase.name);
+        }
+
+        Logger.log(JSON.stringify({
+            test: testCase.name,
+            status: ok ? "PASS" : "FAIL"
+        }));
+    });
+
+    var summary = {
+        test: "Password blocklist — local + Pwned Passwords mocked POC",
+        status: passed === tests.length ? "PASS" : "FAIL",
+        testsPassed: passed,
+        testsTotal: tests.length,
+        blocklistVersion: POC03_PASSWORD_BLOCKLIST_VERSION,
+        remoteCallsAreMocked: true,
+        failureMode: "FAIL_CLOSED",
+        failures: failures
+    };
+
+    Logger.log(JSON.stringify(summary));
+    if (summary.status !== "PASS") {
+        throw new Error("Falha nos testes da blocklist POC-03D: " + failures.join("; "));
+    }
+
+    return summary;
+}
+
+/**
+ * Sonda manual de conectividade usando somente a senha pública de exemplo
+ * "password". Não usa a política mínima e não aceita entrada do usuário.
+ * Executar apenas no projeto Apps Script isolado, após autorizar UrlFetchApp.
+ */
+function poc03RunPwnedPasswordsConnectivityProbe() {
+    var result = poc03LookupPwnedPasswordsForPoc_("password");
+    var passed = result.status === "COMPROMISED" && result.exposureCount > 0;
+    var summary = {
+        test: "Pwned Passwords HTTPS connectivity — fixed public sample only",
+        status: passed ? "PASS" : "FAIL",
+        sample: "PUBLIC_FIXED_TEST_VECTOR_NOT_USER_CREDENTIAL",
+        source: "PWNED_PASSWORDS_RANGE_API",
+        query: "SHA1_PREFIX_ONLY_5_HEX_CHARACTERS",
+        addPadding: true,
+        passwordOrHashLogged: false,
+        lookupStatus: result.status,
+        exposureCount: passed ? result.exposureCount : 0
+    };
+
+    Logger.log(JSON.stringify(summary));
+    if (!passed) {
+        throw new Error("A sonda Pwned Passwords não confirmou o vetor público de demonstração.");
     }
 
     return summary;
