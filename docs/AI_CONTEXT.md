@@ -297,9 +297,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 87857924419e9d4b5f045ce624ffd789bd7605d1
-- **Data do commit:** 2026-11-14T14:38:58-03:00
-- **Mensagem do commit:** feat(auth): estilizar páginas de acesso demonstrativo
+- **Commit de referência:** d26479437f0581574c33ff538b8bb066e788f716
+- **Data do commit:** 2026-11-14T14:40:59-03:00
+- **Mensagem do commit:** docs(architecture): separar interface visual da autenticação real
 - **Branch desta execução:** feat/auth-demo-flow
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 8
@@ -393,13 +393,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| d264794 | 2026-11-14 | docs(architecture): separar interface visual da autenticação real |
+| 546c3f7 | 2026-11-14 | docs(auth): registrar escopo da interface demonstrativa |
+| 00bc81f | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 8785792 | 2026-11-14 | feat(auth): estilizar páginas de acesso demonstrativo |
 | b7b95f6 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 5e92001 | 2026-11-14 | feat(auth): ligar CTA profissional ao cadastro demonstrativo |
 | 06dcc35 | 2026-11-14 | feat(auth): conectar acesso demonstrativo no cabeçalho |
 | 1b104bb | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 8fbd382 | 2026-11-14 | feat(auth): adicionar rota para interface demonstrativa |
-| 680bb7d | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 2caa90e | 2026-11-14 | feat(auth): criar interface demonstrativa de acesso |
 
 <!-- END AUTO-GENERATED SECTION -->
