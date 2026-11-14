@@ -297,9 +297,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** df930d66b0c0ebd6c5a4bd71af76e35b6706aea3
-- **Data do commit:** 2026-11-14T15:18:16-03:00
-- **Mensagem do commit:** docs(architecture): atualizar status das pocs e proxima etapa
+- **Commit de referência:** 894390e35465b75b092f096eb57cd8bde76696df
+- **Data do commit:** 2026-11-14T15:19:06-03:00
+- **Mensagem do commit:** docs(poc-04): documentar plano de sessao por cookie
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -395,13 +395,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 894390e | 2026-11-14 | docs(poc-04): documentar plano de sessao por cookie |
+| 6e11ef3 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
+| ed1e9db | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | df930d6 | 2026-11-14 | docs(architecture): atualizar status das pocs e proxima etapa |
 | 6d1960f | 2026-11-14 | docs(poc-03): consolidar resultados finais e pendencias |
 | c799a8d | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 465a38b | 2026-11-14 | Merge pull request #12 from kleber-goncalves/feat/poc-03-password-kdf |
 | c4a0e2c | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 27ee963 | 2026-11-14 | merge: sincronizar POC-03 com dev e reconciliar documentação |
-| f967df9 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 770560f | 2026-11-14 | Merge pull request #13 from kleber-goncalves/feat/auth-demo-flow |
 
 <!-- END AUTO-GENERATED SECTION -->
