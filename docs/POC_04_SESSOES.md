@@ -88,6 +88,27 @@ SameSite é defesa em profundidade, não substitui validação no servidor. A PO
 8. **Limpeza:** remover somente registros/recursos temporários registrados por esta POC e comprovar o escopo da limpeza.
 9. **CI e revisão:** adicionar testes automatizados para parsing de cookie, flags, origem, ciclo de vida e falha fechada; executar lint/build/POC-01/02/03 existentes; publicar Preview, revisar e obter aprovação antes de merge.
 
+## 7.1. Matriz mínima de cenários e resultado esperado
+
+| Cenário | Resultado esperado |
+|---|---|
+| Emissão de sessão sintética confirmada pelo Apps Script | A Function responde com cookie, sem devolver o token no JSON. |
+| Emissão não confirmada, timeout ou resposta inválida do Apps Script | Nenhum cookie de sessão é emitido; resposta falha fechada. |
+| Cookie no host Preview correto | Navegador armazena cookie host-only com flags aprovadas; não é compartilhado com Production ou outro Preview. |
+| Inspeção por JavaScript (`document.cookie`) | Cookie de sessão não aparece, por ser `HttpOnly`. |
+| Requisição same-origin subsequente | Navegador envia o cookie automaticamente; React não lê nem copia o token. |
+| Cookie ausente, alterado ou desconhecido | Apps Script recusa a sessão; nenhum recurso protegido é liberado. |
+| Assinatura HMAC ausente/inválida ou nonce repetido | Apps Script recusa a chamada interna; não há fallback sem assinatura. |
+| Origin de outro host ou domínio | Gateway recusa operação que altera estado; nenhuma mutação ocorre. |
+| Origin ausente | Aplicação segue a política explícita documentada; não assumir autorização por ausência do cabeçalho. |
+| Sessão revogada | Validação seguinte falha mesmo que o navegador ainda possua cookie. |
+| Inatividade superior a 30 minutos | Backend recusa a sessão; o TTL do cookie não é a única fonte de verdade. |
+| Idade absoluta superior a 8 horas | Backend recusa a sessão mesmo que o cookie tenha sido renovado durante atividade. |
+| Logout com revogação confirmada | Sessão fica inválida no Apps Script e cookie é expirado na resposta HTTP. |
+| Logout sem confirmação do Apps Script | Interface não anuncia revogação concluída; falha é registrada sem token. |
+| Falha do serviço Sheets/Apps Script | Operação protegida falha fechada e não expõe informação interna. |
+| Consulta a logs e artefatos | Não há token, hash de token, cookie, segredo HMAC ou credencial; somente IDs de correlação não secretos. |
+
 ## 8. Critérios mínimos de aceite
 
 - Cookie recebido no host correto com `HttpOnly`, `Secure`, `SameSite`, `Path` e escopo host-only comprovados no navegador.
