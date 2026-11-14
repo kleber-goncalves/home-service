@@ -22,6 +22,9 @@ function createAppsScriptHarness({
   lockUnavailable = false,
   propertiesUnavailable = false,
   spreadsheetApp = {},
+  urlFetchFetchImpl = () => {
+    throw new Error("Unexpected external request in Apps Script test harness");
+  },
 } = {}) {
   const logs = [];
   const propertyStore = new Map();
@@ -69,6 +72,16 @@ function createAppsScriptHarness({
         byte > 127 ? byte - 256 : byte,
       );
     },
+    DigestAlgorithm: {
+      SHA_1: "SHA_1",
+    },
+    computeDigest(algorithm, value) {
+      assert.equal(algorithm, "SHA_1");
+      const digest = createHash("sha1").update(Buffer.from(value)).digest();
+      return Array.from(digest, (byte) =>
+        byte > 127 ? byte - 256 : byte,
+      );
+    },
   };
 
   const lock = {
@@ -102,6 +115,11 @@ function createAppsScriptHarness({
     },
     WebAssembly,
     SpreadsheetApp: spreadsheetApp,
+    UrlFetchApp: {
+      fetch(url, options) {
+        return urlFetchFetchImpl(url, options);
+      },
+    },
     Logger: {
       log(message) {
         logs.push(String(message));
@@ -617,6 +635,77 @@ test("POC-03: comparador XOR do Apps Script valida igualdade e rejeita diferenç
   assert.equal(context.poc03BytesEqualForArgon2_(short, expected), false);
   assert.equal(context.poc03BytesEqualForArgon2_([], expected), false);
 });
+test("POC-03D: blocklist local e consulta Pwned Passwords simulada passam 10/10", () => {
+  const { context, logs } = createAppsScriptHarness();
+  const result = context.poc03RunPasswordBlocklistPolicyTests();
+
+  assert.equal(result.status, "PASS");
+  assert.equal(result.testsPassed, 10);
+  assert.equal(result.testsTotal, 10);
+  assert.equal(result.remoteCallsAreMocked, true);
+  assert.equal(result.failureMode, "FAIL_CLOSED");
+  assert.equal(logs.filter((line) => line.includes('"status":"PASS"')).length, 10);
+  assert.doesNotMatch(logs.join("\\n"), /SenhaFicticiaParaTeste2026|123456789012345|conectalocal2026|[A-F0-9]{40}/i);
+});
+
+test("POC-03D: SHA-1 de demonstração consulta somente prefixo de cinco caracteres", () => {
+  let observedUrl = "";
+  let observedOptions;
+  const { context } = createAppsScriptHarness();
+  const knownHash = createHash("sha1").update("password", "utf8").digest("hex").toUpperCase();
+  const responseBody = `${knownHash.slice(5)}:123456\\r\\n${"0".repeat(35)}:0\\r\\n`;
+
+  const result = context.poc03LookupPwnedPasswordsForPoc_(
+    "password",
+    (url, options) => {
+      observedUrl = url;
+      observedOptions = options;
+      return { getResponseCode: () => 200, getContentText: () => responseBody };
+    },
+  );
+
+  assert.equal(result.status, "COMPROMISED");
+  assert.equal(result.exposureCount, 123456);
+  assert.equal(observedUrl, "https://api.pwnedpasswords.com/range/5BAA6");
+  assert.equal(observedUrl.includes(knownHash), false);
+  assert.equal(observedUrl.includes("password"), false);
+  assert.equal(observedOptions.method, "get");
+  assert.equal(observedOptions.headers["Add-Padding"], "true");
+  assert.equal(observedOptions.headers["User-Agent"], "ConectaLocal-POC03D/1.0");
+  assert.equal(observedOptions.muteHttpExceptions, true);
+});
+
+test("POC-03D: adaptador real usa UrlFetchApp e falha fechado em HTTP inválido", () => {
+  let calls = 0;
+  const knownHash = createHash("sha1").update("password", "utf8").digest("hex").toUpperCase();
+  const responseBody = `${knownHash.slice(5)}:3\\n${"0".repeat(35)}:0\\n`;
+  const { context } = createAppsScriptHarness({
+    urlFetchFetchImpl(url, options) {
+      calls += 1;
+      assert.equal(url, "https://api.pwnedpasswords.com/range/5BAA6");
+      assert.equal(options.headers["Add-Padding"], "true");
+      return { getResponseCode: () => 200, getContentText: () => responseBody };
+    },
+  });
+
+  const successful = context.poc03LookupPwnedPasswordsForPoc_("password");
+  assert.equal(successful.status, "COMPROMISED");
+  assert.equal(calls, 1);
+
+  const unavailableHarness = createAppsScriptHarness({
+    urlFetchFetchImpl: () => ({
+      getResponseCode: () => 503,
+      getContentText: () => "service unavailable",
+    }),
+  });
+  const unavailable = unavailableHarness.context.poc03CheckPasswordBlocklistForPoc_(
+    "SenhaFicticiaParaTeste2026",
+    [],
+  );
+  assert.equal(unavailable.status, "UNAVAILABLE");
+  assert.equal(unavailable.allowed, false);
+});
+
 test("POC-03: comparador Node aceita somente hashes Argon2id hexadecimais iguais de 32 bytes", () => {
   const knownHash = "0123456789abcdef".repeat(4);
 
