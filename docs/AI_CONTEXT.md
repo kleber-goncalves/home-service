@@ -297,14 +297,14 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 770560f93b6a1ee44c31a1990ea4b64454fb1b23
-- **Data do commit:** 2026-11-14T14:56:41-03:00
-- **Mensagem do commit:** Merge pull request #13 from kleber-goncalves/feat/auth-demo-flow
-- **Branch desta execução:** dev
+- **Commit de referência:** 27ee9632e3e2d9b47fa33783a2521964565d08d7
+- **Data do commit:** 2026-11-14T15:06:04-03:00
+- **Mensagem do commit:** merge: sincronizar POC-03 com dev e reconciliar documentação
+- **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 8
+- **Scripts npm:** 9
 - **Dependências de runtime:** 5
-- **Dependências de desenvolvimento:** 9
+- **Dependências de desenvolvimento:** 10
 - **Workflows:** 2
 - **Scripts de automação:** 3
 
@@ -320,6 +320,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run update:ai-context | node scripts/update-ai-context.mjs |
 | npm run test:poc01 | node --test tests/poc01/backend.test.js |
 | npm run test:poc02 | node --test tests/poc02/backend.test.js tests/poc02/apps-script.test.js |
+| npm run test:poc03 | node --test tests/poc03/apps-script.test.js |
 
 ### Variáveis declaradas no .env.example
 
@@ -350,6 +351,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | eslint-plugin-react-hooks | ^7.1.1 |
 | eslint-plugin-react-refresh | ^0.5.7 |
 | globals | ^17.13.0 |
+| hash-wasm | 4.13.0 |
 | vite | ^8.3.6 |
 
 ### Workflows do GitHub Actions
@@ -393,13 +395,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 27ee963 | 2026-11-14 | merge: sincronizar POC-03 com dev e reconciliar documentação |
+| f967df9 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 770560f | 2026-11-14 | Merge pull request #13 from kleber-goncalves/feat/auth-demo-flow |
 | 611cd76 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 92c50c0 | 2026-11-14 | fix(auth): validar caracteres de controle sem regex bloqueada pelo lint |
 | 82b532d | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | d264794 | 2026-11-14 | docs(architecture): separar interface visual da autenticação real |
 | 546c3f7 | 2026-11-14 | docs(auth): registrar escopo da interface demonstrativa |
-| 00bc81f | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 8785792 | 2026-11-14 | feat(auth): estilizar páginas de acesso demonstrativo |
 
 <!-- END AUTO-GENERATED SECTION -->
