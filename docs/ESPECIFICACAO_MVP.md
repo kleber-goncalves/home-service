@@ -31,7 +31,7 @@ Ainda não estão implementados ou integrados:
 - denúncias e moderação operacionais;
 - envio de e-mails.
 
-A arquitetura técnica em prova de conceito é React/Vite → Vercel Function (gateway HTTP) → Google Apps Script → Google Sheets/Drive. A rota `/api/backend` e a assinatura HMAC das POCs-01/02 estão integradas à `dev` e restritas a ações sintéticas. A rota isolada de sessão `/api/poc04/session` existe somente na branch `feat/poc-04-session-cookie`, ainda sem validação manual no Preview e sem integração ao produto. Nenhuma dessas provas implementa autenticação de usuários ou armazenamento operacional.
+A arquitetura técnica em prova de conceito é React/Vite → Vercel Function (gateway HTTP) → Google Apps Script → Google Sheets/Drive. A rota `/api/backend` e a assinatura HMAC das POCs-01/02 estão integradas à `dev` e restritas a ações sintéticas. A rota isolada `/api/poc04/session`, na branch `feat/poc-04-session-cookie`, foi implantada e teve seu ciclo básico de sessão sintética validado manualmente no Preview (emissão, validação, CSRF, logout e revogação). Permanecem pendentes testes de expiração e cenários operacionais adicionais. Nenhuma dessas provas implementa autenticação de usuários ou armazenamento operacional.
 
 ## 3. Classificação e leitura dos requisitos
 
@@ -129,7 +129,7 @@ A conta poderá atender várias cidades e bairros. O endereço residencial compl
 - Duração máxima de 8 horas.
 - Logout invalida a sessão imediatamente.
 - Alteração/recuperação de senha, suspensão ou encerramento da conta invalidam todas as sessões existentes.
-- A forma segura de transportar e armazenar o identificador de sessão no navegador permanece pendente de prova de conceito. A Vercel Function poderá emitir um cookie HttpOnly no domínio da aplicação e encaminhar o token ao Apps Script; isso ainda exige testes de XSS, CSRF, SameSite, Origin, redirecionamentos, expiração e revogação. Não escolher `localStorage`, `sessionStorage` ou cookie sem evidência técnica.
+- A POC-04 demonstrou parcialmente, em Preview e com dados sintéticos, o transporte por cookie HttpOnly emitido pela Vercel e validado pelo Apps Script, incluindo rotação/rejeição CSRF e logout com revogação. Isso ainda não aprova a estratégia para autenticação real: testar expiração ociosa/absoluta, Origin/Fetch Metadata negativos no ambiente real, replay/concorrência, falhas operacionais, XSS e limpeza antes de uma decisão arquitetural. Não conectar `AuthDemoPage.jsx` nem credenciais reais.
 
 **Recuperação de senha**
 - O profissional informa o e-mail; a resposta não deve permitir enumerar contas.
