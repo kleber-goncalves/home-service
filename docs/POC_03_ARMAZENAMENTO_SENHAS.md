@@ -1,6 +1,6 @@
 # POC-03 — viabilidade de derivação e armazenamento de senhas
 
-> **Status:** PBKDF2 sobre `Utilities` reprovado como candidato para implementação. Argon2id com `hash-wasm` 4.13.0/WASM passou em dois vetores independentes no Apps Script real em 2026-11-12; o perfil `m=19456 KiB,t=2,p=1` concluiu em 142 ms numa execução medida. Isso comprova viabilidade funcional inicial e desempenho pontual, não aprovação para autenticação ou produção. Permanecem pendentes medições repetidas, concorrência/abuso, fonte segura de salt, verificação/comparação e revisão de segurança.
+> **Status atualizado em 2026-11-14 — POC-03 incorporada à `dev` pelo PR #12:** PBKDF2 artesanal via `Utilities` foi reprovado; Argon2id com `hash-wasm@4.13.0` passou nos vetores independentes e em cinco medições do perfil `m=19456 KiB,t=2,p=1` (142, 130, 86, 280 e 61 ms; mediana 130 ms). A fonte candidata de salt passou 256/256 testes de UUIDv4; a política de entrada passou 14/14; blocklist didática passou 10/10 e uma consulta real ao Pwned Passwords passou usando somente o vetor público fixo `password`. Ensaios sintéticos de throttling persistente/concorrente foram concluídos e os recursos temporários foram limpos. **Nada disso aprova Argon2id, comparação de hash, cadastro, login ou sessão para credenciais reais.** O comparador XOR não tem garantia formal de tempo constante; o helper Node `timingSafeEqual` continua isolado e não integrado. Persistem pendências de arquitetura, revisão de segurança, proteção contra abuso/lockout DoS e integração de políticas ao fluxo de autenticação.
 > **Escopo:** comprovar primitivas, compatibilidade, vetores de referência e custo de execução no runtime real do Google Apps Script.
 > **Ambiente:** projeto Apps Script separado, sem implantação como Web App, sem planilha de negócio e sem credenciais reais.
 
@@ -88,7 +88,7 @@ Todos os itens abaixo precisam ser verificados; nenhum resultado isolado é sufi
 - Geração criptograficamente segura e origem do salt.
 - Armazenamento/versionamento na aba `USUARIOS`.
 - Comparação de hash e comportamento de tempo.
-- Blocklist completa e integrada ao fluxo: POC-03D implementa apenas uma lista local didática e consulta isolada ao Pwned Passwords; validação manual no Apps Script real ainda pendente.
+- Blocklist completa e integrada ao fluxo: POC-03D validou manualmente 10 cenários simulados e uma única consulta HTTPS real ao Pwned Passwords com o vetor público fixo `password`. A lista local é pequena/didática, a consulta externa não está integrada ao cadastro/login e ainda faltam política operacional, disponibilidade, privacidade e revisão de abuso.
 - Proteção contra abuso e negação de serviço por KDF caro.
 - Cadastro, login, confirmação de e-mail e recuperação.
 - Cookies, CSRF, sessão, expiração e revogação.
@@ -319,14 +319,13 @@ A execução automatizada em Node/VM é complementar e não substitui o resultad
 ### 8.10. Decisão após a execução real
 
 - **PBKDF2 sobre `Utilities`: reprovado** por desempenho operacional inconclusivo e margem insuficiente.
-- **Argon2id via `hash-wasm@4.13.0`: aprovado somente como candidato tecnicamente viável para continuar a POC.** Os dois vetores passaram em cinco baterias manuais; o perfil de referência apresentou média de 139,8 ms, mediana de 130 ms e intervalo observado de 61–280 ms. O resultado é promissor, mas a amostra ainda é pequena e não avalia concorrência ou carga.
-- **Fonte candidata de salt:** execução manual concluída com PASS em 256/256 UUIDs v4, 16 bytes cada e zero colisões observadas. A documentação Google → Java oferece a base criptográfica; a amostra não prova CSPRNG.
-- **Ciclo de criação/verificação:** PASS 8/8 no Apps Script real, em 1.031 ms; registro apenas em memória. Senha correta aceita e senha incorreta/adulterações/metadados malformados rejeitados.
-- **Política de entrada:** PASS 14/14 no Apps Script real; regras candidatas de comprimento, NFC, bytes UTF-8 e Unicode passaram. A POC-03D acrescenta uma blocklist local didática e consulta remota isolada, mas ainda não integra esse avaliador ao cadastro/login.
-- **Modelo de throttling:** PASS 6/6 no Apps Script real; confirma as transições 5 falhas/15 minutos e bloqueio de 15 minutos. Estado apenas em memória; concorrência não testada.
-- **Autenticação/login: continua bloqueado.** Ainda faltam aprovação formal do formato de armazenamento, estratégia aceitável de comparação, blocklist abrangente/atualizada, mecanismo real e atômico de rate limit, mitigação de lockout DoS e revisão de segurança da dependência/integração.
-
-A decisão sobre comparação foi formalizada na seção 8.19: nenhum comparador está aprovado para autenticação nesta arquitetura. A POC-03D iniciou a blocklist isolada (seção 8.20), mas a lista local é pequena/didática e a chamada real ao serviço externo ainda precisa de validação manual no Apps Script isolado. Permanecem bloqueados cadastro, login, sessão e operações de negócio.
+- **Argon2id via `hash-wasm@4.13.0`: candidato funcional aprovado somente para continuar a investigação.** Dois vetores independentes passaram em cinco baterias manuais; o perfil `m=19456 KiB,t=2,p=1` apresentou média de 139,8 ms, mediana de 130 ms e intervalo de 61–280 ms. Isso não mede carga, pico de memória ou capacidade de produção.
+- **Fonte candidata de salt:** 256/256 UUIDv4 passaram no Apps Script real, com 16 bytes e zero colisões observadas na amostra. Isso não é prova estatística independente de CSPRNG nem de unicidade global.
+- **Ciclo de criação/verificação:** PASS 8/8 no Apps Script real, em memória e sem persistência. O teste confirma os casos funcionais previstos, mas usa o comparador XOR, que não tem garantia formal de tempo constante e não foi aprovado.
+- **Política de entrada:** PASS 14/14 no Apps Script real para 15–128 code points, NFC, até 512 bytes UTF-8, preservação de espaços/case e rejeição de controles/UTF-16 malformado.
+- **Blocklist / Pwned Passwords:** POC-03D passou 10/10 cenários simulados no Apps Script real e uma única consulta HTTPS real com a senha pública fixa `password`; apenas o prefixo SHA-1 de cinco caracteres foi enviado, com `Add-Padding: true`. Não houve uso de senha pessoal nem persistência.
+- **Throttling:** o modelo lógico passou 6/6. Ensaios sintéticos posteriores validaram persistência/concorrência com Script Properties/ScriptLock e atualização de uma planilha temporária isolada; a sonda de planilha e seus metadados foram limpos. Isso não constitui rate limiter operacional nem resolve lockout DoS.
+- **Autenticação/login: continua bloqueado.** Não há formato de armazenamento de senha aprovado, comparador aprovado, integração de blocklist, controle operacional de frequência ou mitigação suficiente de lockout DoS. A arquitetura e dependências ainda exigem revisão.
 
 
 ### 8.13. Política de entrada de senha — execução manual concluída
@@ -347,7 +346,7 @@ A função cobre 14 casos: 14/15 caracteres, comprimentos de 64/128/129, emoji c
 
 **Resultado manual no Apps Script — 2026-11-12: PASS 14/14.** O responsável executou `poc03RunPasswordInputPolicyTests` no projeto isolado. Passaram os 14 cenários listados acima, incluindo a derivação Argon2id idêntica para formas compostas/decompostas após NFC com o mesmo salt. O resumo confirmou `minimumCodePoints=15`, `maximumCodePoints=128`, `maximumUtf8Bytes=512`, `unicodeNormalization=NFC`, `spacesTrimmed=false` e `failedTests=[]`. Nenhuma senha, salt ou saída derivada foi exposta nos logs.
 
-**Limites:** o máximo de 128 code points/512 bytes é uma decisão de engenharia candidata desta POC, não um número determinado pelo NIST. A blocklist ainda não foi integrada ao fluxo de cadastro/login nem é abrangente: a POC-03D mantém uma lista local pequena e avalia uma consulta externa isolada. A validação manual no Apps Script real e a revisão de disponibilidade/privacidade permanecem pendentes; a passagem dos casos de entrada não aprova autenticação.
+**Limites:** o máximo de 128 code points/512 bytes é uma decisão de engenharia candidata desta POC, não um número determinado pelo NIST. A blocklist não foi integrada ao fluxo e não é abrangente: a POC-03D mantém uma lista local pequena e validou isoladamente a conectividade/parsing do Pwned Passwords com uma senha pública fixa. A execução manual real foi concluída em 2026-11-14; ainda faltam integração, política operacional e revisão de disponibilidade/privacidade. A passagem dos casos de entrada não aprova autenticação.
 
 ### 8.14. Throttling de login — modelo lógico executado manualmente
 
@@ -531,7 +530,7 @@ A validação estrutural antecipada é aceitável porque a representação e o t
 - **Uso permitido nesta POC:** somente dados sintéticos e testes isolados. O XOR não será descrito como comparação segura para autenticação; o helper Node não será descrito como integração concluída. Não enviar senha, hash/verifier ou salt ao React, não registrar esses valores e não criar endpoint público de comparação.
 - **Critério para reabrir a decisão:** apresentar um desenho de ameaça e protocolo verificável que mantenha a autoridade do Apps Script, com testes de autenticação interna, nonce/replay, fail closed, limites/timeout, erros e ausência de exposição de material de credencial. Caso isso não possa ser provado sem improviso, reabrir a arquitetura em vez de aceitar o comparador XOR por conveniência.
 
-**Consequência:** POC-03C registra a decisão de não integrar qualquer comparador ao fluxo neste momento. A POC-03D foi iniciada em 2026-11-14; consultar a seção 8.20. Isso não aprova Argon2id para autenticação e não libera cadastro, login, recuperação ou sessão.
+**Consequência:** POC-03C registra a decisão de não integrar qualquer comparador ao fluxo nesta etapa. A POC-03D foi validada manualmente em 2026-11-14; consultar a seção 8.20. Argon2id continua apenas candidato experimental. Não há aprovação para cadastro, login, recuperação, armazenamento de verificadores ou sessão, e credenciais reais continuam proibidas.
 
 ### 8.20. POC-03D — blocklist local e Pwned Passwords (protótipo isolado)
 
@@ -566,7 +565,7 @@ A validação estrutural antecipada é aceitável porque a representação e o t
 
 **Validação automatizada — CI de 2026-11-14:** `npm run test:poc03` concluiu **26/26 PASS**, incluindo os dez cenários locais/remotos simulados, prova de que apenas o prefixo de cinco caracteres é enviado, validação dos cabeçalhos `Add-Padding`/`User-Agent`, parsing de padding zero e falha fechada para HTTP 503, resposta malformada e falha de rede. Push #43615465847 e PR check #43615469998 concluíram SUCCESS; auditoria, POC-01/02, validação do registro, ESLint e build também passaram.
 
-**Aviso de dependências na mesma CI:** `npm audit` reportou três ocorrências moderadas relacionadas a `minimatch` transitivamente via ESLint; o workflow usa `--audit-level=high`, portanto não falhou. A pendência deve ser revisada separadamente; não foi aplicada atualização automática de dependências nesta POC.
+**Aviso de dependências na CI do PR #12:** `npm audit` reportou três ocorrências moderadas relacionadas a `minimatch` transitivamente via ESLint; o workflow usa `--audit-level=high`, portanto a CI passou. A revisão dessa cadeia transitiva permanece como pendência técnica separada; nenhuma atualização automática foi aplicada durante a POC-03.
 
 **Interpretação da contagem:** `exposureCount=52373976` é a contagem de prevalência informada pelo Pwned Passwords para a senha pública de demonstração no momento da consulta; não representa necessariamente pessoas ou contas distintas. A documentação da API define o valor como o número de vezes que a senha aparece no conjunto de dados. As linhas de padding possuem contagem zero e são descartadas.
 
