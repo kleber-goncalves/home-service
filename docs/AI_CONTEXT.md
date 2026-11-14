@@ -300,9 +300,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 7c884ea4e38c13db68dd813319ae68151a6d2952
-- **Data do commit:** 2026-11-14T16:10:50-03:00
-- **Mensagem do commit:** test(poc-04): corrigir formato do nonce no harness
+- **Commit de referência:** 6188ac4042bf46c818151a75b95c85da8176c0bd
+- **Data do commit:** 2026-11-14T16:12:58-03:00
+- **Mensagem do commit:** fix(poc-04): ajustar lint do gateway e testes
 - **Branch desta execução:** feat/poc-04-session-cookie
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 10
@@ -403,13 +403,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 6188ac4 | 2026-11-14 | fix(poc-04): ajustar lint do gateway e testes |
+| 00b541e | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 7c884ea | 2026-11-14 | test(poc-04): corrigir formato do nonce no harness |
 | c2bdd25 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 71f9882 | 2026-11-14 | feat(poc-04): implementar sessao sintetica via cookie |
 | 42e3a0a | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | ffca51c | 2026-11-14 | docs(poc-04): adicionar matriz de cenarios e aceite |
 | 44da445 | 2026-11-14 | docs(ai-context): atualizar estado e passagem para novo chat |
-| 3eebd2b | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 894390e | 2026-11-14 | docs(poc-04): documentar plano de sessao por cookie |
 
 <!-- END AUTO-GENERATED SECTION -->
