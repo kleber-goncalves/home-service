@@ -644,7 +644,7 @@ test("POC-03D: blocklist local e consulta Pwned Passwords simulada passam 10/10"
   assert.equal(result.testsTotal, 10);
   assert.equal(result.remoteCallsAreMocked, true);
   assert.equal(result.failureMode, "FAIL_CLOSED");
-  assert.equal(logs.filter((line) => line.includes('"test":') && line.includes('"status":"PASS"')).length, 10);
+  assert.equal(logs.filter((line) => line.includes('"test":') && line.includes('"status":"PASS"') && !line.includes('"testsPassed"')).length, 10);
   assert.doesNotMatch(logs.join("\\n"), /SenhaFicticiaParaTeste2026|123456789012345|conectalocal2026|[A-F0-9]{40}/i);
 });
 
@@ -668,7 +668,7 @@ test("POC-03D: SHA-1 de demonstração consulta somente prefixo de cinco caracte
   assert.equal(result.exposureCount, 123456);
   assert.equal(observedUrl, "https://api.pwnedpasswords.com/range/5BAA6");
   assert.equal(observedUrl.includes(knownHash), false);
-  assert.equal(observedUrl.includes("password"), false);
+  assert.equal(observedUrl.endsWith("/" + knownHash.slice(0, 5)), true);
   assert.equal(observedOptions.method, "get");
   assert.equal(observedOptions.headers["Add-Padding"], "true");
   assert.equal(observedOptions.headers["User-Agent"], "ConectaLocal-POC03D/1.0");
