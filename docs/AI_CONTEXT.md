@@ -318,9 +318,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 3ba28688122590f797c9978f5c278d153d5ca371
-- **Data do commit:** 2026-11-14T13:28:20-03:00
-- **Mensagem do commit:** docs(poc-03d): documentar blocklist e pwned passwords
+- **Commit de referência:** 32b55a81a2675ec45c8bae0ef5e5c627bb08250d
+- **Data do commit:** 2026-11-14T13:28:22-03:00
+- **Mensagem do commit:** docs(architecture): registrar avaliador de blocklist
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -415,6 +415,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 32b55a8 | 2026-11-14 | docs(architecture): registrar avaliador de blocklist |
 | 3ba2868 | 2026-11-14 | docs(poc-03d): documentar blocklist e pwned passwords |
 | 699edbe | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 3a772ec | 2026-11-14 | fix(poc-03d): ajustar assert de log e prefixo |
@@ -422,6 +423,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 3947be8 | 2026-11-14 | fix(poc-03d): corrigir fixtures da consulta range |
 | 42b093d | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | be5905f | 2026-11-14 | test(poc-03d): cobrir blocklist e consulta k-anonymity |
-| b64f555 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
