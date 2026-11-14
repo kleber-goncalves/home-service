@@ -295,9 +295,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 8fbd3820bee2b925edf768e7c5ffdbb1012c958b
-- **Data do commit:** 2026-11-14T14:37:36-03:00
-- **Mensagem do commit:** feat(auth): adicionar rota para interface demonstrativa
+- **Commit de referência:** 5e920018644f41f80f5922844ece19827971b243
+- **Data do commit:** 2026-11-14T14:37:56-03:00
+- **Mensagem do commit:** feat(auth): ligar CTA profissional ao cadastro demonstrativo
 - **Branch desta execução:** feat/auth-demo-flow
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 8
@@ -391,13 +391,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 5e92001 | 2026-11-14 | feat(auth): ligar CTA profissional ao cadastro demonstrativo |
+| 06dcc35 | 2026-11-14 | feat(auth): conectar acesso demonstrativo no cabeçalho |
+| 1b104bb | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 8fbd382 | 2026-11-14 | feat(auth): adicionar rota para interface demonstrativa |
 | 680bb7d | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 2caa90e | 2026-11-14 | feat(auth): criar interface demonstrativa de acesso |
 | e348e14 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | aa1a98c | 2026-11-11 | Merge pull request #11 from kleber-goncalves/feat/poc-02-hmac-replay |
-| 1d05ff1 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
-| 5096f9f | 2026-11-11 | docs(arquitetura): registrar validação real da assinatura HMAC |
-| fcdf882 | 2026-11-11 | docs(ai-context): registrar validação manual da POC-02 |
 
 <!-- END AUTO-GENERATED SECTION -->
