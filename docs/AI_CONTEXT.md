@@ -82,7 +82,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 
 ## 4. Estado atual do repositório
 
-**Estado atualizado em 2026-11-14 durante a construção da interface demonstrativa de acesso:**
+**Estado atualizado em 2026-11-14 após integração da interface demonstrativa (PR #13) e consolidação da POC-03 (PR #12):**
 
 - A branch `dev` contém a homepage pública demonstrativa do Conecta Local, integrada por Pull Request.
 - `src/pages/HomePage.jsx` coordena a composição das seções e o estado local da busca e dos filtros.
@@ -100,12 +100,12 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 - A planilha permanece uma estrutura inicial vazia, ainda sem uso como armazenamento operacional integrado.
 - A POC-01 de comunicação React → Vercel Function → Apps Script foi integrada à branch `dev` pelo PR #10 em 2026-11-11 e validada manualmente em Preview: HTTP 200 (eco), 422 (erro lógico Apps Script), 502 (resposta upstream inválida), 400 (JSON inválido no navegador) e 405 (método não permitido). O merge commit foi `837f7c6172764ee27ac835c81e1224640d78478d`; o registro está em `docs/POC_01_COMUNICACAO.md`.
 - A POC-02 de assinatura HMAC-SHA-256 e proteção contra replay foi integrada à `dev` pelo PR #11 em 2026-11-11, após cinco cenários no Preview, cinco testes diretos no Apps Script isolado e um teste concorrente em que somente uma das duas chamadas idênticas foi aceita. Os resultados estão em `docs/POC_02_ASSINATURA_GATEWAY.md`.
-- A POC-03 segue em branch isolada `feat/poc-03-password-kdf`, PR #12 aberto para `dev`; não foi incorporada a esta branch. Em 2026-11-14, no projeto Apps Script isolado, os testes de blocklist passaram 10/10 e a sonda HTTPS real do Pwned Passwords passou com o vetor público fixo `password`. A POC não aprova autenticação real: o comparador XOR não foi aprovado e o helper Node permanece não integrado. Consultar o PR #12 e `docs/POC_03_ARMAZENAMENTO_SENHAS.md` na respectiva branch.
-- Não há backend de negócio operacional integrado ao frontend, autenticação real, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo.
-- A branch `feat/auth-demo-flow` contém a primeira interface de acesso visual em `src/pages/AuthDemoPage.jsx`, acessível por `/?auth=demo`. O cabeçalho abre login demonstrativo e o CTA de profissionais abre cadastro demonstrativo (`/?auth=demo&mode=register`). Os formulários fazem apenas validação local da interface; não chamam API, não gravam em storage e limpam campos de senha após a submissão. A mensagem da tela alerta para não usar credenciais reais. Cadastro, verificação por código, login e recuperação ainda não são operações de backend.
+- A POC-03 foi incorporada à `dev` pelo PR #12 como investigação experimental isolada: PBKDF2 via Utilities foi reprovado; Argon2id com `hash-wasm@4.13.0` passou vetores independentes e cinco medições do perfil `m=19456 KiB,t=2,p=1` (mediana 130 ms), mas não foi aprovado para autenticação. Política de entrada 14/14, blocklist 10/10 e sonda HTTPS real do Pwned Passwords com vetor público `password` passaram; provas sintéticas de throttling e limpeza também foram concluídas. XOR não tem garantia formal de tempo constante; helper Node `timingSafeEqual` permanece isolado e não selecionado. Detalhes e limitações em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
+- Não há backend de negócio operacional integrado ao frontend, autenticação real, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo; a tela de acesso é somente demonstrativa.
+- A interface visual de acesso foi integrada à `dev` pelo PR #13 em 2026-11-14, em `src/pages/AuthDemoPage.jsx`, acessível por `/?auth=demo`; o cadastro usa `/?auth=demo&mode=register`. Os formulários validam localmente, não chamam API nem persistem valores e limpam os campos de senha após a submissão. A interface orienta o uso exclusivo de dados fictícios. Cadastro, verificação por código, login e recuperação ainda não são operações de backend.
 - A homepage não processa pagamentos, agendamentos ou contratação.
 
-A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a arquitetura e seus limites. As POCs de transporte (PR #10) e assinatura HMAC/anti-replay (PR #11) estão integradas à `dev`. A POC-03 permanece no PR #12, em branch separada. A interface visual de autenticação é apenas um protótipo de frontend; não significa que operações de negócio, credenciais, sessões, Sheets ou Drive estejam integrados.
+A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a arquitetura e seus limites. POC-01, POC-02, a interface visual de acesso (PR #13) e a investigação experimental POC-03 (PR #12) estão integradas à `dev`. Nenhuma dessas POCs cria autenticação de usuários, sessão ou operações de negócio; credenciais reais continuam proibidas.
 
 ## 5. Arquitetura e decisões tecnológicas
 
@@ -123,7 +123,7 @@ Não foi escolhida uma aplicação Next.js. Não adicionar Express por padrão: 
 ### 5.2. Backend e dados planejados
 
 - **Google Apps Script:** backend de negócio planejado para autenticação, autorização, regras, integridade e acesso a Sheets/Drive. O Web App isolado da POC-02 executa somente ações sintéticas `poc.*`; operações de negócio e acesso a dados ainda não estão integrados.
-- **Vercel Functions:** o gateway HTTP server-side da POC-01 está implementado na branch `dev`. A assinatura HMAC-SHA-256 e a proteção contra replay da POC-02 estão implementadas e validadas na branch `feat/poc-02-hmac-replay`, aguardando merge do PR #11.
+- **Vercel Functions:** o gateway HTTP server-side da POC-01 e a assinatura HMAC-SHA-256 com proteção contra replay da POC-02 estão integrados à branch `dev` pelos PRs #10 e #11; a POC-02 permanece restrita a ações sintéticas `poc.*`.
 - **Google Sheets:** arquivo estrutural já criado pelo responsável, com 12 abas e 102 cabeçalhos aprovados; ainda não está integrado como armazenamento operacional.
 - **Google Drive:** armazenamento futuro das imagens enviadas pelos profissionais; fluxo de upload e permissões ainda não implementado.
 
@@ -137,9 +137,9 @@ A POC-01 foi integrada à branch `dev` pelo PR #10 em 2026-11-11. O merge commit
 
 A implementação usa React → POST same-origin `/api/backend` → Vercel Function → Apps Script via form-urlencoded → redirecionamento para `script.googleusercontent.com`. O frontend não chama Apps Script diretamente. A POC-01, isoladamente, não autenticava a Function perante o Apps Script e não está aprovada para produção. Uma implantação antiga sem assinatura deve ser atualizada para o código protegido ou desativada.
 
-### POC-02 — assinatura HMAC e proteção contra replay validadas em branch isolada
+### POC-02 — assinatura HMAC e proteção contra replay integradas à dev
 
-A branch de trabalho é `feat/poc-02-hmac-replay`, criada a partir de `dev` após a integração do PR #10. O PR #11 está aberto e tem como destino `dev`; não foi integrado. O desenho e os resultados manuais estão documentados em `docs/POC_02_ASSINATURA_GATEWAY.md`.
+O PR #11 foi integrado em 2026-11-11. HMAC-SHA-256, canonicalização versionada, nonce, timestamp e proteção contra replay foram validados em testes de Preview, chamadas diretas ao Apps Script isolado e concorrência básica. A POC permanece restrita a ações sintéticas `poc.*`; não implementa autenticação, sessão ou acesso a dados de negócio. O registro está em `docs/POC_02_ASSINATURA_GATEWAY.md`.
 
 Decisões implementadas:
 - HMAC-SHA-256 com mensagem canônica versionada `v1`, domínio `CONECTA_LOCAL_GATEWAY`, método lógico, timestamp, nonce, ação, requestId e SHA-256 do payload UTF-8.
@@ -154,7 +154,7 @@ Decisões implementadas:
 - Preview: eco HTTP 200; erro lógico HTTP 422; resposta upstream inválida HTTP 502; JSON inválido HTTP 400; GET HTTP 405.
 - Apps Script direto: chamada sem assinatura `AUTHENTICATION_FAILED`; timestamp expirado `REQUEST_EXPIRED`; chamada assinada aceita; repetição `REPLAY_DETECTED`; payload adulterado `AUTHENTICATION_FAILED`.
 - Concorrência: duas chamadas idênticas enviadas em paralelo; uma aceita e outra recusada com `REPLAY_DETECTED`.
-- GitHub Actions: validação automatizada anterior da branch concluída com sucesso; a atualização documental e da interface deve disparar nova validação antes de integrar.
+- GitHub Actions: a validação automatizada da POC-02 passou antes da integração; os workflows pós-merge dos PRs #10 e #11 também foram concluídos com sucesso.
 
 A validação concorrente realizada com duas chamadas comprova o comportamento básico de uso único, não capacidade de carga ou concorrência em escala. A POC continua restrita a dados sintéticos e ações `poc.*`; não habilita login, sessão, Sheets, Drive ou operações de negócio. Não é solução aprovada para produção.
 
@@ -168,7 +168,7 @@ Google Sheets não impõe automaticamente FKs, unicidade composta ou integridade
 
 ### 5.4. Autenticação, e-mail e imagens — decisões e bloqueios
 
-A arquitetura do backend e as provas de conceito estão em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). A branch `feat/auth-demo-flow` implementa apenas a camada visual de acesso: formulários, validações locais e mensagens de demonstração. Não há envio de credenciais, persistência, criação de conta, autenticação ou sessão. As etapas de backend, KDF, comparação de hash e sessão permanecem separadas e não estão aprovadas para credenciais reais.
+A arquitetura do backend e as provas de conceito estão em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). `src/pages/AuthDemoPage.jsx`, integrada à `dev` pelo PR #13, implementa apenas a camada visual de acesso: formulários, validações locais e mensagens de demonstração. Não há envio de credenciais, persistência, criação de conta, autenticação ou sessão. A POC-03 integrada pelo PR #12 permanece experimental; KDF, comparação de hash e sessão não estão aprovados para credenciais reais.
 
 **Decisão funcional para a demonstração**
 - Cadastro e login próprios por e-mail e senha, com lógica no Apps Script; não adicionar Firebase ou provedor externo sem reabrir a decisão.
@@ -185,7 +185,7 @@ A arquitetura do backend e as provas de conceito estão em [docs/ARQUITETURA_APP
 
 **Bloqueios técnicos antes de implementar**
 - Não armazenar senhas em texto puro e não usar SHA/digest rápido isolado como armazenamento de senha.
-- A referência oficial de Apps Script Utilities documenta operações de digest e HMAC; não presumir que exista um KDF de senha pronto. Avaliar implementação adequada e revisada (por exemplo, PBKDF2-HMAC-SHA-256, se viável), parâmetros, salt individual, comparação e desempenho. Não inventar criptografia caseira.
+- A POC-03 avaliou essas limitações: PBKDF2 artesanal sobre `Utilities` foi reprovado por desempenho; Argon2id via WebAssembly é apenas candidato experimental. O comparador XOR foi reprovado para autenticação por ausência de garantia formal de tempo constante; o helper Node com `timingSafeEqual` não foi integrado por introduzir outra fronteira de confiança. Consultar `docs/POC_03_ARMAZENAMENTO_SENHAS.md`; não conectar cadastro/login até nova decisão técnica.
 - Provar como uma sessão será transportada, persistida, expirada e revogada entre React, Vercel Function e Apps Script. A Vercel Function poderá emitir um cookie HttpOnly no domínio da aplicação, mas a estratégia, atributos e controles CSRF ainda exigem POC. O Apps Script permanece a autoridade que valida a sessão; não escolher armazenamento de token no navegador sem evidência.
 - Testar concorrência e o risco de um atacante bloquear uma conta provocando tentativas incorretas.
 - A prova de conceito deverá usar dados sintéticos e não será considerada pronta para produção.
@@ -285,7 +285,7 @@ Os comandos de validação são mantidos em `package.json`. O workflow de qualid
 4. ESLint.
 5. Build de produção do Vite.
 
-Os testes das POCs devem permanecer nos scripts npm e no workflow: `npm run test:poc01` e `npm run test:poc02`. Não criar etapas E2E ou Lighthouse só para imitar outro projeto; introduzi-las quando houver fluxos reais que justifiquem esses testes.
+Os testes das POCs devem permanecer nos scripts npm e no workflow: `npm run test:poc01`, `npm run test:poc02` e `npm run test:poc03`. Não criar etapas E2E ou Lighthouse só para imitar outro projeto; introduzi-las quando houver fluxos reais que justifiquem esses testes.
 
 A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substitui a conferência do deployment, do SHA publicado e testes manuais de navegação/responsividade. Não afirmar que o Google Apps Script, Sheets ou Drive estão funcionando antes de validar sua integração real.
 
@@ -297,14 +297,14 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 770560f93b6a1ee44c31a1990ea4b64454fb1b23
-- **Data do commit:** 2026-11-14T14:56:41-03:00
-- **Mensagem do commit:** Merge pull request #13 from kleber-goncalves/feat/auth-demo-flow
-- **Branch desta execução:** dev
+- **Commit de referência:** 27ee9632e3e2d9b47fa33783a2521964565d08d7
+- **Data do commit:** 2026-11-14T15:06:04-03:00
+- **Mensagem do commit:** merge: sincronizar POC-03 com dev e reconciliar documentação
+- **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 8
+- **Scripts npm:** 9
 - **Dependências de runtime:** 5
-- **Dependências de desenvolvimento:** 9
+- **Dependências de desenvolvimento:** 10
 - **Workflows:** 2
 - **Scripts de automação:** 3
 
@@ -320,6 +320,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run update:ai-context | node scripts/update-ai-context.mjs |
 | npm run test:poc01 | node --test tests/poc01/backend.test.js |
 | npm run test:poc02 | node --test tests/poc02/backend.test.js tests/poc02/apps-script.test.js |
+| npm run test:poc03 | node --test tests/poc03/apps-script.test.js |
 
 ### Variáveis declaradas no .env.example
 
@@ -350,6 +351,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | eslint-plugin-react-hooks | ^7.1.1 |
 | eslint-plugin-react-refresh | ^0.5.7 |
 | globals | ^17.13.0 |
+| hash-wasm | 4.13.0 |
 | vite | ^8.3.6 |
 
 ### Workflows do GitHub Actions
@@ -393,13 +395,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 27ee963 | 2026-11-14 | merge: sincronizar POC-03 com dev e reconciliar documentação |
+| f967df9 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 770560f | 2026-11-14 | Merge pull request #13 from kleber-goncalves/feat/auth-demo-flow |
 | 611cd76 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 92c50c0 | 2026-11-14 | fix(auth): validar caracteres de controle sem regex bloqueada pelo lint |
 | 82b532d | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | d264794 | 2026-11-14 | docs(architecture): separar interface visual da autenticação real |
 | 546c3f7 | 2026-11-14 | docs(auth): registrar escopo da interface demonstrativa |
-| 00bc81f | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 8785792 | 2026-11-14 | feat(auth): estilizar páginas de acesso demonstrativo |
 
 <!-- END AUTO-GENERATED SECTION -->

@@ -11,7 +11,8 @@
     "check:occurrences": "node scripts/validate-occurrence-register.mjs",
     "update:ai-context": "node scripts/update-ai-context.mjs",
     "test:poc01": "node --test tests/poc01/backend.test.js",
-    "test:poc02": "node --test tests/poc02/backend.test.js tests/poc02/apps-script.test.js"
+    "test:poc02": "node --test tests/poc02/backend.test.js tests/poc02/apps-script.test.js",
+    "test:poc03": "node --test tests/poc03/apps-script.test.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.5",
@@ -29,6 +30,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.13.0",
-    "vite": "^8.3.6"
+    "vite": "^8.3.6",
+    "hash-wasm": "4.13.0"
   }
 }

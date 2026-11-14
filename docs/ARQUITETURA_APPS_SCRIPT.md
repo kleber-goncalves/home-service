@@ -2,7 +2,7 @@
 
 > **Versão:** 0.1  
 > **Data:** 2026-11-10  
-> **Status:** POC-01 e POC-02 integradas à branch `dev` pelos PRs #10 e #11 e validadas manualmente no escopo das respectivas provas. POC-03 permanece isolada no PR #12; em 2026-11-14, a bateria local (10/10) e a consulta real ao Pwned Passwords foram validadas no Apps Script isolado. A interface visual de cadastro/login está em `feat/auth-demo-flow`, sem integração de credenciais. A POC-04 de sessão permanece pendente. Nenhuma dessas validações aprova o sistema para produção.  
+> **Status:** POC-01 (#10) e POC-02 (#11) estão integradas à `dev`; a interface visual de acesso foi integrada pelo PR #13; a investigação experimental POC-03 foi incorporada pelo PR #12, incluindo harness Apps Script, testes e documentação. Login, cadastro, sessão e armazenamento operacional de credenciais continuam não implementados. A POC-04 de sessão permanece pendente. Nenhuma validação aprova o sistema para produção.  
 > **Escopo:** integração React/Vite, Google Apps Script, Google Sheets e Google Drive para a demonstração acadêmica.  
 > **Premissa:** manter Apps Script como backend inicial e autenticação própria por e-mail e senha, conforme decisão funcional aprovada. Transporte, sessão e armazenamento seguro de senhas continuam pendentes de prova de conceito.
 
@@ -19,7 +19,7 @@ Estado conhecido na data desta revisão:
 - A planilha ainda não é armazenamento operacional integrado.
 - A comunicação real da POC-01 foi confirmada manualmente em Preview em 2026-11-11: eco HTTP 200, erro lógico HTTP 422, resposta upstream inválida HTTP 502, JSON inválido HTTP 400 e GET HTTP 405. A evidência está registrada em `docs/POC_01_COMUNICACAO.md`.
 - Não há autenticação real, sessão, integração operacional com Sheets/Drive, upload ou painel administrativo implementados.
-- A branch `feat/auth-demo-flow` adiciona apenas a interface visual em `src/pages/AuthDemoPage.jsx`, por `/?auth=demo`. O CTA de profissionais abre `/?auth=demo&mode=register`. Os formulários validam campos localmente, não chamam a Function/Apps Script e não persistem dados; a tela orienta o uso exclusivo de valores fictícios e limpa as senhas após a submissão.
+- `src/pages/AuthDemoPage.jsx`, integrada à `dev` pelo PR #13, fornece apenas a interface visual em `/?auth=demo`; o CTA de profissionais abre `/?auth=demo&mode=register`. Os formulários validam localmente, não chamam a Function/Apps Script, não persistem dados e orientam o uso exclusivo de valores fictícios.
 
 O projeto continua sendo uma demonstração acadêmica com dados sintéticos. Não inserir credenciais, cadastros ou dados pessoais reais.
 
@@ -419,12 +419,19 @@ Não apresentar sucesso integral quando a atualização de permissões falhar. O
 
 ### 10.1. Senhas
 
-A aba USUARIOS já prevê senha_hash, senha_salt e senha_algoritmo, mas isso não significa que o mecanismo criptográfico esteja escolhido.
+A aba `USUARIOS` já prevê `senha_hash`, `senha_salt` e `senha_algoritmo`, mas o formato candidato da POC-03 ainda não foi aprovado para autenticação.
 
-A referência oficial do Apps Script Utilities documenta digest e HMAC; essas operações, isoladamente, não são KDFs adequados para armazenamento de senhas. A OWASP recomenda funções de derivação lentas e apropriadas, priorizando Argon2id; PBKDF2-HMAC-SHA-256 é uma alternativa em cenários específicos, com parâmetros adequados.
+**Resultado da POC-03 — pesquisa experimental incorporada à dev pelo PR #12:**
+- **PBKDF2-HMAC-SHA-256 sobre `Utilities.computeHmacSha256Signature`: reprovado** neste runtime. O vetor de 80.000 iterações/64 bytes levou 84.443 ms; o benchmark de 600.000 iterações foi interrompido preventivamente após 149.247 iterações/180.229 ms, com projeções que poderiam exceder a quota de seis minutos.
+- **Argon2id via `hash-wasm@4.13.0`: candidato funcional, não aprovado.** Dois vetores independentes passaram em cinco baterias manuais. No perfil `m=19456 KiB,t=2,p=1`, os tempos foram 142, 130, 86, 280 e 61 ms (mediana 130 ms). Isso não é teste de carga, SLA, medição de pico de memória nem comprovação de capacidade de produção.
+- **Salt:** 256 UUIDv4 foram validados no Apps Script real, sem colisões observadas na amostra. Isso não constitui prova estatística da fonte CSPRNG nem unicidade global; o formato continua candidato.
+- **Política de entrada:** 14/14 testes manuais passaram para 15–128 code points Unicode, NFC, até 512 bytes UTF-8, preservação de espaços/case e rejeição de controles/malformed UTF-16.
+- **Blocklist:** 10/10 cenários simulados passaram e a consulta HTTPS real ao Pwned Passwords foi validada uma vez com o vetor público fixo `password`, enviando somente o prefixo de cinco caracteres SHA-1 e usando `Add-Padding: true`. A lista local é didática, não abrangente, e o avaliador não está integrado ao cadastro/login.
+- **Throttling:** testes lógicos e ensaios sintéticos de concorrência foram concluídos em Script Properties/ScriptLock e numa planilha temporária isolada. As estruturas temporárias foram limpas. Isso não é rate limiter operacional do endpoint; lockout por conta ainda traz risco de DoS e exige mitigação.
 
-**Bloqueio:** não implementar armazenamento de senha com SHA-256 simples, HMAC simples ou criptografia própria. Antes de aprovar um algoritmo, testar quais primitivas estão realmente disponíveis no runtime V8 do Apps Script, verificar uma implementação mantida e revisada, medir o desempenho e validar parâmetros, salt individual e comparação. Se não houver implementação adequada e viável dentro dos limites da plataforma, interromper a autenticação própria e reabrir a decisão com o responsável.
+**Comparação de verificadores — decisão POC-03C: NO-GO para autenticação.** O comparador XOR do Apps Script verifica igualdade funcional, mas JavaScript/V8 não oferece garantia formal de tempo constante; permanece somente no harness. O helper separado em `server/password-hash-compare.js` usa `node:crypto.timingSafeEqual` com buffers de mesmo tamanho, mas não está ligado ao gateway nem ao Apps Script. Integrá-lo criaria uma nova fronteira de confiança e exigiria protocolo e controles próprios; a decisão foi não integrá-lo nesta etapa.
 
+**Conclusão:** o PR #12 incorpora o código da prova, os testes e os resultados em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`. A POC demonstra compatibilidade experimental de Argon2id e validações auxiliares, mas **não aprova nenhum comparador para autenticação**, não cria cadastro/login e não libera credenciais reais. Não persistir senhas nem conectar esta prova ao fluxo de usuários até nova decisão técnica.
 ### 10.2. Sessões
 
 A modelagem prevê apenas o hash do token na aba SESSOES, 30 minutos de inatividade e duração absoluta de 8 horas. O token em claro não deve ser gravado na planilha nem em logs.
@@ -548,7 +555,7 @@ Não criar endpoints administrativos, painel autenticado, upload público ou esc
 - Formato do envelope e serialização do payload Vercel → Apps Script.
 - Variáveis e escopo dos ambientes Development, Preview e Production.
 - Timeout e região da Function compatíveis com os limites do Apps Script.
-- KDF seguro, mantido e viável no runtime Apps Script.
+- Estratégia de verificação de senha que preserve a autoridade do Apps Script: o XOR não foi aprovado e o helper Node com `timingSafeEqual` não foi selecionado; qualquer nova fronteira de confiança exige decisão e prova próprias.
 - Geração de token e estratégia de cookie no navegador; atributos SameSite e defesa CSRF.
 - Viabilidade prática de upload binário com limite de 5.000.000 bytes.
 - Comportamento das permissões do Drive na conta Google utilizada.
