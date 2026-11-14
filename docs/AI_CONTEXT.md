@@ -300,8 +300,8 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 9636a1828e5425030120f4468c449ea117d7463f
-- **Data do commit:** 2026-11-14T18:41:00-03:00
+- **Commit de referência:** fd91bec0ef4f648742a69f60d3d183347adc95e4
+- **Data do commit:** 2026-11-14T18:41:03-03:00
 - **Mensagem do commit:** docs(poc-04): registrar validacao manual em Preview
 - **Branch desta execução:** feat/poc-04-session-cookie
 - **Projeto declarado:** home-service@0.0.0
@@ -403,6 +403,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| fd91bec | 2026-11-14 | docs(poc-04): registrar validacao manual em Preview |
 | 9636a18 | 2026-11-14 | docs(poc-04): registrar validacao manual em Preview |
 | 0b2a6e6 | 2026-11-14 | docs(poc-04): registrar validacao manual em Preview |
 | 4eedf2c | 2026-11-14 | docs(poc-04): registrar validacao manual em Preview |
@@ -410,6 +411,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 6188ac4 | 2026-11-14 | fix(poc-04): ajustar lint do gateway e testes |
 | 00b541e | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 7c884ea | 2026-11-14 | test(poc-04): corrigir formato do nonce no harness |
-| c2bdd25 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
