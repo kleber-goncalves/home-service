@@ -295,10 +295,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** aa1a98c130369892e6727dda90e97ca4c0f7d2a6
-- **Data do commit:** 2026-11-11T15:49:05-03:00
-- **Mensagem do commit:** Merge pull request #11 from kleber-goncalves/feat/poc-02-hmac-replay
-- **Branch desta execução:** dev
+- **Commit de referência:** 2caa90e5424b2c62e5892d2a9696f1db470d804f
+- **Data do commit:** 2026-11-14T14:37:18-03:00
+- **Mensagem do commit:** feat(auth): criar interface demonstrativa de acesso
+- **Branch desta execução:** feat/auth-demo-flow
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 8
 - **Dependências de runtime:** 5
@@ -374,6 +374,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/data/homepage.js
 - src/lib/utils.js
 - src/main.jsx
+- src/pages/AuthDemoPage.jsx
 - src/pages/HomePage.jsx
 - src/pages/Poc01Page.jsx
 - src/services/poc-01-api.js
@@ -390,13 +391,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 2caa90e | 2026-11-14 | feat(auth): criar interface demonstrativa de acesso |
+| e348e14 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | aa1a98c | 2026-11-11 | Merge pull request #11 from kleber-goncalves/feat/poc-02-hmac-replay |
 | 1d05ff1 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | 5096f9f | 2026-11-11 | docs(arquitetura): registrar validação real da assinatura HMAC |
 | fcdf882 | 2026-11-11 | docs(ai-context): registrar validação manual da POC-02 |
 | 0532395 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
 | c6bdac7 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
-| 5127ec8 | 2026-11-11 | docs(arquitetura): atualizar estado das provas de conceito |
-| c3aad65 | 2026-11-11 | docs(poc-02): registrar validação manual HMAC e replay |
 
 <!-- END AUTO-GENERATED SECTION -->
