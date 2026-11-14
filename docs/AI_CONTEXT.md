@@ -318,9 +318,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 32b55a81a2675ec45c8bae0ef5e5c627bb08250d
-- **Data do commit:** 2026-11-14T13:28:22-03:00
-- **Mensagem do commit:** docs(architecture): registrar avaliador de blocklist
+- **Commit de referência:** d788b1ca98c87a0384817f574acb8738b350491f
+- **Data do commit:** 2026-11-14T14:01:31-03:00
+- **Mensagem do commit:** docs(poc-03): registrar consulta real Pwned Passwords
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -415,13 +415,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| d788b1c | 2026-11-14 | docs(poc-03): registrar consulta real Pwned Passwords |
+| b057da7 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
+| 6fcf32e | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
+| 3fa7944 | 2026-11-14 | docs(ai-context): registrar poc-03d |
 | 32b55a8 | 2026-11-14 | docs(architecture): registrar avaliador de blocklist |
 | 3ba2868 | 2026-11-14 | docs(poc-03d): documentar blocklist e pwned passwords |
 | 699edbe | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 3a772ec | 2026-11-14 | fix(poc-03d): ajustar assert de log e prefixo |
-| 0b6eacc | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 3947be8 | 2026-11-14 | fix(poc-03d): corrigir fixtures da consulta range |
-| 42b093d | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| be5905f | 2026-11-14 | test(poc-03d): cobrir blocklist e consulta k-anonymity |
 
 <!-- END AUTO-GENERATED SECTION -->
