@@ -186,8 +186,8 @@ export function ProfessionalsCTA() {
                         <span className="cta-eyebrow"><BriefcaseBusiness size={16} />Para quem oferece serviços</span>
                         <h2>Seu trabalho merece ser encontrado.</h2>
                         <p>O Conecta Local quer criar um espaço para profissionais apresentarem seus serviços e se aproximarem de novos clientes.</p>
-                        <a className="cta-button" href="#sobre">Conheça a proposta <ArrowRight size={17} /></a>
-                        <span className="cta-note"><CheckCircle2 size={15} />Cadastro de profissionais ainda não disponível</span>
+                        <a className="cta-button" href="/?auth=demo&mode=register">Abrir cadastro demonstrativo <ArrowRight size={17} /></a>
+                        <span className="cta-note"><CheckCircle2 size={15} />Interface de cadastro em demonstração; sem envio de dados</span>
                     </div>
                     <div className="professionals-cta-image">
                         <img src="https://images.pexels.com/photos/27928762/pexels-photo-27928762.jpeg?auto=compress&cs=tinysrgb&w=1000" alt="Imagem ilustrativa de profissional executando um serviço." loading="lazy" />

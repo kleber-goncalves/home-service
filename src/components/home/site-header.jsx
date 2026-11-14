@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowRight, House, Menu, X } from "lucide-react";
+import { ArrowRight, House, Menu, UserRound, X } from "lucide-react";
 
 const navigation = [
     { label: "Início", href: "#inicio" },
@@ -23,7 +23,7 @@ export default function SiteHeader() {
                     <nav className="desktop-nav" aria-label="Navegação principal">
                         {navigation.map((item) => <a key={item.href} href={item.href}>{item.label}</a>)}
                     </nav>
-                    <a className="nav-cta" href="#categorias">Encontrar serviço <ArrowRight size={16} aria-hidden="true" /></a>
+                    <a className="nav-cta" href="/?auth=demo">Entrar <UserRound size={16} aria-hidden="true" /></a>
                     <button
                         type="button"
                         className="mobile-menu-toggle"
@@ -42,6 +42,7 @@ export default function SiteHeader() {
                         </a>
                     ))}
                     <a className="mobile-nav-cta" href="#categorias" onClick={() => setMenuOpen(false)}>Encontrar serviço</a>
+                    <a className="mobile-nav-cta mobile-nav-cta--secondary" href="/?auth=demo" onClick={() => setMenuOpen(false)}>Acessar conta demonstrativa</a>
                 </nav>
             </header>
         </>

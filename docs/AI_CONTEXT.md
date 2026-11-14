@@ -82,7 +82,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 
 ## 4. Estado atual do repositório
 
-**Estado atualizado em 2026-11-14 após a validação manual da POC-03D:**
+**Estado atualizado em 2026-11-14 após integração da interface demonstrativa (PR #13) e consolidação da POC-03 (PR #12):**
 
 - A branch `dev` contém a homepage pública demonstrativa do Conecta Local, integrada por Pull Request.
 - `src/pages/HomePage.jsx` coordena a composição das seções e o estado local da busca e dos filtros.
@@ -99,11 +99,13 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 - O arquivo Google Sheets estrutural foi criado pelo responsável pelo projeto com as 12 abas e os 102 cabeçalhos aprovados. A exportação XLSX foi inspecionada e a conferência manual de proteções e compartilhamento restrito foi confirmada pelo responsável.
 - A planilha permanece uma estrutura inicial vazia, ainda sem uso como armazenamento operacional integrado.
 - A POC-01 de comunicação React → Vercel Function → Apps Script foi integrada à branch `dev` pelo PR #10 em 2026-11-11 e validada manualmente em Preview: HTTP 200 (eco), 422 (erro lógico Apps Script), 502 (resposta upstream inválida), 400 (JSON inválido no navegador) e 405 (método não permitido). O merge commit foi `837f7c6172764ee27ac835c81e1224640d78478d`; o registro está em `docs/POC_01_COMUNICACAO.md`.
-- A POC-02 de assinatura HMAC-SHA-256 e proteção contra replay foi integrada à `dev` pelo PR #11 em 2026-11-11 (merge commit `aa1a98c130369892e6727dda90e97ca4c0f7d2a6`). Os cinco cenários de Preview, cinco testes diretos contra o Apps Script isolado e o teste concorrente com duas chamadas idênticas passaram; somente uma chamada concorrente foi aceita e a outra recebeu `REPLAY_DETECTED`. O workflow pós-merge #93 passou. O Preview mais recente de `dev` foi redeployado após ajustar as variáveis para Preview; a confirmação manual final do Echo nesse deployment permanece pendente. Consulte `docs/POC_02_ASSINATURA_GATEWAY.md`.
-- Não há backend de negócio operacional integrado ao frontend, cadastro, autenticação, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo.
+- A POC-02 de assinatura HMAC-SHA-256 e proteção contra replay foi integrada à `dev` pelo PR #11 em 2026-11-11, após cinco cenários no Preview, cinco testes diretos no Apps Script isolado e um teste concorrente em que somente uma das duas chamadas idênticas foi aceita. Os resultados estão em `docs/POC_02_ASSINATURA_GATEWAY.md`.
+- A POC-03 foi incorporada à `dev` pelo PR #12 como investigação experimental isolada: PBKDF2 via Utilities foi reprovado; Argon2id com `hash-wasm@4.13.0` passou vetores independentes e cinco medições do perfil `m=19456 KiB,t=2,p=1` (mediana 130 ms), mas não foi aprovado para autenticação. Política de entrada 14/14, blocklist 10/10 e sonda HTTPS real do Pwned Passwords com vetor público `password` passaram; provas sintéticas de throttling e limpeza também foram concluídas. XOR não tem garantia formal de tempo constante; helper Node `timingSafeEqual` permanece isolado e não selecionado. Detalhes e limitações em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
+- Não há backend de negócio operacional integrado ao frontend, autenticação real, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo; a tela de acesso é somente demonstrativa.
+- A interface visual de acesso foi integrada à `dev` pelo PR #13 em 2026-11-14, em `src/pages/AuthDemoPage.jsx`, acessível por `/?auth=demo`; o cadastro usa `/?auth=demo&mode=register`. Os formulários validam localmente, não chamam API nem persistem valores e limpam os campos de senha após a submissão. A interface orienta o uso exclusivo de dados fictícios. Cadastro, verificação por código, login e recuperação ainda não são operações de backend.
 - A homepage não processa pagamentos, agendamentos ou contratação.
 
-A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a arquitetura e seus limites. POC-01 e POC-02 estão integradas à `dev`; a POC-02 continua restrita a ações sintéticas. A POC-03 está em branch isolada e investiga a viabilidade de KDF no runtime Apps Script, sem login, endpoint ou armazenamento de usuários. Isso não significa que operações de negócio, autenticação de usuários, sessões, Sheets ou Drive estejam integrados.
+A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a arquitetura e seus limites. POC-01, POC-02, a interface visual de acesso (PR #13) e a investigação experimental POC-03 (PR #12) estão integradas à `dev`. Nenhuma dessas POCs cria autenticação de usuários, sessão ou operações de negócio; credenciais reais continuam proibidas.
 
 ## 5. Arquitetura e decisões tecnológicas
 
@@ -121,7 +123,7 @@ Não foi escolhida uma aplicação Next.js. Não adicionar Express por padrão: 
 ### 5.2. Backend e dados planejados
 
 - **Google Apps Script:** backend de negócio planejado para autenticação, autorização, regras, integridade e acesso a Sheets/Drive. O Web App isolado da POC-02 executa somente ações sintéticas `poc.*`; operações de negócio e acesso a dados ainda não estão integrados.
-- **Vercel Functions:** o gateway HTTP server-side da POC-01 e a assinatura HMAC-SHA-256 com proteção contra replay da POC-02 estão integrados à branch `dev`. A chamada Echo do Preview de `dev` redeployado ainda aguarda confirmação manual final.
+- **Vercel Functions:** o gateway HTTP server-side da POC-01 e a assinatura HMAC-SHA-256 com proteção contra replay da POC-02 estão integrados à branch `dev` pelos PRs #10 e #11; a POC-02 permanece restrita a ações sintéticas `poc.*`.
 - **Google Sheets:** arquivo estrutural já criado pelo responsável, com 12 abas e 102 cabeçalhos aprovados; ainda não está integrado como armazenamento operacional.
 - **Google Drive:** armazenamento futuro das imagens enviadas pelos profissionais; fluxo de upload e permissões ainda não implementado.
 
@@ -137,47 +139,24 @@ A implementação usa React → POST same-origin `/api/backend` → Vercel Funct
 
 ### POC-02 — assinatura HMAC e proteção contra replay integradas à dev
 
-O PR #11 foi integrado em 2026-11-11 e o workflow pós-merge #93 passou. A POC permanece restrita a chamadas sintéticas `poc.*`, sem login, sessão ou acesso a dados de negócio. Os testes manuais da branch e o teste concorrente com duas chamadas idênticas passaram. A execução Echo no último Preview de `dev`, redeployado após a configuração de variáveis exclusivas de Preview, ainda precisa de confirmação manual final.
+O PR #11 foi integrado em 2026-11-11. HMAC-SHA-256, canonicalização versionada, nonce, timestamp e proteção contra replay foram validados em testes de Preview, chamadas diretas ao Apps Script isolado e concorrência básica. A POC permanece restrita a ações sintéticas `poc.*`; não implementa autenticação, sessão ou acesso a dados de negócio. O registro está em `docs/POC_02_ASSINATURA_GATEWAY.md`.
 
-### POC-03 — Argon2id executado no Apps Script; autenticação ainda bloqueada
+Decisões implementadas:
+- HMAC-SHA-256 com mensagem canônica versionada `v1`, domínio `CONECTA_LOCAL_GATEWAY`, método lógico, timestamp, nonce, ação, requestId e SHA-256 do payload UTF-8.
+- Timestamp Unix em milissegundos com tolerância máxima de 5 minutos.
+- Nonce de 32 bytes aleatórios (64 caracteres hexadecimais), gerado na Vercel Function com `node:crypto`.
+- Registro de nonces no Apps Script com Script Properties e Script Lock, retenção de 10 minutos e 30 segundos, capacidade limitada a 2.500 nonces ativos e comportamento fail closed.
+- Segredo de 32 bytes gerado fora do repositório: `APPS_SCRIPT_HMAC_SECRET` somente no ambiente Preview da Vercel e `POC02_HMAC_SECRET` em Script Properties do Apps Script. Os valores devem ser idênticos e não podem aparecer no React, Git, documentação, logs ou chat.
+- `apps-script/poc-02/Code.gs` contém a versão protegida implantada no Web App Apps Script isolado usado nos testes.
+- `tests/poc02/` contém os testes automatizados do gateway e um harness local que simula as APIs do Apps Script. `scripts/poc02-replay-check.mjs` executa testes reais diretos de chamada sem assinatura, timestamp expirado, assinatura válida, repetição de nonce e payload adulterado.
 
-A branch de trabalho é `feat/poc-03-password-kdf`. O harness `apps-script/poc-03/Code.gs` permanece isolado; nenhum endpoint, cadastro, login, sessão ou armazenamento de credenciais foi criado.
+**Validação manual em 2026-11-11, executada pelo responsável do projeto:**
+- Preview: eco HTTP 200; erro lógico HTTP 422; resposta upstream inválida HTTP 502; JSON inválido HTTP 400; GET HTTP 405.
+- Apps Script direto: chamada sem assinatura `AUTHENTICATION_FAILED`; timestamp expirado `REQUEST_EXPIRED`; chamada assinada aceita; repetição `REPLAY_DETECTED`; payload adulterado `AUTHENTICATION_FAILED`.
+- Concorrência: duas chamadas idênticas enviadas em paralelo; uma aceita e outra recusada com `REPLAY_DETECTED`.
+- GitHub Actions: a validação automatizada da POC-02 passou antes da integração; os workflows pós-merge dos PRs #10 e #11 também foram concluídos com sucesso.
 
-**PBKDF2-HMAC-SHA-256 sobre `Utilities.computeHmacSha256Signature`: reprovado para implementação no Apps Script.** Os três vetores rápidos passaram; o vetor RFC de 80.000 iterações/64 bytes passou em 84.443 ms. O benchmark de 600.000 iterações/32 bytes foi interrompido preventivamente após 149.247 iterações em 180.229 ms. Extrapolações lineares diferentes variaram de 5,28 a 12,08 minutos, diante do limite documentado de seis minutos por execução. Não reduzir o work factor arbitrariamente nem usar SHA-256/HMAC simples como substituto. Detalhes em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
-
-**Argon2id via WebAssembly — execução manual real concluída em 2026-11-12.** A sonda WebAssembly básica passou (módulo retornou 42; memória independente de 19 MiB criada). O bundle original `hash-wasm@4.13.0`, com WASM incorporado, foi fixado em `devDependencies` e verificado por SHA-256; o código de produto não importa essa dependência. A função `poc03RunArgon2idTests` passou no Apps Script real em dois vetores independentes:
-- KAT pequeno `m=32 KiB,t=3,p=4`: PASS em 10 ms.
-- Perfil de referência `m=19456 KiB,t=2,p=1`, saída de 32 bytes: PASS em 142 ms.
-- Bateria completa: PASS 2/2, `totalElapsedMs=161`.
-
-O resultado demonstra compatibilidade funcional repetida e desempenho pontual promissor para Argon2id no Apps Script. O responsável executou cinco baterias manuais independentes; o perfil `m=19456 KiB,t=2,p=1` passou em todas, com tempos de 142, 130, 86, 280 e 61 ms (média 139,8 ms; mediana 130 ms; intervalo 61–280 ms). **Não aprova autenticação ou produção.** Cinco amostras não constituem teste de carga, SLA ou garantia de latência. Não comprovam concorrência, pico de memória, CSPRNG para salts, comparação segura, armazenamento, rate limit ou resistência a abuso. A função `argon2Verify` da biblioteca usa comparação simples de strings e não será adotada automaticamente. O wrapper fornece `Uint8Array` para evitar dependência de `TextEncoder`. Os vetores cruzados independentes e as limitações estão documentados em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
-
-**Fonte candidata de salt — execução manual concluída:** o Google documenta `Utilities.getUuid()` como equivalente a `java.util.UUID.randomUUID()`, caracterizado pela especificação Java como gerador pseudoaleatório criptograficamente forte. A função `poc03RunSaltGenerationTests` passou no Apps Script real: 256 UUIDs v4 válidos, 16 bytes cada, 256 distintos, zero colisões observadas e nenhum valor registrado em log. UUIDv4 tem 122 bits aleatórios, conforme RFC 9562. O teste amostral não prova CSPRNG nem unicidade global; a base é documental. Formato candidato, ainda não aprovado: `senha_algoritmo=argon2id$v=19$m=19456,t=2,p=1`, `senha_salt` com 16 bytes/32 hex e `senha_hash` com 32 bytes/64 hex.
-
-**Prova manual de criação/verificação concluída:** `poc03RunPasswordRecordVerificationTests` passou 8/8 casos no Apps Script real em 1.031 ms. Criou um registro sintético somente em memória; aceitou a senha correta e rejeitou senha incorreta, salt/hash adulterados, algoritmo/parâmetros não permitidos e campos malformados. Não escreveu Sheets/Drive/Properties nem imprimiu credenciais. A comparação usa acumulador XOR de tamanho fixo, mas JavaScript/V8 não garante tempo constante; não está aprovada para autenticação. Os tempos individuais não constituem teste de side-channel.
-
-**POC-03 — resultados consolidados:** política de entrada candidata (15–128 code points Unicode, NFC, máximo 512 bytes UTF-8, preserva espaços/case, rejeita controles e UTF-16 malformado) passou 14/14 manualmente no Apps Script real. A blocklist POC-03D passou 10/10 cenários simulados no Apps Script real e a consulta real ao Pwned Passwords passou com a senha pública fixa `password` (52.373.976 ocorrências retornadas no momento da consulta); isso valida conectividade e protocolo, não integração com login nem uma lista local abrangente. `poc03RunLoginThrottlePolicyTests` passou 6/6 na regra em memória; provas posteriores de persistência e concorrência no Apps Script real usaram Properties/Lock e uma planilha temporária isolada, que foi limpa. Não há rate limiter integrado a endpoint de negócio. O comparador XOR segue não aprovado para contas reais; a alternativa Node permanece não integrada.
-
-**POC-03C — decisão sobre comparação de hashes em 2026-11-13: nenhum comparador foi aprovado para autenticação.** poc03BytesEqualForArgon2_ permanece somente no harness Apps Script, onde o acumulador XOR percorre os 32 bytes e demonstra igualdade/rejeição funcional. JavaScript/V8 não oferece garantia formal de tempo constante; o teste de posições inicial/intermediária/final não mede side-channel. Logo, não usar essa função para autenticar contas reais. O módulo server-only server/password-hash-compare.js usa node:crypto.timingSafeEqual com buffers fixos de 32 bytes e permanece como candidato técnico isolado; não é rota, não é importado pelo React/gateway e não está ligado ao Apps Script. Embora a primitiva Node ofereça uma comparação melhor definida para buffers de mesmo tamanho, sua integração criaria uma nova fronteira de confiança e exigiria protocolo interno autenticado, nonce/replay, allowlist, fail closed, timeout, dados mínimos e prova de que o Apps Script só autoriza a sessão após resposta válida. **Decisão:** não integrar o comparador Node agora e não aprovar o XOR para autenticação; manter ambos como evidência experimental e reabrir a arquitetura se não houver estratégia aceitável que preserve a autoridade do Apps Script. Nenhum hash/verifier/salt deve ir ao React ou aos logs.
-
-**Throttling persistente — validação manual concluída em 2026-11-13:** `poc03RunPersistentThrottlePolicyTests` passou **6/6** no Apps Script real, usando Script Properties e ScriptLock reais; a limpeza automática removeu duas propriedades de teste. A sonda foi inicializada como `READY` e dez workers em execuções independentes foram registrados. `poc03RunPersistentThrottleConcurrencySummary` retornou **PASS**: 10 observados, 4 `COUNTED`, 1 `LOCKED_AFTER_FAILURE`, 5 `BLOCKED`, zero falhas de lock, contador final 5 e bloqueio ativo. A limpeza da sonda passou e removeu quatro propriedades do prefixo exclusivo `POC03_THROTTLE_TEST_`. A execução automatizada #231 continua sendo validação do harness Node/VM, não substitui a evidência manual no Google.
-
-**Ressalva histórica da primeira sonda:** o histórico inicial, baseado em dez execuções disparadas manualmente, só apresentava inícios com precisão de segundos e não comprovava sobreposição. Essa limitação foi superada pela sonda coordenada descrita a seguir; não usar a primeira sonda como evidência de contenção simultânea. `PropertiesService` continua sendo apenas o armazenamento da prova, e `getScriptLock` é global por projeto, podendo criar gargalo.
-
-**Nova sonda coordenada — execução manual concluída no Apps Script real em 2026-11-13: PASS.** Dez gatilhos independentes com handlers dedicados validaram o triggerUid, registraram chegada e aguardaram uma barreira comum antes de disputar ScriptLock. Cada seção crítica manteve o lock por 350 ms artificiais. O resumo real registrou 10 workers, máximo 10 simultâneos, 45 pares sobrepostos, todos os dez intervalos com uma janela comum de 1.308 ms e contenção nos 10 workers; espera do lock de 88 a 5.599 ms. Distribuição persistida: 4 COUNTED, 1 LOCKED_AFTER_FAILURE, 5 BLOCKED; zero falhas de lock, timeout de barreira ou erros; contador final 5 e bloqueio ativo. **Concorrência real e consistência de estado foram validadas em Script Properties + ScriptLock.** A limpeza final foi executada às 15:18:47 e retornou PASS: 26 propriedades removidas somente sob `POC03_THROTTLE_TEST_`; 0 gatilhos remanescentes, pois os workers já haviam removido os seus ao terminar. Nenhuma planilha de negócio foi usada. Esta prova não valida escrita concorrente na aba Sheets CONTROLE_AUTENTICACAO.
-
-
-
-**POC-03B — persistência concorrente em Sheets e limpeza concluídas: PASS em 2026-11-13.** `poc03RunSheetsThrottleRecordMappingTests` passou 8/8 no Apps Script real. A sonda criou uma planilha temporária independente com aba `CONTROLE_AUTENTICACAO_POC`, seis colunas e um registro sintético. O resumo confirmou 10/10 workers, máximo simultâneo 10, 45 pares sobrepostos, janela comum 1.760 ms, contenção 10/10, espera pelo lock de 57–17.155 ms, cinco gravações no Sheets, 4 `COUNTED`, 1 `LOCKED_AFTER_FAILURE`, 5 `BLOCKED`, contador final 5/bloqueado e zero falhas de lock, timeout de barreira ou erro. `persistence=GOOGLE_SHEETS_TEMP_SPREADSHEET`; `businessSpreadsheetUsed=false`. A evidência comprova read-modify-write concorrente somente na planilha temporária sob ScriptLock; não demonstra SLA, escala ou produção. A espera máxima e a retenção artificial de 350 ms evidenciam o custo de serialização.
-
-**Limpeza POC-03B — execução manual concluída em 2026-11-13: PASS.** `poc03CleanupSheetsPersistentThrottleProbe()` retornou `trashedSpreadsheet=true`, `removedSheetsProperties=22` e `removedSheetsTriggers=0`; escopo `EXACT_REGISTERED_TRIGGER_IDS_AND_POC03_SHEETS_THROTTLE_PREFIX_ONLY`. A planilha temporária exata foi movida para a lixeira e 22 propriedades exclusivas do prefixo da POC foram removidas. Nenhum gatilho correspondente permanecia registrado; a planilha estrutural não foi aberta nem alterada. A movimentação para a lixeira não é exclusão permanente.
-
-**POC-03D — blocklist implementada e validada manualmente em 2026-11-14:** `poc03RunPasswordBlocklistPolicyTests()` passou **10/10** no Apps Script real, com dez cenários HTTP simulados: lista local, termos contextuais exatos, consulta Pwned Passwords, k-anonymity (prefixo SHA-1 de cinco caracteres), `Add-Padding`, parser, HTTP 503, resposta malformada e falha de rede. Em seguida, `poc03RunPwnedPasswordsConnectivityProbe()` consultou a API real usando somente a senha pública fixa `password`: **PASS**, `lookupStatus=COMPROMISED`, `exposureCount=52373976`, `Add-Padding: true` e `passwordOrHashLogged=false`. A autorização `script.external_request` foi concedida ao projeto Apps Script isolado. A contagem é prevalência no conjunto Pwned Passwords, não pessoas/contas distintas. Nenhuma senha real foi usada; senha e hash completo não foram registrados. A lista local é pequena/didática, não abrangente e o avaliador ainda não está conectado ao cadastro/login.
-
-**CI POC-03D:** `npm run test:poc03` passou **26/26** em Node/VM; os dez cenários simulados passaram, assim como auditoria, testes POC-01/02, validação do registro, ESLint e build no push #43615465847 e PR check #43615469998. `npm audit` ainda reporta três vulnerabilidades moderadas relacionadas a `minimatch` transitivo via ESLint; o nível de falha configurado é high. Essa pendência não foi corrigida neste conjunto de alterações.
-
-**Situação da POC-03D:** validação automatizada 10/10 nos testes simulados e consulta externa real concluída com sucesso no Apps Script isolado. A POC continua experimental e não é uma implementação de autenticação. Nunca inserir senha pessoal/real. O próximo trabalho deve definir explicitamente o escopo do protótipo acadêmico e a estratégia de verificação de hash antes de conectar qualquer fluxo de cadastro/login; o comparador XOR não foi aprovado para contas reais e a POC-03C decidiu não integrar o helper Node.
-
+A validação concorrente realizada com duas chamadas comprova o comportamento básico de uso único, não capacidade de carga ou concorrência em escala. A POC continua restrita a dados sintéticos e ações `poc.*`; não habilita login, sessão, Sheets, Drive ou operações de negócio. Não é solução aprovada para produção.
 
 ### 5.3. Modelagem lógica e física de dados aprovada
 
@@ -189,7 +168,7 @@ Google Sheets não impõe automaticamente FKs, unicidade composta ou integridade
 
 ### 5.4. Autenticação, e-mail e imagens — decisões e bloqueios
 
-A proposta de arquitetura do backend e o plano das provas de conceito estão em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Esse documento não autoriza a implementação: transporte, KDF de senha e sessão permanecem bloqueados até serem testados e aprovados.
+A arquitetura do backend e as provas de conceito estão em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). `src/pages/AuthDemoPage.jsx`, integrada à `dev` pelo PR #13, implementa apenas a camada visual de acesso: formulários, validações locais e mensagens de demonstração. Não há envio de credenciais, persistência, criação de conta, autenticação ou sessão. A POC-03 integrada pelo PR #12 permanece experimental; KDF, comparação de hash e sessão não estão aprovados para credenciais reais.
 
 **Decisão funcional para a demonstração**
 - Cadastro e login próprios por e-mail e senha, com lógica no Apps Script; não adicionar Firebase ou provedor externo sem reabrir a decisão.
@@ -206,7 +185,7 @@ A proposta de arquitetura do backend e o plano das provas de conceito estão em 
 
 **Bloqueios técnicos antes de implementar**
 - Não armazenar senhas em texto puro e não usar SHA/digest rápido isolado como armazenamento de senha.
-- A referência oficial de Apps Script Utilities documenta operações de digest e HMAC; não presumir que exista um KDF de senha pronto. Avaliar implementação adequada e revisada (por exemplo, PBKDF2-HMAC-SHA-256, se viável), parâmetros, salt individual, comparação e desempenho. Não inventar criptografia caseira.
+- A POC-03 avaliou essas limitações: PBKDF2 artesanal sobre `Utilities` foi reprovado por desempenho; Argon2id via WebAssembly é apenas candidato experimental. O comparador XOR foi reprovado para autenticação por ausência de garantia formal de tempo constante; o helper Node com `timingSafeEqual` não foi integrado por introduzir outra fronteira de confiança. Consultar `docs/POC_03_ARMAZENAMENTO_SENHAS.md`; não conectar cadastro/login até nova decisão técnica.
 - Provar como uma sessão será transportada, persistida, expirada e revogada entre React, Vercel Function e Apps Script. A Vercel Function poderá emitir um cookie HttpOnly no domínio da aplicação, mas a estratégia, atributos e controles CSRF ainda exigem POC. O Apps Script permanece a autoridade que valida a sessão; não escolher armazenamento de token no navegador sem evidência.
 - Testar concorrência e o risco de um atacante bloquear uma conta provocando tentativas incorretas.
 - A prova de conceito deverá usar dados sintéticos e não será considerada pronta para produção.
@@ -306,7 +285,7 @@ Os comandos de validação são mantidos em `package.json`. O workflow de qualid
 4. ESLint.
 5. Build de produção do Vite.
 
-Os testes das POCs devem permanecer nos scripts npm e no workflow: `npm run test:poc01` e `npm run test:poc02`. Não criar etapas E2E ou Lighthouse só para imitar outro projeto; introduzi-las quando houver fluxos reais que justifiquem esses testes.
+Os testes das POCs devem permanecer nos scripts npm e no workflow: `npm run test:poc01`, `npm run test:poc02` e `npm run test:poc03`. Não criar etapas E2E ou Lighthouse só para imitar outro projeto; introduzi-las quando houver fluxos reais que justifiquem esses testes.
 
 A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substitui a conferência do deployment, do SHA publicado e testes manuais de navegação/responsividade. Não afirmar que o Google Apps Script, Sheets ou Drive estão funcionando antes de validar sua integração real.
 
@@ -318,14 +297,14 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** f6bddfc1569efa50d02fad137b4610ac6e0e4a22
-- **Data do commit:** 2026-11-14T14:02:25-03:00
-- **Mensagem do commit:** docs(architecture): registrar validação manual da POC-03D
-- **Branch desta execução:** feat/poc-03-password-kdf
+- **Commit de referência:** 770560f93b6a1ee44c31a1990ea4b64454fb1b23
+- **Data do commit:** 2026-11-14T14:56:41-03:00
+- **Mensagem do commit:** Merge pull request #13 from kleber-goncalves/feat/auth-demo-flow
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 9
+- **Scripts npm:** 8
 - **Dependências de runtime:** 5
-- **Dependências de desenvolvimento:** 10
+- **Dependências de desenvolvimento:** 9
 - **Workflows:** 2
 - **Scripts de automação:** 3
 
@@ -341,7 +320,6 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run update:ai-context | node scripts/update-ai-context.mjs |
 | npm run test:poc01 | node --test tests/poc01/backend.test.js |
 | npm run test:poc02 | node --test tests/poc02/backend.test.js tests/poc02/apps-script.test.js |
-| npm run test:poc03 | node --test tests/poc03/apps-script.test.js |
 
 ### Variáveis declaradas no .env.example
 
@@ -372,7 +350,6 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | eslint-plugin-react-hooks | ^7.1.1 |
 | eslint-plugin-react-refresh | ^0.5.7 |
 | globals | ^17.13.0 |
-| hash-wasm | 4.13.0 |
 | vite | ^8.3.6 |
 
 ### Workflows do GitHub Actions
@@ -399,6 +376,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/data/homepage.js
 - src/lib/utils.js
 - src/main.jsx
+- src/pages/AuthDemoPage.jsx
 - src/pages/HomePage.jsx
 - src/pages/Poc01Page.jsx
 - src/services/poc-01-api.js
@@ -415,13 +393,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| f6bddfc | 2026-11-14 | docs(architecture): registrar validação manual da POC-03D |
-| 37db5e3 | 2026-11-14 | docs(ai-context): atualizar conclusão da POC-03D |
-| ca3b383 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| d788b1c | 2026-11-14 | docs(poc-03): registrar consulta real Pwned Passwords |
-| b057da7 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 6fcf32e | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 3fa7944 | 2026-11-14 | docs(ai-context): registrar poc-03d |
-| 32b55a8 | 2026-11-14 | docs(architecture): registrar avaliador de blocklist |
+| 770560f | 2026-11-14 | Merge pull request #13 from kleber-goncalves/feat/auth-demo-flow |
+| 611cd76 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
+| 92c50c0 | 2026-11-14 | fix(auth): validar caracteres de controle sem regex bloqueada pelo lint |
+| 82b532d | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
+| d264794 | 2026-11-14 | docs(architecture): separar interface visual da autenticação real |
+| 546c3f7 | 2026-11-14 | docs(auth): registrar escopo da interface demonstrativa |
+| 00bc81f | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
+| 8785792 | 2026-11-14 | feat(auth): estilizar páginas de acesso demonstrativo |
 
 <!-- END AUTO-GENERATED SECTION -->
