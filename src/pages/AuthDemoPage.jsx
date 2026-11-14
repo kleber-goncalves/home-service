@@ -20,7 +20,12 @@ function getPasswordValidation(password) {
     if (codePoints < 15) return "Use pelo menos 15 caracteres.";
     if (codePoints > 128) return "Use no máximo 128 caracteres.";
     if (byteLength > 512) return "A senha excede o limite de 512 bytes UTF-8.";
-    if (/[\u0000-\u001F\u007F-\u009F]/u.test(normalized)) return "A senha não pode conter caracteres de controle.";
+    const hasControlCharacter = [...normalized].some((character) => {
+        const codePoint = character.codePointAt(0);
+        return (codePoint >= 0x00 && codePoint <= 0x1f)
+            || (codePoint >= 0x7f && codePoint <= 0x9f);
+    });
+    if (hasControlCharacter) return "A senha não pode conter caracteres de controle.";
 
     return "";
 }
