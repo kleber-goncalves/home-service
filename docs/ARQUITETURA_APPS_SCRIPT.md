@@ -2,7 +2,7 @@
 
 > **Versão:** 0.1  
 > **Data:** 2026-11-10  
-> **Status:** POC-01 integrada à branch `dev` e validada manualmente em Preview. POC-02 implementada e validada manualmente em Preview e no Apps Script isolado na branch `feat/poc-02-hmac-replay`; PR #11 aguarda integração em `dev`. Nenhuma das PoCs está aprovada para produção.  
+> **Status:** POC-01 e POC-02 integradas à branch `dev` pelos PRs #10 e #11 e validadas manualmente no escopo das respectivas provas. POC-03 permanece isolada no PR #12; em 2026-11-14, a bateria local (10/10) e a consulta real ao Pwned Passwords foram validadas no Apps Script isolado. A interface visual de cadastro/login está em `feat/auth-demo-flow`, sem integração de credenciais. A POC-04 de sessão permanece pendente. Nenhuma dessas validações aprova o sistema para produção.  
 > **Escopo:** integração React/Vite, Google Apps Script, Google Sheets e Google Drive para a demonstração acadêmica.  
 > **Premissa:** manter Apps Script como backend inicial e autenticação própria por e-mail e senha, conforme decisão funcional aprovada. Transporte, sessão e armazenamento seguro de senhas continuam pendentes de prova de conceito.
 
@@ -18,7 +18,8 @@ Estado conhecido na data desta revisão:
 - Arquivo Google Sheets estrutural criado e conferido pelo responsável, com 12 abas e 102 cabeçalhos.
 - A planilha ainda não é armazenamento operacional integrado.
 - A comunicação real da POC-01 foi confirmada manualmente em Preview em 2026-11-11: eco HTTP 200, erro lógico HTTP 422, resposta upstream inválida HTTP 502, JSON inválido HTTP 400 e GET HTTP 405. A evidência está registrada em `docs/POC_01_COMUNICACAO.md`.
-- Não há autenticação, sessão, integração operacional com Sheets/Drive, upload ou painel administrativo implementados.
+- Não há autenticação real, sessão, integração operacional com Sheets/Drive, upload ou painel administrativo implementados.
+- A branch `feat/auth-demo-flow` adiciona apenas a interface visual em `src/pages/AuthDemoPage.jsx`, por `/?auth=demo`. O CTA de profissionais abre `/?auth=demo&mode=register`. Os formulários validam campos localmente, não chamam a Function/Apps Script e não persistem dados; a tela orienta o uso exclusivo de valores fictícios e limpa as senhas após a submissão.
 
 O projeto continua sendo uma demonstração acadêmica com dados sintéticos. Não inserir credenciais, cadastros ou dados pessoais reais.
 
@@ -538,6 +539,8 @@ Nenhuma implementação de autenticação, publicação anônima ou escrita oper
 9. Somente após aprovações: implementar módulos progressivamente, começando por leitura pública e operações não privilegiadas; autenticação permanece bloqueada até POC-03/04.
 
 Não criar endpoints administrativos, painel autenticado, upload público ou escrita operacional antes das etapas e critérios correspondentes.
+
+**Trabalho visual independente das POCs:** é permitido desenvolver e revisar a experiência visual de cadastro/login em React usando estado local efêmero, desde que não envie credenciais, não persista valores, não crie uma falsa sessão e deixe explícito que o backend não está conectado. Essa permissão não libera a implementação de autenticação, verificação de e-mail, recuperação de senha ou sessão no Apps Script/Vercel.
 
 ## 16. Decisões ainda abertas
 
