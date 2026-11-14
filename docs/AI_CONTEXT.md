@@ -314,9 +314,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** e0651c6db03e0dd2f577cb6b5a2a762ae47f70ae
-- **Data do commit:** 2026-11-13T17:06:14-03:00
-- **Mensagem do commit:** docs(poc-03): registrar suite 23 de 23
+- **Commit de referência:** 133bdcc30de205915adb797c53069a926b05ced4
+- **Data do commit:** 2026-11-14T13:21:11-03:00
+- **Mensagem do commit:** feat(poc-03d): adicionar avaliador isolado de blocklist
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -411,13 +411,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 133bdcc | 2026-11-14 | feat(poc-03d): adicionar avaliador isolado de blocklist |
+| 5dc31f7 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | e0651c6 | 2026-11-13 | docs(poc-03): registrar suite 23 de 23 |
 | e3056c9 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | c88a87e | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | 59daf5b | 2026-11-13 | docs(ai-context): registrar decisao poc-03c |
 | 3037131 | 2026-11-13 | docs(architecture): bloquear integracao do comparador |
 | 62b9906 | 2026-11-13 | docs(poc-03): registrar decisao de comparacao |
-| 95d9ae3 | 2026-11-13 | test(poc-03): cobrir comparador XOR experimental |
-| 9b3d913 | 2026-11-13 | docs(ai-context): registrar CI do comparador |
 
 <!-- END AUTO-GENERATED SECTION -->
