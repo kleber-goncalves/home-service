@@ -82,7 +82,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 
 ## 4. Estado atual do repositório
 
-**Estado atualizado em 2026-11-14 após integração da interface demonstrativa (PR #13) e consolidação da POC-03 (PR #12):**
+**Estado atualizado em 2026-11-14 após os merges dos PRs #12 (POC-03) e #13 (interface demonstrativa):**
 
 - A branch `dev` contém a homepage pública demonstrativa do Conecta Local, integrada por Pull Request.
 - `src/pages/HomePage.jsx` coordena a composição das seções e o estado local da busca e dos filtros.
@@ -100,12 +100,14 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 - A planilha permanece uma estrutura inicial vazia, ainda sem uso como armazenamento operacional integrado.
 - A POC-01 de comunicação React → Vercel Function → Apps Script foi integrada à branch `dev` pelo PR #10 em 2026-11-11 e validada manualmente em Preview: HTTP 200 (eco), 422 (erro lógico Apps Script), 502 (resposta upstream inválida), 400 (JSON inválido no navegador) e 405 (método não permitido). O merge commit foi `837f7c6172764ee27ac835c81e1224640d78478d`; o registro está em `docs/POC_01_COMUNICACAO.md`.
 - A POC-02 de assinatura HMAC-SHA-256 e proteção contra replay foi integrada à `dev` pelo PR #11 em 2026-11-11, após cinco cenários no Preview, cinco testes diretos no Apps Script isolado e um teste concorrente em que somente uma das duas chamadas idênticas foi aceita. Os resultados estão em `docs/POC_02_ASSINATURA_GATEWAY.md`.
-- A POC-03 foi incorporada à `dev` pelo PR #12 como investigação experimental isolada: PBKDF2 via Utilities foi reprovado; Argon2id com `hash-wasm@4.13.0` passou vetores independentes e cinco medições do perfil `m=19456 KiB,t=2,p=1` (mediana 130 ms), mas não foi aprovado para autenticação. Política de entrada 14/14, blocklist 10/10 e sonda HTTPS real do Pwned Passwords com vetor público `password` passaram; provas sintéticas de throttling e limpeza também foram concluídas. XOR não tem garantia formal de tempo constante; helper Node `timingSafeEqual` permanece isolado e não selecionado. Detalhes e limitações em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
+- **PR #12 — POC-03:** merge commit `465a38be2e71604bf7b44a618221b140e5fafac5`, integrado em 2026-11-14. PBKDF2 via Utilities foi reprovado; Argon2id com `hash-wasm@4.13.0` permanece candidato experimental (perfil `m=19456 KiB,t=2,p=1`, cinco medições, mediana 130 ms). Política de entrada 14/14, blocklist local 10/10, consulta HTTPS real ao Pwned Passwords com vetor público fixo `password`, throttling sintético persistente/concorrente e limpeza dos recursos temporários foram concluídos. **Nenhum comparador foi aprovado para autenticação**: XOR não tem garantia formal de tempo constante; helper Node `timingSafeEqual` permanece isolado. Ver `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
 - Não há backend de negócio operacional integrado ao frontend, autenticação real, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo; a tela de acesso é somente demonstrativa.
-- A interface visual de acesso foi integrada à `dev` pelo PR #13 em 2026-11-14, em `src/pages/AuthDemoPage.jsx`, acessível por `/?auth=demo`; o cadastro usa `/?auth=demo&mode=register`. Os formulários validam localmente, não chamam API nem persistem valores e limpam os campos de senha após a submissão. A interface orienta o uso exclusivo de dados fictícios. Cadastro, verificação por código, login e recuperação ainda não são operações de backend.
+- **PR #13 — interface demonstrativa:** merge commit `770560f93b6a1ee44c31a1990ea4b64454fb1b23`, integrado em 2026-11-14. `src/pages/AuthDemoPage.jsx` fica acessível por `/?auth=demo`; cadastro por `/?auth=demo&mode=register`. Os formulários validam localmente, não chamam API nem persistem valores e limpam os campos de senha após a submissão. Cadastro, verificação por código, login e recuperação ainda não são operações de backend.
+- As CI pós-merge de #13 (`Validate Home Service` #43623828275 e `AI Context — Synchronize` #43623828384) e #12 (`Validate Home Service` #43624907349 e `AI Context — Synchronize` #43624907085) concluíram SUCCESS em 2026-11-14. Não havia PRs abertos na última consulta. `main` permaneceu em `45412ad4f1c082590d9f800d8e6b707cfa35c5ed`; não recebeu esses merges.
+- A POC-04 ainda não começou. O plano de escopo, modelo de ameaça e critérios de aceite foi criado em `docs/POC_04_SESSOES.md`; a próxima conversa deve lê-lo antes de alterar código. A POC-04 deve usar token/conta sintéticos e provar cookie, encaminhamento server-side, autoridade Apps Script, expiração, logout/revogação e CSRF/Origin. Ela não libera login nem credenciais reais.
 - A homepage não processa pagamentos, agendamentos ou contratação.
 
-A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a arquitetura e seus limites. POC-01, POC-02, a interface visual de acesso (PR #13) e a investigação experimental POC-03 (PR #12) estão integradas à `dev`. Nenhuma dessas POCs cria autenticação de usuários, sessão ou operações de negócio; credenciais reais continuam proibidas.
+A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a arquitetura e seus limites. POC-01 (#10), POC-02 (#11), interface visual (#13) e POC-03 experimental (#12) estão integradas à `dev`. Nenhuma dessas entregas cria autenticação de usuários, sessão ou operações de negócio; credenciais reais continuam proibidas. Para retomar o trabalho, leia também `docs/POC_04_SESSOES.md` antes de iniciar a próxima POC.
 
 ## 5. Arquitetura e decisões tecnológicas
 
@@ -185,8 +187,8 @@ A arquitetura do backend e as provas de conceito estão em [docs/ARQUITETURA_APP
 
 **Bloqueios técnicos antes de implementar**
 - Não armazenar senhas em texto puro e não usar SHA/digest rápido isolado como armazenamento de senha.
-- A POC-03 avaliou essas limitações: PBKDF2 artesanal sobre `Utilities` foi reprovado por desempenho; Argon2id via WebAssembly é apenas candidato experimental. O comparador XOR foi reprovado para autenticação por ausência de garantia formal de tempo constante; o helper Node com `timingSafeEqual` não foi integrado por introduzir outra fronteira de confiança. Consultar `docs/POC_03_ARMAZENAMENTO_SENHAS.md`; não conectar cadastro/login até nova decisão técnica.
-- Provar como uma sessão será transportada, persistida, expirada e revogada entre React, Vercel Function e Apps Script. A Vercel Function poderá emitir um cookie HttpOnly no domínio da aplicação, mas a estratégia, atributos e controles CSRF ainda exigem POC. O Apps Script permanece a autoridade que valida a sessão; não escolher armazenamento de token no navegador sem evidência.
+- A POC-03 avaliou essas limitações: PBKDF2 artesanal sobre `Utilities` foi reprovado; Argon2id via WebAssembly continua candidato, não aprovado. O comparador XOR foi reprovado para autenticação por falta de garantia formal de tempo constante; o helper Node com `timingSafeEqual` permanece isolado e não integrado. A POC-03D validou a blocklist didática (10/10) e uma única consulta HTTPS real usando somente o vetor público fixo `password`; nada foi integrado ao cadastro/login. Consultar `docs/POC_03_ARMAZENAMENTO_SENHAS.md`; não conectar cadastro/login até nova decisão técnica.
+- A POC-04 ainda não foi executada. O plano está em `docs/POC_04_SESSOES.md`; a hipótese de cookie `HttpOnly` emitido pela Vercel e token validado pelo Apps Script precisa ser provada com valores sintéticos. Não escolher atributos finais nem assumir segurança antes de testar CSRF, Origin, expiração ociosa/absoluta, logout, revogação e falhas.
 - Testar concorrência e o risco de um atacante bloquear uma conta provocando tentativas incorretas.
 - A prova de conceito deverá usar dados sintéticos e não será considerada pronta para produção.
 
@@ -267,7 +269,8 @@ Em falhas: informar estado de carregamento/sucesso/erro; não declarar sucesso a
 
 ## 11. Documentação e registro de problemas
 
-- Este `AI_CONTEXT.md` descreve o estado atual e as regras de continuidade.
+- Este `AI_CONTEXT.md` descreve o estado atual e as regras de continuidade. Em uma conversa nova, leia-o por inteiro antes de qualquer alteração.
+- `POC_04_SESSOES.md` é o plano da próxima etapa; está em estado PLANEJAMENTO, não iniciada, e não autoriza implementar autenticação.
 - `ESPECIFICACAO_MVP.md` v0.4 consolida requisitos funcionais e as Fases 3 e 4; `MODELAGEM_DADOS.md` contém a modelagem lógica e o esquema físico aprovado conceitualmente (12 entidades/102 campos e 12 abas/102 colunas). Validações técnicas e implementação continuam pendentes.
 - `REGISTRO_DE_OCORRENCIAS.md` preserva o histórico de bugs, erros, vulnerabilidades e incidentes. Não criar ocorrência apenas por haver pendência de projeto ou risco conhecido ainda não observado como falha.
 - Atualize o contexto narrativo no mesmo trabalho quando decisões ou comportamentos relevantes mudarem.
