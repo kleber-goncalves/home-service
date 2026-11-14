@@ -2,7 +2,7 @@
 
 > **Versão:** 0.2  
 > **Data da revisão:** 2026-11-14  
-> **Status na branch desta revisão:** POC-01 (#10), POC-02 (#11), interface demonstrativa (#13) e investigação experimental POC-03 (#12) estão integradas à `dev`. A POC-04 está em implementação isolada na branch `feat/poc-04-session-cookie`, com gateway, Apps Script e harness de testes versionados; ainda não foi implantada nem validada manualmente em Preview. A interface continua visual, sem envio/persistência de credenciais. Cadastro, login, recuperação e sessão de usuários reais continuam não implementados. Nenhuma validação aprova o sistema para produção.  
+> **Status na branch desta revisão:** POC-01 (#10), POC-02 (#11), interface demonstrativa (#13) e investigação experimental POC-03 (#12) estão integradas à `dev`. A POC-04 está implantada em Preview na branch isolada `feat/poc-04-session-cookie`; emissão, validação, rotação CSRF, rejeição de CSRF incorreto, logout e revogação foram verificados manualmente com dados sintéticos em 2026-11-14. Expiração, Origin/Fetch Metadata negativos reais, replay/concorrência operacional, falhas reais e limpeza permanecem pendentes. A interface continua visual, sem envio/persistência de credenciais. Cadastro, login, recuperação e sessão de usuários reais continuam não implementados. Nenhuma validação aprova o sistema para produção.  
 > **Escopo:** integração React/Vite, Google Apps Script, Google Sheets e Google Drive para a demonstração acadêmica.  
 > **Premissa:** manter Apps Script como autoridade de domínio e sessão; Vercel Functions atua apenas como gateway HTTP. Qualquer fluxo de autenticação e sessão deverá ser aprovado em provas isoladas com dados sintéticos.
 
@@ -436,21 +436,15 @@ A aba `USUARIOS` já prevê `senha_hash`, `senha_salt` e `senha_algoritmo`, mas 
 
 A modelagem prevê apenas o hash do token na aba SESSOES, 30 minutos de inatividade e duração absoluta de 8 horas. O token em claro não deve ser gravado na planilha nem em logs.
 
-Ainda não está decidido:
+**Estado da POC-04 em 2026-11-14:** a estratégia foi implantada em um projeto Apps Script independente e em Vercel Preview restrito à branch `feat/poc-04-session-cookie`. Com dados sintéticos, foram confirmados no navegador: emissão da sessão (HTTP 200), token de sessão não legível por `document.cookie`, validação da sessão (HTTP 200), rotação CSRF e validação posterior com o novo token, rejeição de CSRF falso (HTTP 403), logout confirmado (HTTP 200) e rejeição após revogação (HTTP 401). O responsável também confirmou `SESSOES.revogada_em` preenchido e cookie ausente após o logout.
 
-- como gerar token com aleatoriedade criptograficamente segura;
-- como a Vercel Function emitirá, receberá, apagará e encaminhará o token;
-- quais atributos de cookie e controles CSRF serão utilizados;
-- como Apps Script validará o hash do token, expiração e revogação;
-- como o fluxo funcionará em domínio de Preview e produção.
+A suíte automatizada verifica o contrato do cookie (`HttpOnly`, `Secure`, `Path=/`, `SameSite=Strict`, ausência de `Domain`), assinatura HMAC, allowlist e cenários de falha. Esses resultados não substituem a inspeção visual dos atributos durante uma sessão ativa nem testes operacionais adicionais.
 
-**Caminho candidato, ainda sem aprovação:** a Vercel Function emitir um cookie `HttpOnly`, `Secure` e `SameSite` adequado no domínio da aplicação. Em chamadas posteriores, a Function lê o cookie somente no servidor e encaminha o token ao Apps Script por envelope HMAC; o Apps Script permanece como autoridade da sessão e valida o hash armazenado na aba `SESSOES`.
+**Pendências:** expiração real por inatividade/absoluta, Origin e Fetch Metadata negativos no Preview real, replay e concorrência/LockService no Apps Script implantado, falhas reais de armazenamento/upstream e limpeza do arquivo temporário/segredo. A PR #14 permanece em Draft até concluir as pendências e a revisão de segurança.
 
-A POC-04 está em implementação isolada na branch `feat/poc-04-session-cookie`: `api/poc04/session.js`, `server/poc04-session-gateway.js` e `apps-script/poc-04/Code.gs` compõem a prova técnica; `tests/poc04/` contém os testes Node/VM. Ainda não houve implantação em Apps Script ou validação manual no Preview. O cookie candidato usa prefixo `__Host-`, `HttpOnly`, `Secure`, `Path=/`, sem `Domain` e `SameSite=Strict`; a decisão só poderá ser considerada validada após testes reais de navegador e CSRF/Origin. O token de sessão não deve aparecer no React, URL, JSON ou logs.
+O cookie atualmente testado chama-se `__Host-conecta_poc04_session`, com `HttpOnly`, `Secure`, `Path=/`, sem `Domain`, `SameSite=Strict` e `Max-Age` limitado ao tempo absoluto restante. A Vercel emite e apaga o cookie somente após confirmação do Apps Script. A propriedade da sessão permanece no Apps Script; a rota é exclusiva de Preview e não está ligada a `AuthDemoPage.jsx`.
 
-A limitação de TextOutput continua relevante para respostas diretas do Apps Script, mas o cookie seria emitido pela Function, não pelo Apps Script.
-
-Para token realmente aleatório e de alta entropia, o hash de validação armazenado no Sheets pode ser rápido; isso é diferente de hash de senha, que exige KDF lento.
+Limites: HttpOnly impede leitura do cookie por JavaScript, mas não impede que um script injetado execute ações same-origin; Origin não autentica clientes HTTP fora do modelo de navegador. A prova não aprova uso em Production ou com usuários reais.
 
 ### 10.3. Códigos e bloqueio de tentativas
 
@@ -538,7 +532,7 @@ Nenhuma implementação de autenticação, publicação anônima ou escrita oper
 1. **POC-01 — comunicação:** concluída e integrada pelo PR #10; testes manuais registrados em `docs/POC_01_COMUNICACAO.md`.
 2. **POC-02 — assinatura do gateway:** concluída e integrada pelo PR #11; permanece restrita a ações sintéticas `poc.*`, com evidências em `docs/POC_02_ASSINATURA_GATEWAY.md`.
 3. **POC-03 — KDF, política de entrada, blocklist e throttling:** investigação concluída e integrada pelo PR #12; nenhuma solução de senha/comparador foi aprovada para autenticação. Evidências e limites em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
-4. **POC-04 — sessão com cookie via gateway:** implementação isolada iniciada na branch `feat/poc-04-session-cookie`. Concluir testes automatizados, criar projeto Apps Script temporário, implantar somente em Preview, validar no navegador e limpar os recursos sintéticos. Não conectar login nem credenciais reais.
+4. **POC-04 — sessão com cookie via gateway:** ciclo básico validado manualmente em Preview com dados sintéticos (emissão, validação, CSRF válido/inválido, logout e revogação). Permanecem testes de expiração, Origin/Fetch Metadata negativos reais, replay/concorrência, falhas operacionais e limpeza do ambiente antes da revisão final e decisão sobre o PR #14. Não conectar login nem credenciais reais.
 5. **POC-05 — Sheets, locks e auditoria:** confirmar lote atômico, concorrência e falhas.
 6. **POC-06/07 — Drive e arquivos:** confirmar permissões, validações e limites.
 7. **POC-08/09 — implantação, abuso e quotas:** testar limites do ambiente de demonstração.
