@@ -318,9 +318,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** d788b1ca98c87a0384817f574acb8738b350491f
-- **Data do commit:** 2026-11-14T14:01:31-03:00
-- **Mensagem do commit:** docs(poc-03): registrar consulta real Pwned Passwords
+- **Commit de referência:** f6bddfc1569efa50d02fad137b4610ac6e0e4a22
+- **Data do commit:** 2026-11-14T14:02:25-03:00
+- **Mensagem do commit:** docs(architecture): registrar validação manual da POC-03D
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -415,13 +415,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| f6bddfc | 2026-11-14 | docs(architecture): registrar validação manual da POC-03D |
+| 37db5e3 | 2026-11-14 | docs(ai-context): atualizar conclusão da POC-03D |
+| ca3b383 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | d788b1c | 2026-11-14 | docs(poc-03): registrar consulta real Pwned Passwords |
 | b057da7 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 6fcf32e | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 3fa7944 | 2026-11-14 | docs(ai-context): registrar poc-03d |
 | 32b55a8 | 2026-11-14 | docs(architecture): registrar avaliador de blocklist |
-| 3ba2868 | 2026-11-14 | docs(poc-03d): documentar blocklist e pwned passwords |
-| 699edbe | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 3a772ec | 2026-11-14 | fix(poc-03d): ajustar assert de log e prefixo |
 
 <!-- END AUTO-GENERATED SECTION -->
