@@ -150,6 +150,8 @@ A execução GitHub Actions `Validate Home Service` #43631016460, associada ao c
 - Registro de ocorrências, ESLint e build: SUCCESS.
 - Auditoria de dependências: passou no limite configurado `--audit-level=high`; três alertas moderados transitivos relacionados a `minimatch` permanecem conhecidos e não foram resolvidos por esta POC.
 
+A validação seguinte, após a atualização dos documentos (`Validate Home Service` #43644117451), também concluiu SUCCESS: instalação/auditoria, POC-01/02/03/04, registro de ocorrências, ESLint e build passaram.
+
 ### Pendências antes de encerrar a prova e decidir o merge
 
 - [ ] Inspecionar visualmente, com sessão ativa, os atributos efetivos do cookie no DevTools (`HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/` e ausência de `Domain`).
