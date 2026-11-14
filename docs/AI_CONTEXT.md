@@ -300,9 +300,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 894390e35465b75b092f096eb57cd8bde76696df
-- **Data do commit:** 2026-11-14T15:19:06-03:00
-- **Mensagem do commit:** docs(poc-04): documentar plano de sessao por cookie
+- **Commit de referência:** ffca51cbc1e279bf6e837dae951c561fb7368387
+- **Data do commit:** 2026-11-14T15:20:55-03:00
+- **Mensagem do commit:** docs(poc-04): adicionar matriz de cenarios e aceite
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -398,13 +398,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| ffca51c | 2026-11-14 | docs(poc-04): adicionar matriz de cenarios e aceite |
+| 44da445 | 2026-11-14 | docs(ai-context): atualizar estado e passagem para novo chat |
+| 3eebd2b | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 894390e | 2026-11-14 | docs(poc-04): documentar plano de sessao por cookie |
 | 6e11ef3 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | ed1e9db | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | df930d6 | 2026-11-14 | docs(architecture): atualizar status das pocs e proxima etapa |
 | 6d1960f | 2026-11-14 | docs(poc-03): consolidar resultados finais e pendencias |
-| c799a8d | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 465a38b | 2026-11-14 | Merge pull request #12 from kleber-goncalves/feat/poc-03-password-kdf |
-| c4a0e2c | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
