@@ -644,7 +644,7 @@ test("POC-03D: blocklist local e consulta Pwned Passwords simulada passam 10/10"
   assert.equal(result.testsTotal, 10);
   assert.equal(result.remoteCallsAreMocked, true);
   assert.equal(result.failureMode, "FAIL_CLOSED");
-  assert.equal(logs.filter((line) => line.includes('"status":"PASS"')).length, 10);
+  assert.equal(logs.filter((line) => line.includes('"test":') && line.includes('"status":"PASS"')).length, 10);
   assert.doesNotMatch(logs.join("\\n"), /SenhaFicticiaParaTeste2026|123456789012345|conectalocal2026|[A-F0-9]{40}/i);
 });
 
@@ -653,7 +653,7 @@ test("POC-03D: SHA-1 de demonstração consulta somente prefixo de cinco caracte
   let observedOptions;
   const { context } = createAppsScriptHarness();
   const knownHash = createHash("sha1").update("password", "utf8").digest("hex").toUpperCase();
-  const responseBody = `${knownHash.slice(5)}:123456\\r\\n${"0".repeat(35)}:0\\r\\n`;
+  const responseBody = `${knownHash.slice(5)}:123456\r\n${"0".repeat(35)}:0\r\n`;
 
   const result = context.poc03LookupPwnedPasswordsForPoc_(
     "password",
@@ -678,7 +678,7 @@ test("POC-03D: SHA-1 de demonstração consulta somente prefixo de cinco caracte
 test("POC-03D: adaptador real usa UrlFetchApp e falha fechado em HTTP inválido", () => {
   let calls = 0;
   const knownHash = createHash("sha1").update("password", "utf8").digest("hex").toUpperCase();
-  const responseBody = `${knownHash.slice(5)}:3\\n${"0".repeat(35)}:0\\n`;
+  const responseBody = `${knownHash.slice(5)}:3\n${"0".repeat(35)}:0\n`;
   const { context } = createAppsScriptHarness({
     urlFetchFetchImpl(url, options) {
       calls += 1;
