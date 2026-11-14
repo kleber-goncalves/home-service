@@ -3,6 +3,8 @@ import {
     createHmac,
     randomBytes,
 } from "node:crypto";
+import { Buffer } from "node:buffer";
+import process from "node:process";
 
 const SESSION_COOKIE_NAME = "__Host-conecta_poc04_session";
 const COOKIE_MAX_AGE_SECONDS = 30 * 60;
@@ -179,6 +181,14 @@ function cookieMaxAge(expiresAt, now) {
         COOKIE_MAX_AGE_SECONDS,
         Math.floor(remainingMs / 1000),
     );
+}
+
+function getRedirectHost(value) {
+    try {
+        return new URL(value).hostname;
+    } catch {
+        return null;
+    }
 }
 
 function getAppsScriptUrl(value) {
@@ -537,12 +547,7 @@ export function createPoc04SessionHandler({
             );
         }
 
-        let redirectHost = "";
-        try {
-            redirectHost = new URL(upstream.url).hostname;
-        } catch {
-            redirectHost = "";
-        }
+        const redirectHost = getRedirectHost(upstream.url);
 
         if (
             !upstream.redirected

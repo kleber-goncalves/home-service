@@ -72,11 +72,6 @@ function setCookie(response) {
     return response.headers.get("set-cookie") || "";
 }
 
-function tokenFromCookie(value) {
-    const prefix = SESSION_COOKIE + "=";
-    return value.split(";")[0].slice(prefix.length);
-}
-
 function makeHandler(options = {}) {
     let randomIndex = 1;
     const randomBytesImpl = options.randomBytesImpl || ((size) => {
