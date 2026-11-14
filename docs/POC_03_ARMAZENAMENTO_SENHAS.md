@@ -535,7 +535,7 @@ A validação estrutural antecipada é aceitável porque a representação e o t
 
 ### 8.20. POC-03D — blocklist local e Pwned Passwords (protótipo isolado)
 
-**Estado em 2026-11-14:** avaliador implementado no harness `apps-script/poc-03/Code.gs`; testes simulados e CI aprovados. A chamada real ao serviço externo no Apps Script isolado ainda precisa ser executada manualmente. Não há cadastro/login nem integração com o sistema de negócio.
+**Estado em 2026-11-14 — validação manual concluída:** avaliador implementado no harness `apps-script/poc-03/Code.gs`; dez cenários simulados passaram no Apps Script real e a sonda HTTPS real ao Pwned Passwords também passou no projeto Apps Script isolado. Não há cadastro/login nem integração com o sistema de negócio.
 
 **Camada local — `local-demo-v1`:**
 - Lista pequena, explícita e didática de senhas previsíveis com pelo menos 15 caracteres, compatível com o limite mínimo candidato da POC.
@@ -561,11 +561,15 @@ A validação estrutural antecipada é aceitável porque a representação e o t
 **Funções para validação manual no projeto Apps Script isolado:**
 1. Atualizar apenas o `Code.gs` no projeto Apps Script isolado da POC-03. Preservar `HashWasmArgon2.gs`; não alterar o Apps Script de negócio.
 2. Executar `poc03RunPasswordBlocklistPolicyTests()`. São dez cenários determinísticos, todos com respostas HTTP simuladas; não faz chamada externa. Resultado esperado: `PASS`, `testsPassed=10`, `testsTotal=10`.
-3. Depois, executar uma única vez `poc03RunPwnedPasswordsConnectivityProbe()`. Essa função usa somente a senha pública fixa de demonstração `password` para validar conectividade/consulta; não aceita input do usuário e não utiliza senha pessoal. Autorizar `script.external_request` quando solicitado. Resultado esperado: `PASS`, `lookupStatus=COMPROMISED`, contagem maior que zero. Senha e hash não são registrados.
-4. Enviar os dois Execution Logs. A sonda externa faz apenas uma consulta HTTPS; não cria planilha, propriedade, gatilho ou registro persistente, portanto não requer rotina de limpeza.
+3. Em 2026-11-14, `poc03RunPwnedPasswordsConnectivityProbe()` foi executada uma vez no Apps Script isolado, após autorização de `script.external_request`. Resultado observado: `PASS`, `lookupStatus=COMPROMISED`, `exposureCount=52373976`, `Add-Padding: true`, prefixo SHA-1 de cinco caracteres enviado e `passwordOrHashLogged=false`. A sonda usou somente a senha pública fixa `password`; não aceita input do usuário nem utilizou senha pessoal.
+4. A sonda executou uma única consulta HTTPS. Não criou planilha, propriedade, gatilho ou registro persistente; não houve necessidade de rotina de limpeza.
 
 **Validação automatizada — CI de 2026-11-14:** `npm run test:poc03` concluiu **26/26 PASS**, incluindo os dez cenários locais/remotos simulados, prova de que apenas o prefixo de cinco caracteres é enviado, validação dos cabeçalhos `Add-Padding`/`User-Agent`, parsing de padding zero e falha fechada para HTTP 503, resposta malformada e falha de rede. Push #43615465847 e PR check #43615469998 concluíram SUCCESS; auditoria, POC-01/02, validação do registro, ESLint e build também passaram.
 
 **Aviso de dependências na mesma CI:** `npm audit` reportou três ocorrências moderadas relacionadas a `minimatch` transitivamente via ESLint; o workflow usa `--audit-level=high`, portanto não falhou. A pendência deve ser revisada separadamente; não foi aplicada atualização automática de dependências nesta POC.
 
-**Limites:** a CI usa Node/VM e mocks; não comprova a conectividade real do Apps Script com Have I Been Pwned, concessão do escopo OAuth, disponibilidade do serviço ou comportamento em produção. A lista local e a consulta remota ainda não estão conectadas a cadastro/login. A finalidade continua exclusivamente acadêmica, com dados fictícios.
+**Interpretação da contagem:** `exposureCount=52373976` é a contagem de prevalência informada pelo Pwned Passwords para a senha pública de demonstração no momento da consulta; não representa necessariamente pessoas ou contas distintas. A documentação da API define o valor como o número de vezes que a senha aparece no conjunto de dados. As linhas de padding possuem contagem zero e são descartadas.
+
+**Limites:** a execução manual confirma a conectividade HTTPS do Apps Script isolado, o escopo externo concedido e o parsing de uma resposta real. Não comprova disponibilidade contínua, SLA, anonimato absoluto, nem comportamento do serviço para todas as senhas. A lista local é pequena/didática; o avaliador e a consulta remota ainda não estão conectados a cadastro/login. A CI usa Node/VM e mocks, portanto não substitui a execução manual no runtime Google. A finalidade continua exclusivamente acadêmica, com dados fictícios. SHA-1 é usado exclusivamente no protocolo de consulta por faixa, nunca para armazenamento ou verificação de senha.
+
+Referência técnica: [Pwned Passwords API — busca por faixa, k-anonymity, prevalência e padding](https://haveibeenpwned.com/api/v3#PwnedPasswords).
