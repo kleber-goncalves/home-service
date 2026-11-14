@@ -300,12 +300,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** ffca51cbc1e279bf6e837dae951c561fb7368387
-- **Data do commit:** 2026-11-14T15:20:55-03:00
-- **Mensagem do commit:** docs(poc-04): adicionar matriz de cenarios e aceite
-- **Branch desta execução:** dev
+- **Commit de referência:** 71f9882227cfdc876a6d42f0a35481a4c12ab3ac
+- **Data do commit:** 2026-11-14T16:07:21-03:00
+- **Mensagem do commit:** feat(poc-04): implementar sessao sintetica via cookie
+- **Branch desta execução:** feat/poc-04-session-cookie
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 9
+- **Scripts npm:** 10
 - **Dependências de runtime:** 5
 - **Dependências de desenvolvimento:** 10
 - **Workflows:** 2
@@ -324,6 +324,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run test:poc01 | node --test tests/poc01/backend.test.js |
 | npm run test:poc02 | node --test tests/poc02/backend.test.js tests/poc02/apps-script.test.js |
 | npm run test:poc03 | node --test tests/poc03/apps-script.test.js |
+| npm run test:poc04 | node --test tests/poc04/gateway.test.js tests/poc04/apps-script.test.js |
 
 ### Variáveis declaradas no .env.example
 
@@ -331,6 +332,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 - APPS_SCRIPT_HMAC_SECRET
 - APPS_SCRIPT_WEB_APP_URL
+- POC04_ALLOWED_ORIGIN
+- POC04_APPS_SCRIPT_HMAC_SECRET
+- POC04_APPS_SCRIPT_WEB_APP_URL
+- POC04_ENABLED
 
 ### Dependências de runtime
 
@@ -398,13 +403,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 71f9882 | 2026-11-14 | feat(poc-04): implementar sessao sintetica via cookie |
+| 42e3a0a | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | ffca51c | 2026-11-14 | docs(poc-04): adicionar matriz de cenarios e aceite |
 | 44da445 | 2026-11-14 | docs(ai-context): atualizar estado e passagem para novo chat |
 | 3eebd2b | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 894390e | 2026-11-14 | docs(poc-04): documentar plano de sessao por cookie |
 | 6e11ef3 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | ed1e9db | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| df930d6 | 2026-11-14 | docs(architecture): atualizar status das pocs e proxima etapa |
-| 6d1960f | 2026-11-14 | docs(poc-03): consolidar resultados finais e pendencias |
 
 <!-- END AUTO-GENERATED SECTION -->
