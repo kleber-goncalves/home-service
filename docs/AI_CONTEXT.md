@@ -82,7 +82,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 
 ## 4. Estado atual do repositório
 
-**Estado atualizado em 2026-11-11 após integração da POC-01 e validação manual da POC-02 em branch isolada:**
+**Estado atualizado em 2026-11-14 durante a construção da interface demonstrativa de acesso:**
 
 - A branch `dev` contém a homepage pública demonstrativa do Conecta Local, integrada por Pull Request.
 - `src/pages/HomePage.jsx` coordena a composição das seções e o estado local da busca e dos filtros.
@@ -99,11 +99,13 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 - O arquivo Google Sheets estrutural foi criado pelo responsável pelo projeto com as 12 abas e os 102 cabeçalhos aprovados. A exportação XLSX foi inspecionada e a conferência manual de proteções e compartilhamento restrito foi confirmada pelo responsável.
 - A planilha permanece uma estrutura inicial vazia, ainda sem uso como armazenamento operacional integrado.
 - A POC-01 de comunicação React → Vercel Function → Apps Script foi integrada à branch `dev` pelo PR #10 em 2026-11-11 e validada manualmente em Preview: HTTP 200 (eco), 422 (erro lógico Apps Script), 502 (resposta upstream inválida), 400 (JSON inválido no navegador) e 405 (método não permitido). O merge commit foi `837f7c6172764ee27ac835c81e1224640d78478d`; o registro está em `docs/POC_01_COMUNICACAO.md`.
-- A POC-02 de assinatura HMAC-SHA-256 e proteção contra replay está implementada na branch `feat/poc-02-hmac-replay`, no PR #11 aberto para `dev`. Em 2026-11-11, o responsável confirmou cinco cenários no Preview, cinco testes diretos contra o Apps Script isolado e um teste concorrente com duas chamadas idênticas, no qual somente uma foi aceita e a outra recebeu `REPLAY_DETECTED`. O código ainda não foi integrado à `dev`; a descrição e os resultados estão em `docs/POC_02_ASSINATURA_GATEWAY.md`.
-- Não há backend de negócio operacional integrado ao frontend, cadastro, autenticação, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo.
+- A POC-02 de assinatura HMAC-SHA-256 e proteção contra replay foi integrada à `dev` pelo PR #11 em 2026-11-11, após cinco cenários no Preview, cinco testes diretos no Apps Script isolado e um teste concorrente em que somente uma das duas chamadas idênticas foi aceita. Os resultados estão em `docs/POC_02_ASSINATURA_GATEWAY.md`.
+- A POC-03 segue em branch isolada `feat/poc-03-password-kdf`, PR #12 aberto para `dev`; não foi incorporada a esta branch. Em 2026-11-14, no projeto Apps Script isolado, os testes de blocklist passaram 10/10 e a sonda HTTPS real do Pwned Passwords passou com o vetor público fixo `password`. A POC não aprova autenticação real: o comparador XOR não foi aprovado e o helper Node permanece não integrado. Consultar o PR #12 e `docs/POC_03_ARMAZENAMENTO_SENHAS.md` na respectiva branch.
+- Não há backend de negócio operacional integrado ao frontend, autenticação real, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo.
+- A branch `feat/auth-demo-flow` contém a primeira interface de acesso visual em `src/pages/AuthDemoPage.jsx`, acessível por `/?auth=demo`. O cabeçalho abre login demonstrativo e o CTA de profissionais abre cadastro demonstrativo (`/?auth=demo&mode=register`). Os formulários fazem apenas validação local da interface; não chamam API, não gravam em storage e limpam campos de senha após a submissão. A mensagem da tela alerta para não usar credenciais reais. Cadastro, verificação por código, login e recuperação ainda não são operações de backend.
 - A homepage não processa pagamentos, agendamentos ou contratação.
 
-A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a arquitetura e seus limites. O gateway Vercel → Apps Script da POC-01 está integrado à `dev`; a camada HMAC/anti-replay da POC-02 foi validada manualmente na branch `feat/poc-02-hmac-replay`, mas ainda aguarda integração. Isso não significa que operações de negócio, autenticação de usuários, sessões, Sheets ou Drive estejam integrados.
+A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a arquitetura e seus limites. As POCs de transporte (PR #10) e assinatura HMAC/anti-replay (PR #11) estão integradas à `dev`. A POC-03 permanece no PR #12, em branch separada. A interface visual de autenticação é apenas um protótipo de frontend; não significa que operações de negócio, credenciais, sessões, Sheets ou Drive estejam integrados.
 
 ## 5. Arquitetura e decisões tecnológicas
 
@@ -166,7 +168,7 @@ Google Sheets não impõe automaticamente FKs, unicidade composta ou integridade
 
 ### 5.4. Autenticação, e-mail e imagens — decisões e bloqueios
 
-A proposta de arquitetura do backend e o plano das provas de conceito estão em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Esse documento não autoriza a implementação: transporte, KDF de senha e sessão permanecem bloqueados até serem testados e aprovados.
+A arquitetura do backend e as provas de conceito estão em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). A branch `feat/auth-demo-flow` implementa apenas a camada visual de acesso: formulários, validações locais e mensagens de demonstração. Não há envio de credenciais, persistência, criação de conta, autenticação ou sessão. As etapas de backend, KDF, comparação de hash e sessão permanecem separadas e não estão aprovadas para credenciais reais.
 
 **Decisão funcional para a demonstração**
 - Cadastro e login próprios por e-mail e senha, com lógica no Apps Script; não adicionar Firebase ou provedor externo sem reabrir a decisão.
@@ -295,10 +297,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** aa1a98c130369892e6727dda90e97ca4c0f7d2a6
-- **Data do commit:** 2026-11-11T15:49:05-03:00
-- **Mensagem do commit:** Merge pull request #11 from kleber-goncalves/feat/poc-02-hmac-replay
-- **Branch desta execução:** dev
+- **Commit de referência:** 92c50c02066ca113bd4071770aee5b870b3c610a
+- **Data do commit:** 2026-11-14T14:42:00-03:00
+- **Mensagem do commit:** fix(auth): validar caracteres de controle sem regex bloqueada pelo lint
+- **Branch desta execução:** feat/auth-demo-flow
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 8
 - **Dependências de runtime:** 5
@@ -374,6 +376,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/data/homepage.js
 - src/lib/utils.js
 - src/main.jsx
+- src/pages/AuthDemoPage.jsx
 - src/pages/HomePage.jsx
 - src/pages/Poc01Page.jsx
 - src/services/poc-01-api.js
@@ -390,13 +393,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| aa1a98c | 2026-11-11 | Merge pull request #11 from kleber-goncalves/feat/poc-02-hmac-replay |
-| 1d05ff1 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
-| 5096f9f | 2026-11-11 | docs(arquitetura): registrar validação real da assinatura HMAC |
-| fcdf882 | 2026-11-11 | docs(ai-context): registrar validação manual da POC-02 |
-| 0532395 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
-| c6bdac7 | 2026-11-11 | docs(ai-context): atualizar snapshot automaticamente |
-| 5127ec8 | 2026-11-11 | docs(arquitetura): atualizar estado das provas de conceito |
-| c3aad65 | 2026-11-11 | docs(poc-02): registrar validação manual HMAC e replay |
+| 92c50c0 | 2026-11-14 | fix(auth): validar caracteres de controle sem regex bloqueada pelo lint |
+| 82b532d | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
+| d264794 | 2026-11-14 | docs(architecture): separar interface visual da autenticação real |
+| 546c3f7 | 2026-11-14 | docs(auth): registrar escopo da interface demonstrativa |
+| 00bc81f | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
+| 8785792 | 2026-11-14 | feat(auth): estilizar páginas de acesso demonstrativo |
+| b7b95f6 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
+| 5e92001 | 2026-11-14 | feat(auth): ligar CTA profissional ao cadastro demonstrativo |
 
 <!-- END AUTO-GENERATED SECTION -->
