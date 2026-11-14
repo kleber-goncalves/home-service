@@ -314,9 +314,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** be5905faffff41ea5bcce6b35636ccfe69a3ca4f
-- **Data do commit:** 2026-11-14T13:21:57-03:00
-- **Mensagem do commit:** test(poc-03d): cobrir blocklist e consulta k-anonymity
+- **Commit de referência:** 3947be806b41531ee6f0db0676f9cd05fa9917bf
+- **Data do commit:** 2026-11-14T13:23:58-03:00
+- **Mensagem do commit:** fix(poc-03d): corrigir fixtures da consulta range
 - **Branch desta execução:** feat/poc-03-password-kdf
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -411,13 +411,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 3947be8 | 2026-11-14 | fix(poc-03d): corrigir fixtures da consulta range |
+| 42b093d | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | be5905f | 2026-11-14 | test(poc-03d): cobrir blocklist e consulta k-anonymity |
 | b64f555 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 133bdcc | 2026-11-14 | feat(poc-03d): adicionar avaliador isolado de blocklist |
 | 5dc31f7 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
 | e0651c6 | 2026-11-13 | docs(poc-03): registrar suite 23 de 23 |
 | e3056c9 | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| c88a87e | 2026-11-13 | docs(ai-context): atualizar snapshot automaticamente |
-| 59daf5b | 2026-11-13 | docs(ai-context): registrar decisao poc-03c |
 
 <!-- END AUTO-GENERATED SECTION -->
