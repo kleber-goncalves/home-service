@@ -300,9 +300,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** e75662476d7915098002172d2c2b42d7ebe7f78c
-- **Data do commit:** 2026-11-16T15:43:22-03:00
-- **Mensagem do commit:** fix(home): manter categorias de exemplo sem anuncios reais
+- **Commit de referência:** d4bb33f89b99866c135dbc3bc8c63a21ceb6fe1d
+- **Data do commit:** 2026-11-16T15:43:27-03:00
+- **Mensagem do commit:** style(frontend): incluir campos de cadastro e botoes do painel
 - **Branch desta execução:** feat/prototipo-demo-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -399,13 +399,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| d4bb33f | 2026-11-16 | style(frontend): incluir campos de cadastro e botoes do painel |
+| 5f638ea | 2026-11-16 | fix(session): mapear expiracao para resposta 401 |
 | e756624 | 2026-11-16 | fix(home): manter categorias de exemplo sem anuncios reais |
 | eefca93 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 8569e47 | 2026-11-16 | feat(home): carregar catalogo e servicos publicados da planilha |
 | 50813bc | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | ef936d8 | 2026-11-16 | feat(home): exibir serviços reais e contato público |
 | a14703f | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| efe9543 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| 01c35b5 | 2026-11-16 | fix(session): renovar cookie durante atividade |
 
 <!-- END AUTO-GENERATED SECTION -->
