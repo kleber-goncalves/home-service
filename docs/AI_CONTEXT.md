@@ -2,6 +2,17 @@
 
 > Documento de continuidade do projeto. Leia antes de sugerir ou realizar alterações. Reúne propósito, decisões, arquitetura planejada, estado implementado, regras de manutenção e limitações. A seção de snapshot ao final é atualizada pelo GitHub Actions.
 
+## Atualização vigente — 2026-11-16
+
+> Esta atualização prevalece sobre os trechos históricos datados de 2026-11-14 que ainda descrevem a integração funcional como estando somente em uma branch separada ou como pendente.
+
+- O PR #15 (`feat/prototipo-demo-profissional` → `dev`) foi integrado por squash merge. A branch `dev` contém agora o protótipo funcional com cadastro, confirmação demonstrativa, login, sessão, perfil, criação/pausa/publicação de serviços e persistência no Google Sheets via Apps Script.
+- O gateway funcional está em `api/app.js` → `server/app-gateway.js`. O Apps Script correspondente está em `apps-script/conecta-local/Code.gs`. A configuração do ambiente Preview está documentada em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`.
+- O fluxo validado pelo responsável do projeto usa dados fictícios. A demonstração continua restrita ao ambiente Preview e não deve ser descrita como produto pronto para produção.
+- A POC-04 continua isolada na branch `feat/poc-04-session-cookie` e não deve ser misturada à autenticação do protótipo.
+- A atividade acadêmica de LOO está sendo implementada separadamente na branch `feat/loo-orientacao-objetos`, criada a partir de `dev`. As classes `Usuario`, `Profissional` e `Servico` ficam em `server/domain-entities.js` e são utilizadas pelo gateway Node.js. A documentação específica está em `docs/LOO_ORIENTACAO_OBJETOS.md`; os testes ficam em `tests/loo/domain-entities.test.js` e são executados por `npm run test:loo`.
+- As classes de domínio organizam atributos, métodos e montagem dos payloads no Node.js. A validação final, autenticação, autorização, persistência e auditoria continuam sob responsabilidade do Apps Script.
+
 ## 1. Instruções para a IA que assumir o projeto
 
 1. Leia este documento por inteiro antes de propor mudanças, especialmente em uma conversa nova.
