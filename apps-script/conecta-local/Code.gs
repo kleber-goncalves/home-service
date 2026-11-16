@@ -329,6 +329,7 @@ function appGetCatalog_() {
 /* ------------------------------ Cadastro -------------------------------- */
 
 function appRegister_(payload, nowMs, secret) {
+    appEnsureSeedData_();
     var required = [
         "email", "senha_hash", "senha_salt", "senha_algoritmo",
         "nome_completo", "nome_publico", "apresentacao",
