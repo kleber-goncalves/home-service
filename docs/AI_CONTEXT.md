@@ -300,9 +300,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 7a256fc9f0950ce236b73fe20a2c492d9490d942
-- **Data do commit:** 2026-11-16T15:46:20-03:00
-- **Mensagem do commit:** docs: atualizar estado do MVP com backend funcional
+- **Commit de referência:** c08a7fbb68f413aee7126b002ff5314ec7df3ed7
+- **Data do commit:** 2026-11-16T15:48:26-03:00
+- **Mensagem do commit:** fix(gateway): remover chave duplicada de expiracao
 - **Branch desta execução:** feat/prototipo-demo-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -399,13 +399,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| c08a7fb | 2026-11-16 | fix(gateway): remover chave duplicada de expiracao |
+| a77721d | 2026-11-16 | docs(ai-context): registrar backend de prototipo com Sheets |
+| 997b868 | 2026-11-16 | docs: substituir simulacao local pelo fluxo persistente |
+| bed5ef2 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
+| a78affb | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 7a256fc | 2026-11-16 | docs: atualizar estado do MVP com backend funcional |
 | d5e5303 | 2026-11-16 | docs: atualizar README para prototipo com persistencia |
 | 04956ba | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| 6d90e34 | 2026-11-16 | docs: orientar ativacao do prototipo com Google Sheets |
-| 645d1b2 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| 898d3ca | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| d4bb33f | 2026-11-16 | style(frontend): incluir campos de cadastro e botoes do painel |
-| 5f638ea | 2026-11-16 | fix(session): mapear expiracao para resposta 401 |
 
 <!-- END AUTO-GENERATED SECTION -->
