@@ -300,9 +300,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** ef936d8eca07aeb1fb5e7da956436db6df2f21ca
-- **Data do commit:** 2026-11-16T15:40:34-03:00
-- **Mensagem do commit:** feat(home): exibir serviços reais e contato público
+- **Commit de referência:** 8569e477a1603868f9cae97d212ba9318f87a0c0
+- **Data do commit:** 2026-11-16T15:41:19-03:00
+- **Mensagem do commit:** feat(home): carregar catalogo e servicos publicados da planilha
 - **Branch desta execução:** feat/prototipo-demo-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -399,13 +399,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 8569e47 | 2026-11-16 | feat(home): carregar catalogo e servicos publicados da planilha |
+| 50813bc | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | ef936d8 | 2026-11-16 | feat(home): exibir serviços reais e contato público |
 | a14703f | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | efe9543 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 01c35b5 | 2026-11-16 | fix(session): renovar cookie durante atividade |
 | 4d07af7 | 2026-11-16 | fix(frontend): separar codigo exibido do codigo digitado |
 | 3eaf045 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| 7986291 | 2026-11-16 | feat(frontend): conectar cadastro login e servicos ao Sheets |
-| b43ffe4 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
