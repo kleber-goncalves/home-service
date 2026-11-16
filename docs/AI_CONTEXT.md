@@ -300,9 +300,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** b11af56a9e8c68c2d639e875a532583db82344d5
-- **Data do commit:** 2026-11-16T15:48:52-03:00
-- **Mensagem do commit:** fix(frontend): confirmar sessao antes de abrir painel e sair
+- **Commit de referência:** 6f4ebc8a932e0050db8267ce14ab91df72d22ffb
+- **Data do commit:** 2026-11-16T15:50:06-03:00
+- **Mensagem do commit:** fix(auth): validar codigo digitado e aguardar confirmacao
 - **Branch desta execução:** feat/prototipo-demo-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -399,13 +399,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 6f4ebc8 | 2026-11-16 | fix(auth): validar codigo digitado e aguardar confirmacao |
+| be8525d | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | b11af56 | 2026-11-16 | fix(frontend): confirmar sessao antes de abrir painel e sair |
 | 11f84be | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | c08a7fb | 2026-11-16 | fix(gateway): remover chave duplicada de expiracao |
 | a77721d | 2026-11-16 | docs(ai-context): registrar backend de prototipo com Sheets |
 | 997b868 | 2026-11-16 | docs: substituir simulacao local pelo fluxo persistente |
 | bed5ef2 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| a78affb | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| 7a256fc | 2026-11-16 | docs: atualizar estado do MVP com backend funcional |
 
 <!-- END AUTO-GENERATED SECTION -->
