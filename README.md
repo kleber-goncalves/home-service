@@ -8,7 +8,7 @@ O projeto tem finalidade acadêmica e busca demonstrar investigação de problem
 
 A homepage pública foi construída como experiência demonstrativa em React + Vite. Ela apresenta a identidade visual, categorias, exemplos ilustrativos de serviços, busca local de demonstração, explicação da jornada, FAQ e navegação responsiva.
 
-A demonstração **não** representa um marketplace operacional: não há cadastro real de profissionais, backend integrado, autenticação, planilha operacional, pesquisa geográfica ou fluxo de contratação.
+A demonstração **não** representa um marketplace operacional: não há cadastro real de profissionais, backend integrado, autenticação, planilha operacional, pesquisa geográfica ou fluxo de contratação. A branch `feat/prototipo-demo-profissional` acrescenta um fluxo local de demonstração da área profissional, com dados fictícios e sem persistência; ela não substitui autenticação real.
 
 - **Repositório:** https://github.com/kleber-goncalves/home-service
 - **Deploy:** https://home-service-blush.vercel.app/
