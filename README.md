@@ -43,6 +43,7 @@ O GitHub Actions executa essas verificações em pushes e Pull Requests direcion
 ## Documentação
 
 - [Contexto técnico para IAs e desenvolvedores](docs/AI_CONTEXT.md)
+- [Protótipo demonstrativo local — área do profissional](docs/PROTOTIPO_DEMO_LOCAL.md)
 - [Especificação funcional do MVP (em revisão)](docs/ESPECIFICACAO_MVP.md)
 - [Modelagem lógica e física dos dados](docs/MODELAGEM_DADOS.md)
 - [Arquitetura de integração Vercel Functions + Apps Script](docs/ARQUITETURA_APPS_SCRIPT.md)
