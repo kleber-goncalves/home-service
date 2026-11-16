@@ -300,9 +300,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 4831f80888fa25c800f43d1c7026fd085a604972
-- **Data do commit:** 2026-11-16T15:25:34-03:00
-- **Mensagem do commit:** feat(backend): criar Apps Script conectado à planilha do Conecta Local
+- **Commit de referência:** 56afe82de3c403f28dc92944ec7cf9b460f36815
+- **Data do commit:** 2026-11-16T15:31:56-03:00
+- **Mensagem do commit:** feat(gateway): conectar autenticação e serviços ao Apps Script
 - **Branch desta execução:** feat/prototipo-demo-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -398,13 +398,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 56afe82 | 2026-11-16 | feat(gateway): conectar autenticação e serviços ao Apps Script |
+| 255c618 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 4831f80 | 2026-11-16 | feat(backend): criar Apps Script conectado à planilha do Conecta Local |
 | 5345575 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | b93fb3e | 2026-11-16 | docs: adicionar guia do fluxo demonstrativo local |
 | 992a9df | 2026-11-16 | docs: registrar fluxo e limites do prototipo local |
 | 28d05ee | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | f2ed1eb | 2026-11-16 | docs: atualizar contexto da demonstracao profissional |
-| c492cb6 | 2026-11-16 | docs: diferenciar simulacao local de autenticacao operacional |
-| a2a92ef | 2026-11-16 | docs: registrar escopo do fluxo demonstrativo local |
 
 <!-- END AUTO-GENERATED SECTION -->
