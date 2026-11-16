@@ -311,10 +311,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 9efc728c7deff4109f840c3e837ece841656edfc
-- **Data do commit:** 2026-11-16T16:54:46-03:00
-- **Mensagem do commit:** ci(loo): executar testes das classes no workflow
-- **Branch desta execução:** feat/loo-orientacao-objetos
+- **Commit de referência:** 44088f43f892e5c1513a07ed3f2c501ee247688f
+- **Data do commit:** 2026-11-16T17:00:57-03:00
+- **Mensagem do commit:** feat(loo): integrar orientacao a objetos no backend
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 10
 - **Dependências de runtime:** 6
@@ -411,13 +411,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| 9efc728 | 2026-11-16 | ci(loo): executar testes das classes no workflow |
-| 64533db | 2026-11-16 | test(loo): adicionar comando de validacao das classes |
-| 21f3494 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| 76fea0d | 2026-11-16 | feat(loo): integrar objetos ao gateway |
-| 2884a4c | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| 1414f49 | 2026-11-16 | docs(loo): documentar orientacao a objetos no backend |
-| 30334f3 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| 6cf485b | 2026-11-16 | test(loo): cobrir classes e metodos de dominio |
+| 44088f4 | 2026-11-16 | feat(loo): integrar orientacao a objetos no backend |
+| f5c289c | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
+| 5033dbd | 2026-11-16 | feat: adicionar protótipo funcional do Conecta Local |
+| 42e3a0a | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
+| ffca51c | 2026-11-14 | docs(poc-04): adicionar matriz de cenarios e aceite |
+| 44da445 | 2026-11-14 | docs(ai-context): atualizar estado e passagem para novo chat |
+| 3eebd2b | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
+| 894390e | 2026-11-14 | docs(poc-04): documentar plano de sessao por cookie |
 
 <!-- END AUTO-GENERATED SECTION -->
