@@ -238,6 +238,7 @@ function mapAppsScriptError(output) {
         PROFILE_UNAVAILABLE: [409, "O perfil profissional não está disponível."],
         SESSION_INVALID: [401, "Entre novamente para continuar."],
         SESSION_EXPIRED: [401, "Sua sessão expirou. Entre novamente."],
+        SESSION_EXPIRED: [401, "Sua sessão expirou. Entre novamente."],
         STORE_NOT_CONFIGURED: [503, "A planilha ainda não foi conectada ao Apps Script."],
         STORE_UNAVAILABLE: [503, "O armazenamento está temporariamente indisponível."],
         STORE_SCHEMA_INVALID: [503, "A estrutura da planilha não corresponde ao modelo esperado."],
