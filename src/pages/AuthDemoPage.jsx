@@ -1,30 +1,31 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
-    ArrowLeft, ArrowRight, Check, Eye, EyeOff, Info, LockKeyhole,
-    LogOut, Mail, Plus, ShieldCheck, UserRound, Wrench, X,
+    ArrowLeft, ArrowRight, Check, Info, LockKeyhole, LogOut,
+    Mail, Plus, ShieldCheck, UserRound, Wrench, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { appRequest } from "@/services/app-api";
 
-const DEMO_ACCOUNT = {
-    fullName: "Alex Silva",
-    publicName: "Alex Reformas",
-    email: "profissional@conectalocal.invalid",
-    password: "ConectaLocal#Demo26",
-    description: "Profissional demonstrativo de reformas e pequenos reparos residenciais.",
-    city: "Capelinha - MG",
+const EMPTY_REGISTER = {
+    fullName: "",
+    publicName: "",
+    email: "",
+    whatsapp: "",
+    presentation: "",
+    cityId: "",
+    password: "",
+    passwordConfirmation: "",
 };
 
-const INITIAL_SERVICES = [
-    { id: "service-1", title: "Pintura residencial", category: "Pintura", description: "Pintura interna e externa, pequenos reparos e acabamento.", status: "published" },
-    { id: "service-2", title: "Pequenos reparos", category: "Reformas", description: "Ajustes, montagem e manutenção residencial.", status: "paused" },
-];
-
-const EMPTY_FORM = { fullName: "", publicName: "", email: "", password: "", passwordConfirmation: "" };
-const EMPTY_SERVICE = { title: "", category: "Reformas", description: "" };
+const EMPTY_SERVICE = {
+    title: "",
+    categoryId: "",
+    description: "",
+};
 
 function getPasswordValidation(password) {
-    if (typeof password !== "string") return "Informe uma senha fictícia.";
+    if (typeof password !== "string") return "Informe uma senha.";
     const normalized = password.normalize("NFC");
     const codePoints = [...normalized].length;
     const byteLength = new TextEncoder().encode(normalized).byteLength;
@@ -34,276 +35,289 @@ function getPasswordValidation(password) {
     if (byteLength > 512) return "A senha excede o limite de 512 bytes UTF-8.";
 
     const hasControlCharacter = [...normalized].some((character) => {
-        const codePoint = character.codePointAt(0);
-        return (codePoint >= 0x00 && codePoint <= 0x1f)
-            || (codePoint >= 0x7f && codePoint <= 0x9f);
+        const point = character.codePointAt(0);
+        return point <= 0x1f || (point >= 0x7f && point <= 0x9f);
     });
 
-    if (hasControlCharacter) return "A senha não pode conter caracteres de controle.";
-    return "";
+    return hasControlCharacter ? "A senha não pode conter caracteres de controle." : "";
 }
 
-function createDemoCode() {
-    const values = new Uint32Array(1);
-    if (globalThis.crypto?.getRandomValues) {
-        globalThis.crypto.getRandomValues(values);
-        return String(100000 + (values[0] % 900000));
-    }
-    return String(Math.floor(100000 + (Math.random() * 900000)));
-}
-
-function normalizeEmail(email) {
-    return email.trim().toLocaleLowerCase("pt-BR");
+function formatStatus(status) {
+    return status === "published" ? "Publicado" : "Em pausa";
 }
 
 export default function AuthDemoPage({ initialMode = "login" }) {
     const [mode, setMode] = useState(initialMode === "register" ? "register" : "login");
-    const [screen, setScreen] = useState("auth");
-    const [form, setForm] = useState(EMPTY_FORM);
-    const [notice, setNotice] = useState(null);
-    const [showPassword, setShowPassword] = useState(false);
-    const [registeredAccount, setRegisteredAccount] = useState(null);
-    const [pendingAccount, setPendingAccount] = useState(null);
-    const [confirmationCode, setConfirmationCode] = useState("");
-    const [codeInput, setCodeInput] = useState("");
+    const [catalog, setCatalog] = useState({ categories: [], cities: [] });
+    const [registerForm, setRegisterForm] = useState(EMPTY_REGISTER);
+    const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+    const [verificationCode, setVerificationCode] = useState("");
+    const [pendingEmail, setPendingEmail] = useState("");
+    const [csrfToken, setCsrfToken] = useState("");
     const [currentUser, setCurrentUser] = useState(null);
-    const [services, setServices] = useState(INITIAL_SERVICES);
-    const [showServiceForm, setShowServiceForm] = useState(false);
+    const [services, setServices] = useState([]);
     const [newService, setNewService] = useState(EMPTY_SERVICE);
-    const [recoveryCode, setRecoveryCode] = useState("");
-    const [recoveryCodeInput, setRecoveryCodeInput] = useState("");
-    const [recoveryEmail, setRecoveryEmail] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [recoveryStage, setRecoveryStage] = useState("email");
+    const [showServiceForm, setShowServiceForm] = useState(false);
+    const [notice, setNotice] = useState(null);
+    const [pageLoading, setPageLoading] = useState(true);
+    const [busy, setBusy] = useState(false);
+    const [catalogReady, setCatalogReady] = useState(false);
 
     const activeServices = useMemo(
         () => services.filter((service) => service.status === "published").length,
         [services],
     );
 
-    function updateField(event) {
+    useEffect(() => {
+        let active = true;
+
+        async function initialize() {
+            try {
+                const data = await appRequest("public.catalog");
+                if (active) {
+                    setCatalog(data || { categories: [], cities: [] });
+                    setCatalogReady(true);
+                    if (data?.cities?.[0]?.id) {
+                        setRegisterForm((current) => ({
+                            ...current,
+                            cityId: current.cityId || data.cities[0].id,
+                        }));
+                    }
+                    if (data?.categories?.[0]?.id) {
+                        setNewService((current) => ({
+                            ...current,
+                            categoryId: current.categoryId || data.categories[0].id,
+                        }));
+                    }
+                }
+            } catch (error) {
+                if (active) {
+                    setNotice({
+                        title: "Planilha ainda não conectada",
+                        message: error.message || "Configure o Apps Script e as variáveis Preview para ativar o cadastro.",
+                        tone: "warning",
+                    });
+                }
+            }
+
+            try {
+                const session = await appRequest("auth.me");
+                if (active && session?.authenticated) {
+                    setCurrentUser(session.user);
+                    setServices(session.services || []);
+                    setCsrfToken(session.csrfToken || "");
+                }
+            } catch {
+                // Visitante sem sessão: permanece na tela de acesso.
+            } finally {
+                if (active) setPageLoading(false);
+            }
+        }
+
+        initialize();
+        return () => { active = false; };
+    }, []);
+
+    function updateRegisterField(event) {
         const { name, value } = event.target;
-        setForm((current) => ({ ...current, [name]: value }));
+        setRegisterForm((current) => ({ ...current, [name]: value }));
+        setNotice(null);
+    }
+
+    function updateLoginField(event) {
+        const { name, value } = event.target;
+        setLoginForm((current) => ({ ...current, [name]: value }));
         setNotice(null);
     }
 
     function switchMode(nextMode) {
         setMode(nextMode);
-        setScreen("auth");
         setNotice(null);
-        setShowPassword(false);
-        setForm(EMPTY_FORM);
-        setCodeInput("");
-        setRecoveryStage("email");
-        setRecoveryCode("");
-        setRecoveryCodeInput("");
-        setNewPassword("");
-    }
-
-    function enterDashboard(account) {
-        setCurrentUser({
-            fullName: account.fullName,
-            publicName: account.publicName,
-            email: account.email,
-            description: account.description || "Perfil profissional demonstrativo.",
-            city: account.city || "Capelinha - MG",
-        });
-        setScreen("dashboard");
-        setNotice(null);
-        setShowServiceForm(false);
-    }
-
-    function handleDemoAccess() {
-        enterDashboard(DEMO_ACCOUNT);
-    }
-
-    function handleLogin(event) {
-        event.preventDefault();
-
-        const email = normalizeEmail(form.email);
-        const password = form.password;
-        const account = registeredAccount
-            && normalizeEmail(registeredAccount.email) === email
-            ? registeredAccount
-            : DEMO_ACCOUNT;
-
-        if (normalizeEmail(account.email) !== email || account.password !== password) {
-            setNotice({
-                title: "Não foi possível entrar",
-                message: "Confira os dados fictícios ou utilize o botão de acesso à conta demonstrativa.",
-                tone: "warning",
-            });
-            return;
+        setVerificationCode("");
+        if (nextMode === "register") {
+            setRegisterForm((current) => ({ ...current, password: "", passwordConfirmation: "" }));
+        } else {
+            setLoginForm((current) => ({ ...current, password: "" }));
         }
-
-        enterDashboard(account);
     }
 
-    function handleRegister(event) {
+    async function submitRegistration(event) {
         event.preventDefault();
-
-        const passwordError = getPasswordValidation(form.password);
+        const passwordError = getPasswordValidation(registerForm.password);
         if (passwordError) {
-            setNotice({ title: "Revise a senha fictícia", message: passwordError, tone: "warning" });
+            setNotice({ title: "Revise a senha", message: passwordError, tone: "warning" });
+            return;
+        }
+        if (registerForm.password !== registerForm.passwordConfirmation) {
+            setNotice({ title: "As senhas não coincidem", message: "Confira os dois campos e tente novamente.", tone: "warning" });
+            return;
+        }
+        if (!catalog.cities.length) {
+            setNotice({ title: "Catálogo indisponível", message: "Não foi possível carregar as cidades da planilha.", tone: "warning" });
             return;
         }
 
-        if (form.password !== form.passwordConfirmation) {
-            setNotice({
-                title: "As senhas não coincidem",
-                message: "Confira os dois campos e tente novamente.",
-                tone: "warning",
-            });
-            return;
-        }
-
-        if (
-            normalizeEmail(form.email) === normalizeEmail(DEMO_ACCOUNT.email)
-            || (registeredAccount && normalizeEmail(form.email) === normalizeEmail(registeredAccount.email))
-        ) {
-            setNotice({
-                title: "E-mail já utilizado nesta demonstração",
-                message: "Use outro endereço fictício para simular um novo cadastro.",
-                tone: "warning",
-            });
-            return;
-        }
-
-        const account = {
-            fullName: form.fullName.trim(),
-            publicName: form.publicName.trim(),
-            email: form.email.trim(),
-            password: form.password,
-            description: "Novo perfil profissional demonstrativo.",
-            city: "Capelinha - MG",
-        };
-
-        setPendingAccount(account);
-        setConfirmationCode(createDemoCode());
-        setCodeInput("");
-        setMode("confirm");
+        setBusy(true);
         setNotice(null);
-        setForm((current) => ({ ...current, password: "", passwordConfirmation: "" }));
+        try {
+            const result = await appRequest("auth.register", {
+                fullName: registerForm.fullName,
+                publicName: registerForm.publicName,
+                email: registerForm.email,
+                whatsapp: registerForm.whatsapp,
+                presentation: registerForm.presentation,
+                cityId: registerForm.cityId,
+                password: registerForm.password,
+            });
+            setPendingEmail(registerForm.email.trim());
+            setVerificationCode(String(result.verificationCode || ""));
+            setRegisterForm((current) => ({ ...current, password: "", passwordConfirmation: "" }));
+            setMode("verify");
+            setNotice({
+                title: "Cadastro gravado na planilha",
+                message: "A conta e o perfil foram registrados. Use o código demonstrativo abaixo para ativar o acesso.",
+                tone: "info",
+            });
+        } catch (error) {
+            setNotice({ title: "Não foi possível cadastrar", message: error.message, tone: "warning" });
+        } finally {
+            setBusy(false);
+        }
     }
 
-    function handleConfirmRegistration(event) {
+    async function submitVerification(event) {
         event.preventDefault();
-
-        if (codeInput.trim() !== confirmationCode) {
-            setNotice({
-                title: "Código incorreto",
-                message: "Digite o código demonstrativo exibido nesta tela.",
-                tone: "warning",
-            });
+        if (!/^\d{6}$/.test(verificationCode)) {
+            setNotice({ title: "Código inválido", message: "Digite os seis números do código demonstrativo.", tone: "warning" });
             return;
         }
 
-        setRegisteredAccount(pendingAccount);
-        enterDashboard(pendingAccount);
-    }
-
-    function handleRecoveryRequest(event) {
-        event.preventDefault();
-
-        const email = normalizeEmail(recoveryEmail);
-        if (!registeredAccount || normalizeEmail(registeredAccount.email) !== email) {
-            setNotice({
-                title: "Conta não localizada nesta sessão",
-                message: "Nesta demonstração, a recuperação funciona para uma conta criada no mesmo acesso. Também é possível criar uma nova conta fictícia.",
-                tone: "warning",
-            });
-            return;
-        }
-
-        setRecoveryCode(createDemoCode());
-        setRecoveryCodeInput("");
-        setRecoveryStage("code");
-        setNotice({
-            title: "Código demonstrativo gerado",
-            message: "Use o código apresentado abaixo para continuar. Nenhum e-mail foi enviado.",
-            tone: "info",
-        });
-    }
-
-    function handleRecoveryCode(event) {
-        event.preventDefault();
-
-        if (recoveryCodeInput.trim() !== recoveryCode) {
-            setNotice({
-                title: "Código incorreto",
-                message: "Confira o código demonstrativo e tente novamente.",
-                tone: "warning",
-            });
-            return;
-        }
-
-        setRecoveryStage("password");
+        setBusy(true);
         setNotice(null);
+        try {
+            await appRequest("auth.verify", { email: pendingEmail, code: verificationCode });
+            setLoginForm({ email: pendingEmail, password: "" });
+            setVerificationCode("");
+            setMode("login");
+            setNotice({
+                title: "Cadastro confirmado",
+                message: "Seu cadastro foi ativado na planilha. Entre com o e-mail e a senha que acabou de criar.",
+                tone: "info",
+            });
+        } catch (error) {
+            setNotice({ title: "Não foi possível confirmar", message: error.message, tone: "warning" });
+        } finally {
+            setBusy(false);
+        }
     }
 
-    function handlePasswordReset(event) {
+    async function submitLogin(event) {
         event.preventDefault();
+        setBusy(true);
+        setNotice(null);
+        try {
+            const result = await appRequest("auth.login", {
+                email: loginForm.email,
+                password: loginForm.password,
+            });
+            setCsrfToken(result.csrfToken || "");
+            setCurrentUser(result.user);
+            setLoginForm((current) => ({ ...current, password: "" }));
+            const mine = await appRequest("service.listMine", {}, result.csrfToken || "");
+            setServices(mine.services || []);
+        } catch (error) {
+            setNotice({ title: "Não foi possível entrar", message: error.message, tone: "warning" });
+        } finally {
+            setBusy(false);
+        }
+    }
 
-        const passwordError = getPasswordValidation(newPassword);
-        if (passwordError) {
-            setNotice({ title: "Revise a nova senha", message: passwordError, tone: "warning" });
+    async function refreshServices() {
+        const result = await appRequest("service.listMine", {}, csrfToken);
+        setServices(result.services || []);
+    }
+
+    async function createService(event) {
+        event.preventDefault();
+        if (!newService.categoryId) {
+            setNotice({ title: "Selecione uma categoria", message: "O catálogo ainda não oferece uma categoria ativa.", tone: "warning" });
             return;
         }
-
-        setRegisteredAccount((current) => ({ ...current, password: newPassword }));
-        setMode("login");
-        setRecoveryStage("email");
-        setRecoveryCode("");
-        setNewPassword("");
-        setForm(EMPTY_FORM);
-        setNotice({
-            title: "Senha fictícia atualizada",
-            message: "A alteração existe somente nesta demonstração em memória.",
-            tone: "info",
-        });
+        setBusy(true);
+        setNotice(null);
+        try {
+            const result = await appRequest("service.create", {
+                categoryId: newService.categoryId,
+                title: newService.title,
+                description: newService.description,
+            }, csrfToken);
+            setServices((current) => [result.service, ...current]);
+            setNewService((current) => ({
+                ...EMPTY_SERVICE,
+                categoryId: current.categoryId || catalog.categories[0]?.id || "",
+            }));
+            setShowServiceForm(false);
+            setNotice({
+                title: "Serviço salvo na planilha",
+                message: "O serviço foi cadastrado e já pode aparecer na vitrine pública.",
+                tone: "info",
+            });
+        } catch (error) {
+            setNotice({ title: "Não foi possível salvar", message: error.message, tone: "warning" });
+        } finally {
+            setBusy(false);
+        }
     }
 
-    function logout() {
-        setCurrentUser(null);
-        setScreen("auth");
-        setMode("login");
-        setForm(EMPTY_FORM);
-        setNotice({
-            title: "Você saiu da demonstração",
-            message: "A sessão visual foi encerrada. Nenhuma sessão de servidor foi criada.",
-            tone: "info",
-        });
+    async function toggleService(service) {
+        const nextStatus = service.status === "published" ? "paused" : "published";
+        setBusy(true);
+        setNotice(null);
+        try {
+            const result = await appRequest("service.setStatus", {
+                serviceId: service.id,
+                status: nextStatus,
+            }, csrfToken);
+            setServices((current) => current.map((item) => item.id === service.id ? result.service : item));
+        } catch (error) {
+            setNotice({ title: "Não foi possível atualizar", message: error.message, tone: "warning" });
+        } finally {
+            setBusy(false);
+        }
     }
 
-    function addService(event) {
-        event.preventDefault();
-        if (!newService.title.trim() || !newService.description.trim()) return;
-
-        setServices((current) => [{
-            id: "service-" + Date.now(),
-            title: newService.title.trim(),
-            category: newService.category,
-            description: newService.description.trim(),
-            status: "published",
-        }, ...current]);
-
-        setNewService(EMPTY_SERVICE);
-        setShowServiceForm(false);
+    async function logout() {
+        setBusy(true);
+        try {
+            await appRequest("auth.logout", {}, csrfToken);
+            setNotice({ title: "Sessão encerrada", message: "Você saiu da área do profissional.", tone: "info" });
+        } catch (error) {
+            setNotice({ title: "Falha ao encerrar sessão", message: error.message, tone: "warning" });
+        } finally {
+            setCurrentUser(null);
+            setServices([]);
+            setCsrfToken("");
+            setMode("login");
+            setLoginForm({ email: "", password: "" });
+            setBusy(false);
+        }
     }
 
-    function toggleService(serviceId) {
-        setServices((current) => current.map((service) => (
-            service.id === serviceId
-                ? { ...service, status: service.status === "published" ? "paused" : "published" }
-                : service
-        )));
+    if (pageLoading) {
+        return (
+            <main className="auth-demo-page">
+                <div className="auth-demo-shell">
+                    <div className="auth-demo-card">
+                        <span className="section-eyebrow">Conecta Local</span>
+                        <h2>Conectando ao cadastro...</h2>
+                        <p>Carregando a planilha e verificando sua sessão.</p>
+                    </div>
+                </div>
+            </main>
+        );
     }
 
-    const isRegister = mode === "register";
-    const isRecovery = mode === "recovery";
-    const isConfirm = mode === "confirm";
-
-    if (screen === "dashboard" && currentUser) {
+    if (currentUser) {
         return (
             <main className="demo-dashboard-page">
                 <header className="demo-dashboard-header">
@@ -312,8 +326,8 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                         <span className="brand-name">Conecta <strong>Local</strong></span>
                     </a>
                     <div className="demo-dashboard-header-actions">
-                        <span className="demo-mode-pill"><span /> Demonstração</span>
-                        <button className="demo-logout-button" type="button" onClick={logout}>
+                        <span className="demo-mode-pill"><span /> Dados salvos na planilha</span>
+                        <button className="demo-logout-button" type="button" onClick={logout} disabled={busy}>
                             <LogOut size={16} aria-hidden="true" /> Sair
                         </button>
                     </div>
@@ -324,26 +338,28 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                         <div>
                             <span className="section-eyebrow">Área do profissional</span>
                             <h1>Olá, {currentUser.publicName}!</h1>
-                            <p>Este é o seu espaço de demonstração para organizar seu perfil e seus serviços.</p>
+                            <p>Gerencie seu perfil e os serviços cadastrados no Conecta Local.</p>
                         </div>
                         <div className="demo-profile-avatar" aria-hidden="true"><UserRound size={30} /></div>
                     </div>
 
-                    <div className="demo-dashboard-notice" role="note">
-                        <Info size={18} aria-hidden="true" />
-                        <p><strong>Ambiente acadêmico:</strong> as alterações ficam somente na memória desta página. Nenhum dado é enviado ou salvo em um banco.</p>
-                    </div>
+                    {notice && (
+                        <div className="demo-dashboard-notice" role="status">
+                            <Info size={18} aria-hidden="true" />
+                            <p><strong>{notice.title}:</strong> {notice.message}</p>
+                        </div>
+                    )}
 
                     <section className="demo-dashboard-stats" aria-label="Resumo dos serviços">
                         <article className="demo-stat-card">
                             <span>Serviços cadastrados</span>
                             <strong>{services.length}</strong>
-                            <small>Exemplos desta demonstração</small>
+                            <small>Registros da sua conta</small>
                         </article>
                         <article className="demo-stat-card">
                             <span>Publicados</span>
                             <strong>{activeServices}</strong>
-                            <small>Visíveis no perfil simulado</small>
+                            <small>Visíveis na página pública</small>
                         </article>
                         <article className="demo-stat-card">
                             <span>Em pausa</span>
@@ -352,36 +368,23 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                         </article>
                     </section>
 
-                    <div className="demo-dashboard-grid">
-                        <section className="demo-panel demo-profile-panel">
-                            <div className="demo-panel-heading">
-                                <div>
-                                    <span className="section-eyebrow">Seu perfil</span>
-                                    <h2>Informações profissionais</h2>
-                                </div>
-                                <span className="demo-status-label">Ativo na demonstração</span>
+                    <section className="demo-panel demo-profile-panel">
+                        <div className="demo-panel-heading">
+                            <div>
+                                <span className="section-eyebrow">Seu perfil</span>
+                                <h2>Informações profissionais</h2>
                             </div>
-                            <div className="demo-profile-details">
-                                <div><span>Nome público</span><strong>{currentUser.publicName}</strong></div>
-                                <div><span>Nome completo</span><strong>{currentUser.fullName}</strong></div>
-                                <div><span>E-mail fictício</span><strong>{currentUser.email}</strong></div>
-                                <div><span>Localidade</span><strong>{currentUser.city}</strong></div>
-                            </div>
-                            <p className="demo-profile-description">{currentUser.description}</p>
-                        </section>
-
-                        <section className="demo-panel demo-shortcuts-panel">
-                            <span className="section-eyebrow">Próximos passos</span>
-                            <h2>Deixe seu perfil pronto</h2>
-                            <p>Adicione serviços claros, descreva o que você faz e mantenha as informações de contato atualizadas.</p>
-                            <button className="demo-shortcut-link" type="button" onClick={() => setShowServiceForm(true)}>
-                                <Plus size={17} aria-hidden="true" /> Adicionar serviço
-                            </button>
-                            <a className="demo-shortcut-link demo-shortcut-link--secondary" href="/">
-                                <ArrowLeft size={17} aria-hidden="true" /> Voltar à página pública
-                            </a>
-                        </section>
-                    </div>
+                            <span className="demo-status-label">Conta ativa</span>
+                        </div>
+                        <div className="demo-profile-details">
+                            <div><span>Nome público</span><strong>{currentUser.publicName}</strong></div>
+                            <div><span>Nome completo</span><strong>{currentUser.fullName}</strong></div>
+                            <div><span>E-mail</span><strong>{currentUser.email}</strong></div>
+                            <div><span>WhatsApp</span><strong>{currentUser.whatsapp}</strong></div>
+                            <div><span>Localidade</span><strong>{catalog.cities.find((city) => city.id === currentUser.cityId)?.name || currentUser.cityId}</strong></div>
+                        </div>
+                        <p className="demo-profile-description">{currentUser.presentation}</p>
+                    </section>
 
                     <section className="demo-panel demo-services-panel">
                         <div className="demo-panel-heading">
@@ -396,62 +399,68 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                         </div>
 
                         {showServiceForm && (
-                            <form className="demo-new-service-form" onSubmit={addService}>
+                            <form className="demo-new-service-form" onSubmit={createService}>
                                 <div className="demo-new-service-fields">
                                     <label>
                                         Nome do serviço
-                                        <Input value={newService.title} onChange={(event) => setNewService((current) => ({ ...current, title: event.target.value }))} placeholder="Ex.: Instalação de chuveiro" maxLength={80} required />
+                                        <Input value={newService.title} onChange={(event) => setNewService((current) => ({ ...current, title: event.target.value }))} placeholder="Ex.: Instalação de chuveiro" maxLength={80} minLength={3} required />
                                     </label>
                                     <label>
                                         Categoria
-                                        <select value={newService.category} onChange={(event) => setNewService((current) => ({ ...current, category: event.target.value }))}>
-                                            <option>Reformas</option>
-                                            <option>Elétrica</option>
-                                            <option>Hidráulica</option>
-                                            <option>Pintura</option>
-                                            <option>Limpeza</option>
-                                            <option>Jardinagem</option>
+                                        <select value={newService.categoryId} onChange={(event) => setNewService((current) => ({ ...current, categoryId: event.target.value }))} required>
+                                            {catalog.categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
                                         </select>
                                     </label>
                                 </div>
                                 <label>
                                     Descrição
-                                    <textarea value={newService.description} onChange={(event) => setNewService((current) => ({ ...current, description: event.target.value }))} placeholder="Descreva o serviço oferecido." maxLength={300} rows={3} required />
+                                    <textarea value={newService.description} onChange={(event) => setNewService((current) => ({ ...current, description: event.target.value }))} placeholder="Descreva o serviço oferecido." maxLength={500} minLength={10} rows={3} required />
                                 </label>
-                                <Button type="submit"><Check size={16} aria-hidden="true" /> Adicionar à demonstração</Button>
+                                <Button type="submit" disabled={busy}><Check size={16} aria-hidden="true" /> {busy ? "Salvando..." : "Salvar na planilha"}</Button>
                             </form>
                         )}
 
                         <div className="demo-service-list">
-                            {services.map((service) => (
+                            {services.length ? services.map((service) => (
                                 <article className="demo-service-item" key={service.id}>
                                     <div className="demo-service-icon"><Wrench size={19} aria-hidden="true" /></div>
                                     <div className="demo-service-copy">
                                         <div className="demo-service-title-row">
                                             <h3>{service.title}</h3>
                                             <span className={service.status === "published" ? "demo-service-status is-published" : "demo-service-status is-paused"}>
-                                                {service.status === "published" ? "Publicado" : "Em pausa"}
+                                                {formatStatus(service.status)}
                                             </span>
                                         </div>
                                         <span className="demo-service-category">{service.category}</span>
                                         <p>{service.description}</p>
                                     </div>
-                                    <Button type="button" variant="secondary" size="sm" onClick={() => toggleService(service.id)}>
+                                    <Button type="button" variant="secondary" size="sm" disabled={busy} onClick={() => toggleService(service)}>
                                         {service.status === "published" ? "Pausar" : "Publicar"}
                                     </Button>
                                 </article>
-                            ))}
+                            )) : (
+                                <div className="empty-results">
+                                    <h3>Você ainda não cadastrou serviços</h3>
+                                    <p>Adicione seu primeiro serviço para começar a aparecer na vitrine pública.</p>
+                                </div>
+                            )}
+                        </div>
+                        <div className="demo-services-refresh">
+                            <button type="button" onClick={refreshServices} disabled={busy}>Atualizar lista</button>
                         </div>
                     </section>
 
                     <footer className="demo-dashboard-footer">
                         <span>Conecta Local</span>
-                        <span>Protótipo acadêmico · Dados fictícios · Sem persistência</span>
+                        <span>Protótipo acadêmico · Dados fictícios · Google Sheets</span>
                     </footer>
                 </div>
             </main>
         );
     }
+
+    const isRegister = mode === "register";
+    const isVerify = mode === "verify";
 
     return (
         <main className="auth-demo-page">
@@ -469,35 +478,33 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                         </a>
                         <span className="auth-demo-eyebrow">Área do profissional</span>
                         <h1 id="auth-demo-heading">
-                            {isRecovery ? "Vamos recuperar seu acesso." : isConfirm ? "Só falta confirmar." : isRegister ? "Seu próximo passo começa aqui." : "Bom ter você de volta."}
+                            {isVerify ? "Confirme seu cadastro." : isRegister ? "Seu próximo passo começa aqui." : "Bom ter você de volta."}
                         </h1>
                         <p>
-                            {isRecovery
-                                ? "Simule a recuperação de acesso com um código demonstrativo exibido nesta tela."
-                                : isConfirm
-                                    ? "Confirme o cadastro fictício para acessar a área demonstrativa do profissional."
-                                    : isRegister
-                                        ? "Crie um perfil fictício e explore a experiência do profissional no Conecta Local."
-                                        : "Acesse a área demonstrativa e conheça as ferramentas preparadas para profissionais."}
+                            {isVerify
+                                ? "Ative sua conta demonstrativa para acessar a área profissional."
+                                : isRegister
+                                    ? "Cadastre seu perfil e comece a apresentar seus serviços na plataforma."
+                                    : "Entre na sua conta e gerencie o perfil e os serviços cadastrados."}
                         </p>
                         <div className="auth-demo-benefit">
                             <ShieldCheck size={20} aria-hidden="true" />
-                            <span>Projeto acadêmico com dados exclusivamente fictícios.</span>
+                            <span>Projeto acadêmico com dados de demonstração.</span>
                         </div>
                     </section>
 
-                    <section className="auth-demo-card" aria-label={isRegister ? "Cadastro demonstrativo" : isRecovery ? "Recuperação demonstrativa" : isConfirm ? "Confirmação demonstrativa" : "Login demonstrativo"}>
+                    <section className="auth-demo-card" aria-label={isRegister ? "Cadastro profissional" : isVerify ? "Confirmação de e-mail" : "Login profissional"}>
                         <div className="auth-demo-card-heading">
                             <span className="auth-demo-icon"><LockKeyhole size={20} aria-hidden="true" /></span>
                             <div>
-                                <span className="section-eyebrow">Ambiente demonstrativo</span>
-                                <h2>{isRecovery ? "Recuperar acesso" : isConfirm ? "Confirmar cadastro" : isRegister ? "Criar conta profissional" : "Entrar na conta"}</h2>
+                                <span className="section-eyebrow">Conecta Local</span>
+                                <h2>{isVerify ? "Confirmar cadastro" : isRegister ? "Criar conta profissional" : "Entrar na conta"}</h2>
                             </div>
                         </div>
 
                         <div className="auth-demo-warning" role="note">
                             <Info size={17} aria-hidden="true" />
-                            <p><strong>Use somente dados fictícios.</strong> Esta demonstração funciona no navegador, não envia dados ao servidor e não persiste informações após recarregar a página.</p>
+                            <p><strong>Protótipo acadêmico:</strong> use dados fictícios. O cadastro, o hash de senha, a sessão e os serviços são gravados na planilha do projeto. O código de confirmação é mostrado na tela; nenhum e-mail é enviado.</p>
                         </div>
 
                         {notice && (
@@ -507,125 +514,90 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                             </div>
                         )}
 
-                        {isConfirm ? (
-                            <form className="auth-demo-form" onSubmit={handleConfirmRegistration}>
+                        {isVerify ? (
+                            <form className="auth-demo-form" onSubmit={submitVerification}>
                                 <div className="demo-code-card">
-                                    <span>Código fictício de confirmação</span>
-                                    <strong>{confirmationCode}</strong>
-                                    <small>Na aplicação real, este código seria enviado ao e-mail informado.</small>
+                                    <span>Código demonstrativo de confirmação</span>
+                                    <strong>{verificationCode || "------"}</strong>
+                                    <small>Conta: {pendingEmail}. Válido por 10 minutos e até cinco tentativas.</small>
                                 </div>
-                                <label htmlFor="confirmation-code">Digite o código de 6 números</label>
-                                <Input id="confirmation-code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={codeInput} onChange={(event) => setCodeInput(event.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="000000" required />
-                                <Button type="submit" className="auth-demo-submit">Confirmar e acessar <ArrowRight size={17} aria-hidden="true" /></Button>
-                                <button className="auth-demo-text-button" type="button" onClick={() => switchMode("register")}>Voltar ao cadastro</button>
+                                <label htmlFor="verification-code">Digite os seis números</label>
+                                <Input id="verification-code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={verificationCodeInput} onChange={(event) => setVerificationCodeInput(event.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="000000" required />
+                                <Button type="submit" className="auth-demo-submit" disabled={busy}>{busy ? "Confirmando..." : "Confirmar cadastro"} <ArrowRight size={17} aria-hidden="true" /></Button>
+                                <button className="auth-demo-text-button" type="button" onClick={() => switchMode("login")}>Voltar para entrar</button>
                             </form>
-                        ) : isRecovery ? (
-                            recoveryStage === "email" ? (
-                                <form className="auth-demo-form" onSubmit={handleRecoveryRequest}>
-                                    <label htmlFor="recovery-email">E-mail da conta criada nesta sessão</label>
-                                    <div className="auth-demo-input-wrap">
-                                        <Mail size={17} aria-hidden="true" />
-                                        <Input id="recovery-email" name="email" type="email" autoComplete="off" placeholder="voce@exemplo.invalid" value={recoveryEmail} onChange={(event) => setRecoveryEmail(event.target.value)} required />
-                                    </div>
-                                    <Button type="submit" className="auth-demo-submit">Gerar código demonstrativo <ArrowRight size={17} aria-hidden="true" /></Button>
-                                    <button className="auth-demo-text-button" type="button" onClick={() => switchMode("login")}>Voltar para entrar</button>
-                                </form>
-                            ) : recoveryStage === "code" ? (
-                                <form className="auth-demo-form" onSubmit={handleRecoveryCode}>
-                                    <div className="demo-code-card">
-                                        <span>Código fictício de recuperação</span>
-                                        <strong>{recoveryCode}</strong>
-                                        <small>Nenhuma mensagem foi enviada por e-mail.</small>
-                                    </div>
-                                    <label htmlFor="recovery-code">Digite o código de 6 números</label>
-                                    <Input id="recovery-code" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={recoveryCodeInput} onChange={(event) => setRecoveryCodeInput(event.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="000000" required />
-                                    <Button type="submit" className="auth-demo-submit">Validar código <ArrowRight size={17} aria-hidden="true" /></Button>
-                                    <button className="auth-demo-text-button" type="button" onClick={() => switchMode("login")}>Cancelar</button>
-                                </form>
-                            ) : (
-                                <form className="auth-demo-form" onSubmit={handlePasswordReset}>
-                                    <label htmlFor="recovery-new-password">Nova senha fictícia</label>
-                                    <Input id="recovery-new-password" type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} autoComplete="new-password" placeholder="Mínimo de 15 caracteres" required />
-                                    <Button type="submit" className="auth-demo-submit">Atualizar senha <ArrowRight size={17} aria-hidden="true" /></Button>
-                                    <button className="auth-demo-text-button" type="button" onClick={() => switchMode("login")}>Cancelar</button>
-                                </form>
-                            )
                         ) : isRegister ? (
-                            <form className="auth-demo-form" onSubmit={handleRegister}>
+                            <form className="auth-demo-form" onSubmit={submitRegistration}>
                                 <div className="auth-demo-fields-grid">
                                     <div className="auth-demo-field">
-                                        <label htmlFor="fullName">Nome completo (uso interno)</label>
-                                        <Input id="fullName" name="fullName" autoComplete="off" placeholder="Ex.: Alex Silva" value={form.fullName} onChange={updateField} minLength={2} maxLength={120} required />
+                                        <label htmlFor="fullName">Nome completo</label>
+                                        <Input id="fullName" name="fullName" autoComplete="off" placeholder="Ex.: Alex Silva" value={registerForm.fullName} onChange={updateRegisterField} minLength={2} maxLength={120} required />
                                     </div>
                                     <div className="auth-demo-field">
                                         <label htmlFor="publicName">Nome público</label>
-                                        <Input id="publicName" name="publicName" autoComplete="off" placeholder="Ex.: Alex Reformas" value={form.publicName} onChange={updateField} minLength={2} maxLength={80} required />
+                                        <Input id="publicName" name="publicName" autoComplete="off" placeholder="Ex.: Alex Reformas" value={registerForm.publicName} onChange={updateRegisterField} minLength={2} maxLength={80} required />
                                     </div>
                                 </div>
                                 <div className="auth-demo-field">
                                     <label htmlFor="register-email">E-mail fictício</label>
                                     <div className="auth-demo-input-wrap">
                                         <Mail size={17} aria-hidden="true" />
-                                        <Input id="register-email" name="email" type="email" autoComplete="off" placeholder="voce@exemplo.invalid" value={form.email} onChange={updateField} maxLength={254} required />
+                                        <Input id="register-email" name="email" type="email" autoComplete="off" placeholder="voce@exemplo.invalid" value={registerForm.email} onChange={updateRegisterField} maxLength={254} required />
                                     </div>
+                                </div>
+                                <div className="auth-demo-field">
+                                    <label htmlFor="register-whatsapp">WhatsApp com DDD</label>
+                                    <Input id="register-whatsapp" name="whatsapp" type="tel" autoComplete="off" placeholder="Ex.: (33) 99999-9999" value={registerForm.whatsapp} onChange={updateRegisterField} maxLength={20} required />
+                                </div>
+                                <div className="auth-demo-field">
+                                    <label htmlFor="register-presentation">Apresentação profissional</label>
+                                    <textarea id="register-presentation" name="presentation" className="demo-auth-textarea" rows={3} minLength={10} maxLength={500} placeholder="Conte um pouco sobre os serviços que você oferece." value={registerForm.presentation} onChange={updateRegisterField} required />
                                 </div>
                                 <div className="auth-demo-fields-grid">
                                     <div className="auth-demo-field">
-                                        <label htmlFor="register-password">Senha fictícia</label>
-                                        <div className="auth-demo-input-wrap auth-demo-password-wrap">
-                                            <Input id="register-password" name="password" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="Mínimo de 15 caracteres" value={form.password} onChange={updateField} required />
-                                            <button className="auth-demo-password-toggle" type="button" aria-label={showPassword ? "Ocultar senha" : "Exibir senha"} onClick={() => setShowPassword((value) => !value)}>
-                                                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-                                            </button>
-                                        </div>
+                                        <label htmlFor="register-city">Cidade principal</label>
+                                        <select id="register-city" name="cityId" value={registerForm.cityId} onChange={updateRegisterField} required>
+                                            {catalog.cities.map((city) => <option key={city.id} value={city.id}>{city.name} - {city.state}</option>)}
+                                        </select>
                                     </div>
                                     <div className="auth-demo-field">
-                                        <label htmlFor="passwordConfirmation">Confirmar senha</label>
-                                        <Input id="passwordConfirmation" name="passwordConfirmation" type="password" autoComplete="new-password" placeholder="Repita a senha" value={form.passwordConfirmation} onChange={updateField} required />
+                                        <label htmlFor="register-password">Senha (mínimo 15 caracteres)</label>
+                                        <Input id="register-password" name="password" type="password" autoComplete="new-password" placeholder="Crie uma senha fictícia" value={registerForm.password} onChange={updateRegisterField} required />
                                     </div>
                                 </div>
-                                <p className="auth-demo-hint">A senha é usada somente para simular o fluxo nesta página. Não utilize uma senha pessoal.</p>
-                                <Button type="submit" className="auth-demo-submit">Continuar cadastro <ArrowRight size={17} aria-hidden="true" /></Button>
+                                <div className="auth-demo-field">
+                                    <label htmlFor="passwordConfirmation">Confirmar senha</label>
+                                    <Input id="passwordConfirmation" name="passwordConfirmation" type="password" autoComplete="new-password" placeholder="Repita a senha" value={registerForm.passwordConfirmation} onChange={updateRegisterField} required />
+                                </div>
+                                <p className="auth-demo-hint">Senha processada com Argon2id no servidor. Nunca use sua senha pessoal neste protótipo.</p>
+                                <Button type="submit" className="auth-demo-submit" disabled={busy || !catalogReady || !catalog.cities.length}>
+                                    {busy ? "Gravando cadastro..." : "Cadastrar e salvar na planilha"} <ArrowRight size={17} aria-hidden="true" />
+                                </Button>
                                 <p className="auth-demo-switch">Já tem uma conta? <button className="auth-demo-text-button" type="button" onClick={() => switchMode("login")}>Entrar</button></p>
                             </form>
                         ) : (
-                            <form className="auth-demo-form" onSubmit={handleLogin}>
+                            <form className="auth-demo-form" onSubmit={submitLogin}>
                                 <div className="auth-demo-field">
-                                    <label htmlFor="login-email">E-mail fictício</label>
+                                    <label htmlFor="login-email">E-mail</label>
                                     <div className="auth-demo-input-wrap">
                                         <Mail size={17} aria-hidden="true" />
-                                        <Input id="login-email" name="email" type="email" autoComplete="off" placeholder="voce@exemplo.invalid" value={form.email} onChange={updateField} maxLength={254} required />
+                                        <Input id="login-email" name="email" type="email" autoComplete="username" placeholder="voce@exemplo.invalid" value={loginForm.email} onChange={updateLoginField} maxLength={254} required />
                                     </div>
                                 </div>
                                 <div className="auth-demo-field">
-                                    <div className="auth-demo-label-row">
-                                        <label htmlFor="login-password">Senha fictícia</label>
-                                        <button className="auth-demo-text-button" type="button" onClick={() => switchMode("recovery")}>Esqueceu a senha?</button>
-                                    </div>
-                                    <div className="auth-demo-input-wrap auth-demo-password-wrap">
-                                        <Input id="login-password" name="password" type={showPassword ? "text" : "password"} autoComplete="off" placeholder="Digite a senha fictícia" value={form.password} onChange={updateField} required />
-                                        <button className="auth-demo-password-toggle" type="button" aria-label={showPassword ? "Ocultar senha" : "Exibir senha"} onClick={() => setShowPassword((value) => !value)}>
-                                            {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-                                        </button>
-                                    </div>
+                                    <label htmlFor="login-password">Senha</label>
+                                    <Input id="login-password" name="password" type="password" autoComplete="current-password" placeholder="Digite sua senha fictícia" value={loginForm.password} onChange={updateLoginField} required />
                                 </div>
-                                <Button type="submit" className="auth-demo-submit">Entrar na demonstração <ArrowRight size={17} aria-hidden="true" /></Button>
+                                <Button type="submit" className="auth-demo-submit" disabled={busy}>
+                                    {busy ? "Entrando..." : "Entrar na área profissional"} <ArrowRight size={17} aria-hidden="true" />
+                                </Button>
                                 <p className="auth-demo-switch">Ainda não tem conta? <button className="auth-demo-text-button" type="button" onClick={() => switchMode("register")}>Criar conta</button></p>
-
-                                <div className="demo-credentials-card">
-                                    <div>
-                                        <span>Acesso rápido para apresentação</span>
-                                        <strong>{DEMO_ACCOUNT.email}</strong>
-                                        <small>Senha fictícia: {DEMO_ACCOUNT.password}</small>
-                                    </div>
-                                    <button type="button" onClick={handleDemoAccess}>Entrar sem digitar</button>
-                                </div>
                             </form>
                         )}
 
                         <div className="auth-demo-footer">
                             <span>Conecta Local</span>
-                            <span>Protótipo acadêmico · Dados fictícios · Sem persistência</span>
+                            <span>Protótipo acadêmico · Google Sheets</span>
                         </div>
                     </section>
                 </div>
