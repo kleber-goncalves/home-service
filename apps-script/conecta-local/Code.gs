@@ -825,7 +825,12 @@ function appNormalizeEmail_(value) {
 function appNormalizePhone_(value) {
     if (typeof value !== "string") throw appFault_("INVALID_PHONE", "Informe um WhatsApp válido.");
     var digits = value.replace(/\D/g, "");
-    if (digits.length < 10 || digits.length > 13) throw appFault_("INVALID_PHONE", "Informe um WhatsApp com DDD e número.");
+    if (digits.length === 10 || digits.length === 11) {
+        digits = "55" + digits;
+    }
+    if (!/^55\d{10,11}$/.test(digits)) {
+        throw appFault_("INVALID_PHONE", "Informe um WhatsApp brasileiro com DDD e número.");
+    }
     return digits;
 }
 
