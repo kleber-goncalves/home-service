@@ -441,6 +441,9 @@ export function createAppHandler({
                 if (output.ok && action === "auth.me") {
                     output.data = { ...output.data, csrfToken: deriveCsrfToken(sessionToken, secret) };
                 }
+                if (output.ok && protectedActions.has(action) && action !== "auth.logout") {
+                    cookieToSet = buildSessionCookie(sessionToken);
+                }
                 if (action === "auth.logout") cookieToSet = clearSessionCookie();
             }
         } catch (error) {
