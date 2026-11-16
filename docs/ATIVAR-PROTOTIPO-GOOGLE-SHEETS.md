@@ -70,11 +70,13 @@ No projeto Vercel `home-service`, vá a **Settings → Environment Variables**. 
 | `CONECTA_LOCAL_HMAC_SECRET` | o mesmo segredo gerado na etapa 2 |
 | `CONECTA_LOCAL_ALLOWED_ORIGIN` | origem HTTPS exata do Preview desta branch, sem barra final nem caminho |
 
-A origem deve ser somente o protocolo e host, por exemplo:
+A origem ativa atual atribuída pela Vercel à branch é:
 
 ```text
-https://nome-do-preview.vercel.app
+https://home-service-git-feat-protot-d879cc-kleber-goncalves-s-projects.vercel.app
 ```
+
+Use exatamente essa origem como valor de `CONECTA_LOCAL_ALLOWED_ORIGIN` (sem barra final). Se a Vercel trocar o alias da branch, atualize a variável para o novo host. A origem deve ser somente protocolo e host, nunca uma URL com caminho.
 
 Não coloque essas variáveis no frontend, não use prefixo `VITE_` e não configure esses valores em Production.
 
