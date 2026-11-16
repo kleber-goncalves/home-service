@@ -300,9 +300,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 67610602163d5abb10936b8adc34a4106c9880ef
-- **Data do commit:** 2026-11-16T15:50:12-03:00
-- **Mensagem do commit:** fix(home): selecionar imagem ilustrativa por categoria
+- **Commit de referência:** 002664d92e854b2e7f95646384e99d6dca79d185
+- **Data do commit:** 2026-11-16T15:50:56-03:00
+- **Mensagem do commit:** security(gateway): restringir prototipo ao ambiente Preview
 - **Branch desta execução:** feat/prototipo-demo-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -399,13 +399,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 002664d | 2026-11-16 | security(gateway): restringir prototipo ao ambiente Preview |
+| de3f768 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
+| b2ca007 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 6761060 | 2026-11-16 | fix(home): selecionar imagem ilustrativa por categoria |
 | 684f235 | 2026-11-16 | fix(contact): normalizar telefone para link WhatsApp internacional |
 | 6f4ebc8 | 2026-11-16 | fix(auth): validar codigo digitado e aguardar confirmacao |
 | be8525d | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | b11af56 | 2026-11-16 | fix(frontend): confirmar sessao antes de abrir painel e sair |
-| 11f84be | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| c08a7fb | 2026-11-16 | fix(gateway): remover chave duplicada de expiracao |
-| a77721d | 2026-11-16 | docs(ai-context): registrar backend de prototipo com Sheets |
 
 <!-- END AUTO-GENERATED SECTION -->
