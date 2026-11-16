@@ -300,9 +300,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 4d07af72c319165b392c58377b1e2dd1f95cdea9
-- **Data do commit:** 2026-11-16T15:39:25-03:00
-- **Mensagem do commit:** fix(frontend): separar codigo exibido do codigo digitado
+- **Commit de referência:** 01c35b5f5a3da515f56cf55ebda8d1e9e61177ab
+- **Data do commit:** 2026-11-16T15:39:28-03:00
+- **Mensagem do commit:** fix(session): renovar cookie durante atividade
 - **Branch desta execução:** feat/prototipo-demo-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -399,6 +399,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 01c35b5 | 2026-11-16 | fix(session): renovar cookie durante atividade |
 | 4d07af7 | 2026-11-16 | fix(frontend): separar codigo exibido do codigo digitado |
 | 3eaf045 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 7986291 | 2026-11-16 | feat(frontend): conectar cadastro login e servicos ao Sheets |
@@ -406,6 +407,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | c4c9870 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 99fcbfb | 2026-11-16 | build: incluir hash-wasm nas dependencias de producao |
 | 0633535 | 2026-11-16 | build: disponibilizar hash-wasm no runtime da Function |
-| 427f40e | 2026-11-16 | fix(apps-script): inicializar catalogo antes do cadastro |
 
 <!-- END AUTO-GENERATED SECTION -->
