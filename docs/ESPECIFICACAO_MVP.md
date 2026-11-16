@@ -20,16 +20,18 @@ O MVP não será um marketplace transacional: não intermediará pagamentos, con
 
 A branch `dev` contém uma homepage demonstrativa em React + Vite. A busca e os filtros atuais funcionam somente sobre dados ilustrativos no frontend; o campo de cidade ainda não realiza pesquisa geográfica.
 
-Ainda não estão implementados ou integrados:
-- cadastro e autenticação de profissionais;
-- backend/API operacional;
+Ainda não estão implementados ou integrados em backend:
+- cadastro e autenticação reais de profissionais;
+- API de negócio operacional;
 - Google Sheets como armazenamento operacional;
 - Google Drive para uploads reais;
 - pesquisa remota;
 - perfis e serviços reais;
-- painel do profissional ou painel administrativo;
+- painel profissional ou administrativo conectado aos dados;
 - denúncias e moderação operacionais;
-- envio de e-mails.
+- envio real de e-mails.
+
+A branch `feat/prototipo-demo-profissional` contém um fluxo de interface local para apresentação: cadastro fictício, confirmação por código exibido na tela, login, área profissional, inclusão/pausa/publicação de serviços em memória, recuperação simulada e logout visual. Não chama API, não usa a POC-04, não persiste dados e perde o estado ao recarregar a página. Essa simulação não altera o bloqueio de autenticação real.
 
 A arquitetura planejada é React/Vite → Vercel Function (gateway HTTP) → Google Apps Script (backend de negócio) → Google Sheets/Drive. A Function ainda não existe no repositório; a arquitetura e principalmente a autenticação exigem provas de conceito técnicas antes da implementação.
 
