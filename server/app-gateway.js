@@ -261,6 +261,10 @@ export function createAppHandler({
             return fail(null, "METHOD_NOT_ALLOWED", "Esta rota aceita somente POST.", 405);
         }
 
+        if (env.VERCEL_ENV !== "preview") {
+            return fail(null, "APP_DEMO_DISABLED", "O protótipo está habilitado somente em Preview.", 404);
+        }
+
         const allowedOrigin = parseAllowedOrigin(env.CONECTA_LOCAL_ALLOWED_ORIGIN);
         if (!allowedOrigin) {
             return fail(null, "APP_ORIGIN_NOT_CONFIGURED", "A origem permitida não está configurada.", 503);
