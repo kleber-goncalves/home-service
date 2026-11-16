@@ -300,12 +300,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 76fea0dc3f920b9d8c8a3e9a602b5bf16f4ed729
-- **Data do commit:** 2026-11-16T16:54:25-03:00
-- **Mensagem do commit:** feat(loo): integrar objetos ao gateway
+- **Commit de referência:** 64533dbeac22821a3f5ec735d2f3ad483041576f
+- **Data do commit:** 2026-11-16T16:54:43-03:00
+- **Mensagem do commit:** test(loo): adicionar comando de validacao das classes
 - **Branch desta execução:** feat/loo-orientacao-objetos
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 9
+- **Scripts npm:** 10
 - **Dependências de runtime:** 6
 - **Dependências de desenvolvimento:** 9
 - **Workflows:** 2
@@ -324,6 +324,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run test:poc01 | node --test tests/poc01/backend.test.js |
 | npm run test:poc02 | node --test tests/poc02/backend.test.js tests/poc02/apps-script.test.js |
 | npm run test:poc03 | node --test tests/poc03/apps-script.test.js |
+| npm run test:loo | node --test tests/loo/domain-entities.test.js |
 
 ### Variáveis declaradas no .env.example
 
@@ -399,13 +400,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 64533db | 2026-11-16 | test(loo): adicionar comando de validacao das classes |
+| 21f3494 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 76fea0d | 2026-11-16 | feat(loo): integrar objetos ao gateway |
 | 2884a4c | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 1414f49 | 2026-11-16 | docs(loo): documentar orientacao a objetos no backend |
 | 30334f3 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 6cf485b | 2026-11-16 | test(loo): cobrir classes e metodos de dominio |
 | a5dec4c | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| 7207388 | 2026-11-16 | feat(loo): adicionar classes de domínio |
-| f5c289c | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
