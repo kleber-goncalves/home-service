@@ -8,6 +8,7 @@ import {
 import { Buffer } from "node:buffer";
 import process from "node:process";
 import { argon2id } from "hash-wasm";
+import { Profissional, Servico } from "./domain-entities.js";
 
 const COOKIE_NAME = "__Host-conecta_local_session";
 const COOKIE_IDLE_SECONDS = 30 * 60;
@@ -337,21 +338,16 @@ export function createAppHandler({
                 const saltHex = salt.toString("hex");
                 const hash = await derivePasswordHash(normalizedPassword, saltHex);
                 const verificationCode = String(randomIntImpl(100000, 1000000));
+                const profissional = new Profissional(payload);
                 output = await callAppsScript({
                     action,
                     requestId,
-                    payload: {
-                        email: payload.email,
-                        senha_hash: hash.toString("hex"),
-                        senha_salt: saltHex,
-                        senha_algoritmo: PASSWORD_ALGORITHM,
-                        nome_completo: payload.fullName,
-                        nome_publico: payload.publicName,
-                        apresentacao: payload.presentation,
-                        id_cidade_principal: payload.cityId,
-                        whatsapp: payload.whatsapp,
+                    payload: profissional.toRegistrationPayload({
+                        passwordHash: hash.toString("hex"),
+                        passwordSalt: saltHex,
+                        passwordAlgorithm: PASSWORD_ALGORITHM,
                         verificationCode,
-                    },
+                    }),
                     appsScriptUrl,
                     secret,
                     fetchImpl,
@@ -426,6 +422,24 @@ export function createAppHandler({
                     } else {
                         forwardedPayload.tokenHash = tokenHash;
                     }
+                }
+
+                if (action === "service.create") {
+                    const service = new Servico(payload);
+                    forwardedPayload = {
+                        ...service.toCreatePayload(),
+                        tokenHash: forwardedPayload.tokenHash,
+                    };
+                } else if (action === "service.setStatus") {
+                    const service = new Servico({ serviceId: payload.serviceId });
+                    if (payload.status === "published") service.publicar();
+                    else if (payload.status === "paused") service.pausar();
+                    else service.status = payload.status;
+
+                    forwardedPayload = {
+                        ...service.toStatusPayload(),
+                        tokenHash: forwardedPayload.tokenHash,
+                    };
                 }
 
                 const appsAction = action === "auth.me" ? "session.me" : action === "auth.logout" ? "session.logout" : action;

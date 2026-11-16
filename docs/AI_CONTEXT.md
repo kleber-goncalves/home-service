@@ -2,6 +2,17 @@
 
 > Documento de continuidade do projeto. Leia antes de sugerir ou realizar alterações. Reúne propósito, decisões, arquitetura planejada, estado implementado, regras de manutenção e limitações. A seção de snapshot ao final é atualizada pelo GitHub Actions.
 
+## Atualização vigente — 2026-11-16
+
+> Esta atualização prevalece sobre os trechos históricos datados de 2026-11-14 que ainda descrevem a integração funcional como estando somente em uma branch separada ou como pendente.
+
+- O PR #15 (`feat/prototipo-demo-profissional` → `dev`) foi integrado por squash merge. A branch `dev` contém agora o protótipo funcional com cadastro, confirmação demonstrativa, login, sessão, perfil, criação/pausa/publicação de serviços e persistência no Google Sheets via Apps Script.
+- O gateway funcional está em `api/app.js` → `server/app-gateway.js`. O Apps Script correspondente está em `apps-script/conecta-local/Code.gs`. A configuração do ambiente Preview está documentada em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`.
+- O fluxo validado pelo responsável do projeto usa dados fictícios. A demonstração continua restrita ao ambiente Preview e não deve ser descrita como produto pronto para produção.
+- A POC-04 continua isolada na branch `feat/poc-04-session-cookie` e não deve ser misturada à autenticação do protótipo.
+- A atividade acadêmica de LOO está sendo implementada separadamente na branch `feat/loo-orientacao-objetos`, criada a partir de `dev`. As classes `Usuario`, `Profissional` e `Servico` ficam em `server/domain-entities.js` e são utilizadas pelo gateway Node.js. A documentação específica está em `docs/LOO_ORIENTACAO_OBJETOS.md`; os testes ficam em `tests/loo/domain-entities.test.js` e são executados por `npm run test:loo`.
+- As classes de domínio organizam atributos, métodos e montagem dos payloads no Node.js. A validação final, autenticação, autorização, persistência e auditoria continuam sob responsabilidade do Apps Script.
+
 ## 1. Instruções para a IA que assumir o projeto
 
 1. Leia este documento por inteiro antes de propor mudanças, especialmente em uma conversa nova.
@@ -300,12 +311,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 5033dbdcab64c24436e9f61c417510cd87bd17c4
-- **Data do commit:** 2026-11-16T16:35:35-03:00
-- **Mensagem do commit:** feat: adicionar protótipo funcional do Conecta Local
-- **Branch desta execução:** dev
+- **Commit de referência:** 9efc728c7deff4109f840c3e837ece841656edfc
+- **Data do commit:** 2026-11-16T16:54:46-03:00
+- **Mensagem do commit:** ci(loo): executar testes das classes no workflow
+- **Branch desta execução:** feat/loo-orientacao-objetos
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 9
+- **Scripts npm:** 10
 - **Dependências de runtime:** 6
 - **Dependências de desenvolvimento:** 9
 - **Workflows:** 2
@@ -324,6 +335,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run test:poc01 | node --test tests/poc01/backend.test.js |
 | npm run test:poc02 | node --test tests/poc02/backend.test.js tests/poc02/apps-script.test.js |
 | npm run test:poc03 | node --test tests/poc03/apps-script.test.js |
+| npm run test:loo | node --test tests/loo/domain-entities.test.js |
 
 ### Variáveis declaradas no .env.example
 
@@ -399,13 +411,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| 5033dbd | 2026-11-16 | feat: adicionar protótipo funcional do Conecta Local |
-| 42e3a0a | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| ffca51c | 2026-11-14 | docs(poc-04): adicionar matriz de cenarios e aceite |
-| 44da445 | 2026-11-14 | docs(ai-context): atualizar estado e passagem para novo chat |
-| 3eebd2b | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 894390e | 2026-11-14 | docs(poc-04): documentar plano de sessao por cookie |
-| 6e11ef3 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| ed1e9db | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
+| 9efc728 | 2026-11-16 | ci(loo): executar testes das classes no workflow |
+| 64533db | 2026-11-16 | test(loo): adicionar comando de validacao das classes |
+| 21f3494 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
+| 76fea0d | 2026-11-16 | feat(loo): integrar objetos ao gateway |
+| 2884a4c | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
+| 1414f49 | 2026-11-16 | docs(loo): documentar orientacao a objetos no backend |
+| 30334f3 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
+| 6cf485b | 2026-11-16 | test(loo): cobrir classes e metodos de dominio |
 
 <!-- END AUTO-GENERATED SECTION -->
