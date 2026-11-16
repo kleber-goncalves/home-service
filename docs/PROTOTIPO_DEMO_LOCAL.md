@@ -1,37 +1,46 @@
-# Protótipo demonstrativo local — Área do profissional
+# Área do profissional — protótipo funcional
 
-> **Status:** implementação isolada na branch `feat/prototipo-demo-profissional`.
-> **Finalidade:** apresentação acadêmica com dados fictícios.
+> **Branch:** `feat/prototipo-demo-profissional`.
 > **Acesso:** `/?auth=demo` ou `/?auth=demo&mode=register`.
+> **Persistência:** Google Sheets, depois de ativar o Apps Script conforme `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`.
 
 ## Fluxo disponível
 
-1. **Acesso rápido:** na tela de login, usar “Entrar sem digitar” para abrir o perfil sintético de Alex Silva.
-2. **Cadastro fictício:** informar nome completo, nome público, e-mail de domínio reservado para exemplos e senha fictícia com pelo menos 15 caracteres.
-3. **Confirmação:** a interface gera um código de seis dígitos e o exibe na própria tela; digitá-lo conclui a simulação.
-4. **Login:** a conta cadastrada pode ser acessada novamente enquanto a página permanecer aberta. Também existe uma conta sintética de acesso rápido.
-5. **Área profissional:** visualizar dados do perfil, consultar serviços de exemplo, adicionar serviço e alternar o estado entre publicado e em pausa.
-6. **Recuperação:** para a conta criada nessa mesma sessão da página, gerar código fictício, validá-lo e definir nova senha fictícia.
-7. **Logout:** encerra o estado visual de acesso e retorna ao formulário.
+1. Cadastro profissional com nome, nome público, e-mail, WhatsApp, apresentação, cidade e senha.
+2. O cadastro cria registros em `USUARIOS`, `PROFISSIONAIS` e `CODIGOS_VERIFICACAO`.
+3. A interface mostra o código demonstrativo de confirmação; ao confirmar, o status da conta muda para `active`.
+4. Login verifica a senha no servidor e cria uma sessão com token HttpOnly; a planilha armazena somente o hash do token.
+5. O profissional consulta seus dados e os serviços associados à conta.
+6. É possível criar um serviço e alternar o status entre `published` e `paused`; as mudanças são gravadas na aba `SERVICOS`.
+7. A homepage consulta serviços publicados e apresenta nome do profissional, categoria, cidade e contato de WhatsApp.
+8. Logout revoga a sessão no Apps Script e limpa o cookie.
 
-## Limites explícitos
+## Onde estão as partes
 
-- O fluxo roda somente no frontend e no estado React em memória.
-- Não chama Vercel Functions, Apps Script, Google Sheets ou Google Drive.
-- Não usa a POC-04 e não emite cookie de sessão.
-- Não existe autenticação, autorização, conta ou armazenamento persistente.
-- O código de confirmação/recuperação é exibido na interface; nenhum e-mail é enviado.
-- Ao recarregar ou fechar a página, cadastros e alterações simuladas são perdidos.
-- Usar exclusivamente dados fictícios. Não inserir senhas, e-mails ou dados pessoais reais.
+- `src/pages/AuthDemoPage.jsx`: telas de cadastro, confirmação, login e área profissional.
+- `src/services/app-api.js`: cliente HTTP de mesma origem.
+- `api/app.js` e `server/app-gateway.js`: Vercel Function, Argon2id, cookie, CSRF e assinatura HMAC server-to-server.
+- `apps-script/conecta-local/Code.gs`: regras, validações e persistência nas abas da planilha.
+- `src/pages/HomePage.jsx`: consulta e filtro dos serviços publicados.
 
-## Roteiro sugerido para apresentação
+## Limites desta rodada
 
-1. Na homepage, clicar em **Abrir cadastro demonstrativo**.
-2. Criar uma conta com dados fictícios e confirmar usando o código mostrado na página.
-3. Na área profissional, adicionar um serviço e pausar/publicar um dos exemplos.
-4. Sair e entrar novamente com a conta criada enquanto a mesma página estiver aberta.
-5. Mostrar também o botão de acesso rápido para explicar o perfil sintético de demonstração.
+- Usar somente dados fictícios; não cadastrar credenciais ou dados pessoais reais.
+- O código de confirmação é mostrado na interface, sem envio de e-mail.
+- Não há recuperação de senha nesta rodada.
+- Upload de imagens no Drive, edição completa do perfil e painel administrativo ficam para a próxima etapa.
+- O protótipo é acadêmico e não foi dimensionado para produção ou escala comercial.
+- A POC-04 continua separada. A sessão da aplicação usa a implementação nova desta branch, não a conta sintética da POC-04.
 
-## Separação das provas de conceito
+## Roteiro de apresentação
 
-A POC-04 de sessão sintética permanece na branch `feat/poc-04-session-cookie`, PR #14 em Draft. Ela valida um ciclo de sessão técnica para uma conta sintética fixa, mas não autentica o e-mail e a senha informados no formulário. Não conectar uma coisa à outra sem concluir a revisão técnica e implementar o backend de autenticação real.
+1. Abrir `/?auth=demo&mode=register`.
+2. Criar uma conta fictícia e confirmar usando o código exibido.
+3. Entrar com as credenciais recém-criadas.
+4. Adicionar um serviço e alterar seu estado para pausa/publicado.
+5. Sair, entrar novamente e mostrar que perfil e serviços continuam salvos.
+6. Abrir a homepage e mostrar o serviço publicado e o contato público.
+
+## Ativação necessária
+
+Antes do primeiro uso, implantar `apps-script/conecta-local/Code.gs`, vincular o ID da planilha e o segredo HMAC nas Propriedades do Script, publicar o Web App e configurar as três variáveis Preview da Vercel. Seguir o passo a passo em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`.
