@@ -52,6 +52,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
     const [registerForm, setRegisterForm] = useState(EMPTY_REGISTER);
     const [loginForm, setLoginForm] = useState({ email: "", password: "" });
     const [verificationCode, setVerificationCode] = useState("");
+    const [verificationCodeInput, setVerificationCodeInput] = useState("");
     const [pendingEmail, setPendingEmail] = useState("");
     const [csrfToken, setCsrfToken] = useState("");
     const [currentUser, setCurrentUser] = useState(null);
@@ -171,6 +172,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
             });
             setPendingEmail(registerForm.email.trim());
             setVerificationCode(String(result.verificationCode || ""));
+            setVerificationCodeInput("");
             setRegisterForm((current) => ({ ...current, password: "", passwordConfirmation: "" }));
             setMode("verify");
             setNotice({
