@@ -300,9 +300,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** d5e5303a94969ef37830fc1ad093a514400ea5c3
-- **Data do commit:** 2026-11-16T15:46:15-03:00
-- **Mensagem do commit:** docs: atualizar README para prototipo com persistencia
+- **Commit de referência:** 7a256fc9f0950ce236b73fe20a2c492d9490d942
+- **Data do commit:** 2026-11-16T15:46:20-03:00
+- **Mensagem do commit:** docs: atualizar estado do MVP com backend funcional
 - **Branch desta execução:** feat/prototipo-demo-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -399,6 +399,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 7a256fc | 2026-11-16 | docs: atualizar estado do MVP com backend funcional |
 | d5e5303 | 2026-11-16 | docs: atualizar README para prototipo com persistencia |
 | 04956ba | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 6d90e34 | 2026-11-16 | docs: orientar ativacao do prototipo com Google Sheets |
@@ -406,6 +407,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 898d3ca | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | d4bb33f | 2026-11-16 | style(frontend): incluir campos de cadastro e botoes do painel |
 | 5f638ea | 2026-11-16 | fix(session): mapear expiracao para resposta 401 |
-| e756624 | 2026-11-16 | fix(home): manter categorias de exemplo sem anuncios reais |
 
 <!-- END AUTO-GENERATED SECTION -->
