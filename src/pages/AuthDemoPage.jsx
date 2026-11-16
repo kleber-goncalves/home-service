@@ -222,11 +222,11 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                 email: loginForm.email,
                 password: loginForm.password,
             });
+            const mine = await appRequest("service.listMine", {}, result.csrfToken || "");
             setCsrfToken(result.csrfToken || "");
+            setServices(mine.services || []);
             setCurrentUser(result.user);
             setLoginForm((current) => ({ ...current, password: "" }));
-            const mine = await appRequest("service.listMine", {}, result.csrfToken || "");
-            setServices(mine.services || []);
         } catch (error) {
             setNotice({ title: "Não foi possível entrar", message: error.message, tone: "warning" });
         } finally {
@@ -235,8 +235,16 @@ export default function AuthDemoPage({ initialMode = "login" }) {
     }
 
     async function refreshServices() {
-        const result = await appRequest("service.listMine", {}, csrfToken);
-        setServices(result.services || []);
+        setBusy(true);
+        try {
+            const result = await appRequest("service.listMine", {}, csrfToken);
+            setServices(result.services || []);
+            setNotice({ title: "Lista atualizada", message: "Os serviços foram recarregados da planilha.", tone: "info" });
+        } catch (error) {
+            setNotice({ title: "Não foi possível atualizar", message: error.message, tone: "warning" });
+        } finally {
+            setBusy(false);
+        }
     }
 
     async function createService(event) {
@@ -292,15 +300,15 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         setBusy(true);
         try {
             await appRequest("auth.logout", {}, csrfToken);
-            setNotice({ title: "Sessão encerrada", message: "Você saiu da área do profissional.", tone: "info" });
-        } catch (error) {
-            setNotice({ title: "Falha ao encerrar sessão", message: error.message, tone: "warning" });
-        } finally {
             setCurrentUser(null);
             setServices([]);
             setCsrfToken("");
             setMode("login");
             setLoginForm({ email: "", password: "" });
+            setNotice({ title: "Sessão encerrada", message: "A sessão foi revogada no armazenamento.", tone: "info" });
+        } catch (error) {
+            setNotice({ title: "Falha ao encerrar sessão", message: error.message, tone: "warning" });
+        } finally {
             setBusy(false);
         }
     }
