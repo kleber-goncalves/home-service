@@ -23,6 +23,7 @@ function imageForCategory(category) {
     if (match) return match.image;
     if (/hidraul|encan/.test(normalized)) return exampleProfessionals[1].image;
     if (/limpez|diar/.test(normalized)) return exampleProfessionals[2].image;
+    if (/limpez|diar/.test(normalized)) return exampleProfessionals[2].image;
     if (/pint|reform/.test(normalized)) return exampleProfessionals[3].image;
     if (/jardin|paisag/.test(normalized)) return exampleProfessionals[4].image;
     return exampleProfessionals[0].image;
