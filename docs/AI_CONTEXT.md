@@ -300,9 +300,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 980669a024e0173e3e3652222c64af7a26945bd4
-- **Data do commit:** 2026-11-16T15:32:29-03:00
-- **Mensagem do commit:** feat(api): expor rota do protótipo funcional
+- **Commit de referência:** 02c033e54a84ba390b2653ee5fed2875ff4d8398
+- **Data do commit:** 2026-11-16T15:32:39-03:00
+- **Mensagem do commit:** feat(frontend): criar cliente do backend do protótipo
 - **Branch desta execução:** feat/prototipo-demo-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -384,6 +384,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/pages/AuthDemoPage.jsx
 - src/pages/HomePage.jsx
 - src/pages/Poc01Page.jsx
+- src/services/app-api.js
 - src/services/poc-01-api.js
 
 ### Diretórios principais de src/
@@ -398,13 +399,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 02c033e | 2026-11-16 | feat(frontend): criar cliente do backend do protótipo |
+| 57ac35c | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 980669a | 2026-11-16 | feat(api): expor rota do protótipo funcional |
 | 11eb075 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 56afe82 | 2026-11-16 | feat(gateway): conectar autenticação e serviços ao Apps Script |
 | 255c618 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 4831f80 | 2026-11-16 | feat(backend): criar Apps Script conectado à planilha do Conecta Local |
 | 5345575 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| b93fb3e | 2026-11-16 | docs: adicionar guia do fluxo demonstrativo local |
-| 992a9df | 2026-11-16 | docs: registrar fluxo e limites do prototipo local |
 
 <!-- END AUTO-GENERATED SECTION -->
