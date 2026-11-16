@@ -300,9 +300,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** d4bb33f89b99866c135dbc3bc8c63a21ceb6fe1d
-- **Data do commit:** 2026-11-16T15:43:27-03:00
-- **Mensagem do commit:** style(frontend): incluir campos de cadastro e botoes do painel
+- **Commit de referência:** 6d90e34bd4c22eaa8d6fc790448955930dae7ded
+- **Data do commit:** 2026-11-16T15:44:40-03:00
+- **Mensagem do commit:** docs: orientar ativacao do prototipo com Google Sheets
 - **Branch desta execução:** feat/prototipo-demo-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -399,13 +399,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 6d90e34 | 2026-11-16 | docs: orientar ativacao do prototipo com Google Sheets |
+| 645d1b2 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
+| 898d3ca | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | d4bb33f | 2026-11-16 | style(frontend): incluir campos de cadastro e botoes do painel |
 | 5f638ea | 2026-11-16 | fix(session): mapear expiracao para resposta 401 |
 | e756624 | 2026-11-16 | fix(home): manter categorias de exemplo sem anuncios reais |
 | eefca93 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 8569e47 | 2026-11-16 | feat(home): carregar catalogo e servicos publicados da planilha |
-| 50813bc | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| ef936d8 | 2026-11-16 | feat(home): exibir serviços reais e contato público |
-| a14703f | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
