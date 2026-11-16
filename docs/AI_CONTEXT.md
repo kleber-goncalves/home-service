@@ -300,14 +300,14 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 02c033e54a84ba390b2653ee5fed2875ff4d8398
-- **Data do commit:** 2026-11-16T15:32:39-03:00
-- **Mensagem do commit:** feat(frontend): criar cliente do backend do protótipo
+- **Commit de referência:** 427f40e406eb7a649dcc0e2a98fba7ae9f78b130
+- **Data do commit:** 2026-11-16T15:34:07-03:00
+- **Mensagem do commit:** fix(apps-script): inicializar catalogo antes do cadastro
 - **Branch desta execução:** feat/prototipo-demo-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
-- **Dependências de runtime:** 5
-- **Dependências de desenvolvimento:** 10
+- **Dependências de runtime:** 6
+- **Dependências de desenvolvimento:** 9
 - **Workflows:** 2
 - **Scripts de automação:** 3
 
@@ -337,6 +337,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | Pacote | Versão declarada |
 |---|---|
 | @tailwindcss/vite | ^4.3.5 |
+| hash-wasm | 4.13.0 |
 | lucide-react | ^1.61.0 |
 | react | ^19.3.1 |
 | react-dom | ^19.3.1 |
@@ -354,7 +355,6 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | eslint-plugin-react-hooks | ^7.1.1 |
 | eslint-plugin-react-refresh | ^0.5.7 |
 | globals | ^17.13.0 |
-| hash-wasm | 4.13.0 |
 | vite | ^8.3.6 |
 
 ### Workflows do GitHub Actions
@@ -399,13 +399,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 427f40e | 2026-11-16 | fix(apps-script): inicializar catalogo antes do cadastro |
+| e385d4e | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 02c033e | 2026-11-16 | feat(frontend): criar cliente do backend do protótipo |
 | 57ac35c | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 980669a | 2026-11-16 | feat(api): expor rota do protótipo funcional |
 | 11eb075 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 56afe82 | 2026-11-16 | feat(gateway): conectar autenticação e serviços ao Apps Script |
 | 255c618 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| 4831f80 | 2026-11-16 | feat(backend): criar Apps Script conectado à planilha do Conecta Local |
-| 5345575 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
