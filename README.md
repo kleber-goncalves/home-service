@@ -6,18 +6,18 @@ O projeto tem finalidade acadêmica e busca demonstrar investigação de problem
 
 ## Estado atual
 
-A homepage pública foi construída como experiência demonstrativa em React + Vite. Ela apresenta a identidade visual, categorias, exemplos ilustrativos de serviços, busca local de demonstração, explicação da jornada, FAQ e navegação responsiva.
+A branch `dev` mantém a homepage pública demonstrativa. A branch `feat/prototipo-demo-profissional` acrescenta o fluxo conectado à planilha: cadastro, confirmação por código, login, sessão, área profissional, criação/pausa/publicação de serviços e vitrine de serviços publicados. A integração exige concluir a configuração do Apps Script e das variáveis Preview descritas em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`.
 
-A demonstração **não** representa um marketplace operacional: não há cadastro real de profissionais, backend integrado, autenticação, planilha operacional, pesquisa geográfica ou fluxo de contratação.
+O protótipo é acadêmico e deve usar apenas dados fictícios. Na branch de entrega, os fluxos de cadastro/login e gestão de serviços foram implementados com gravação no Google Sheets via Apps Script; o funcionamento depende da implantação e configuração do backend no ambiente Preview. Não é um serviço de produção nem um marketplace transacional.
 
 - **Repositório:** https://github.com/kleber-goncalves/home-service
 - **Deploy:** https://home-service-blush.vercel.app/
 - **Frontend:** React, JavaScript, Vite 8 e Tailwind CSS 4.
 - **Componentes:** primitivas locais editáveis no padrão visual shadcn/ui, configuradas para JavaScript.
 - **Ícones:** Lucide React.
-- **Backend de negócio planejado:** Google Apps Script.
-- **Gateway HTTP:** Vercel Functions; a primeira integração está isolada na POC-01 e ainda depende da implantação de teste do Apps Script.
-- **Dados planejados:** Google Sheets.
+- **Backend de negócio:** Google Apps Script (`apps-script/conecta-local/Code.gs`) na branch de protótipo.
+- **Gateway HTTP:** Vercel Function (`api/app.js`, `server/app-gateway.js`) com HMAC, Argon2id no servidor, cookie HttpOnly e CSRF.
+- **Persistência:** Google Sheets nas abas existentes `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`.
 - **Imagens:** fotografias ilustrativas externas do Pexels; fontes e créditos abaixo.
 
 ## Executar localmente
@@ -43,6 +43,8 @@ O GitHub Actions executa essas verificações em pushes e Pull Requests direcion
 ## Documentação
 
 - [Contexto técnico para IAs e desenvolvedores](docs/AI_CONTEXT.md)
+- [Ativar o protótipo funcional com Google Sheets](docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md)
+- [Fluxo da área do profissional](docs/PROTOTIPO_DEMO_LOCAL.md)
 - [Especificação funcional do MVP (em revisão)](docs/ESPECIFICACAO_MVP.md)
 - [Modelagem lógica e física dos dados](docs/MODELAGEM_DADOS.md)
 - [Arquitetura de integração Vercel Functions + Apps Script](docs/ARQUITETURA_APPS_SCRIPT.md)

@@ -20,24 +20,26 @@ O MVP não será um marketplace transacional: não intermediará pagamentos, con
 
 A branch `dev` contém uma homepage demonstrativa em React + Vite. A busca e os filtros atuais funcionam somente sobre dados ilustrativos no frontend; o campo de cidade ainda não realiza pesquisa geográfica.
 
-Ainda não estão implementados ou integrados:
-- cadastro e autenticação de profissionais;
-- backend/API operacional;
+Ainda não estão implementados ou integrados em backend:
+- cadastro e autenticação reais de profissionais;
+- API de negócio operacional;
 - Google Sheets como armazenamento operacional;
 - Google Drive para uploads reais;
 - pesquisa remota;
 - perfis e serviços reais;
-- painel do profissional ou painel administrativo;
+- painel profissional ou administrativo conectado aos dados;
 - denúncias e moderação operacionais;
-- envio de e-mails.
+- envio real de e-mails.
 
-A arquitetura planejada é React/Vite → Vercel Function (gateway HTTP) → Google Apps Script (backend de negócio) → Google Sheets/Drive. A Function ainda não existe no repositório; a arquitetura e principalmente a autenticação exigem provas de conceito técnicas antes da implementação.
+A branch `feat/prototipo-demo-profissional` contém a primeira implementação funcional do fluxo acadêmico com persistência: cadastro em `USUARIOS`/`PROFISSIONAIS`, confirmação usando `CODIGOS_VERIFICACAO`, login com hash Argon2id processado na Vercel Function, sessão em `SESSOES`, criação/pausa/publicação em `SERVICOS` e leitura de serviços na homepage. O Apps Script está em `apps-script/conecta-local/Code.gs`; a Function fica em `api/app.js` e `server/app-gateway.js`. A ativação depende de implantar esse Apps Script e configurar as variáveis Preview documentadas em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`. A recuperação de senha, envio de e-mail, imagens/Drive e painel administrativo permanecem fora desta entrega.
+
+A arquitetura da branch de protótipo é React/Vite → Vercel Function → Google Apps Script → Google Sheets. O código de integração foi implementado na branch de entrega, mas não está operacional até a configuração do Web App Apps Script e das variáveis de Preview. A homepage pública lê os serviços publicados pela API quando o backend está ativo; os exemplos locais permanecem como fallback enquanto não houver registros publicados.
 
 ## 3. Classificação e leitura dos requisitos
 
 - **Decisão funcional aprovada:** comportamento escolhido para o MVP nesta rodada de levantamento.
 - **Validação técnica pendente:** requisito aprovado conceitualmente, mas cuja viabilidade, segurança ou comportamento ainda precisa ser comprovado.
-- **Implementado:** funcionalidade presente no código e validada. Nenhum dos fluxos de backend descritos neste documento deve ser considerado implementado por estar especificado.
+- **Implementado no código da branch de protótipo:** funcionalidade presente no código. A ativação real ainda depende da implantação do Apps Script e configuração da Vercel Preview; não confundir código versionado com integração já ativada na conta Google.
 - **Fora do MVP:** funcionalidade explicitamente excluída da primeira entrega.
 
 A especificação deve ser usada como referência para a modelagem. Não transformar uma pendência técnica em decisão por conveniência nem apresentar propostas futuras como comportamento já existente.

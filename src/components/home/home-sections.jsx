@@ -14,7 +14,19 @@ function SectionHeading({ eyebrow, title, description, align = "left" }) {
     );
 }
 
-export function CategorySection({ selectedCategory, onSelect }) {
+export function CategorySection({ selectedCategory, onSelect, catalogCategories = [] }) {
+    const displayedCategories = catalogCategories.length
+        ? catalogCategories.map((category) => ({
+            id: category.id,
+            label: category.name,
+            Icon: BriefcaseBusiness,
+        }))
+        : categories.map((category) => ({
+            id: category.id,
+            label: category.label,
+            Icon: category.icon,
+        }));
+
     return (
         <section className="category-section" id="categorias" aria-labelledby="category-title">
             <div className="category-inner mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -22,54 +34,84 @@ export function CategorySection({ selectedCategory, onSelect }) {
                     <span className="section-eyebrow">Encontre por categoria</span>
                     <h2 className="sr-only" id="category-title">Explore os tipos de serviço</h2>
                 </div>
-                <div className="category-scroller" aria-label="Filtrar exemplos por categoria">
+                <div className="category-scroller" aria-label="Filtrar serviços por categoria">
                     <button type="button" className={`category-chip ${selectedCategory === "todas" ? "is-active" : ""}`} aria-pressed={selectedCategory === "todas"} onClick={() => onSelect("todas")}>Todas</button>
-                    {categories.map(({ id, label, icon: Icon }) => (
+                    {displayedCategories.map(({ id, label, Icon }) => (
                         <button type="button" className={`category-chip ${selectedCategory === label ? "is-active" : ""}`} key={id} aria-pressed={selectedCategory === label} onClick={() => onSelect(label)}>
                             <Icon size={18} strokeWidth={1.9} aria-hidden="true" />{label}
                         </button>
                     ))}
                 </div>
-                <a className="category-more" href="#profissionais">Ver exemplos <ArrowRight size={15} aria-hidden="true" /></a>
+                <a className="category-more" href="#profissionais">Ver serviços <ArrowRight size={15} aria-hidden="true" /></a>
             </div>
         </section>
     );
 }
 
 function ProfessionalCard({ professional }) {
+    const whatsapp = String(professional.whatsapp || "").replace(/\D/g, "");
+    const contactUrl = whatsapp ? "https://wa.me/" + whatsapp : null;
+
     return (
         <Card className="professional-card">
             <div className="professional-photo">
                 <img src={professional.image} alt={professional.imageAlt} loading="lazy" />
-                <Badge variant="demo">Exemplo</Badge>
+                <Badge variant="demo">{professional.isPersisted ? "Cadastro ativo" : "Exemplo visual"}</Badge>
             </div>
             <CardContent className="professional-card-content">
                 <span className="professional-category">{professional.category}</span>
                 <h3>{professional.title}</h3>
                 <p>{professional.description}</p>
-                <div className="professional-card-meta"><MapPin size={14} aria-hidden="true" /><span>Região não informada</span></div>
-                <a className="professional-card-link" href="#como-funciona">Como funciona <ArrowRight size={15} aria-hidden="true" /></a>
+                <div className="professional-card-meta">
+                    <MapPin size={14} aria-hidden="true" />
+                    <span>{professional.city || "Região não informada"}</span>
+                </div>
+                {professional.professionalName && (
+                    <div className="professional-card-meta">
+                        <BriefcaseBusiness size={14} aria-hidden="true" />
+                        <span>{professional.professionalName}</span>
+                    </div>
+                )}
+                {contactUrl ? (
+                    <a className="professional-card-link" href={contactUrl} target="_blank" rel="noreferrer">Entrar em contato <ArrowRight size={15} aria-hidden="true" /></a>
+                ) : (
+                    <a className="professional-card-link" href="#como-funciona">Como funciona <ArrowRight size={15} aria-hidden="true" /></a>
+                )}
             </CardContent>
         </Card>
     );
 }
 
-export function ProfessionalSection({ professionals, hasSearched, query, city, selectedCategory, onClearFilters }) {
-    const hasFilters = hasSearched || selectedCategory !== "todas";
+export function ProfessionalSection({
+    professionals,
+    hasSearched,
+    query,
+    city,
+    selectedCategory,
+    onClearFilters,
+    hasRealServices = false,
+}) {
+    const hasFilters = hasSearched || selectedCategory !== "todas" || Boolean(city.trim());
     return (
         <section className="professionals-section section-space" id="profissionais" aria-labelledby="professionals-title">
             <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="professionals-topline">
-                    <SectionHeading eyebrow="Possibilidades para sua região" title="Conheça os exemplos de perfil" description="Veja como os serviços poderão ser apresentados quando os profissionais começarem a criar seus perfis." />
-                    <span className="demo-disclaimer"><span aria-hidden="true" />Conteúdo demonstrativo</span>
+                    <SectionHeading
+                        eyebrow={hasRealServices ? "Serviços cadastrados" : "Possibilidades para sua região"}
+                        title={hasRealServices ? "Serviços de profissionais da região" : "Conheça como os perfis serão apresentados"}
+                        description={hasRealServices
+                            ? "Encontre serviços cadastrados por profissionais e entre em contato diretamente."
+                            : "Estes exemplos ilustram a apresentação da plataforma. Cadastre um profissional para publicar serviços reais."}
+                    />
+                    <span className="demo-disclaimer"><span aria-hidden="true" />{hasRealServices ? "Dados da planilha" : "Conteúdo de exemplo"}</span>
                 </div>
                 {hasFilters && (
                     <div className="results-feedback" aria-live="polite">
                         <div>
-                            <strong>{professionals.length} exemplo{professionals.length === 1 ? "" : "s"} encontrado{professionals.length === 1 ? "" : "s"}</strong>
+                            <strong>{professionals.length} serviço{professionals.length === 1 ? "" : "s"} encontrado{professionals.length === 1 ? "" : "s"}</strong>
                             <span>
-                                {query.trim() ? ` Busca por “${query.trim()}”.` : selectedCategory !== "todas" ? ` Categoria: ${selectedCategory}.` : " Filtro demonstrativo aplicado."}
-                                {city.trim() ? ` Localidade informada: ${city.trim()}; o filtro geográfico ainda não está conectado.` : ""}
+                                {query.trim() ? ` Busca por “${query.trim()}”.` : selectedCategory !== "todas" ? ` Categoria: ${selectedCategory}.` : ""}
+                                {city.trim() ? ` Localidade: ${city.trim()}.` : ""}
                             </span>
                         </div>
                         <Button variant="ghost" size="sm" onClick={onClearFilters}>Limpar filtros</Button>
@@ -79,12 +121,14 @@ export function ProfessionalSection({ professionals, hasSearched, query, city, s
                     <div className="professional-grid">{professionals.map((person) => <ProfessionalCard key={person.id} professional={person} />)}</div>
                 ) : (
                     <div className="empty-results">
-                        <h3>Nenhum exemplo encontrado</h3>
-                        <p>Tente outra palavra ou escolha uma categoria diferente. A busca ainda não consulta profissionais reais.</p>
+                        <h3>Nenhum serviço encontrado</h3>
+                        <p>Tente outra palavra, cidade ou categoria.</p>
                         <Button variant="outline" onClick={onClearFilters}>Limpar busca</Button>
                     </div>
                 )}
-                <p className="photo-credit-note">As imagens são ilustrativas e não representam profissionais cadastrados no Conecta Local.</p>
+                {!hasRealServices && (
+                    <p className="photo-credit-note">As imagens e os perfis mostrados são ilustrativos; ainda não há serviços publicados na planilha.</p>
+                )}
             </div>
         </section>
     );

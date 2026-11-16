@@ -97,17 +97,17 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. 
 - O workflow de sincronização automática do AI Context e o workflow de validação foram executados com sucesso após a integração da homepage, conforme os registros consultados em 2026-11-09.
 - `main` permanece fora do escopo desta etapa; `dev` é a linha de integração do trabalho em andamento.
 - O arquivo Google Sheets estrutural foi criado pelo responsável pelo projeto com as 12 abas e os 102 cabeçalhos aprovados. A exportação XLSX foi inspecionada e a conferência manual de proteções e compartilhamento restrito foi confirmada pelo responsável.
-- A planilha permanece uma estrutura inicial vazia, ainda sem uso como armazenamento operacional integrado.
+- A planilha estrutural tem as 12 abas e 102 cabeçalhos aprovados. `dev` ainda não grava nela; a branch `feat/prototipo-demo-profissional` contém um Apps Script específico para persistir usuários, profissionais, sessões, códigos, serviços e auditoria após sua implantação/configuração.
 - A POC-01 de comunicação React → Vercel Function → Apps Script foi integrada à branch `dev` pelo PR #10 em 2026-11-11 e validada manualmente em Preview: HTTP 200 (eco), 422 (erro lógico Apps Script), 502 (resposta upstream inválida), 400 (JSON inválido no navegador) e 405 (método não permitido). O merge commit foi `837f7c6172764ee27ac835c81e1224640d78478d`; o registro está em `docs/POC_01_COMUNICACAO.md`.
 - A POC-02 de assinatura HMAC-SHA-256 e proteção contra replay foi integrada à `dev` pelo PR #11 em 2026-11-11, após cinco cenários no Preview, cinco testes diretos no Apps Script isolado e um teste concorrente em que somente uma das duas chamadas idênticas foi aceita. Os resultados estão em `docs/POC_02_ASSINATURA_GATEWAY.md`.
 - **PR #12 — POC-03:** merge commit `465a38be2e71604bf7b44a618221b140e5fafac5`, integrado em 2026-11-14. PBKDF2 via Utilities foi reprovado; Argon2id com `hash-wasm@4.13.0` permanece candidato experimental (perfil `m=19456 KiB,t=2,p=1`, cinco medições, mediana 130 ms). Política de entrada 14/14, blocklist local 10/10, consulta HTTPS real ao Pwned Passwords com vetor público fixo `password`, throttling sintético persistente/concorrente e limpeza dos recursos temporários foram concluídos. **Nenhum comparador foi aprovado para autenticação**: XOR não tem garantia formal de tempo constante; helper Node `timingSafeEqual` permanece isolado. Ver `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
-- Não há backend de negócio operacional integrado ao frontend, autenticação real, sessão, busca remota, envio de e-mail, upload no Drive ou painel administrativo; a tela de acesso é somente demonstrativa.
-- **PR #13 — interface demonstrativa:** merge commit `770560f93b6a1ee44c31a1990ea4b64454fb1b23`, integrado em 2026-11-14. `src/pages/AuthDemoPage.jsx` fica acessível por `/?auth=demo`; cadastro por `/?auth=demo&mode=register`. Os formulários validam localmente, não chamam API nem persistem valores e limpam os campos de senha após a submissão. Cadastro, verificação por código, login e recuperação ainda não são operações de backend.
+- Na branch `dev`, a homepage ainda usa os dados ilustrativos. Na branch `feat/prototipo-demo-profissional`, há implementação versionada de cadastro/login/sessão e gravação de serviços no Sheets; o backend ainda precisa ser ativado com o Web App Apps Script e variáveis Vercel Preview. Envio de e-mail, upload no Drive e painel administrativo continuam ausentes.
+- **PR #13 — interface demonstrativa:** merge commit `770560f93b6a1ee44c31a1990ea4b64454fb1b23`, integrado em 2026-11-14. `dev` mantém a interface visual base. Na branch de entrega `feat/prototipo-demo-profissional`, `AuthDemoPage.jsx` foi conectada a `src/services/app-api.js`: cadastro, confirmação, login, sessão, criação e pausa/publicação de serviços. O Apps Script grava nas abas da planilha existente; a ativação externa (projeto Apps Script, Script Properties, implantação Web App e variáveis Preview) está descrita em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`.
 - As CI pós-merge de #13 (`Validate Home Service` #43623828275 e `AI Context — Synchronize` #43623828384) e #12 (`Validate Home Service` #43624907349 e `AI Context — Synchronize` #43624907085) concluíram SUCCESS em 2026-11-14. Não havia PRs abertos na última consulta. `main` permaneceu em `45412ad4f1c082590d9f800d8e6b707cfa35c5ed`; não recebeu esses merges.
-- A POC-04 ainda não começou. O plano de escopo, modelo de ameaça e critérios de aceite foi criado em `docs/POC_04_SESSOES.md`; a próxima conversa deve lê-lo antes de alterar código. A POC-04 deve usar token/conta sintéticos e provar cookie, encaminhamento server-side, autoridade Apps Script, expiração, logout/revogação e CSRF/Origin. Ela não libera login nem credenciais reais.
+- A POC-04 de sessão sintética por cookie está isolada na branch `feat/poc-04-session-cookie`, PR #14 em Draft, base `dev`. Não reutilizá-la como autenticação da aplicação: a branch do protótipo funcional implementa seu próprio fluxo de login/sessão.
 - A homepage não processa pagamentos, agendamentos ou contratação.
 
-A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física aprovados. `docs/ARQUITETURA_APPS_SCRIPT.md` registra a arquitetura e seus limites. POC-01 (#10), POC-02 (#11), interface visual (#13) e POC-03 experimental (#12) estão integradas à `dev`. Nenhuma dessas entregas cria autenticação de usuários, sessão ou operações de negócio; credenciais reais continuam proibidas. Para retomar o trabalho, leia também `docs/POC_04_SESSOES.md` antes de iniciar a próxima POC.
+A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física. POC-01 (#10), POC-02 (#11), interface base (#13) e POC-03 experimental (#12) estão integradas à `dev`. A branch `feat/prototipo-demo-profissional` contém a primeira implementação do protótipo com persistência em Sheets via Apps Script e rotas server-side Vercel; sua ativação depende da configuração documentada em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`. A POC-04 continua separada em PR #14. Usar apenas dados fictícios.
 
 ## 5. Arquitetura e decisões tecnológicas
 
@@ -170,7 +170,7 @@ Google Sheets não impõe automaticamente FKs, unicidade composta ou integridade
 
 ### 5.4. Autenticação, e-mail e imagens — decisões e bloqueios
 
-A arquitetura do backend e as provas de conceito estão em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). `src/pages/AuthDemoPage.jsx`, integrada à `dev` pelo PR #13, implementa apenas a camada visual de acesso: formulários, validações locais e mensagens de demonstração. Não há envio de credenciais, persistência, criação de conta, autenticação ou sessão. A POC-03 integrada pelo PR #12 permanece experimental; KDF, comparação de hash e sessão não estão aprovados para credenciais reais.
+A arquitetura do backend e as POCs estão em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Na branch `feat/prototipo-demo-profissional`, `src/pages/AuthDemoPage.jsx` chama `src/services/app-api.js`. `server/app-gateway.js` deriva/verifica Argon2id no servidor, aplica cookie HttpOnly/Secure/SameSite, CSRF, HMAC e bloqueio fora de Vercel Preview; `apps-script/conecta-local/Code.gs` valida assinatura, controla nonce, grava cadastros, ativa contas, cria/revoga sessões e gerencia serviços nas abas existentes. A ativação depende de seguir `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`. O código de confirmação é mostrado na tela, sem envio de e-mail.
 
 **Decisão funcional para a demonstração**
 - Cadastro e login próprios por e-mail e senha, com lógica no Apps Script; não adicionar Firebase ou provedor externo sem reabrir a decisão.
@@ -300,14 +300,14 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** ffca51cbc1e279bf6e837dae951c561fb7368387
-- **Data do commit:** 2026-11-14T15:20:55-03:00
-- **Mensagem do commit:** docs(poc-04): adicionar matriz de cenarios e aceite
-- **Branch desta execução:** dev
+- **Commit de referência:** d654f7affeae76b0c10d0c70edc675f2049297fc
+- **Data do commit:** 2026-11-16T15:52:45-03:00
+- **Mensagem do commit:** docs: registrar arquitetura do prototipo Sheets
+- **Branch desta execução:** feat/prototipo-demo-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
-- **Dependências de runtime:** 5
-- **Dependências de desenvolvimento:** 10
+- **Dependências de runtime:** 6
+- **Dependências de desenvolvimento:** 9
 - **Workflows:** 2
 - **Scripts de automação:** 3
 
@@ -337,6 +337,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | Pacote | Versão declarada |
 |---|---|
 | @tailwindcss/vite | ^4.3.5 |
+| hash-wasm | 4.13.0 |
 | lucide-react | ^1.61.0 |
 | react | ^19.3.1 |
 | react-dom | ^19.3.1 |
@@ -354,7 +355,6 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | eslint-plugin-react-hooks | ^7.1.1 |
 | eslint-plugin-react-refresh | ^0.5.7 |
 | globals | ^17.13.0 |
-| hash-wasm | 4.13.0 |
 | vite | ^8.3.6 |
 
 ### Workflows do GitHub Actions
@@ -384,6 +384,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/pages/AuthDemoPage.jsx
 - src/pages/HomePage.jsx
 - src/pages/Poc01Page.jsx
+- src/services/app-api.js
 - src/services/poc-01-api.js
 
 ### Diretórios principais de src/
@@ -398,13 +399,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| ffca51c | 2026-11-14 | docs(poc-04): adicionar matriz de cenarios e aceite |
-| 44da445 | 2026-11-14 | docs(ai-context): atualizar estado e passagem para novo chat |
-| 3eebd2b | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 894390e | 2026-11-14 | docs(poc-04): documentar plano de sessao por cookie |
-| 6e11ef3 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| ed1e9db | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| df930d6 | 2026-11-14 | docs(architecture): atualizar status das pocs e proxima etapa |
-| 6d1960f | 2026-11-14 | docs(poc-03): consolidar resultados finais e pendencias |
+| d654f7a | 2026-11-16 | docs: registrar arquitetura do prototipo Sheets |
+| 9a821cb | 2026-11-16 | docs(ai-context): separar estado dev e prototipo Sheets |
+| be43108 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
+| 23ac25a | 2026-11-16 | docs: informar origem Preview da branch |
+| 002664d | 2026-11-16 | security(gateway): restringir prototipo ao ambiente Preview |
+| de3f768 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
+| b2ca007 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
+| 6761060 | 2026-11-16 | fix(home): selecionar imagem ilustrativa por categoria |
 
 <!-- END AUTO-GENERATED SECTION -->

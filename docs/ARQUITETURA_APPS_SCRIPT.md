@@ -8,6 +8,23 @@
 
 ## 1. Objetivo e estado real
 
+### Protótipo funcional com persistência — branch `feat/prototipo-demo-profissional`
+
+A branch de entrega acrescenta a implementação inicial do fluxo profissional conectado ao Google Sheets, sem alterar `dev` ou `main`:
+
+- `api/app.js` expõe a Function `POST /api/app`.
+- `server/app-gateway.js` aplica validação de Origin, contrato de JSON, Argon2id no runtime Node, comparação de hash com `timingSafeEqual`, cookie HttpOnly/Secure/SameSite, CSRF e HMAC server-to-server.
+- `apps-script/conecta-local/Code.gs` recebe ações assinadas, verifica nonce/timestamp, valida dados e grava usuários, perfis, códigos, sessões, serviços e auditoria nas abas estruturais existentes.
+- `src/services/app-api.js` conecta React à Function; `AuthDemoPage.jsx` usa o backend e `HomePage.jsx` consulta os serviços publicados.
+- A senha em texto puro não é encaminhada ao Apps Script; a Function deriva o hash Argon2id e envia somente hash, salt e algoritmo.
+- O código de confirmação é HMAC no Apps Script e exibido na interface do protótipo. Não há envio de e-mail.
+- A sessão é criada pelo backend funcional desta branch; a POC-04 de conta sintética continua separada.
+
+**Ativação pendente:** o novo projeto Apps Script precisa ser criado/atualizado com `apps-script/conecta-local/Code.gs`, receber as Script Properties `CONECTA_LOCAL_SPREADSHEET_ID` e `CONECTA_LOCAL_HMAC_SECRET`, ser implantado como Web App e ter suas três variáveis configuradas somente na Vercel Preview. O passo a passo está em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`. Até essa configuração, o código está versionado e o Preview publicado, mas ainda não grava efetivamente na planilha.
+
+**Escopo de demonstração:** cadastro, ativação por código, login, sessão, consulta de dados e CRUD mínimo de serviços. Recuperação de senha, e-mail, upload Drive, edição completa de perfil, admin e moderação ficam fora desta rodada. Usar apenas dados fictícios; o protótipo não é declarado pronto para produção.
+
+
 Este documento registra a arquitetura aprovada para a comunicação do Conecta Local e os testes necessários antes da implementação. Ele não declara que qualquer API ou integração já exista.
 
 Estado conhecido na data desta revisão:
