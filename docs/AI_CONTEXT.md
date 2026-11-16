@@ -300,9 +300,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 75bdee3204bd75ec6925527cb0ee299cdfc6354c
-- **Data do commit:** 2026-11-16T15:00:51-03:00
-- **Mensagem do commit:** style(demo): adicionar layout responsivo da área profissional
+- **Commit de referência:** a2a92eff4b5e0e1cd5cc547f468305d71194fcba
+- **Data do commit:** 2026-11-16T15:03:19-03:00
+- **Mensagem do commit:** docs: registrar escopo do fluxo demonstrativo local
 - **Branch desta execução:** feat/prototipo-demo-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -398,13 +398,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| a2a92ef | 2026-11-16 | docs: registrar escopo do fluxo demonstrativo local |
+| c9adacd | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 75bdee3 | 2026-11-16 | style(demo): adicionar layout responsivo da área profissional |
 | 0d8b4df | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | d06e9db | 2026-11-16 | feat(demo): implementar fluxo local de acesso profissional |
 | 42e3a0a | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | ffca51c | 2026-11-14 | docs(poc-04): adicionar matriz de cenarios e aceite |
 | 44da445 | 2026-11-14 | docs(ai-context): atualizar estado e passagem para novo chat |
-| 3eebd2b | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 894390e | 2026-11-14 | docs(poc-04): documentar plano de sessao por cookie |
 
 <!-- END AUTO-GENERATED SECTION -->
