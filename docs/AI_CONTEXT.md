@@ -300,10 +300,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** ffca51cbc1e279bf6e837dae951c561fb7368387
-- **Data do commit:** 2026-11-14T15:20:55-03:00
-- **Mensagem do commit:** docs(poc-04): adicionar matriz de cenarios e aceite
-- **Branch desta execução:** dev
+- **Commit de referência:** d06e9db0eebcfd10a4c1ec51d7b772b5ad059163
+- **Data do commit:** 2026-11-16T14:59:13-03:00
+- **Mensagem do commit:** feat(demo): implementar fluxo local de acesso profissional
+- **Branch desta execução:** feat/prototipo-demo-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
 - **Dependências de runtime:** 5
@@ -398,13 +398,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| d06e9db | 2026-11-16 | feat(demo): implementar fluxo local de acesso profissional |
+| 42e3a0a | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | ffca51c | 2026-11-14 | docs(poc-04): adicionar matriz de cenarios e aceite |
 | 44da445 | 2026-11-14 | docs(ai-context): atualizar estado e passagem para novo chat |
 | 3eebd2b | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | 894390e | 2026-11-14 | docs(poc-04): documentar plano de sessao por cookie |
 | 6e11ef3 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | ed1e9db | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| df930d6 | 2026-11-14 | docs(architecture): atualizar status das pocs e proxima etapa |
-| 6d1960f | 2026-11-14 | docs(poc-03): consolidar resultados finais e pendencias |
 
 <!-- END AUTO-GENERATED SECTION -->
