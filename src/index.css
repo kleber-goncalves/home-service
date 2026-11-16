@@ -694,3 +694,37 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
     .demo-dashboard-footer { flex-direction: column; gap: 6px; }
     .demo-credentials-card { align-items: flex-start; flex-direction: column; }
 }
+
+
+/* Campos adicionais do cadastro conectado ao Apps Script */
+.auth-demo-card select,
+.demo-auth-textarea {
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    padding: 11px 13px;
+    color: var(--navy);
+    background: #fbfdff;
+    border: 1px solid #dce5f0;
+    border-radius: 10px;
+    font: inherit;
+    font-size: .76rem;
+}
+.demo-auth-textarea { resize: vertical; line-height: 1.6; }
+.auth-demo-card select:focus,
+.demo-auth-textarea:focus {
+    outline: none;
+    border-color: #8db2ec;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.09);
+}
+.demo-services-refresh { display: flex; justify-content: flex-end; margin-top: 10px; }
+.demo-services-refresh button {
+    padding: 8px 0;
+    color: var(--brand);
+    background: transparent;
+    border: 0;
+    font-size: .68rem;
+    font-weight: 800;
+}
+.demo-services-refresh button:hover { color: var(--brand-dark); text-decoration: underline; }
+.demo-services-refresh button:disabled { opacity: .5; cursor: not-allowed; }
