@@ -300,9 +300,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 99fcbfb8a6d6b4e84fadcf2bb7743a6aae38e976
-- **Data do commit:** 2026-11-16T15:34:12-03:00
-- **Mensagem do commit:** build: incluir hash-wasm nas dependencias de producao
+- **Commit de referência:** 7986291c32f6b583ed1441d216bf9e6322cd1c20
+- **Data do commit:** 2026-11-16T15:37:59-03:00
+- **Mensagem do commit:** feat(frontend): conectar cadastro login e servicos ao Sheets
 - **Branch desta execução:** feat/prototipo-demo-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
@@ -399,13 +399,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 7986291 | 2026-11-16 | feat(frontend): conectar cadastro login e servicos ao Sheets |
+| b43ffe4 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
+| c4c9870 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 99fcbfb | 2026-11-16 | build: incluir hash-wasm nas dependencias de producao |
 | 0633535 | 2026-11-16 | build: disponibilizar hash-wasm no runtime da Function |
 | 427f40e | 2026-11-16 | fix(apps-script): inicializar catalogo antes do cadastro |
 | e385d4e | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 02c033e | 2026-11-16 | feat(frontend): criar cliente do backend do protótipo |
-| 57ac35c | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| 980669a | 2026-11-16 | feat(api): expor rota do protótipo funcional |
-| 11eb075 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
