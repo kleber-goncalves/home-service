@@ -189,7 +189,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
 
     async function submitVerification(event) {
         event.preventDefault();
-        if (!/^\d{6}$/.test(verificationCode)) {
+        if (!/^\d{6}$/.test(verificationCodeInput)) {
             setNotice({ title: "Código inválido", message: "Digite os seis números do código demonstrativo.", tone: "warning" });
             return;
         }
@@ -197,9 +197,10 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         setBusy(true);
         setNotice(null);
         try {
-            await appRequest("auth.verify", { email: pendingEmail, code: verificationCode });
+            await appRequest("auth.verify", { email: pendingEmail, code: verificationCodeInput });
             setLoginForm({ email: pendingEmail, password: "" });
             setVerificationCode("");
+            setVerificationCodeInput("");
             setMode("login");
             setNotice({
                 title: "Cadastro confirmado",
