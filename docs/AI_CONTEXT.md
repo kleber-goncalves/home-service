@@ -300,10 +300,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** d654f7affeae76b0c10d0c70edc675f2049297fc
-- **Data do commit:** 2026-11-16T15:52:45-03:00
-- **Mensagem do commit:** docs: registrar arquitetura do prototipo Sheets
-- **Branch desta execução:** feat/prototipo-demo-profissional
+- **Commit de referência:** 5033dbdcab64c24436e9f61c417510cd87bd17c4
+- **Data do commit:** 2026-11-16T16:35:35-03:00
+- **Mensagem do commit:** feat: adicionar protótipo funcional do Conecta Local
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 9
 - **Dependências de runtime:** 6
@@ -399,13 +399,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| d654f7a | 2026-11-16 | docs: registrar arquitetura do prototipo Sheets |
-| 9a821cb | 2026-11-16 | docs(ai-context): separar estado dev e prototipo Sheets |
-| be43108 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| 23ac25a | 2026-11-16 | docs: informar origem Preview da branch |
-| 002664d | 2026-11-16 | security(gateway): restringir prototipo ao ambiente Preview |
-| de3f768 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| b2ca007 | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| 6761060 | 2026-11-16 | fix(home): selecionar imagem ilustrativa por categoria |
+| 5033dbd | 2026-11-16 | feat: adicionar protótipo funcional do Conecta Local |
+| 42e3a0a | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
+| ffca51c | 2026-11-14 | docs(poc-04): adicionar matriz de cenarios e aceite |
+| 44da445 | 2026-11-14 | docs(ai-context): atualizar estado e passagem para novo chat |
+| 3eebd2b | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
+| 894390e | 2026-11-14 | docs(poc-04): documentar plano de sessao por cookie |
+| 6e11ef3 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
+| ed1e9db | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
