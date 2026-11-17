@@ -311,10 +311,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 44088f43f892e5c1513a07ed3f2c501ee247688f
-- **Data do commit:** 2026-11-16T17:00:57-03:00
-- **Mensagem do commit:** feat(loo): integrar orientacao a objetos no backend
-- **Branch desta execução:** dev
+- **Commit de referência:** 3a037fb31751e330475d4239c23bdf5d508d2305
+- **Data do commit:** 2026-11-17T14:16:13-03:00
+- **Mensagem do commit:** fix: manter exemplos ao exibir serviços cadastrados
+- **Branch desta execução:** fix/manter-servicos-exemplo-home
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 10
 - **Dependências de runtime:** 6
@@ -411,13 +411,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 3a037fb | 2026-11-17 | fix: manter exemplos ao exibir serviços cadastrados |
+| 39de5fe | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 44088f4 | 2026-11-16 | feat(loo): integrar orientacao a objetos no backend |
 | f5c289c | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 5033dbd | 2026-11-16 | feat: adicionar protótipo funcional do Conecta Local |
 | 42e3a0a | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | ffca51c | 2026-11-14 | docs(poc-04): adicionar matriz de cenarios e aceite |
 | 44da445 | 2026-11-14 | docs(ai-context): atualizar estado e passagem para novo chat |
-| 3eebd2b | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 894390e | 2026-11-14 | docs(poc-04): documentar plano de sessao por cookie |
 
 <!-- END AUTO-GENERATED SECTION -->
