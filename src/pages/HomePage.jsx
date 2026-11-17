@@ -76,14 +76,15 @@ export default function HomePage() {
     }, []);
 
     const sourceProfessionals = useMemo(
-        () => realServices.length
-            ? realServices
-            : exampleProfessionals.map((item) => ({
+        () => [
+            ...exampleProfessionals.map((item) => ({
                 ...item,
                 city: "Exemplo de localidade",
                 professionalName: "",
                 isPersisted: false,
             })),
+            ...realServices,
+        ],
         [realServices],
     );
 
