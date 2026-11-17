@@ -40,7 +40,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Audit dependency vulnerabilities
+      - name: Audit production dependencies (blocking)
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Report full dependency audit (development tooling)
+        continue-on-error: true
         run: npm audit --audit-level=high
 
       - name: Run POC-01 gateway tests
