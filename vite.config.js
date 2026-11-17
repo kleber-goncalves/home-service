@@ -1,18 +1,12 @@
-import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { fileURLToPath } from "node:url";
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
+const sourceDirectory = fileURLToPath(new URL("./src", import.meta.url));
 
-// https://vite.dev/config/
 export default defineConfig({
-    server: {
-        host: "0.0.0.0", // não usa loopback
-        port: 5173, // porta ALTA (fora de políticas)
-        strictPort: true,
-        hmr: {
-            port: 5173,
-            protocol: "ws",
-        },
-    },
+    resolve: { alias: { "@": sourceDirectory } },
+    server: { host: "0.0.0.0", port: 5173, strictPort: true },
     plugins: [react(), tailwindcss()],
 });

@@ -1,16 +1,70 @@
-# React + Vite
+# Home Service — Conecta Local
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Plataforma regional para aproximar pessoas que procuram serviços de profissionais autônomos e pequenos empreendedores.
 
-Currently, two official plugins are available:
+O projeto tem finalidade acadêmica e busca demonstrar investigação de problemas, levantamento de requisitos, desenvolvimento web, modelagem, segurança e testes.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Estado atual
 
-## React Compiler
+A branch `dev` mantém a homepage pública demonstrativa. A branch `feat/prototipo-demo-profissional` acrescenta o fluxo conectado à planilha: cadastro, confirmação por código, login, sessão, área profissional, criação/pausa/publicação de serviços e vitrine de serviços publicados. A integração exige concluir a configuração do Apps Script e das variáveis Preview descritas em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+O protótipo é acadêmico e deve usar apenas dados fictícios. Na branch de entrega, os fluxos de cadastro/login e gestão de serviços foram implementados com gravação no Google Sheets via Apps Script; o funcionamento depende da implantação e configuração do backend no ambiente Preview. Não é um serviço de produção nem um marketplace transacional.
 
-## Expanding the ESLint configuration
+- **Repositório:** https://github.com/kleber-goncalves/home-service
+- **Deploy:** https://home-service-blush.vercel.app/
+- **Frontend:** React, JavaScript, Vite 8 e Tailwind CSS 4.
+- **Componentes:** primitivas locais editáveis no padrão visual shadcn/ui, configuradas para JavaScript.
+- **Ícones:** Lucide React.
+- **Backend de negócio:** Google Apps Script (`apps-script/conecta-local/Code.gs`) na branch de protótipo.
+- **Gateway HTTP:** Vercel Function (`api/app.js`, `server/app-gateway.js`) com HMAC, Argon2id no servidor, cookie HttpOnly e CSRF.
+- **Persistência:** Google Sheets nas abas existentes `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`.
+- **Imagens:** fotografias ilustrativas externas do Pexels; fontes e créditos abaixo.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Executar localmente
+
+Recomendado: Node.js 24.
+
+```bash
+npm ci
+npm run dev
+```
+
+## Validações
+
+```bash
+npm run lint
+npm run check:occurrences
+npm run build
+npm audit --audit-level=high
+```
+
+O GitHub Actions executa essas verificações em pushes e Pull Requests direcionados às branches `main` e `dev`. O workflow de sincronização atualiza automaticamente a seção gerada de `docs/AI_CONTEXT.md`.
+
+## Documentação
+
+- [Contexto técnico para IAs e desenvolvedores](docs/AI_CONTEXT.md)
+- [Ativar o protótipo funcional com Google Sheets](docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md)
+- [Fluxo da área do profissional](docs/PROTOTIPO_DEMO_LOCAL.md)
+- [Especificação funcional do MVP (em revisão)](docs/ESPECIFICACAO_MVP.md)
+- [Modelagem lógica e física dos dados](docs/MODELAGEM_DADOS.md)
+- [Arquitetura de integração Vercel Functions + Apps Script](docs/ARQUITETURA_APPS_SCRIPT.md)
+- [POC-01 — Comunicação React, Vercel Functions e Apps Script](docs/POC_01_COMUNICACAO.md)
+- [Registro público de ocorrências](docs/REGISTRO_DE_OCORRENCIAS.md)
+
+## Créditos das imagens
+
+As fotografias são gratuitas no Pexels e aparecem apenas como exemplos visuais. Não representam profissionais cadastrados no Conecta Local.
+
+- Eletricista — Pexels, imagem 27928762.
+- Encanador — [Bulat843 / Pexels](https://www.pexels.com/photo/plumber-repairing-pipe-with-wrench-indoors-32588548/).
+- Limpeza residencial — [Helena Lopes / Pexels](https://www.pexels.com/photo/woman-cleaning-a-living-room-27176671/).
+- Pintura — [Tima Miroshnichenko / Pexels](https://www.pexels.com/photo/man-painting-the-wall-6474471/).
+- Jardinagem — [Helena Lopes / Pexels](https://www.pexels.com/photo/gardener-hands-over-plants-on-ground-27176054/).
+
+## Princípios do projeto
+
+- Priorizar as necessidades reais de profissionais e clientes da região.
+- Manter o escopo proporcional ao prazo acadêmico.
+- Separar funcionalidades implementadas, decisões vigentes e ideias futuras.
+- Não publicar credenciais, dados pessoais ou evidências sensíveis.
+- Validar operações e permissões no lado confiável do sistema, não apenas na interface.

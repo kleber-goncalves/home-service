@@ -1,0 +1,423 @@
+# Conecta Local — Contexto técnico para IAs
+
+> Documento de continuidade do projeto. Leia antes de sugerir ou realizar alterações. Reúne propósito, decisões, arquitetura planejada, estado implementado, regras de manutenção e limitações. A seção de snapshot ao final é atualizada pelo GitHub Actions.
+
+## Atualização vigente — 2026-11-16
+
+> Esta atualização prevalece sobre os trechos históricos datados de 2026-11-14 que ainda descrevem a integração funcional como estando somente em uma branch separada ou como pendente.
+
+- O PR #15 (`feat/prototipo-demo-profissional` → `dev`) foi integrado por squash merge. A branch `dev` contém agora o protótipo funcional com cadastro, confirmação demonstrativa, login, sessão, perfil, criação/pausa/publicação de serviços e persistência no Google Sheets via Apps Script.
+- O gateway funcional está em `api/app.js` → `server/app-gateway.js`. O Apps Script correspondente está em `apps-script/conecta-local/Code.gs`. A configuração do ambiente Preview está documentada em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`.
+- O fluxo validado pelo responsável do projeto usa dados fictícios. A demonstração continua restrita ao ambiente Preview e não deve ser descrita como produto pronto para produção.
+- A POC-04 continua isolada na branch `feat/poc-04-session-cookie` e não deve ser misturada à autenticação do protótipo.
+- A atividade acadêmica de LOO está sendo implementada separadamente na branch `feat/loo-orientacao-objetos`, criada a partir de `dev`. As classes `Usuario`, `Profissional` e `Servico` ficam em `server/domain-entities.js` e são utilizadas pelo gateway Node.js. A documentação específica está em `docs/LOO_ORIENTACAO_OBJETOS.md`; os testes ficam em `tests/loo/domain-entities.test.js` e são executados por `npm run test:loo`.
+- As classes de domínio organizam atributos, métodos e montagem dos payloads no Node.js. A validação final, autenticação, autorização, persistência e auditoria continuam sob responsabilidade do Apps Script.
+
+## 1. Instruções para a IA que assumir o projeto
+
+1. Leia este documento por inteiro antes de propor mudanças, especialmente em uma conversa nova.
+2. Confirme a branch, o commit e o estado atual do repositório. O snapshot registra a revisão usada na última sincronização; commits posteriores podem existir.
+3. Trate o código da branch em análise como fonte de verdade para o comportamento implementado. A documentação fornece contexto, mas pode ficar desatualizada.
+4. Diferencie explicitamente **implementado**, **decisão funcional aprovada**, **validação técnica pendente** e **planejado**. Não apresente ideias futuras como funcionalidades prontas.
+5. O projeto utiliza JavaScript e JSX. Não introduza TypeScript sem solicitação explícita.
+6. Faça mudanças pequenas, coesas e proporcionais ao problema. Evite dependências, abstrações, serviços ou infraestrutura sem necessidade demonstrável.
+7. Respeite o prazo e a finalidade acadêmica. Priorize um MVP funcional; não replique a complexidade de marketplaces comerciais grandes.
+8. Preserve responsividade, HTML semântico, acessibilidade, navegação por teclado, contraste e preferência por movimento reduzido.
+9. Antes de alterar uma área, leia os arquivos relacionados e verifique impactos em navegação, dados, segurança, desempenho e publicação.
+10. Não declare lint, testes, build, Actions ou deploy aprovados sem executar os comandos ou consultar os resultados correspondentes. Diferencie validação automatizada de inspeção manual.
+11. Quando uma mudança alterar comportamento, arquitetura, regras do produto, segurança ou publicação, atualize a seção narrativa pertinente deste arquivo no mesmo trabalho.
+12. Não edite manualmente o conteúdo entre os marcadores de snapshot automatizado. Ele é gerado por `scripts/update-ai-context.mjs`.
+13. Nunca inclua chaves, tokens, senhas, cookies, credenciais, valores de arquivos `.env`, dados pessoais ou informações privadas neste documento.
+14. Não assuma que a arquitetura planejada já está integrada. Confirme a existência dos arquivos, planilhas, scripts, serviços e variáveis no código antes de descrevê-los como ativos.
+15. Consulte também `README.md`, `docs/REGISTRO_DE_OCORRENCIAS.md` e `docs/ESPECIFICACAO_MVP.md`. A especificação consolidou decisões funcionais, mas ainda contém bloqueios de validação técnica; nenhum desses documentos substitui a descrição do estado atual.
+16. Não faça testes de segurança intrusivos em sistemas, contas, planilhas ou arquivos reais sem autorização explícita. Prefira desenvolvimento local, Preview autorizado e dados sintéticos.
+
+## 2. Identidade e propósito
+
+- **Nome do produto:** Conecta Local.
+- **Nome do repositório:** `home-service`.
+- **Repositório:** https://github.com/kleber-goncalves/home-service
+- **Deploy informado:** https://home-service-blush.vercel.app/
+- **Tipo:** plataforma web regional de divulgação e descoberta de serviços.
+- **Finalidade:** projeto acadêmico integrador, com possibilidade de evolução após a entrega.
+- **Públicos:** pessoas que procuram serviços locais; profissionais autônomos e pequenos empreendedores; administradores da plataforma.
+- **Objetivo:** facilitar a divulgação de serviços por profissionais e permitir que moradores encontrem opções na própria região.
+- **Jornada pública pretendida:** **PESQUISAR → DESCOBRIR → CONHECER → ENTRAR EM CONTATO**.
+
+A plataforma será uma vitrine regional organizada, não um sistema de pagamentos ou contratação complexa. O contato será direto com o profissional, principalmente pelo WhatsApp público informado.
+
+## 3. Problema e escopo do produto
+
+### 3.1. Problema a investigar
+
+Hipótese inicial: profissionais autônomos e pequenos empreendedores podem ter dificuldade para divulgar seus serviços e alcançar novos clientes; moradores podem ter dificuldade para localizar profissionais e conhecer os serviços disponíveis na região.
+
+Essa hipótese ainda deve ser validada com pesquisa de campo, se possível. Não apresentar os requisitos como necessidades locais comprovadas sem evidências.
+
+### 3.2. Áreas previstas
+
+Estas áreas são decisões de produto, não funcionalidades implementadas.
+
+**Área pública**
+- Busca textual por nome do serviço, nome público do profissional e descrição.
+- Filtros por categoria, cidade e bairro/região.
+- Ordenação por relevância e data de publicação mais recente.
+- Listagem, detalhes do serviço e perfil público.
+- Contato direto pelo WhatsApp informado.
+- Sem login para pesquisar e visualizar serviços.
+
+**Painel do profissional**
+- Cadastro com e-mail e senha próprios, confirmação demonstrativa e login.
+- Manutenção do perfil.
+- Cadastro, edição, pausa, reativação e remoção dos próprios serviços.
+- Gestão de imagens e consulta do estado de publicação.
+- Recuperação e alteração de senha; alteração de e-mail com confirmação.
+
+**Painel administrativo**
+- Gestão de profissionais, serviços, categorias e cidades.
+- Análise de denúncias.
+- Suspensão/reativação de profissionais e serviços.
+- Consulta de auditoria.
+
+### 3.3. Escopo e finalidade da demonstração
+
+O projeto será uma **demonstração acadêmica com dados fictícios**, simulando fluxos coerentes com um sistema real. Não deve receber credenciais ou dados pessoais reais e não está aprovado para operação pública de produção.
+
+O backend planejado continua sendo Google Apps Script, com Google Sheets para dados e Drive para imagens. A decisão funcional é não usar Firebase ou outro provedor de autenticação nesta demonstração; cadastro e login próprios deverão ser avaliados em prova de conceito no Apps Script.
+
+A confirmação de e-mail e a recuperação de senha serão simuladas na interface, com códigos demonstrativos e sem envio real nesta etapa. O projeto poderá ativar envio real futuramente, após revisar as permissões e quotas do Apps Script/MailApp.
+
+Não incluir pagamentos, contratação, contratos, agendamento, chat interno, avaliações, favoritos, geolocalização em tempo real ou aplicativo nativo no MVP.
+
+O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. A Fase 3 deverá modelar dados e relacionamentos a partir desses requisitos. A autenticação não está liberada para implementação até a prova de conceito técnica descrita na especificação.
+
+## 4. Estado atual do repositório
+
+**Estado atualizado em 2026-11-14 após os merges dos PRs #12 (POC-03) e #13 (interface demonstrativa):**
+
+- A branch `dev` contém a homepage pública demonstrativa do Conecta Local, integrada por Pull Request.
+- `src/pages/HomePage.jsx` coordena a composição das seções e o estado local da busca e dos filtros.
+- `src/components/home/` contém cabeçalho, hero/busca e seções públicas reutilizáveis.
+- `src/components/ui/` contém primitivas locais editáveis (Button, Input, Card e Badge) no padrão visual shadcn/ui.
+- `components.json` e `jsconfig.json` preparam a estrutura para componentes JavaScript (`tsx: false`) e aliases `@/`; `vite.config.js` resolve o alias no Vite.
+- `src/index.css` concentra tokens visuais, estilos globais, responsividade, foco visível e preferência por movimento reduzido.
+- A busca e a seleção de categorias filtram somente registros demonstrativos em `src/data/homepage.js`. O campo de cidade é ilustrativo e não executa busca geográfica.
+- Os perfis e as fotografias não representam profissionais cadastrados. A natureza demonstrativa é indicada na interface.
+- As fotografias são carregadas de URLs externas do Pexels; a disponibilidade visual depende da conexão com esse serviço. Os créditos estão no README.
+- A validação de Pull Requests destinados a `dev` foi habilitada no workflow de CI pela correção integrada no PR #3.
+- O workflow de sincronização automática do AI Context e o workflow de validação foram executados com sucesso após a integração da homepage, conforme os registros consultados em 2026-11-09.
+- `main` permanece fora do escopo desta etapa; `dev` é a linha de integração do trabalho em andamento.
+- O arquivo Google Sheets estrutural foi criado pelo responsável pelo projeto com as 12 abas e os 102 cabeçalhos aprovados. A exportação XLSX foi inspecionada e a conferência manual de proteções e compartilhamento restrito foi confirmada pelo responsável.
+- A planilha estrutural tem as 12 abas e 102 cabeçalhos aprovados. `dev` ainda não grava nela; a branch `feat/prototipo-demo-profissional` contém um Apps Script específico para persistir usuários, profissionais, sessões, códigos, serviços e auditoria após sua implantação/configuração.
+- A POC-01 de comunicação React → Vercel Function → Apps Script foi integrada à branch `dev` pelo PR #10 em 2026-11-11 e validada manualmente em Preview: HTTP 200 (eco), 422 (erro lógico Apps Script), 502 (resposta upstream inválida), 400 (JSON inválido no navegador) e 405 (método não permitido). O merge commit foi `837f7c6172764ee27ac835c81e1224640d78478d`; o registro está em `docs/POC_01_COMUNICACAO.md`.
+- A POC-02 de assinatura HMAC-SHA-256 e proteção contra replay foi integrada à `dev` pelo PR #11 em 2026-11-11, após cinco cenários no Preview, cinco testes diretos no Apps Script isolado e um teste concorrente em que somente uma das duas chamadas idênticas foi aceita. Os resultados estão em `docs/POC_02_ASSINATURA_GATEWAY.md`.
+- **PR #12 — POC-03:** merge commit `465a38be2e71604bf7b44a618221b140e5fafac5`, integrado em 2026-11-14. PBKDF2 via Utilities foi reprovado; Argon2id com `hash-wasm@4.13.0` permanece candidato experimental (perfil `m=19456 KiB,t=2,p=1`, cinco medições, mediana 130 ms). Política de entrada 14/14, blocklist local 10/10, consulta HTTPS real ao Pwned Passwords com vetor público fixo `password`, throttling sintético persistente/concorrente e limpeza dos recursos temporários foram concluídos. **Nenhum comparador foi aprovado para autenticação**: XOR não tem garantia formal de tempo constante; helper Node `timingSafeEqual` permanece isolado. Ver `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
+- Na branch `dev`, a homepage ainda usa os dados ilustrativos. Na branch `feat/prototipo-demo-profissional`, há implementação versionada de cadastro/login/sessão e gravação de serviços no Sheets; o backend ainda precisa ser ativado com o Web App Apps Script e variáveis Vercel Preview. Envio de e-mail, upload no Drive e painel administrativo continuam ausentes.
+- **PR #13 — interface demonstrativa:** merge commit `770560f93b6a1ee44c31a1990ea4b64454fb1b23`, integrado em 2026-11-14. `dev` mantém a interface visual base. Na branch de entrega `feat/prototipo-demo-profissional`, `AuthDemoPage.jsx` foi conectada a `src/services/app-api.js`: cadastro, confirmação, login, sessão, criação e pausa/publicação de serviços. O Apps Script grava nas abas da planilha existente; a ativação externa (projeto Apps Script, Script Properties, implantação Web App e variáveis Preview) está descrita em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`.
+- As CI pós-merge de #13 (`Validate Home Service` #43623828275 e `AI Context — Synchronize` #43623828384) e #12 (`Validate Home Service` #43624907349 e `AI Context — Synchronize` #43624907085) concluíram SUCCESS em 2026-11-14. Não havia PRs abertos na última consulta. `main` permaneceu em `45412ad4f1c082590d9f800d8e6b707cfa35c5ed`; não recebeu esses merges.
+- A POC-04 de sessão sintética por cookie está isolada na branch `feat/poc-04-session-cookie`, PR #14 em Draft, base `dev`. Não reutilizá-la como autenticação da aplicação: a branch do protótipo funcional implementa seu próprio fluxo de login/sessão.
+- A homepage não processa pagamentos, agendamentos ou contratação.
+
+A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física. POC-01 (#10), POC-02 (#11), interface base (#13) e POC-03 experimental (#12) estão integradas à `dev`. A branch `feat/prototipo-demo-profissional` contém a primeira implementação do protótipo com persistência em Sheets via Apps Script e rotas server-side Vercel; sua ativação depende da configuração documentada em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`. A POC-04 continua separada em PR #14. Usar apenas dados fictícios.
+
+## 5. Arquitetura e decisões tecnológicas
+
+### 5.1. Frontend
+
+- **React + JavaScript/JSX:** interface e componentes.
+- **Vite 8:** servidor de desenvolvimento e build.
+- **Node.js 24:** ambiente recomendado para ferramentas de desenvolvimento, scripts e build.
+- **Tailwind CSS 4:** utilitários e integração com Vite; estilos específicos da homepage ficam em `src/index.css`.
+- **shadcn/ui:** configuração em `components.json` no modo JavaScript (`tsx: false`), com aliases `@/`. As primitivas locais usadas nesta homepage são componentes editáveis no padrão visual shadcn; o CLI não é dependência de runtime.
+- **Lucide React:** biblioteca de ícones da interface.
+
+Não foi escolhida uma aplicação Next.js. Não adicionar Express por padrão: para manter o projeto simples, o Google Apps Script é a opção inicial de backend. Reavaliar somente se surgir requisito concreto que justifique uma API Node.js hospedada separadamente.
+
+### 5.2. Backend e dados planejados
+
+- **Google Apps Script:** backend de negócio planejado para autenticação, autorização, regras, integridade e acesso a Sheets/Drive. O Web App isolado da POC-02 executa somente ações sintéticas `poc.*`; operações de negócio e acesso a dados ainda não estão integrados.
+- **Vercel Functions:** o gateway HTTP server-side da POC-01 e a assinatura HMAC-SHA-256 com proteção contra replay da POC-02 estão integrados à branch `dev` pelos PRs #10 e #11; a POC-02 permanece restrita a ações sintéticas `poc.*`.
+- **Google Sheets:** arquivo estrutural já criado pelo responsável, com 12 abas e 102 cabeçalhos aprovados; ainda não está integrado como armazenamento operacional.
+- **Google Drive:** armazenamento futuro das imagens enviadas pelos profissionais; fluxo de upload e permissões ainda não implementado.
+
+Fluxo aprovado para orientar a POC: React/Vite → rota same-origin da Vercel Function → Web App Apps Script → Google Sheets/Drive. A Function será somente gateway técnico: valida formato, tamanho, método, timeout, assinatura servidor-servidor e normalização de resposta. Não será dona das regras de negócio, dados, autenticação final ou autorização. O Apps Script continua sendo a autoridade de domínio e precisa recusar chamadas diretas sem uma assinatura válida do gateway. Não usar CORS do navegador para falar diretamente com Apps Script.
+
+A estratégia de assinatura gateway→Apps Script e o possível cookie HttpOnly emitido pela Vercel continuam sujeitos a provas de conceito. A Function poderá emitir o cookie no domínio da aplicação; o Apps Script continuará validando o token e a sessão. A proposta completa, incluindo riscos, critérios de aceite e limites de TextOutput, está em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Google Sheets é uma solução de armazenamento simplificada para o escopo acadêmico; não é um banco relacional. Considerar concorrência, cotas, limites de execução, latência e integridade. Não prometer capacidade de produção em grande escala.
+
+### POC-01 — transporte real integrado e validado
+
+A POC-01 foi integrada à branch `dev` pelo PR #10 em 2026-11-11. O merge commit foi `837f7c6172764ee27ac835c81e1224640d78478d`. A validação manual em Preview confirmou: eco HTTP 200, erro lógico do Apps Script HTTP 422, resposta upstream inválida HTTP 502, JSON inválido HTTP 400 e método GET HTTP 405. O registro está em `docs/POC_01_COMUNICACAO.md`.
+
+A implementação usa React → POST same-origin `/api/backend` → Vercel Function → Apps Script via form-urlencoded → redirecionamento para `script.googleusercontent.com`. O frontend não chama Apps Script diretamente. A POC-01, isoladamente, não autenticava a Function perante o Apps Script e não está aprovada para produção. Uma implantação antiga sem assinatura deve ser atualizada para o código protegido ou desativada.
+
+### POC-02 — assinatura HMAC e proteção contra replay integradas à dev
+
+O PR #11 foi integrado em 2026-11-11. HMAC-SHA-256, canonicalização versionada, nonce, timestamp e proteção contra replay foram validados em testes de Preview, chamadas diretas ao Apps Script isolado e concorrência básica. A POC permanece restrita a ações sintéticas `poc.*`; não implementa autenticação, sessão ou acesso a dados de negócio. O registro está em `docs/POC_02_ASSINATURA_GATEWAY.md`.
+
+Decisões implementadas:
+- HMAC-SHA-256 com mensagem canônica versionada `v1`, domínio `CONECTA_LOCAL_GATEWAY`, método lógico, timestamp, nonce, ação, requestId e SHA-256 do payload UTF-8.
+- Timestamp Unix em milissegundos com tolerância máxima de 5 minutos.
+- Nonce de 32 bytes aleatórios (64 caracteres hexadecimais), gerado na Vercel Function com `node:crypto`.
+- Registro de nonces no Apps Script com Script Properties e Script Lock, retenção de 10 minutos e 30 segundos, capacidade limitada a 2.500 nonces ativos e comportamento fail closed.
+- Segredo de 32 bytes gerado fora do repositório: `APPS_SCRIPT_HMAC_SECRET` somente no ambiente Preview da Vercel e `POC02_HMAC_SECRET` em Script Properties do Apps Script. Os valores devem ser idênticos e não podem aparecer no React, Git, documentação, logs ou chat.
+- `apps-script/poc-02/Code.gs` contém a versão protegida implantada no Web App Apps Script isolado usado nos testes.
+- `tests/poc02/` contém os testes automatizados do gateway e um harness local que simula as APIs do Apps Script. `scripts/poc02-replay-check.mjs` executa testes reais diretos de chamada sem assinatura, timestamp expirado, assinatura válida, repetição de nonce e payload adulterado.
+
+**Validação manual em 2026-11-11, executada pelo responsável do projeto:**
+- Preview: eco HTTP 200; erro lógico HTTP 422; resposta upstream inválida HTTP 502; JSON inválido HTTP 400; GET HTTP 405.
+- Apps Script direto: chamada sem assinatura `AUTHENTICATION_FAILED`; timestamp expirado `REQUEST_EXPIRED`; chamada assinada aceita; repetição `REPLAY_DETECTED`; payload adulterado `AUTHENTICATION_FAILED`.
+- Concorrência: duas chamadas idênticas enviadas em paralelo; uma aceita e outra recusada com `REPLAY_DETECTED`.
+- GitHub Actions: a validação automatizada da POC-02 passou antes da integração; os workflows pós-merge dos PRs #10 e #11 também foram concluídos com sucesso.
+
+A validação concorrente realizada com duas chamadas comprova o comportamento básico de uso único, não capacidade de carga ou concorrência em escala. A POC continua restrita a dados sintéticos e ações `poc.*`; não habilita login, sessão, Sheets, Drive ou operações de negócio. Não é solução aprovada para produção.
+
+### 5.3. Modelagem lógica e física de dados aprovada
+
+A modelagem lógica e o esquema físico estão consolidados em [`docs/MODELAGEM_DADOS.md`](./MODELAGEM_DADOS.md): 12 entidades e 102 campos lógicos, com 12 abas e 102 colunas físicas. O documento define UUIDs, PKs/FKs lógicas, cardinalidades, ordem de abas e colunas, tipos de célula, campos opcionais, valores controlados, unicidade, integridade, estados, visibilidade, privacidade e persistência no Sheets/Drive.
+
+Entidades/abas: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CONTROLE_AUTENTICACAO`, `SERVICOS`, `CATEGORIAS`, `CIDADES`, `SERVICO_CIDADES`, `IMAGENS`, `DENUNCIAS` e `AUDITORIA`. A estrutura prevê um único arquivo Google Sheets; linha 1 para cabeçalhos e linha 2 em diante para registros; UUIDs/textos como texto; datas como ISO 8601 UTC; números em células numéricas; células vazias para opcionais; validações do Sheets apenas auxiliares, com Apps Script como autoridade.
+
+Google Sheets não impõe automaticamente FKs, unicidade composta ou integridade relacional; esses controles pertencem ao Apps Script e exigem testes de concorrência. **A planilha estrutural foi criada e conferida; não há registros de negócio nem integração operacional.** A inserção futura deverá usar exclusivamente dados sintéticos e ocorrer após a validação dos fluxos de backend.
+
+### 5.4. Autenticação, e-mail e imagens — decisões e bloqueios
+
+A arquitetura do backend e as POCs estão em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Na branch `feat/prototipo-demo-profissional`, `src/pages/AuthDemoPage.jsx` chama `src/services/app-api.js`. `server/app-gateway.js` deriva/verifica Argon2id no servidor, aplica cookie HttpOnly/Secure/SameSite, CSRF, HMAC e bloqueio fora de Vercel Preview; `apps-script/conecta-local/Code.gs` valida assinatura, controla nonce, grava cadastros, ativa contas, cria/revoga sessões e gerencia serviços nas abas existentes. A ativação depende de seguir `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`. O código de confirmação é mostrado na tela, sem envio de e-mail.
+
+**Decisão funcional para a demonstração**
+- Cadastro e login próprios por e-mail e senha, com lógica no Apps Script; não adicionar Firebase ou provedor externo sem reabrir a decisão.
+- A demonstração utilizará dados fictícios e não deverá receber senhas ou dados reais.
+- Conta nasce em `pending_activation`; confirmação de e-mail simulada por código de 6 dígitos, validade de 10 minutos, máximo 5 tentativas e intervalo de 60 segundos para novo código.
+- Recuperação de senha usa as mesmas regras de código; novo código invalida o anterior; uso único.
+- O código é exibido somente na demonstração. Envio real por e-mail é uma etapa futura e deverá respeitar quotas e falhas do MailApp.
+- Senha: mínimo 15 caracteres, suporte a pelo menos 64, sem exigência de classes de caracteres, rejeição de senhas comuns e sem troca periódica obrigatória.
+- Login: 5 falhas dentro de uma janela de contabilização de 15 minutos geram bloqueio de 15 minutos; controle no backend por HMAC do e-mail normalizado; mensagens genéricas; testar abuso de bloqueio contra contas.
+- Sessões: 30 minutos de inatividade, máximo 8 horas; logout, alteração/recuperação de senha, suspensão e encerramento revogam sessões.
+- Alteração de e-mail só efetiva após confirmação do novo endereço; endereço anterior continua válido até então.
+- Primeiro administrador criado manualmente por procedimento controlado; papel administrativo nunca é definido por valor livre do frontend.
+- Toda conta `professional` precisa possuir exatamente um perfil válido em `PROFISSIONAIS` antes de ser ativada; conta `admin` não exige perfil. Mudança de papel que gere vínculos inconsistentes fica bloqueada até procedimento seguro e auditado.
+
+**Bloqueios técnicos antes de implementar**
+- Não armazenar senhas em texto puro e não usar SHA/digest rápido isolado como armazenamento de senha.
+- A POC-03 avaliou essas limitações: PBKDF2 artesanal sobre `Utilities` foi reprovado; Argon2id via WebAssembly continua candidato, não aprovado. O comparador XOR foi reprovado para autenticação por falta de garantia formal de tempo constante; o helper Node com `timingSafeEqual` permanece isolado e não integrado. A POC-03D validou a blocklist didática (10/10) e uma única consulta HTTPS real usando somente o vetor público fixo `password`; nada foi integrado ao cadastro/login. Consultar `docs/POC_03_ARMAZENAMENTO_SENHAS.md`; não conectar cadastro/login até nova decisão técnica.
+- A POC-04 ainda não foi executada. O plano está em `docs/POC_04_SESSOES.md`; a hipótese de cookie `HttpOnly` emitido pela Vercel e token validado pelo Apps Script precisa ser provada com valores sintéticos. Não escolher atributos finais nem assumir segurança antes de testar CSRF, Origin, expiração ociosa/absoluta, logout, revogação e falhas.
+- Testar concorrência e o risco de um atacante bloquear uma conta provocando tentativas incorretas.
+- A prova de conceito deverá usar dados sintéticos e não será considerada pronta para produção.
+
+**Imagens no Drive**
+- Decisão funcional: imagens de serviços publicados e contas ativas poderão ser visualizadas por link; serviços pausados, suspensos ou removidos e contas suspensas/encerradas terão acesso restringido.
+- O fluxo pretendido usa permissões equivalentes a `ANYONE_WITH_LINK` para visualização e `PRIVATE` para restringir, quando permitido pela conta. Pasta raiz privada; compartilhamento individual por arquivo; limite exato de 5.000.000 bytes; no máximo 1 imagem ativa por perfil e 5 por serviço, com posições exclusivas de 1 a 5. Testar em arquivos individuais e tratar falhas parciais.
+- Links públicos podem ser copiados e imagens podem ser baixadas; revogar a permissão não apaga cópias já obtidas. Não tratar esconder a URL na interface como controle de acesso.
+
+### 5.5. Limites da plataforma
+
+Consultar cotas oficiais vigentes do Apps Script antes e durante a implementação. Quotas, limites de execução, envio de e-mails e serviços associados podem mudar e dependem do tipo de conta. A demonstração não deve ser apresentada como solução pronta para escala.
+
+## 6. Regras de negócio e segurança
+
+1. Visitantes podem pesquisar e visualizar serviços públicos sem criar conta.
+2. Cada profissional pode possuir vários serviços; não há limite numérico fixo decidido para o MVP.
+3. Profissionais só podem consultar/alterar seus próprios registros privados; a identidade e a propriedade são verificadas no Apps Script em toda operação.
+4. Papel administrativo não pode ser escolhido pelo usuário; a criação inicial é manual e concessões posteriores exigem administrador autorizado.
+5. Um serviço pode permanecer como `draft` incompleto, privado e sem cidade; a publicação automática exige campos válidos, conta ativa, perfil válido, categoria ativa, preço coerente e ao menos uma cidade ativa associada.
+6. Conta suspensa ou encerrada não pode autenticar; suas sessões são invalidadas e seus serviços deixam de ser públicos.
+7. Suspensão/fechamento da conta oculta serviços e imagens sem sobrescrever `SERVICOS.status`; na reativação, somente serviços cujo estado individual continue `published` são elegíveis.
+8. Serviço pausado deixa de aparecer publicamente, mas pode ser reativado pelo proprietário se não estiver bloqueado por ação administrativa.
+9. Serviço suspenso administrativamente exige justificativa; somente administrador pode reativar ou remover.
+10. Serviço removido pelo proprietário ou administrador deixa de ser público, mas permanece no histórico da demonstração.
+11. Categoria inativa não pode ser usada em novos serviços/publicações; serviços existentes nela continuam públicos, conforme decisão aprovada. Cidade inativa não recebe novas associações; vínculos existentes são preservados. O encerramento de denúncia (`valid`, `invalid` ou `closed`) preenche `analisado_em` no backend.
+12. Denúncia não remove automaticamente conteúdo; a moderação é uma ação administrativa registrada.
+13. Exibir nome público, apresentação, foto opcional, cidades/regiões e WhatsApp. Nome completo, e-mail e telefone alternativo ficam privados por padrão.
+14. Não solicitar nem expor endereço residencial completo.
+15. Não apresentar identidade, qualificação, reputação ou avaliação como verificada sem processo real.
+16. Validar novamente no Apps Script; validação no React não é fronteira de segurança.
+17. Não confiar em papel, ID de proprietário, preço, estado ou permissões enviados pelo navegador sem validação no backend.
+18. Não expor chaves, senhas, tokens, códigos de verificação ou credenciais no bundle Vite, repositório, planilha pública ou logs.
+19. Registrar auditoria sem segredos ou dados pessoais desnecessários.
+20. Considerar finalidade, minimização, transparência e retenção de dados. A demonstração usa dados fictícios.
+
+## 7. Categorias, localidades e dados de demonstração
+
+Categorias iniciais: Construção e reformas; Elétrica; Hidráulica; Limpeza; Beleza e estética; Tecnologia; Aulas e educação; Transporte; Outros.
+
+Cidades/estados serão selecionados de uma lista administrável; bairros e regiões serão texto livre. O profissional poderá atender várias cidades. Não haverá GPS nem endereço residencial.
+
+Base demonstrativa inicial sugerida e aprovada: 8 profissionais fictícios, 16–24 serviços, todas as categorias iniciais, 3–5 cidades, alguns exemplos de denúncias e decisões e um administrador criado manualmente. Identificar todos os registros como fictícios.
+
+## 8. Painel administrativo, auditoria e operação
+
+O painel deverá permitir consulta/gestão de profissionais, serviços, denúncias, categorias e cidades, além de consulta da auditoria. Suspensões e remoções exigem justificativa quando definidas; ações sensíveis devem pedir confirmação.
+
+`AUDITORIA` possui nove campos e funciona como append-only pela aplicação: backend escreve, administradores consultam e a interface não edita eventos. Isso não torna a planilha inviolável contra quem tem acesso privilegiado direto ao arquivo/projeto. Registrar identificador, ator, tipo do ator, ação controlada, entidade/registro afetado, resultado, detalhes sanitizados e data/hora. Nunca registrar credenciais, hashes/salts de senha, códigos, tokens ou segredos.
+
+Para alterações auditadas, atualização de negócio e inclusão do evento deverão integrar o mesmo `spreadsheets.batchUpdate` do único arquivo Sheets. A API aplica o lote de forma atômica; se uma solicitação for inválida, nenhuma alteração daquele lote é aplicada. `LockService` protege trechos críticos de leitura–validação–gravação, mas não substitui a atomicidade do lote nem uma transação com outros serviços.
+
+Permissões do Drive são operações separadas: confirmar permissão efetiva, registrar falhas e reconciliar divergências. Não declarar uma operação integralmente concluída antes das etapas obrigatórias. Sheets e Drive não formam uma transação distribuída.
+
+Em falhas: informar estado de carregamento/sucesso/erro; não declarar sucesso antes da confirmação do backend; manter formulário em falha de rede; prevenir duplo envio; solicitar confirmação antes de ação destrutiva; pedir novo login quando a sessão expirar. Mensagens ao usuário são genéricas e não revelam detalhes internos. Não haverá offline para login, cadastro ou administração.
+
+## 9. Regras de desenvolvimento e manutenção
+
+- Preserve JavaScript/JSX e a estrutura simples do Vite.
+- Prefira componentes pequenos e reutilizáveis, sem fragmentar funções triviais.
+- Separe interface, acesso a dados, validação e regras de negócio.
+- Centralize chamadas ao Apps Script em uma camada de serviços.
+- Não duplicar regras de validação entre telas; valide também no backend.
+- Use estados claros para carregamento, sucesso, vazio e erro.
+- Trate falhas de rede e respostas inválidas sem expor detalhes internos.
+- Não adicionar dependências sem necessidade.
+- Não criar dados falsos como se fossem profissionais reais. Identifique os dados de demonstração.
+- Mantenha o README, este contexto e o registro de ocorrências coerentes com o código.
+- Não implementar autenticação sem concluir as provas de conceito da seção 5.4 e documentar seus resultados.
+
+## 10. Git, branches e commits
+
+- Não presumir que a branch de produção deve receber mudanças diretamente.
+- Antes de editar, confirmar branch, estado e commit atual.
+- Preferir branches de trabalho com nomes claros, por exemplo `feat/nome-da-funcionalidade`, `fix/nome-do-problema` e `docs/nome-da-documentacao`.
+- Usar mensagens de commit descritivas e consistentes, preferencialmente Conventional Commits.
+- Pull Requests devem explicar objetivo, mudanças, validações executadas e limitações.
+- Não declarar um Preview Vercel como produção nem confundir status de deploy com aprovação funcional.
+
+## 11. Documentação e registro de problemas
+
+- Este `AI_CONTEXT.md` descreve o estado atual e as regras de continuidade. Em uma conversa nova, leia-o por inteiro antes de qualquer alteração.
+- `POC_04_SESSOES.md` é o plano da próxima etapa; está em estado PLANEJAMENTO, não iniciada, e não autoriza implementar autenticação.
+- `ESPECIFICACAO_MVP.md` v0.4 consolida requisitos funcionais e as Fases 3 e 4; `MODELAGEM_DADOS.md` contém a modelagem lógica e o esquema físico aprovado conceitualmente (12 entidades/102 campos e 12 abas/102 colunas). Validações técnicas e implementação continuam pendentes.
+- `REGISTRO_DE_OCORRENCIAS.md` preserva o histórico de bugs, erros, vulnerabilidades e incidentes. Não criar ocorrência apenas por haver pendência de projeto ou risco conhecido ainda não observado como falha.
+- Atualize o contexto narrativo no mesmo trabalho quando decisões ou comportamentos relevantes mudarem.
+- O snapshot delimitado por marcadores é automatizado; não editar manualmente.
+- Não apagar ocorrências resolvidas. Corrigir informações de maneira rastreável.
+- O registro é público: incluir apenas resumos sanitizados e aprovados para divulgação.
+
+## 12. Validação e publicação
+
+Os comandos de validação são mantidos em `package.json`. O workflow de qualidade deve executar:
+
+1. Instalação reproduzível com `npm ci`.
+2. Auditoria de dependências com `npm audit --audit-level=high` (vulnerabilidades high/critical fazem a etapa falhar; avisos inferiores ainda podem existir).
+3. Validação estrutural do registro de ocorrências.
+4. ESLint.
+5. Build de produção do Vite.
+
+Os testes das POCs devem permanecer nos scripts npm e no workflow: `npm run test:poc01`, `npm run test:poc02` e `npm run test:poc03`. Não criar etapas E2E ou Lighthouse só para imitar outro projeto; introduzi-las quando houver fluxos reais que justifiquem esses testes.
+
+A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substitui a conferência do deployment, do SHA publicado e testes manuais de navegação/responsividade. Não afirmar que o Google Apps Script, Sheets ou Drive estão funcionando antes de validar sua integração real.
+
+## 13. Snapshot automatizado do repositório
+
+<!-- BEGIN AUTO-GENERATED SECTION -->
+
+## Snapshot automatizado do repositório
+
+> Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
+
+- **Commit de referência:** 7efc6bf9641ebeca912f139ed934b69226a11099
+- **Data do commit:** 2026-11-17T15:59:52-03:00
+- **Mensagem do commit:** docs: adicionar relatório integrador do Conecta Local
+- **Branch desta execução:** dev
+- **Projeto declarado:** home-service@0.0.0
+- **Scripts npm:** 10
+- **Dependências de runtime:** 4
+- **Dependências de desenvolvimento:** 11
+- **Workflows:** 2
+- **Scripts de automação:** 3
+
+### Scripts npm
+
+| Comando | Definição |
+|---|---|
+| npm run dev | vite |
+| npm run build | vite build |
+| npm run lint | eslint . |
+| npm run preview | vite preview |
+| npm run check:occurrences | node scripts/validate-occurrence-register.mjs |
+| npm run update:ai-context | node scripts/update-ai-context.mjs |
+| npm run test:poc01 | node --test tests/poc01/backend.test.js |
+| npm run test:poc02 | node --test tests/poc02/backend.test.js tests/poc02/apps-script.test.js |
+| npm run test:poc03 | node --test tests/poc03/apps-script.test.js |
+| npm run test:loo | node --test tests/loo/domain-entities.test.js |
+
+### Variáveis declaradas no .env.example
+
+> Somente os nomes são listados; valores nunca são lidos nem publicados.
+
+- APPS_SCRIPT_HMAC_SECRET
+- APPS_SCRIPT_WEB_APP_URL
+
+### Dependências de runtime
+
+| Pacote | Versão declarada |
+|---|---|
+| hash-wasm | 4.13.0 |
+| lucide-react | ^1.61.0 |
+| react | ^19.3.1 |
+| react-dom | ^19.3.1 |
+
+### Dependências de desenvolvimento
+
+| Pacote | Versão declarada |
+|---|---|
+| @eslint/js | ^10.0.1 |
+| @tailwindcss/vite | ^4.3.5 |
+| @types/react | ^19.3.0 |
+| @types/react-dom | ^19.3.0 |
+| @vitejs/plugin-react | ^6.1.2 |
+| eslint | ^10.14.0 |
+| eslint-plugin-react-hooks | ^7.1.1 |
+| eslint-plugin-react-refresh | ^0.5.7 |
+| globals | ^17.13.0 |
+| tailwindcss | ^4.3.5 |
+| vite | ^8.3.6 |
+
+### Workflows do GitHub Actions
+
+- .github/workflows/ai-context.yml — AI Context — Synchronize
+- .github/workflows/validate.yml — Validate Home Service
+
+### Scripts de automação
+
+- scripts/poc02-replay-check.mjs
+- scripts/update-ai-context.mjs
+- scripts/validate-occurrence-register.mjs
+
+### Arquivos JavaScript/JSX em src/
+
+- src/App.jsx
+- src/components/home/hero-search.jsx
+- src/components/home/home-sections.jsx
+- src/components/home/site-header.jsx
+- src/components/ui/badge.jsx
+- src/components/ui/button.jsx
+- src/components/ui/card.jsx
+- src/components/ui/input.jsx
+- src/data/homepage.js
+- src/lib/utils.js
+- src/main.jsx
+- src/pages/AuthDemoPage.jsx
+- src/pages/HomePage.jsx
+- src/pages/Poc01Page.jsx
+- src/services/app-api.js
+- src/services/poc-01-api.js
+
+### Diretórios principais de src/
+
+- src/components/
+- src/data/
+- src/lib/
+- src/pages/
+- src/services/
+
+### Oito commits recentes até o commit de referência
+
+| Commit | Data | Mensagem |
+|---|---|---|
+| 7efc6bf | 2026-11-17 | docs: adicionar relatório integrador do Conecta Local |
+| 90abaab | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
+| 1e33c0e | 2026-11-17 | fix: manter serviços de exemplo junto aos cadastrados (#17) |
+| 39de5fe | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
+| 44088f4 | 2026-11-16 | feat(loo): integrar orientacao a objetos no backend |
+| f5c289c | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
+| 5033dbd | 2026-11-16 | feat: adicionar protótipo funcional do Conecta Local |
+| 42e3a0a | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
+
+<!-- END AUTO-GENERATED SECTION -->

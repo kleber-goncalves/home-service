@@ -1,0 +1,69 @@
+name: Validate Home Service
+
+on:
+  push:
+    branches:
+      - "**"
+    paths-ignore:
+      - "docs/AI_CONTEXT.md"
+  pull_request:
+    branches:
+      - main
+      - dev
+    paths-ignore:
+      - "docs/AI_CONTEXT.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Lint, occurrence register and production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit production dependencies (blocking)
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Report full dependency audit (development tooling)
+        continue-on-error: true
+        run: npm audit --audit-level=high
+
+      - name: Run POC-01 gateway tests
+        run: npm run test:poc01
+
+      - name: Run POC-02 gateway security tests
+        run: npm run test:poc02
+
+      - name: Run POC-03 password KDF compatibility tests
+        run: npm run test:poc03
+
+      - name: Run LOO domain entity tests
+        run: npm run test:loo
+
+      - name: Validate occurrence register
+        run: npm run check:occurrences
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Build production bundle
+        run: npm run build
