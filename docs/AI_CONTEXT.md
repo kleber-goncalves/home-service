@@ -311,10 +311,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 7efc6bf9641ebeca912f139ed934b69226a11099
-- **Data do commit:** 2026-11-17T15:59:52-03:00
-- **Mensagem do commit:** docs: adicionar relatório integrador do Conecta Local
-- **Branch desta execução:** dev
+- **Commit de referência:** 43d77af8febae30aec67488aedc34e6e258455e1
+- **Data do commit:** 2026-11-17T16:09:25-03:00
+- **Mensagem do commit:** release: integrar dev em main (#19)
+- **Branch desta execução:** main
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 10
 - **Dependências de runtime:** 4
@@ -411,13 +411,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 43d77af | 2026-11-17 | release: integrar dev em main (#19) |
+| 9177c35 | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
 | 7efc6bf | 2026-11-17 | docs: adicionar relatório integrador do Conecta Local |
 | 90abaab | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
 | 1e33c0e | 2026-11-17 | fix: manter serviços de exemplo junto aos cadastrados (#17) |
 | 39de5fe | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 44088f4 | 2026-11-16 | feat(loo): integrar orientacao a objetos no backend |
 | f5c289c | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| 5033dbd | 2026-11-16 | feat: adicionar protótipo funcional do Conecta Local |
-| 42e3a0a | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
