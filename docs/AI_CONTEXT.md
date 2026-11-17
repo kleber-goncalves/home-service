@@ -311,14 +311,14 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 3a037fb31751e330475d4239c23bdf5d508d2305
-- **Data do commit:** 2026-11-17T14:16:13-03:00
-- **Mensagem do commit:** fix: manter exemplos ao exibir serviços cadastrados
+- **Commit de referência:** 0416a2d9fc75ced03f119ce1c115e7582b1d35c7
+- **Data do commit:** 2026-11-17T14:29:26-03:00
+- **Mensagem do commit:** docs: registrar classificação e alertas de dependências
 - **Branch desta execução:** fix/manter-servicos-exemplo-home
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 10
-- **Dependências de runtime:** 6
-- **Dependências de desenvolvimento:** 9
+- **Dependências de runtime:** 4
+- **Dependências de desenvolvimento:** 11
 - **Workflows:** 2
 - **Scripts de automação:** 3
 
@@ -348,18 +348,17 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Pacote | Versão declarada |
 |---|---|
-| @tailwindcss/vite | ^4.3.5 |
 | hash-wasm | 4.13.0 |
 | lucide-react | ^1.61.0 |
 | react | ^19.3.1 |
 | react-dom | ^19.3.1 |
-| tailwindcss | ^4.3.5 |
 
 ### Dependências de desenvolvimento
 
 | Pacote | Versão declarada |
 |---|---|
 | @eslint/js | ^10.0.1 |
+| @tailwindcss/vite | ^4.3.5 |
 | @types/react | ^19.3.0 |
 | @types/react-dom | ^19.3.0 |
 | @vitejs/plugin-react | ^6.1.2 |
@@ -367,6 +366,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | eslint-plugin-react-hooks | ^7.1.1 |
 | eslint-plugin-react-refresh | ^0.5.7 |
 | globals | ^17.13.0 |
+| tailwindcss | ^4.3.5 |
 | vite | ^8.3.6 |
 
 ### Workflows do GitHub Actions
@@ -411,13 +411,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 0416a2d | 2026-11-17 | docs: registrar classificação e alertas de dependências |
+| 9545946 | 2026-11-17 | ci: bloquear auditoria de produção e reportar alertas dev |
+| dea7acc | 2026-11-17 | build: sincronizar lockfile com dependências de desenvolvimento |
+| 34bbe8c | 2026-11-17 | build: classificar Tailwind como dependência de desenvolvimento |
+| fa9302d | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
 | 3a037fb | 2026-11-17 | fix: manter exemplos ao exibir serviços cadastrados |
 | 39de5fe | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 | 44088f4 | 2026-11-16 | feat(loo): integrar orientacao a objetos no backend |
-| f5c289c | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| 5033dbd | 2026-11-16 | feat: adicionar protótipo funcional do Conecta Local |
-| 42e3a0a | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| ffca51c | 2026-11-14 | docs(poc-04): adicionar matriz de cenarios e aceite |
-| 44da445 | 2026-11-14 | docs(ai-context): atualizar estado e passagem para novo chat |
 
 <!-- END AUTO-GENERATED SECTION -->
