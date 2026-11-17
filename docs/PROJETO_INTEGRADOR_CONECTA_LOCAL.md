@@ -396,7 +396,7 @@ A existência de um teste automatizado no repositório não significa que toda a
 | T11 | Criação e alteração de serviço | Criar um serviço, pausar e publicar novamente. | Estado é salvo no Sheets e refletido na área do profissional. | Implementado no código; validar ponta a ponta no Preview. |
 | T12 | Visibilidade pública e autorização | Publicar serviço e consultar homepage; tentar alterar serviço que não pertence ao usuário autenticado. | Serviço publicado elegível aparece; operação de outro proprietário é negada. | Regras presentes no backend; registrar evidência manual de ponta a ponta. |
 | T13 | Logout e revogação | Encerrar a sessão e tentar acessar uma operação protegida com a sessão anterior. | Sessão é revogada, cookie expirado e operação protegida recusada. | Implementado no código; revalidar manualmente no Preview. |
-| T14 | Origem externa | Enviar requisição com origem diferente da permitida. | Gateway responde com recusa; operação não chega ao backend de negócio. | Proteção presente no código; cenários negativos constam na cobertura de gateway. |
+| T14 | Origem externa | Enviar requisição com origem diferente da permitida. | Gateway responde com recusa; operação não chega ao backend de negócio. | Validação implementada em `server/app-gateway.js`; automatizar e registrar o teste específico de origem rejeitada ainda está pendente. |
 
 ### 7.2. Comandos de validação
 
