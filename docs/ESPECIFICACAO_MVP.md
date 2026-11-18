@@ -22,7 +22,7 @@ A branch `dev` contém a demonstração acadêmica atual do Conecta Local. O PR 
 
 A validação manual ponta a ponta do PR #15 foi realizada em Preview em 16/11/2026, com dados fictícios. Ela confirmou catálogo, cadastro/ativação, persistência na planilha, login, criação de serviço, pausa/publicação, logout e novo login/refresh. Como os PRs #16 (orientação a objetos) e #17 (correção da vitrine) foram integrados depois, a jornada completa precisa ser repetida no Preview atualizado de `dev` antes do encerramento da demonstração.
 
-Os PRs #18 (relatório integrador) e #19 (integração de `dev` em `main`) também foram concluídos. Em 18/11/2026, `main` e `dev` estão alinhadas no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`.
+Os PRs #18 (relatório integrador) e #19 (integração de `dev` em `main`) também foram concluídos. O PR #19 levou o código funcional ao commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`. Depois, a PR #20 atualizou apenas documentação em `dev`; `main` permanece no commit de release e `dev` está à frente somente por esses documentos e pelo snapshot automático. O código funcional permanece alinhado.
 
 **O que está implementado na demonstração**
 - Homepage pública e filtros locais sobre dados de exemplo e serviços retornados pelo backend.

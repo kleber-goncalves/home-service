@@ -8,7 +8,7 @@ O projeto tem finalidade acadêmica e busca demonstrar investigação de problem
 
 A branch `dev` contém a demonstração acadêmica atual do Conecta Local. O PR #15 foi integrado em 16/11/2026 e trouxe o fluxo conectado ao Google Sheets: cadastro de profissional, confirmação demonstrativa por código, login, sessão, atualização de perfil, criação de serviços, pausa/publicação e consulta pública dos serviços publicados. O percurso ponta a ponta foi validado manualmente no Preview da branch de implementação em 16/11/2026, usando exclusivamente dados fictícios.
 
-Os PRs #16 (orientação a objetos), #17 (preservação dos serviços de exemplo na vitrine) e #18 (relatório integrador) também foram integrados em `dev`. O PR #19 integrou `dev` em `main`; em 18/11/2026 as branches foram alinhadas no commit `49354a4`.
+Os PRs #16 (orientação a objetos), #17 (preservação dos serviços de exemplo na vitrine) e #18 (relatório integrador) também foram integrados em `dev`. O PR #19 integrou `dev` em `main`, levando o código funcional ao commit `49354a4`. Depois, a PR #20 atualizou somente documentação e foi mesclada em `dev`; assim, `main` permanece em `49354a4` e `dev` está à frente apenas por alterações documentais, sem divergência no código funcional.
 
 **Ambientes**
 - **Preview de `dev`:** ambiente destinado ao desenvolvimento e à demonstração funcional. A validação ponta a ponta deve ser repetida neste Preview após as integrações mais recentes.
