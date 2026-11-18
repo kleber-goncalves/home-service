@@ -57,7 +57,13 @@ O GitHub Actions executa essas verificações em pushes e Pull Requests direcion
 - [Modelagem lógica e física dos dados](docs/MODELAGEM_DADOS.md)
 - [Arquitetura de integração Vercel Functions + Apps Script](docs/ARQUITETURA_APPS_SCRIPT.md)
 - [POC-01 — Comunicação React, Vercel Functions e Apps Script](docs/POC_01_COMUNICACAO.md)
+- [POC-02 — HMAC e proteção contra replay](docs/POC_02_ASSINATURA_GATEWAY.md)
+- [POC-03 — Investigação de armazenamento de senhas](docs/POC_03_ARMAZENAMENTO_SENHAS.md)
+- [Orientação a objetos no backend](docs/LOO_ORIENTACAO_OBJETOS.md)
+- [Relatório integrador acadêmico](docs/PROJETO_INTEGRADOR_CONECTA_LOCAL.md)
 - [Registro público de ocorrências](docs/REGISTRO_DE_OCORRENCIAS.md)
+
+A POC-04 está isolada na branch `feat/poc-04-session-cookie`, PR #14 em Draft, e ainda não integra `dev`.
 
 ## Créditos das imagens
 
