@@ -15,7 +15,7 @@
 - O gateway em `api/app.js` → `server/app-gateway.js` bloqueia as operações de negócio fora de Vercel Preview. Production permanece como vitrine pública, conforme decisão do responsável pelo projeto.
 - O Apps Script de negócio está em `apps-script/conecta-local/Code.gs`. O fluxo atual utiliza oito abas operacionais do Sheets: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`. A modelagem aprovada contempla 12 abas; as quatro restantes ainda não têm fluxo operacional implementado.
 - Argon2id (`hash-wasm@4.13.0`) e comparação de hash por `timingSafeEqual` estão integrados no gateway do protótipo. Isso atende à demonstração acadêmica, não constitui auditoria independente ou aprovação para produção.
-- A POC-04 continua separada na branch `feat/poc-04-session-cookie`, PR #14 em Draft. Já possui implementação e validações automatizadas/manuais parciais, mas ainda depende das verificações listadas em `docs/POC_04_SESSOES.md` e no corpo da PR. Não conectar essa POC à autenticação principal.
+- A POC-04 continua separada na branch `feat/poc-04-session-cookie`, PR #14 em Draft. Já possui implementação e validações automatizadas/manuais parciais, mas ainda depende das verificações listadas em `corpo da PR #14` e no corpo da PR. Não conectar essa POC à autenticação principal.
 - Usar somente dados fictícios. Não configurar backend em Production nesta etapa.
 
 ## 1. Instruções para a IA que assumir o projeto
