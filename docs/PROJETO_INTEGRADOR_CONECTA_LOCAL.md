@@ -427,7 +427,7 @@ O workflow do GitHub Actions executa essas etapas de validação. A auditoria co
 7. Abrir a homepage e verificar a visibilidade do serviço publicado e o canal de contato.
 8. Encerrar a sessão e verificar que o acesso protegido exige nova autenticação.
 
-**Estado de implantação em 18/11/2026:** após sincronizar `dev` com `main`, a Vercel publicou um Preview da branch `dev` no commit `49354a4` com estado `READY`. Isso confirma build e publicação; não comprova, isoladamente, a jornada ponta a ponta. O fluxo manual foi validado no Preview da branch de implementação do PR #15 em 16/11/2026, mas precisa ser repetido no Preview atualizado de `dev` após as integrações #16 e #17.
+**Estado de implantação em 18/11/2026:** após o merge da PR #20, a Vercel publicou um Preview da branch `dev` no commit `6c787ec` com estado `READY`. A PR #20 e os commits subsequentes deste ajuste são exclusivamente documentais; o código funcional foi originalmente sincronizado com `main` no commit `49354a4`. O estado `READY` confirma build e publicação, não a jornada ponta a ponta. O fluxo manual foi validado no Preview da branch de implementação do PR #15 em 16/11/2026, mas precisa ser repetido no Preview atualizado de `dev` após as integrações #16 e #17.
 
 ## 8. Viabilidade — custos e benefícios
 
