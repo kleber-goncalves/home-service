@@ -4,7 +4,7 @@
 **Natureza:** projeto acadêmico de desenvolvimento web  
 **Versão do documento:** 1.0  
 **Data de consolidação:** 17 de novembro de 2026  
-**Base técnica analisada:** branch `dev`, commit `90abaabcd1dfcb4f22370f3792bfba189663f035`  
+**Base técnica analisada:** branches `dev` e `main`, commit `49354a46863d5a5eb36ce32e450b975d4087fe3b` (18/11/2026)  
 **Ambiente de demonstração:** Vercel Preview — `https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app`
 
 > **Finalidade:** apresentar como o Conecta Local atende às oito etapas solicitadas na atividade integradora: investigação, dados, APS, LOO, PI, segurança, testes e viabilidade. O documento diferencia funcionalidades implementadas, decisões de projeto, evidências existentes e atividades ainda pendentes.
@@ -29,7 +29,7 @@ O projeto já possui implementação concreta de orientação a objetos, control
 | 4. LOO — Linguagem Orientada a Objetos | Implementada | Classes `Usuario`, `Profissional` e `Servico`, com herança e testes automatizados. |
 | 5. PI — Programação/Projeto de Interface | Implementada | Interface React/JSX, CSS/Tailwind e fluxos responsivos. |
 | 6. Segurança | Implementada em nível de protótipo | Hash de senha, sessão, CSRF, HMAC, validação de origem e auditoria; sem aprovação para produção. |
-| 7. Testes | Estruturada e parcialmente validada em integração | Suítes automatizadas e cenários manuais definidos; revalidar os fluxos reais no Preview após configuração. |
+| 7. Testes | Suítes automatizadas aprovadas; integração manual validada parcialmente | O PR #15 teve validação ponta a ponta no Preview de sua branch em 16/11/2026. Repetir a jornada no Preview atualizado de `dev` após os PRs #16 e #17. A POC-04 ainda possui ensaios manuais pendentes. |
 | 8. Viabilidade | Análise preliminar | Custos de demonstração baixos; uso comercial exige plano e infraestrutura adequados. |
 
 **Critério de leitura:** “implementado” significa que há código ou estrutura versionada. Não significa, por si só, que todos os fluxos foram novamente testados em ambiente real, que houve auditoria independente ou que o sistema esteja liberado para produção.
@@ -391,12 +391,12 @@ A existência de um teste automatizado no repositório não significa que toda a
 | T06 | Política de senha | Testar senha abaixo do mínimo, senha válida de 15+ caracteres, Unicode e limites de bytes. | Entradas inválidas são recusadas; entradas dentro da política podem ser processadas. | Testes automatizados POC-03 existentes. |
 | T07 | Hash de senha | Gerar hash Argon2id e comparar senha correta e incorreta. | Senha correta valida; senha diferente não autentica. | Testes isolados da POC-03; a suíte do produto não substitui ensaio de integração completo. |
 | T08 | Herança e operações LOO | Instanciar `Profissional`, verificar herança de `Usuario`, pausar e publicar um `Servico`. | Atributos e payloads corretos; estados `paused` e `published`. | Cinco casos automatizados em `tests/loo/domain-entities.test.js`. |
-| T09 | Cadastro e confirmação | Criar conta totalmente fictícia e usar o código exibido na interface. | Conta é registrada; código válido ativa o fluxo; código inválido/expirado é recusado. | Implementado no código; executar no Preview para validar integração atual. |
-| T10 | Login e restauração de sessão | Entrar com credencial fictícia e recarregar a página. | Sessão é reconhecida pelo backend; dados do profissional são carregados. | Implementado no código; revalidar manualmente após a correção das variáveis Preview. |
-| T11 | Criação e alteração de serviço | Criar um serviço, pausar e publicar novamente. | Estado é salvo no Sheets e refletido na área do profissional. | Implementado no código; validar ponta a ponta no Preview. |
-| T12 | Visibilidade pública e autorização | Publicar serviço e consultar homepage; tentar alterar serviço que não pertence ao usuário autenticado. | Serviço publicado elegível aparece; operação de outro proprietário é negada. | Regras presentes no backend; registrar evidência manual de ponta a ponta. |
-| T13 | Logout e revogação | Encerrar a sessão e tentar acessar uma operação protegida com a sessão anterior. | Sessão é revogada, cookie expirado e operação protegida recusada. | Implementado no código; revalidar manualmente no Preview. |
-| T14 | Origem externa | Enviar requisição com origem diferente da permitida. | Gateway responde com recusa; operação não chega ao backend de negócio. | Validação implementada em `server/app-gateway.js`; automatizar e registrar o teste específico de origem rejeitada ainda está pendente. |
+| T09 | Cadastro e confirmação | Criar conta totalmente fictícia e usar o código exibido na interface. | Conta é registrada; código válido ativa o fluxo; código inválido/expirado é recusado. | Validado manualmente no Preview da branch do PR #15 em 16/11/2026; repetir no Preview atualizado de `dev`. |
+| T10 | Login e restauração de sessão | Entrar com credencial fictícia e recarregar a página. | Sessão é reconhecida pelo backend; dados do profissional são carregados. | Validado manualmente no Preview da branch do PR #15 em 16/11/2026; repetir no Preview atualizado de `dev`. |
+| T11 | Criação e alteração de serviço | Criar um serviço, pausar e publicar novamente. | Estado é salvo no Sheets e refletido na área do profissional. | Criar, pausar e publicar novamente foi validado manualmente no Preview da branch do PR #15 em 16/11/2026; repetir no Preview atualizado de `dev`. Edição/remoção não fazem parte da implementação atual. |
+| T12 | Visibilidade pública e autorização | Publicar serviço e consultar homepage; tentar alterar serviço que não pertence ao usuário autenticado. | Serviço publicado elegível aparece; operação de outro proprietário é negada. | Visibilidade de serviço publicado na homepage foi validada no Preview do PR #15 em 16/11/2026. O ensaio adversarial de acesso cruzado entre profissionais ainda precisa de evidência específica. |
+| T13 | Logout e revogação | Encerrar a sessão e tentar acessar uma operação protegida com a sessão anterior. | Sessão é revogada, cookie expirado e operação protegida recusada. | Logout, novo login e refresh foram validados manualmente no Preview do PR #15 em 16/11/2026; repetir no Preview atualizado de `dev`. |
+| T14 | Origem externa | Enviar requisição com origem diferente da permitida. | Gateway responde com recusa; operação não chega ao backend de negócio. | Validação de Origin implementada no gateway. A evidência específica de rejeição manual no Preview atualizado de `dev` ainda precisa ser registrada. |
 
 ### 7.2. Comandos de validação
 
@@ -427,7 +427,7 @@ O workflow do GitHub Actions executa essas etapas de validação. A auditoria co
 7. Abrir a homepage e verificar a visibilidade do serviço publicado e o canal de contato.
 8. Encerrar a sessão e verificar que o acesso protegido exige nova autenticação.
 
-**Estado de implantação em 17/11/2026:** a implantação Preview baseada no commit `90abaab` da branch `dev` foi concluída e ficou `READY`. Esse estado confirma que o build e a publicação foram concluídos; não comprova, isoladamente, que login, integração com Sheets e todos os cenários ponta a ponta passaram após a alteração de variáveis. A validação manual do fluxo real continua sendo necessária.
+**Estado de implantação em 18/11/2026:** após sincronizar `dev` com `main`, a Vercel publicou um Preview da branch `dev` no commit `49354a4` com estado `READY`. Isso confirma build e publicação; não comprova, isoladamente, a jornada ponta a ponta. O fluxo manual foi validado no Preview da branch de implementação do PR #15 em 16/11/2026, mas precisa ser repetido no Preview atualizado de `dev` após as integrações #16 e #17.
 
 ## 8. Viabilidade — custos e benefícios
 
@@ -523,6 +523,7 @@ A conclusão adequada é que o Conecta Local é um **protótipo acadêmico funci
 - `docs/POC_01_COMUNICACAO.md` — comunicação entre frontend, Vercel e Apps Script.
 - `docs/POC_02_ASSINATURA_GATEWAY.md` — HMAC e proteção contra replay.
 - `docs/POC_03_ARMAZENAMENTO_SENHAS.md` — investigação e validação do armazenamento de senhas.
+- A POC-04 está em uma branch independente (`feat/poc-04-session-cookie`), na PR #14 em Draft; a documentação e as pendências completas permanecem nessa branch até a conclusão da revisão.
 - `docs/REGISTRO_DE_OCORRENCIAS.md` — histórico sanitizado de ocorrências.
 
 ---

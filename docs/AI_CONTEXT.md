@@ -2,16 +2,21 @@
 
 > Documento de continuidade do projeto. Leia antes de sugerir ou realizar alterações. Reúne propósito, decisões, arquitetura planejada, estado implementado, regras de manutenção e limitações. A seção de snapshot ao final é atualizada pelo GitHub Actions.
 
-## Atualização vigente — 2026-11-16
+## Atualização vigente — 2026-11-18
 
-> Esta atualização prevalece sobre os trechos históricos datados de 2026-11-14 que ainda descrevem a integração funcional como estando somente em uma branch separada ou como pendente.
+> Esta seção registra o estado mais recente conhecido. Consulte os SHAs e os arquivos do branch efetivamente em análise antes de realizar mudanças.
 
-- O PR #15 (`feat/prototipo-demo-profissional` → `dev`) foi integrado por squash merge. A branch `dev` contém agora o protótipo funcional com cadastro, confirmação demonstrativa, login, sessão, perfil, criação/pausa/publicação de serviços e persistência no Google Sheets via Apps Script.
-- O gateway funcional está em `api/app.js` → `server/app-gateway.js`. O Apps Script correspondente está em `apps-script/conecta-local/Code.gs`. A configuração do ambiente Preview está documentada em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`.
-- O fluxo validado pelo responsável do projeto usa dados fictícios. A demonstração continua restrita ao ambiente Preview e não deve ser descrita como produto pronto para produção.
-- A POC-04 continua isolada na branch `feat/poc-04-session-cookie` e não deve ser misturada à autenticação do protótipo.
-- A atividade acadêmica de LOO está sendo implementada separadamente na branch `feat/loo-orientacao-objetos`, criada a partir de `dev`. As classes `Usuario`, `Profissional` e `Servico` ficam em `server/domain-entities.js` e são utilizadas pelo gateway Node.js. A documentação específica está em `docs/LOO_ORIENTACAO_OBJETOS.md`; os testes ficam em `tests/loo/domain-entities.test.js` e são executados por `npm run test:loo`.
-- As classes de domínio organizam atributos, métodos e montagem dos payloads no Node.js. A validação final, autenticação, autorização, persistência e auditoria continuam sob responsabilidade do Apps Script.
+- O PR #15 (`feat/prototipo-demo-profissional` → `dev`) foi integrado em 16/11/2026. O protótipo funcional com cadastro, confirmação demonstrativa, login, sessão, perfil, criação/pausa/publicação de serviços e persistência no Google Sheets está na branch `dev`.
+- O PR #15 teve validação manual ponta a ponta em Preview em 16/11/2026, usando dados fictícios: catálogo, cadastro/ativação, persistência, login, criação de serviço, pausa/publicação, logout e novo login/refresh foram conferidos. Como os PRs #16 e #17 foram integrados depois, repetir o percurso no Preview atualizado de `dev` antes de encerrar a demonstração.
+- O PR #16 integrou as classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`, com testes em `tests/loo/domain-entities.test.js` (`npm run test:loo`). O PR #17 corrigiu a composição da vitrine para manter os serviços de exemplo junto aos serviços cadastrados.
+- O PR #18 adicionou `docs/PROJETO_INTEGRADOR_CONECTA_LOCAL.md`. O PR #19 integrou `dev` em `main`.
+- Em 18/11/2026, `main` e `dev` estão alinhadas no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`. A sincronização de `dev` foi feita por fast-forward, sem force push.
+- O ambiente Preview de `dev` contém variáveis `CONECTA_LOCAL_*` com escopo Preview; os valores são secretos e não devem ser lidos, copiados para documentação ou compartilhados. A Production permanece sem variáveis de backend.
+- O gateway em `api/app.js` → `server/app-gateway.js` bloqueia as operações de negócio fora de Vercel Preview. Production permanece como vitrine pública, conforme decisão do responsável pelo projeto.
+- O Apps Script de negócio está em `apps-script/conecta-local/Code.gs`. O fluxo atual utiliza oito abas operacionais do Sheets: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`. A modelagem aprovada contempla 12 abas; as quatro restantes ainda não têm fluxo operacional implementado.
+- Argon2id (`hash-wasm@4.13.0`) e comparação de hash por `timingSafeEqual` estão integrados no gateway do protótipo. Isso atende à demonstração acadêmica, não constitui auditoria independente ou aprovação para produção.
+- A POC-04 continua separada na branch `feat/poc-04-session-cookie`, PR #14 em Draft. Já possui implementação e validações automatizadas/manuais parciais, mas ainda depende das verificações listadas em `corpo da PR #14` e no corpo da PR. Não conectar essa POC à autenticação principal.
+- Usar somente dados fictícios. Não configurar backend em Production nesta etapa.
 
 ## 1. Instruções para a IA que assumir o projeto
 
@@ -89,36 +94,34 @@ A confirmação de e-mail e a recuperação de senha serão simuladas na interfa
 
 Não incluir pagamentos, contratação, contratos, agendamento, chat interno, avaliações, favoritos, geolocalização em tempo real ou aplicativo nativo no MVP.
 
-O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.2. A Fase 3 deverá modelar dados e relacionamentos a partir desses requisitos. A autenticação não está liberada para implementação até a prova de conceito técnica descrita na especificação.
+O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, e a modelagem lógica/física está em `docs/MODELAGEM_DADOS.md`. O protótipo de autenticação e gestão de serviços foi implementado e validado no Preview com dados fictícios; isso não equivale a liberação para produção. Requisitos adicionais ainda não implementados permanecem no backlog.
 
 ## 4. Estado atual do repositório
 
-**Estado atualizado em 2026-11-14 após os merges dos PRs #12 (POC-03) e #13 (interface demonstrativa):**
+**Estado atualizado em 18/11/2026 — branch `dev` e `main` no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`.**
 
-- A branch `dev` contém a homepage pública demonstrativa do Conecta Local, integrada por Pull Request.
-- `src/pages/HomePage.jsx` coordena a composição das seções e o estado local da busca e dos filtros.
-- `src/components/home/` contém cabeçalho, hero/busca e seções públicas reutilizáveis.
-- `src/components/ui/` contém primitivas locais editáveis (Button, Input, Card e Badge) no padrão visual shadcn/ui.
-- `components.json` e `jsconfig.json` preparam a estrutura para componentes JavaScript (`tsx: false`) e aliases `@/`; `vite.config.js` resolve o alias no Vite.
-- `src/index.css` concentra tokens visuais, estilos globais, responsividade, foco visível e preferência por movimento reduzido.
-- A busca e a seleção de categorias filtram somente registros demonstrativos em `src/data/homepage.js`. O campo de cidade é ilustrativo e não executa busca geográfica.
-- Os perfis e as fotografias não representam profissionais cadastrados. A natureza demonstrativa é indicada na interface.
-- As fotografias são carregadas de URLs externas do Pexels; a disponibilidade visual depende da conexão com esse serviço. Os créditos estão no README.
-- A validação de Pull Requests destinados a `dev` foi habilitada no workflow de CI pela correção integrada no PR #3.
-- O workflow de sincronização automática do AI Context e o workflow de validação foram executados com sucesso após a integração da homepage, conforme os registros consultados em 2026-11-09.
-- `main` permanece fora do escopo desta etapa; `dev` é a linha de integração do trabalho em andamento.
-- O arquivo Google Sheets estrutural foi criado pelo responsável pelo projeto com as 12 abas e os 102 cabeçalhos aprovados. A exportação XLSX foi inspecionada e a conferência manual de proteções e compartilhamento restrito foi confirmada pelo responsável.
-- A planilha estrutural tem as 12 abas e 102 cabeçalhos aprovados. `dev` ainda não grava nela; a branch `feat/prototipo-demo-profissional` contém um Apps Script específico para persistir usuários, profissionais, sessões, códigos, serviços e auditoria após sua implantação/configuração.
-- A POC-01 de comunicação React → Vercel Function → Apps Script foi integrada à branch `dev` pelo PR #10 em 2026-11-11 e validada manualmente em Preview: HTTP 200 (eco), 422 (erro lógico Apps Script), 502 (resposta upstream inválida), 400 (JSON inválido no navegador) e 405 (método não permitido). O merge commit foi `837f7c6172764ee27ac835c81e1224640d78478d`; o registro está em `docs/POC_01_COMUNICACAO.md`.
-- A POC-02 de assinatura HMAC-SHA-256 e proteção contra replay foi integrada à `dev` pelo PR #11 em 2026-11-11, após cinco cenários no Preview, cinco testes diretos no Apps Script isolado e um teste concorrente em que somente uma das duas chamadas idênticas foi aceita. Os resultados estão em `docs/POC_02_ASSINATURA_GATEWAY.md`.
-- **PR #12 — POC-03:** merge commit `465a38be2e71604bf7b44a618221b140e5fafac5`, integrado em 2026-11-14. PBKDF2 via Utilities foi reprovado; Argon2id com `hash-wasm@4.13.0` permanece candidato experimental (perfil `m=19456 KiB,t=2,p=1`, cinco medições, mediana 130 ms). Política de entrada 14/14, blocklist local 10/10, consulta HTTPS real ao Pwned Passwords com vetor público fixo `password`, throttling sintético persistente/concorrente e limpeza dos recursos temporários foram concluídos. **Nenhum comparador foi aprovado para autenticação**: XOR não tem garantia formal de tempo constante; helper Node `timingSafeEqual` permanece isolado. Ver `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
-- Na branch `dev`, a homepage ainda usa os dados ilustrativos. Na branch `feat/prototipo-demo-profissional`, há implementação versionada de cadastro/login/sessão e gravação de serviços no Sheets; o backend ainda precisa ser ativado com o Web App Apps Script e variáveis Vercel Preview. Envio de e-mail, upload no Drive e painel administrativo continuam ausentes.
-- **PR #13 — interface demonstrativa:** merge commit `770560f93b6a1ee44c31a1990ea4b64454fb1b23`, integrado em 2026-11-14. `dev` mantém a interface visual base. Na branch de entrega `feat/prototipo-demo-profissional`, `AuthDemoPage.jsx` foi conectada a `src/services/app-api.js`: cadastro, confirmação, login, sessão, criação e pausa/publicação de serviços. O Apps Script grava nas abas da planilha existente; a ativação externa (projeto Apps Script, Script Properties, implantação Web App e variáveis Preview) está descrita em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`.
-- As CI pós-merge de #13 (`Validate Home Service` #43623828275 e `AI Context — Synchronize` #43623828384) e #12 (`Validate Home Service` #43624907349 e `AI Context — Synchronize` #43624907085) concluíram SUCCESS em 2026-11-14. Não havia PRs abertos na última consulta. `main` permaneceu em `45412ad4f1c082590d9f800d8e6b707cfa35c5ed`; não recebeu esses merges.
-- A POC-04 de sessão sintética por cookie está isolada na branch `feat/poc-04-session-cookie`, PR #14 em Draft, base `dev`. Não reutilizá-la como autenticação da aplicação: a branch do protótipo funcional implementa seu próprio fluxo de login/sessão.
-- A homepage não processa pagamentos, agendamentos ou contratação.
+### Implementado e integrado
 
-A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e modelagem lógica/física. POC-01 (#10), POC-02 (#11), interface base (#13) e POC-03 experimental (#12) estão integradas à `dev`. A branch `feat/prototipo-demo-profissional` contém a primeira implementação do protótipo com persistência em Sheets via Apps Script e rotas server-side Vercel; sua ativação depende da configuração documentada em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`. A POC-04 continua separada em PR #14. Usar apenas dados fictícios.
+- Homepage pública demonstrativa em `src/pages/HomePage.jsx`, organizada com componentes reutilizáveis em `src/components/home/` e primitivas locais em `src/components/ui/`.
+- A homepage combina serviços reais da demonstração retornados por `public.services` com serviços/profissionais ilustrativos. Busca, categoria e cidade filtram os itens disponíveis no frontend; não há pesquisa geográfica externa ou geolocalização.
+- Cadastro, confirmação de código demonstrativo, login, sessão, atualização do perfil, criação de serviço, pausa/publicação e consulta pública de serviços implementados em `src/pages/AuthDemoPage.jsx`, `src/services/app-api.js`, `api/app.js` e `server/app-gateway.js`.
+- O fluxo funcional foi validado manualmente pelo responsável no Preview da branch de implementação em 16/11/2026: catálogo, cadastro/ativação, gravação em Sheets, login, criação, pausa/publicação, logout e novo login/refresh com dados fictícios. Repetir essa validação no Preview de `dev` após os PRs #16 e #17.
+- O Apps Script de negócio está em `apps-script/conecta-local/Code.gs`; utiliza operacionalmente as abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`.
+- O gateway aplica Argon2id (`hash-wasm@4.13.0`), comparação resistente a diferenças de tempo, cookie `HttpOnly; Secure; SameSite=Strict`, CSRF, HMAC servidor-servidor, validação de Origin e bloqueio fora de Preview.
+- POC-01 (#10), POC-02 (#11) e POC-03 (#12) estão integradas a `dev`; documentação específica em `docs/POC_01_COMUNICACAO.md`, `docs/POC_02_ASSINATURA_GATEWAY.md` e `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
+- PR #16 integrou LOO em JavaScript no gateway: `Usuario`, `Profissional` e `Servico`, com testes `npm run test:loo` e documentação em `docs/LOO_ORIENTACAO_OBJETOS.md`.
+- PR #17 manteve os serviços de exemplo na homepage quando existem serviços persistidos.
+- PR #18 adicionou o relatório integrador em `docs/PROJETO_INTEGRADOR_CONECTA_LOCAL.md`.
+- PR #19 integrou `dev` em `main`. A sincronização posterior de `dev` para o SHA de `main` foi fast-forward, sem force push.
+
+### Ambientes e limites
+
+- **Preview de `dev`:** ambiente da demonstração funcional; as variáveis `CONECTA_LOCAL_*` estão escopadas para Preview. Não registrar seus valores.
+- **Production (`main`):** vitrine pública. O gateway retorna `APP_DEMO_DISABLED` fora de `preview`; não há variáveis Production do backend e não se deve habilitá-lo nesta etapa.
+- O projeto é acadêmico e utiliza somente dados fictícios. Não inserir credenciais ou dados pessoais reais.
+- A modelagem prevê 12 abas/entidades; somente as oito listadas acima são atualmente utilizadas pelo backend de negócio. `CONTROLE_AUTENTICACAO`, `SERVICO_CIDADES`, `IMAGENS` e `DENUNCIAS` ainda não têm fluxos operacionais.
+- Ainda não implementados: recuperação/alteração de senha ou e-mail, edição e remoção de serviços, upload de imagens no Drive, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades.
+- A POC-04 está isolada na branch `feat/poc-04-session-cookie`, PR #14 em Draft. Não é a sessão do protótipo principal; concluir as verificações pendentes antes de decidir merge.
 
 ## 5. Arquitetura e decisões tecnológicas
 
@@ -133,16 +136,17 @@ A especificação v0.4 e `docs/MODELAGEM_DADOS.md` consolidam requisitos e model
 
 Não foi escolhida uma aplicação Next.js. Não adicionar Express por padrão: para manter o projeto simples, o Google Apps Script é a opção inicial de backend. Reavaliar somente se surgir requisito concreto que justifique uma API Node.js hospedada separadamente.
 
-### 5.2. Backend e dados planejados
+### 5.2. Backend e dados implementados e planejados
 
-- **Google Apps Script:** backend de negócio planejado para autenticação, autorização, regras, integridade e acesso a Sheets/Drive. O Web App isolado da POC-02 executa somente ações sintéticas `poc.*`; operações de negócio e acesso a dados ainda não estão integrados.
-- **Vercel Functions:** o gateway HTTP server-side da POC-01 e a assinatura HMAC-SHA-256 com proteção contra replay da POC-02 estão integrados à branch `dev` pelos PRs #10 e #11; a POC-02 permanece restrita a ações sintéticas `poc.*`.
-- **Google Sheets:** arquivo estrutural já criado pelo responsável, com 12 abas e 102 cabeçalhos aprovados; ainda não está integrado como armazenamento operacional.
-- **Google Drive:** armazenamento futuro das imagens enviadas pelos profissionais; fluxo de upload e permissões ainda não implementado.
+- **Google Apps Script:** backend de negócio implementado em `apps-script/conecta-local/Code.gs`, responsável por validar assinatura, sessão, conta, propriedade do serviço e operações permitidas.
+- **Vercel Functions:** gateway em `api/app.js` e `server/app-gateway.js`; o frontend chama somente a rota same-origin `POST /api/app`. O gateway executa Argon2id, gerencia o cookie HttpOnly/CSRF e assina as chamadas ao Apps Script.
+- **Google Sheets:** armazenamento operacional da demonstração nas abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`. A modelagem aprovada possui 12 abas; as quatro não listadas ainda não têm operações de negócio implementadas.
+- **Google Drive:** upload, armazenamento e gerenciamento de permissões de imagens ainda não implementados.
+- **POC-02:** permanece uma prova isolada para ações sintéticas `poc.*`; não confundir seu Apps Script de teste com o Apps Script funcional em `apps-script/conecta-local/Code.gs`.
 
-Fluxo aprovado para orientar a POC: React/Vite → rota same-origin da Vercel Function → Web App Apps Script → Google Sheets/Drive. A Function será somente gateway técnico: valida formato, tamanho, método, timeout, assinatura servidor-servidor e normalização de resposta. Não será dona das regras de negócio, dados, autenticação final ou autorização. O Apps Script continua sendo a autoridade de domínio e precisa recusar chamadas diretas sem uma assinatura válida do gateway. Não usar CORS do navegador para falar diretamente com Apps Script.
+Fluxo de negócio implementado: React/Vite → `POST /api/app` → Vercel Function → Apps Script → Google Sheets. O Apps Script é a autoridade para validação de sessão, identidade, propriedade, transições e persistência. O navegador não chama Apps Script diretamente.
 
-A estratégia de assinatura gateway→Apps Script e o possível cookie HttpOnly emitido pela Vercel continuam sujeitos a provas de conceito. A Function poderá emitir o cookie no domínio da aplicação; o Apps Script continuará validando o token e a sessão. A proposta completa, incluindo riscos, critérios de aceite e limites de TextOutput, está em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Google Sheets é uma solução de armazenamento simplificada para o escopo acadêmico; não é um banco relacional. Considerar concorrência, cotas, limites de execução, latência e integridade. Não prometer capacidade de produção em grande escala.
+A assinatura HMAC e o controle de replay foram provados na POC-02 e incorporados ao gateway de negócio. O cookie HttpOnly/Secure/SameSite, o CSRF e a validação de Origin fazem parte da autenticação do protótipo principal. A POC-04 é independente e permanece em validação; não é pré-requisito para a sessão já utilizada pelo protótipo. Google Sheets é uma solução simplificada para a demonstração acadêmica, não um banco relacional ou promessa de escala. Considerar cotas, concorrência, latência, integridade e recuperação de falhas.
 
 ### POC-01 — transporte real integrado e validado
 
@@ -179,34 +183,28 @@ Entidades/abas: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `
 
 Google Sheets não impõe automaticamente FKs, unicidade composta ou integridade relacional; esses controles pertencem ao Apps Script e exigem testes de concorrência. **A planilha estrutural foi criada e conferida; não há registros de negócio nem integração operacional.** A inserção futura deverá usar exclusivamente dados sintéticos e ocorrer após a validação dos fluxos de backend.
 
-### 5.4. Autenticação, e-mail e imagens — decisões e bloqueios
+### 5.4. Autenticação, e-mail e imagens — estado atual
 
-A arquitetura do backend e as POCs estão em [docs/ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Na branch `feat/prototipo-demo-profissional`, `src/pages/AuthDemoPage.jsx` chama `src/services/app-api.js`. `server/app-gateway.js` deriva/verifica Argon2id no servidor, aplica cookie HttpOnly/Secure/SameSite, CSRF, HMAC e bloqueio fora de Vercel Preview; `apps-script/conecta-local/Code.gs` valida assinatura, controla nonce, grava cadastros, ativa contas, cria/revoga sessões e gerencia serviços nas abas existentes. A ativação depende de seguir `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`. O código de confirmação é mostrado na tela, sem envio de e-mail.
+O fluxo principal está implementado em `src/pages/AuthDemoPage.jsx`, `src/services/app-api.js`, `server/app-gateway.js` e `apps-script/conecta-local/Code.gs`. O responsável validou manualmente cadastro, confirmação demonstrativa, login, sessão, criação/pausa/publicação de serviços, persistência, logout e novo login no Preview da branch de implementação em 16/11/2026. Revalidar no Preview atualizado de `dev` antes de concluir a demonstração.
 
-**Decisão funcional para a demonstração**
-- Cadastro e login próprios por e-mail e senha, com lógica no Apps Script; não adicionar Firebase ou provedor externo sem reabrir a decisão.
-- A demonstração utilizará dados fictícios e não deverá receber senhas ou dados reais.
-- Conta nasce em `pending_activation`; confirmação de e-mail simulada por código de 6 dígitos, validade de 10 minutos, máximo 5 tentativas e intervalo de 60 segundos para novo código.
-- Recuperação de senha usa as mesmas regras de código; novo código invalida o anterior; uso único.
-- O código é exibido somente na demonstração. Envio real por e-mail é uma etapa futura e deverá respeitar quotas e falhas do MailApp.
-- Senha: mínimo 15 caracteres, suporte a pelo menos 64, sem exigência de classes de caracteres, rejeição de senhas comuns e sem troca periódica obrigatória.
-- Login: 5 falhas dentro de uma janela de contabilização de 15 minutos geram bloqueio de 15 minutos; controle no backend por HMAC do e-mail normalizado; mensagens genéricas; testar abuso de bloqueio contra contas.
-- Sessões: 30 minutos de inatividade, máximo 8 horas; logout, alteração/recuperação de senha, suspensão e encerramento revogam sessões.
-- Alteração de e-mail só efetiva após confirmação do novo endereço; endereço anterior continua válido até então.
-- Primeiro administrador criado manualmente por procedimento controlado; papel administrativo nunca é definido por valor livre do frontend.
-- Toda conta `professional` precisa possuir exatamente um perfil válido em `PROFISSIONAIS` antes de ser ativada; conta `admin` não exige perfil. Mudança de papel que gere vínculos inconsistentes fica bloqueada até procedimento seguro e auditado.
+**Controles integrados ao protótipo**
+- Argon2id via `hash-wasm@4.13.0`, perfil usado no protótipo `m=19456 KiB,t=2,p=1`; a POC-03 registrou mediana de aproximadamente 130 ms nas medições realizadas. O algoritmo e a comparação foram integrados ao gateway, com `timingSafeEqual` para comparar hashes.
+- Política de senha de 15 a 128 caracteres, normalização NFC e rejeição de entradas inválidas/controles; a demonstração usa somente credenciais fictícias.
+- Cookie `__Host-conecta_local_session` com `HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/` e sem `Domain`; o token original não é enviado ao React e o Apps Script armazena o hash da sessão.
+- CSRF por cabeçalho, validação de Origin HTTPS exata, HMAC servidor-servidor e proteção contra replay.
+- O Apps Script controla criação, consulta, expiração e revogação de sessões e registra eventos principais na aba `AUDITORIA`.
 
-**Bloqueios técnicos antes de implementar**
-- Não armazenar senhas em texto puro e não usar SHA/digest rápido isolado como armazenamento de senha.
-- A POC-03 avaliou essas limitações: PBKDF2 artesanal sobre `Utilities` foi reprovado; Argon2id via WebAssembly continua candidato, não aprovado. O comparador XOR foi reprovado para autenticação por falta de garantia formal de tempo constante; o helper Node com `timingSafeEqual` permanece isolado e não integrado. A POC-03D validou a blocklist didática (10/10) e uma única consulta HTTPS real usando somente o vetor público fixo `password`; nada foi integrado ao cadastro/login. Consultar `docs/POC_03_ARMAZENAMENTO_SENHAS.md`; não conectar cadastro/login até nova decisão técnica.
-- A POC-04 ainda não foi executada. O plano está em `docs/POC_04_SESSOES.md`; a hipótese de cookie `HttpOnly` emitido pela Vercel e token validado pelo Apps Script precisa ser provada com valores sintéticos. Não escolher atributos finais nem assumir segurança antes de testar CSRF, Origin, expiração ociosa/absoluta, logout, revogação e falhas.
-- Testar concorrência e o risco de um atacante bloquear uma conta provocando tentativas incorretas.
-- A prova de conceito deverá usar dados sintéticos e não será considerada pronta para produção.
+**Limitações funcionais ainda abertas**
+- A confirmação de cadastro é demonstrativa: o código é exibido na interface, sem envio real de e-mail.
+- Recuperação de senha, alteração de senha, alteração de e-mail com confirmação e envio real de e-mail não estão implementados.
+- Edição/remoção de serviços, imagens no Drive e painel administrativo/moderação não estão implementados.
+- Não há auditoria independente, certificação, teste de carga ou autorização para uso em produção.
 
-**Imagens no Drive**
-- Decisão funcional: imagens de serviços publicados e contas ativas poderão ser visualizadas por link; serviços pausados, suspensos ou removidos e contas suspensas/encerradas terão acesso restringido.
-- O fluxo pretendido usa permissões equivalentes a `ANYONE_WITH_LINK` para visualização e `PRIVATE` para restringir, quando permitido pela conta. Pasta raiz privada; compartilhamento individual por arquivo; limite exato de 5.000.000 bytes; no máximo 1 imagem ativa por perfil e 5 por serviço, com posições exclusivas de 1 a 5. Testar em arquivos individuais e tratar falhas parciais.
-- Links públicos podem ser copiados e imagens podem ser baixadas; revogar a permissão não apaga cópias já obtidas. Não tratar esconder a URL na interface como controle de acesso.
+**POC-04 — sessão sintética independente**
+- A POC-04 possui implementação própria em `server/poc04-session-gateway.js`, `api/poc04/session.js` e `apps-script/poc-04/Code.gs`, com testes em `tests/poc04/`.
+- A PR #14 está em Draft e a branch `feat/poc-04-session-cookie` não integra o fluxo principal. A emissão/validação/rotação CSRF/logout tiveram validação manual parcial no Preview em 14/11/2026.
+- Antes de concluir a POC: conferir atributos efetivos do cookie, Origin ausente/externa e `Sec-Fetch-Site` cross-site, expiração ociosa/absoluta, replay e concorrência/LockService no Apps Script, falhas reais de armazenamento/timeout/upstream, limpeza dos recursos temporários e revisão final de segurança.
+- Não conectar a POC-04 ao `AuthDemoPage.jsx` nem tratar seus resultados como auditoria/certificação.
 
 ### 5.5. Limites da plataforma
 
@@ -311,10 +309,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 43d77af8febae30aec67488aedc34e6e258455e1
-- **Data do commit:** 2026-11-17T16:09:25-03:00
-- **Mensagem do commit:** release: integrar dev em main (#19)
-- **Branch desta execução:** main
+- **Commit de referência:** 5db757c84dcf41225c4db5f9bbd70720a6c414b5
+- **Data do commit:** 2026-11-18T16:14:19-03:00
+- **Mensagem do commit:** docs(readme): completar índice de documentação
+- **Branch desta execução:** docs/consolidar-estado-atual-mvp
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 10
 - **Dependências de runtime:** 4
@@ -411,13 +409,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| 43d77af | 2026-11-17 | release: integrar dev em main (#19) |
-| 9177c35 | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
-| 7efc6bf | 2026-11-17 | docs: adicionar relatório integrador do Conecta Local |
-| 90abaab | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
-| 1e33c0e | 2026-11-17 | fix: manter serviços de exemplo junto aos cadastrados (#17) |
-| 39de5fe | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
-| 44088f4 | 2026-11-16 | feat(loo): integrar orientacao a objetos no backend |
-| f5c289c | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
+| 5db757c | 2026-11-18 | docs(readme): completar índice de documentação |
+| 484bc8a | 2026-11-18 | docs(report): atualizar evidências e base técnica do relatório |
+| 8385bb4 | 2026-11-18 | docs(ai-context): atualizar snapshot automaticamente |
+| c79a7b6 | 2026-11-18 | docs(spec): atualizar status de implementação e validações |
+| 1b067b4 | 2026-11-18 | docs(ai-context): alinhar estado narrativo ao código atual |
+| a2861db | 2026-11-18 | docs(ai-context): atualizar snapshot automaticamente |
+| cea57a5 | 2026-11-18 | docs(readme): atualizar estado atual do protótipo |
+| 49354a4 | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
