@@ -10,7 +10,7 @@
 - O PR #15 teve validação manual ponta a ponta em Preview em 16/11/2026, usando dados fictícios: catálogo, cadastro/ativação, persistência, login, criação de serviço, pausa/publicação, logout e novo login/refresh foram conferidos. Como os PRs #16 e #17 foram integrados depois, repetir o percurso no Preview atualizado de `dev` antes de encerrar a demonstração.
 - O PR #16 integrou as classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`, com testes em `tests/loo/domain-entities.test.js` (`npm run test:loo`). O PR #17 corrigiu a composição da vitrine para manter os serviços de exemplo junto aos serviços cadastrados.
 - O PR #18 adicionou `docs/PROJETO_INTEGRADOR_CONECTA_LOCAL.md`. O PR #19 integrou `dev` em `main`.
-- Em 18/11/2026, `main` e `dev` estão alinhadas no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`. A sincronização de `dev` foi feita por fast-forward, sem force push.
+- O PR #19 sincronizou o código de `dev` com `main` por fast-forward, sem force push. Depois, o PR #20 foi mesclado apenas em `dev` e alterou quatro documentos; `main` permanece em `49354a46863d5a5eb36ce32e450b975d4087fe3b`, enquanto `dev` contém essas atualizações documentais e o snapshot automático. O código funcional não diverge entre as branches.
 - O ambiente Preview de `dev` contém variáveis `CONECTA_LOCAL_*` com escopo Preview; os valores são secretos e não devem ser lidos, copiados para documentação ou compartilhados. A Production permanece sem variáveis de backend.
 - O gateway em `api/app.js` → `server/app-gateway.js` bloqueia as operações de negócio fora de Vercel Preview. Production permanece como vitrine pública, conforme decisão do responsável pelo projeto.
 - O Apps Script de negócio está em `apps-script/conecta-local/Code.gs`. O fluxo atual utiliza oito abas operacionais do Sheets: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`. A modelagem aprovada contempla 12 abas; as quatro restantes ainda não têm fluxo operacional implementado.
@@ -98,7 +98,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 
 ## 4. Estado atual do repositório
 
-**Estado atualizado em 18/11/2026 — branch `dev` e `main` no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`.**
+**Estado atualizado em 18/11/2026 — código funcional alinhado ao release `49354a46863d5a5eb36ce32e450b975d4087fe3b`; `dev` contém commits documentais posteriores da PR #20, enquanto `main` permanece no commit de release.**
 
 ### Implementado e integrado
 
