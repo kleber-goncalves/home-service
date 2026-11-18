@@ -309,10 +309,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** adb22161634a63e9562a2d6a270a8ec145aef04a
-- **Data do commit:** 2026-11-18T16:20:35-03:00
-- **Mensagem do commit:** docs(report): atualizar estado pós-PR20
-- **Branch desta execução:** docs/corrigir-status-branches-pos-pr20
+- **Commit de referência:** b2ab6da1f54f695e156c3e2111e19386c265ce04
+- **Data do commit:** 2026-11-18T16:26:27-03:00
+- **Mensagem do commit:** docs: corrigir estado das branches após PR #20
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 10
 - **Dependências de runtime:** 4
@@ -409,13 +409,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| adb2216 | 2026-11-18 | docs(report): atualizar estado pós-PR20 |
-| bc6de1b | 2026-11-18 | docs(spec): corrigir sincronização após PR20 |
-| fb80452 | 2026-11-18 | docs(ai-context): registrar diferença documental entre branches |
-| a7dc8cb | 2026-11-18 | docs(readme): corrigir estado das branches após PR20 |
+| b2ab6da | 2026-11-18 | docs: corrigir estado das branches após PR #20 |
 | 11d2664 | 2026-11-18 | docs(ai-context): atualizar snapshot automaticamente |
 | 6c787ec | 2026-11-18 | docs: consolidar estado atual da demonstração acadêmica |
 | 49354a4 | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
 | 43d77af | 2026-11-17 | release: integrar dev em main (#19) |
+| 9177c35 | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
+| 7efc6bf | 2026-11-17 | docs: adicionar relatório integrador do Conecta Local |
+| 90abaab | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
