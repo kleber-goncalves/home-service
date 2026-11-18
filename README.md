@@ -4,21 +4,29 @@ Plataforma regional para aproximar pessoas que procuram serviços de profissiona
 
 O projeto tem finalidade acadêmica e busca demonstrar investigação de problemas, levantamento de requisitos, desenvolvimento web, modelagem, segurança e testes.
 
-## Estado atual
+## Estado atual — 18/11/2026
 
-A branch `dev` mantém a homepage pública demonstrativa. A branch `feat/prototipo-demo-profissional` acrescenta o fluxo conectado à planilha: cadastro, confirmação por código, login, sessão, área profissional, criação/pausa/publicação de serviços e vitrine de serviços publicados. A integração exige concluir a configuração do Apps Script e das variáveis Preview descritas em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`.
+A branch `dev` contém a demonstração acadêmica atual do Conecta Local. O PR #15 foi integrado em 16/11/2026 e trouxe o fluxo conectado ao Google Sheets: cadastro de profissional, confirmação demonstrativa por código, login, sessão, atualização de perfil, criação de serviços, pausa/publicação e consulta pública dos serviços publicados. O percurso ponta a ponta foi validado manualmente no Preview da branch de implementação em 16/11/2026, usando exclusivamente dados fictícios.
 
-O protótipo é acadêmico e deve usar apenas dados fictícios. Na branch de entrega, os fluxos de cadastro/login e gestão de serviços foram implementados com gravação no Google Sheets via Apps Script; o funcionamento depende da implantação e configuração do backend no ambiente Preview. Não é um serviço de produção nem um marketplace transacional.
+Os PRs #16 (orientação a objetos), #17 (preservação dos serviços de exemplo na vitrine) e #18 (relatório integrador) também foram integrados em `dev`. O PR #19 integrou `dev` em `main`; em 18/11/2026 as branches foram alinhadas no commit `49354a4`.
+
+**Ambientes**
+- **Preview de `dev`:** ambiente destinado ao desenvolvimento e à demonstração funcional. A validação ponta a ponta deve ser repetida neste Preview após as integrações mais recentes.
+- **Production (`main`):** vitrine pública. O gateway do protótipo bloqueia operações de negócio fora de Vercel Preview; não habilitar variáveis de backend em Production nesta etapa.
+
+O projeto é acadêmico, usa somente dados fictícios e não deve receber credenciais ou dados pessoais reais. Não é serviço comercial, marketplace transacional ou aplicação aprovada para produção.
 
 - **Repositório:** https://github.com/kleber-goncalves/home-service
-- **Deploy:** https://home-service-blush.vercel.app/
-- **Frontend:** React, JavaScript, Vite 8 e Tailwind CSS 4.
-- **Componentes:** primitivas locais editáveis no padrão visual shadcn/ui, configuradas para JavaScript.
-- **Ícones:** Lucide React.
-- **Backend de negócio:** Google Apps Script (`apps-script/conecta-local/Code.gs`) na branch de protótipo.
-- **Gateway HTTP:** Vercel Function (`api/app.js`, `server/app-gateway.js`) com HMAC, Argon2id no servidor, cookie HttpOnly e CSRF.
-- **Persistência:** Google Sheets nas abas existentes `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`.
-- **Imagens:** fotografias ilustrativas externas do Pexels; fontes e créditos abaixo.
+- **Preview de demonstração:** https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app
+- **Production (vitrine):** https://home-service-blush.vercel.app/
+- **Frontend:** React, JavaScript/JSX, Vite 8 e Tailwind CSS 4.
+- **Gateway HTTP:** Vercel Function em `api/app.js`, com regras em `server/app-gateway.js`.
+- **Backend de negócio:** Google Apps Script em `apps-script/conecta-local/Code.gs`.
+- **Persistência operacional atual:** Google Sheets nas abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`.
+- **Orientação a objetos:** classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`, integradas pelo PR #16.
+- **POC-04:** permanece isolada na PR #14, em Draft; não faz parte da autenticação principal.
+
+**Limitações conhecidas da demonstração:** recuperação e alteração de senha/e-mail, edição e remoção de serviços, upload de imagens no Google Drive, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades ainda não estão implementados. A modelagem aprovada prevê 12 abas; o backend atual utiliza operacionalmente as oito listadas acima.
 
 ## Executar localmente
 
