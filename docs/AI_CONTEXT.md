@@ -309,10 +309,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 5db757c84dcf41225c4db5f9bbd70720a6c414b5
-- **Data do commit:** 2026-11-18T16:14:19-03:00
-- **Mensagem do commit:** docs(readme): completar índice de documentação
-- **Branch desta execução:** docs/consolidar-estado-atual-mvp
+- **Commit de referência:** 6c787ec33fc32aa62e08d1564f53efbfa3b86575
+- **Data do commit:** 2026-11-18T16:16:02-03:00
+- **Mensagem do commit:** docs: consolidar estado atual da demonstração acadêmica
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 10
 - **Dependências de runtime:** 4
@@ -409,13 +409,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| 5db757c | 2026-11-18 | docs(readme): completar índice de documentação |
-| 484bc8a | 2026-11-18 | docs(report): atualizar evidências e base técnica do relatório |
-| 8385bb4 | 2026-11-18 | docs(ai-context): atualizar snapshot automaticamente |
-| c79a7b6 | 2026-11-18 | docs(spec): atualizar status de implementação e validações |
-| 1b067b4 | 2026-11-18 | docs(ai-context): alinhar estado narrativo ao código atual |
-| a2861db | 2026-11-18 | docs(ai-context): atualizar snapshot automaticamente |
-| cea57a5 | 2026-11-18 | docs(readme): atualizar estado atual do protótipo |
+| 6c787ec | 2026-11-18 | docs: consolidar estado atual da demonstração acadêmica |
 | 49354a4 | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
+| 43d77af | 2026-11-17 | release: integrar dev em main (#19) |
+| 9177c35 | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
+| 7efc6bf | 2026-11-17 | docs: adicionar relatório integrador do Conecta Local |
+| 90abaab | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
+| 1e33c0e | 2026-11-17 | fix: manter serviços de exemplo junto aos cadastrados (#17) |
+| 39de5fe | 2026-11-16 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
