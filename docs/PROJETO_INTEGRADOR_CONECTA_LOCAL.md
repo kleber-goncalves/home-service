@@ -29,7 +29,7 @@ O projeto já possui implementação concreta de orientação a objetos, control
 | 4. LOO — Linguagem Orientada a Objetos | Implementada | Classes `Usuario`, `Profissional` e `Servico`, com herança e testes automatizados. |
 | 5. PI — Programação/Projeto de Interface | Implementada | Interface React/JSX, CSS/Tailwind e fluxos responsivos. |
 | 6. Segurança | Implementada em nível de protótipo | Hash de senha, sessão, CSRF, HMAC, validação de origem e auditoria; sem aprovação para produção. |
-| 7. Testes | Suítes automatizadas aprovadas; integração manual validada parcialmente | O PR #15 teve validação ponta a ponta no Preview de sua branch em 16/11/2026. Repetir a jornada no Preview atualizado de `dev` após os PRs #16 e #17. A POC-04 ainda possui ensaios manuais pendentes. |
+| 7. Testes | Suítes automatizadas aprovadas; fluxo funcional revalidado manualmente | Em 20/11/2026, o responsável confirmou o funcionamento do fluxo principal no Preview atualizado de `dev`, após as integrações recentes. A autorização adversarial entre profissionais e a validação de abuso/carga continuam fora dessa confirmação. |
 | 8. Viabilidade | Análise preliminar | Custos de demonstração baixos; uso comercial exige plano e infraestrutura adequados. |
 
 **Critério de leitura:** “implementado” significa que há código ou estrutura versionada. Não significa, por si só, que todos os fluxos foram novamente testados em ambiente real, que houve auditoria independente ou que o sistema esteja liberado para produção.
@@ -391,11 +391,11 @@ A existência de um teste automatizado no repositório não significa que toda a
 | T06 | Política de senha | Testar senha abaixo do mínimo, senha válida de 15+ caracteres, Unicode e limites de bytes. | Entradas inválidas são recusadas; entradas dentro da política podem ser processadas. | Testes automatizados POC-03 existentes. |
 | T07 | Hash de senha | Gerar hash Argon2id e comparar senha correta e incorreta. | Senha correta valida; senha diferente não autentica. | Testes isolados da POC-03; a suíte do produto não substitui ensaio de integração completo. |
 | T08 | Herança e operações LOO | Instanciar `Profissional`, verificar herança de `Usuario`, pausar e publicar um `Servico`. | Atributos e payloads corretos; estados `paused` e `published`. | Cinco casos automatizados em `tests/loo/domain-entities.test.js`. |
-| T09 | Cadastro e confirmação | Criar conta totalmente fictícia e usar o código exibido na interface. | Conta é registrada; código válido ativa o fluxo; código inválido/expirado é recusado. | Validado manualmente no Preview da branch do PR #15 em 16/11/2026; repetir no Preview atualizado de `dev`. |
-| T10 | Login e restauração de sessão | Entrar com credencial fictícia e recarregar a página. | Sessão é reconhecida pelo backend; dados do profissional são carregados. | Validado manualmente no Preview da branch do PR #15 em 16/11/2026; repetir no Preview atualizado de `dev`. |
-| T11 | Criação e alteração de serviço | Criar um serviço, pausar e publicar novamente. | Estado é salvo no Sheets e refletido na área do profissional. | Criar, pausar e publicar novamente foi validado manualmente no Preview da branch do PR #15 em 16/11/2026; repetir no Preview atualizado de `dev`. Edição/remoção não fazem parte da implementação atual. |
+| T09 | Cadastro e confirmação | Criar conta totalmente fictícia e usar o código exibido na interface. | Conta é registrada; código válido ativa o fluxo; código inválido/expirado é recusado. | Responsável confirmou a validação do fluxo no Preview atualizado de `dev` em 20/11/2026, após as integrações recentes. |
+| T10 | Login e restauração de sessão | Entrar com credencial fictícia e recarregar a página. | Sessão é reconhecida pelo backend; dados do profissional são carregados. | Responsável confirmou a validação do fluxo no Preview atualizado de `dev` em 20/11/2026, após as integrações recentes. |
+| T11 | Criação e alteração de serviço | Criar um serviço, pausar e publicar novamente. | Estado é salvo no Sheets e refletido na área do profissional. | Responsável confirmou o fluxo de criação, pausa e publicação no Preview atualizado de `dev` em 20/11/2026. Edição/remoção continuam não implementadas. |
 | T12 | Visibilidade pública e autorização | Publicar serviço e consultar homepage; tentar alterar serviço que não pertence ao usuário autenticado. | Serviço publicado elegível aparece; operação de outro proprietário é negada. | Visibilidade de serviço publicado na homepage foi validada no Preview do PR #15 em 16/11/2026. O ensaio adversarial de acesso cruzado entre profissionais ainda precisa de evidência específica. |
-| T13 | Logout e revogação | Encerrar a sessão e tentar acessar uma operação protegida com a sessão anterior. | Sessão é revogada, cookie expirado e operação protegida recusada. | Logout, novo login e refresh foram validados manualmente no Preview do PR #15 em 16/11/2026; repetir no Preview atualizado de `dev`. |
+| T13 | Logout e revogação | Encerrar a sessão e tentar acessar uma operação protegida com a sessão anterior. | Sessão é revogada, cookie expirado e operação protegida recusada. | Responsável confirmou a validação do fluxo no Preview atualizado de `dev` em 20/11/2026. |
 | T14 | Origem externa | Enviar requisição com origem diferente da permitida. | Gateway responde com recusa; operação não chega ao backend de negócio. | Validação de Origin implementada no gateway. A evidência específica de rejeição manual no Preview atualizado de `dev` ainda precisa ser registrada. |
 
 ### 7.2. Comandos de validação
@@ -523,7 +523,7 @@ A conclusão adequada é que o Conecta Local é um **protótipo acadêmico funci
 - `docs/POC_01_COMUNICACAO.md` — comunicação entre frontend, Vercel e Apps Script.
 - `docs/POC_02_ASSINATURA_GATEWAY.md` — HMAC e proteção contra replay.
 - `docs/POC_03_ARMAZENAMENTO_SENHAS.md` — investigação e validação do armazenamento de senhas.
-- A POC-04 está em uma branch independente (`feat/poc-04-session-cookie`), na PR #14 em Draft; a documentação e as pendências completas permanecem nessa branch até a conclusão da revisão.
+- A POC-04 foi integrada à branch `dev` pela PR #14 em 20/11/2026, mas permanece independente e desabilitada; os limites e a decisão de não reativação estão registrados em `docs/POC_04_SESSOES.md`.
 - `docs/REGISTRO_DE_OCORRENCIAS.md` — histórico sanitizado de ocorrências.
 
 ---
