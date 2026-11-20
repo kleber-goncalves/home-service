@@ -311,9 +311,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** adb51e2f1de8b9d47fb59205938b3e33e21739a1
-- **Data do commit:** 2026-11-20T15:23:53-03:00
-- **Mensagem do commit:** merge: integrar POC-04 em dev
+- **Commit de referência:** 1919a0d4e4cbc78bf0d69b02593a784409a80526
+- **Data do commit:** 2026-11-20T15:40:02-03:00
+- **Mensagem do commit:** docs(arquitetura): sincronizar implementacao atual
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 11
@@ -416,13 +416,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 1919a0d | 2026-11-20 | docs(arquitetura): sincronizar implementacao atual |
+| aedf073 | 2026-11-20 | docs(mvp): atualizar estado das validacoes |
+| 737c616 | 2026-11-20 | docs(relatorio): atualizar evidencias de validacao |
+| 869b205 | 2026-11-20 | docs(ai-context): corrigir estado atual e continuidade |
+| 8aa977c | 2026-11-20 | docs(poc-04): registrar merge em dev e estado desabilitado |
+| 55f2ecf | 2026-11-20 | docs: atualizar estado do projeto e prioridades |
+| d431629 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | adb51e2 | 2026-11-20 | merge: integrar POC-04 em dev |
-| df09664 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 98d83c5 | 2026-11-20 | docs(poc-04): registrar decisão sobre limites aceitos |
-| 3dfdea0 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 7a207b3 | 2026-11-20 | docs(ai-context): atualizar estado de revisão da POC-04 |
-| 788bc02 | 2026-11-20 | docs(poc-04): remover duplicidade do estado final |
-| 13eb70b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 45bfb47 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
