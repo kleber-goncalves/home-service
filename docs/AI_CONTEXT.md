@@ -359,9 +359,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** e713f292fb411318b46efadd14cf6b1f01eb13b9
-- **Data do commit:** 2026-11-20T19:08:28-03:00
-- **Mensagem do commit:** docs: vincular instrumento de pesquisa ao relatorio
+- **Commit de referência:** a18a99e9c0305b91edd53046c7bd8528d8a3a242
+- **Data do commit:** 2026-11-20T19:09:14-03:00
+- **Mensagem do commit:** docs: confirmar encerramento da etapa 3 em PROTOTIPO_DEMO_LOCAL.md
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -465,13 +465,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| a18a99e | 2026-11-20 | docs: confirmar encerramento da etapa 3 em PROTOTIPO_DEMO_LOCAL.md |
+| 0985730 | 2026-11-20 | docs: confirmar encerramento da etapa 3 em ROADMAP_ESTUDOS.md |
+| 24b189f | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 3dd0f4c | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | e713f29 | 2026-11-20 | docs: vincular instrumento de pesquisa ao relatorio |
 | 0ce90da | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 6fef096 | 2026-11-20 | docs: preparar etapa de pesquisa exploratoria |
 | 78fabb8 | 2026-11-20 | docs: listar roteiro de pesquisa no README |
-| 6442194 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 6824975 | 2026-11-20 | docs: adicionar instrumento de pesquisa exploratoria |
-| 035136d | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 700ae4a | 2026-11-20 | docs: detalhar testes de cobertura e fontes Cetic |
 
 <!-- END AUTO-GENERATED SECTION -->
