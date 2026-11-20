@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 7823f9df1ef708dd66809ff07f8c5bc309aab6a3
-- **Data do commit:** 2026-11-20T20:06:35-03:00
-- **Mensagem do commit:** fix: tratar 308 sem Range como offset não confirmado
+- **Commit de referência:** 2011e8fcda5383a7d7625f3bf853ae388874306d
+- **Data do commit:** 2026-11-20T20:06:53-03:00
+- **Mensagem do commit:** test: cobrir resposta 308 sem Range no upload retomável
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -473,13 +473,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 2011e8f | 2026-11-20 | test: cobrir resposta 308 sem Range no upload retomável |
+| 214ac4a | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 7823f9d | 2026-11-20 | fix: tratar 308 sem Range como offset não confirmado |
 | 321d77c | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 013a237 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 7b8a8f2 | 2026-11-20 | test: validar sincronização em lote com falha parcial no Drive |
 | 5a88027 | 2026-11-20 | fix: tentar sincronizar todas as permissões de imagens do serviço |
 | 3a26997 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 3684f7d | 2026-11-20 | fix: criar prévias locais sem estado dentro de efeito React |
-| 584c17c | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
