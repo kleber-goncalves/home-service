@@ -359,9 +359,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 3ddcda1d6cad8a16e59d669463c5214b9026ca5d
-- **Data do commit:** 2026-11-20T19:05:29-03:00
-- **Mensagem do commit:** docs: atualizar relatorio integrador com validacoes recentes
+- **Commit de referência:** 700ae4ae12d335b1b5aad4864ce9ed42db226129
+- **Data do commit:** 2026-11-20T19:06:31-03:00
+- **Mensagem do commit:** docs: detalhar testes de cobertura e fontes Cetic
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -465,13 +465,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 700ae4a | 2026-11-20 | docs: detalhar testes de cobertura e fontes Cetic |
+| e4acd4c | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| f33def6 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 3ddcda1 | 2026-11-20 | docs: atualizar relatorio integrador com validacoes recentes |
 | 5f221bd | 2026-11-20 | docs: atualizar estado atual do prototipo no README |
 | a17f241 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | fdd2b9e | 2026-11-20 | docs: registrar validacao manual da cobertura por cidades |
 | d6dffac | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 1b785c7 | 2026-11-20 | docs: atualizar estado da etapa 3 após integração |
-| 7774048 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 5003604 | 2026-11-20 | Merge pull request #25 from kleber-goncalves/feat/service-city-coverage |
 
 <!-- END AUTO-GENERATED SECTION -->
