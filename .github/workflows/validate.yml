@@ -62,6 +62,9 @@ jobs:
       - name: Run authorization and ownership tests
         run: npm run test:authorization
 
+      - name: Run image upload gateway tests
+        run: npm run test:images
+
       - name: Run LOO domain entity tests
         run: npm run test:loo
 
