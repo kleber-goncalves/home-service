@@ -236,12 +236,19 @@ A conclusão exige testes funcionais reais no Preview e na pasta de Drive de tes
 
 ## 10. Estado e próxima ação
 
-- **Arquitetura:** definida com upload em blocos de 1 MiB.
-- **Código:** ainda não implementado.
-- **Pasta Drive e Script Property:** ainda não configuradas.
-- **Manifesto e escopos OAuth:** precisam ser inspecionados e atualizados preservando a configuração existente.
-- **Testes:** ainda não executados.
-- **Próxima ação de desenvolvimento:** implementar o contrato server-side de início, envio, conclusão e cancelamento, com testes de Apps Script e gateway; depois integrar UI e fazer a validação manual no Preview.
+**Status em 20/11/2026:** implementação parcial versionada em `feat/drive-image-upload`. Ainda não foi integrada em `dev` e não foi conectada ao Google Drive real.
+
+- **Arquitetura:** definida com upload retomável em blocos binários de 1 MiB pela rota dedicada `/api/images`.
+- **Backend Apps Script:** ações de iniciar, enviar bloco, consultar status, cancelar e remover; estado/URI do Drive em Script Properties; metadados em `IMAGENS`; permissões por estado do serviço.
+- **Gateway:** rota binária separada com mesma origem, cookie HttpOnly, CSRF, HMAC e limite de stream de 1 MiB; endpoints JSON atuais preservam seus limites.
+- **Interface:** seleção de imagens de serviço, prévia local, progresso, cancelamento, remoção e exibição da primeira imagem pública na homepage.
+- **Testes automatizados:** foram adicionados casos para o harness Apps Script, gateway e cliente de upload. A CI da revisão corrente ainda precisa concluir com SUCCESS; não declarar a Etapa 4 aprovada antes desse resultado.
+- **Drive real:** pasta privada, Script Property `CONECTA_LOCAL_DRIVE_FOLDER_ID`, escopos OAuth e autorização ainda não configurados.
+- **Validação manual:** ainda não executada. Nenhuma imagem foi enviada para o Drive do usuário.
+
+**Próxima ação:** concluir a CI da revisão atual, corrigir qualquer falha, então preparar a pasta privada e os escopos no projeto Apps Script existente. Somente depois o responsável sincronizará o código e publicará uma nova versão na implantação Web App existente para validar o fluxo no Preview.
+
+Não integrar em `dev`, alterar `main`, habilitar Production ou solicitar upgrade do plano Vercel nesta etapa.
 
 ## 11. Referências técnicas oficiais
 

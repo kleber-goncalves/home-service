@@ -159,7 +159,7 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 4 — Imagens no Google Drive
 
-**Status: em andamento — desenho técnico definido em `docs/ETAPA_4_IMAGENS_DRIVE.md`; implementação e validação ainda pendentes.**
+**Status: implementação parcial em `feat/drive-image-upload`; validação automatizada da revisão atual e integração real com o Drive ainda pendentes.**
 
 O responsável escolheu prosseguir com esta etapa em 20/11/2026, mantendo o escopo acadêmico e o plano Vercel Hobby.
 
@@ -176,6 +176,10 @@ O responsável escolheu prosseguir com esta etapa em 20/11/2026, mantendo o esco
 - Mostrar prévia, progresso e estado de erro na interface.
 
 **Não faz parte do primeiro ciclo:** foto de perfil, galeria avançada, painel de mídia e operação em Production.
+
+**Código já presente na branch de trabalho:** ações Apps Script para iniciar/enviar/consultar/cancelar upload e remover imagem; gateway separado para blocos binários com sessão, CSRF, mesma origem e HMAC; cliente de upload com blocos de 1 MiB e reconciliação; componente de seleção/prévia/progresso/remoção na área profissional; primeira imagem pública exibida na vitrine; testes automatizados para gateway, fluxo de navegador e harness de Apps Script. A suíte da revisão corrente ainda precisa concluir com SUCCESS antes da preparação do Apps Script real.
+
+**Ainda pendente:** configurar pasta privada e Script Property no Apps Script, revisar escopos e autorizar Drive, sincronizar/deployar a versão no projeto Apps Script existente, validar uploads e permissões reais no Preview e resolver eventuais falhas observadas.
 
 **Critério de conclusão:** upload, listagem, exibição, pausa/publicação e remoção validados em Preview com arquivos fictícios/licenciados, pasta Drive privada e permissões individuais conferidas no Drive real.
 

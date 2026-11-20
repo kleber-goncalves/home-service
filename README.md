@@ -33,7 +33,7 @@ O projeto é acadêmico, usa somente dados fictícios e não deve receber creden
 - **Orientação a objetos:** classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`.
 - **POC-04:** integrada à `dev` pela PR #14 como experimento independente de sessão sintética. Permanece desabilitada e não integra a autenticação principal. Os recursos temporários foram limpos; os limites de hardening e a decisão de não reativação estão documentados em `docs/POC_04_SESSOES.md`.
 
-**Limitações conhecidas da demonstração:** envio real de e-mail, recuperação/alteração de senha e e-mail, upload de imagens no Google Drive, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades ainda não foram implementados. Pesquisa local com moradores e profissionais também continua pendente; os indicadores documentais não substituem dados primários de Capelinha.
+**Limitações conhecidas da demonstração:** envio real de e-mail, recuperação/alteração de senha e e-mail, implementação de upload de imagens ainda em desenvolvimento na branch `feat/drive-image-upload`; a integração real com o Google Drive e a validação no Preview continuam pendentes, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades ainda não foram implementados. Pesquisa local com moradores e profissionais também continua pendente; os indicadores documentais não substituem dados primários de Capelinha.
 
 ## Executar localmente
 
