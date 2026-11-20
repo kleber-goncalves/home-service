@@ -1288,12 +1288,12 @@ test("image.upload.status recupera recibo quando a conclusão já foi gravada no
         "A consulta do recibo não deve enviar blocos novamente ao Drive."
     );
     assert.equal(
-        harness.properties.getProperty("CONECTA_LOCAL_IMAGE_UPLOAD_V1_" + started.data.uploadId) !== null,
+        typeof harness.properties.get("CONECTA_LOCAL_IMAGE_UPLOAD_V1_" + started.data.uploadId) === "string",
         true,
         "O recibo de conclusão deve permanecer disponível durante a janela de recuperação."
     );
     assert.equal(
-        harness.properties.getProperty("CONECTA_LOCAL_IMAGE_SERVICE_UPLOAD_V1_" + SERVICE_A),
+        harness.properties.get("CONECTA_LOCAL_IMAGE_SERVICE_UPLOAD_V1_" + SERVICE_A),
         null,
         "A conclusão deve liberar a reserva para novos envios no mesmo serviço."
     );
