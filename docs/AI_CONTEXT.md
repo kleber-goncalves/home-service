@@ -309,12 +309,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** b2ab6da1f54f695e156c3e2111e19386c265ce04
-- **Data do commit:** 2026-11-18T16:26:27-03:00
-- **Mensagem do commit:** docs: corrigir estado das branches após PR #20
-- **Branch desta execução:** dev
+- **Commit de referência:** 51bf7d4b2d832ffa4927d0a8937bb303f476b89d
+- **Data do commit:** 2026-11-20T14:35:13-03:00
+- **Mensagem do commit:** merge: reconciliar dev com POC-04
+- **Branch desta execução:** feat/poc-04-session-cookie
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 10
+- **Scripts npm:** 11
 - **Dependências de runtime:** 4
 - **Dependências de desenvolvimento:** 11
 - **Workflows:** 2
@@ -334,6 +334,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run test:poc02 | node --test tests/poc02/backend.test.js tests/poc02/apps-script.test.js |
 | npm run test:poc03 | node --test tests/poc03/apps-script.test.js |
 | npm run test:loo | node --test tests/loo/domain-entities.test.js |
+| npm run test:poc04 | node --test tests/poc04/gateway.test.js tests/poc04/apps-script.test.js |
 
 ### Variáveis declaradas no .env.example
 
@@ -341,6 +342,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 - APPS_SCRIPT_HMAC_SECRET
 - APPS_SCRIPT_WEB_APP_URL
+- POC04_ALLOWED_ORIGIN
+- POC04_APPS_SCRIPT_HMAC_SECRET
+- POC04_APPS_SCRIPT_WEB_APP_URL
+- POC04_ENABLED
 
 ### Dependências de runtime
 
@@ -409,13 +414,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| b2ab6da | 2026-11-18 | docs: corrigir estado das branches após PR #20 |
-| 11d2664 | 2026-11-18 | docs(ai-context): atualizar snapshot automaticamente |
-| 6c787ec | 2026-11-18 | docs: consolidar estado atual da demonstração acadêmica |
-| 49354a4 | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
-| 43d77af | 2026-11-17 | release: integrar dev em main (#19) |
-| 9177c35 | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
-| 7efc6bf | 2026-11-17 | docs: adicionar relatório integrador do Conecta Local |
-| 90abaab | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
+| 51bf7d4 | 2026-11-20 | merge: reconciliar dev com POC-04 |
+| 88d1853 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 5c5f522 | 2026-11-20 | docs(poc-04): registrar preview documental atual |
+| 6c9821a | 2026-11-20 | docs(ai-context): atualizar encerramento parcial da poc-04 |
+| 592dde8 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| b7e0e26 | 2026-11-20 | docs(arquitetura): atualizar estado de validacao da poc-04 |
+| d10b72e | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| b7f5132 | 2026-11-20 | docs(poc-04): consolidar ensaios e limpeza do ambiente |
 
 <!-- END AUTO-GENERATED SECTION -->
