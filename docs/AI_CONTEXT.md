@@ -123,7 +123,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 - Ainda não implementados: recuperação/alteração de senha ou e-mail, edição e remoção de serviços, upload de imagens no Drive, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades.
 - A POC-04 está integrada à `dev` pela PR #14, mas sua rota independente permanece desabilitada. Os ensaios sintéticos foram concluídos e os recursos/segredos exclusivos foram limpos. Dois itens de hardening ainda impedem qualquer reativação: limite de leitura aplicado durante consumo de stream e rate limiting/limite de emissão. Não conectar a POC ao fluxo principal. Falhas reais de infraestrutura e testes de carga não foram executados. Ver `docs/POC_04_SESSOES.md`.
 
-### Etapa 1 — Autorização e integridade (integrada em `dev`; validação residual)
+### Etapa 1 — Autorização e integridade (validação técnica concluída em 20/11/2026)
 
 - A PR #22 (`feat/authorization-integrity`) foi integrada exclusivamente em `dev` em 20/11/2026 pelo merge commit `1bf55488539c5e4874573f77737827c1089504cc`. `main` e Production não foram alteradas.
 - O gateway reduz o payload de `profile.update` aos campos editáveis permitidos e deriva o token de sessão do cookie; `service.listMine` encaminha somente o token derivado.
@@ -132,10 +132,12 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 - `tests/authorization/apps-script.test.js` executa o `apps-script/conecta-local/Code.gs` real em Node/VM com duas contas, perfis, sessões e serviços sintéticos, usando mocks de Sheets, Properties e LockService.
 - `tests/authorization/gateway.test.js` verifica sanitização dos payloads e bloqueio de `session.create` na allowlist pública do navegador.
 - O workflow `Validate Home Service` inclui `npm run test:authorization`. A execução final #44797635404 concluiu **SUCCESS** no head exato da PR `54142fca94b71e72b19cee7dbaae2d6467db4dd0`; a suíte de autorização teve **17 PASS e 0 FAIL** (12 Apps Script e 5 gateway), e todas as etapas do job passaram.
-- **Validação manual de propriedade — PASS em 20/11/2026:** no Preview de `dev`, A tentou alterar o serviço fictício de B. A API retornou HTTP 404/`SERVICE_NOT_FOUND`; o serviço de B permaneceu `published` em `SERVICOS` e não houve evento de sucesso indevido em `AUDITORIA`. Esse teste ocorreu antes do merge e comprova o isolamento de propriedade já existente em `dev`.
-- O Preview atualizado de `dev` concluiu **READY** no deployment `dpl_GuadbXiGjb6MtQnRNENf4S6Xp5bP`, commit `66d319bccccd879ba8b037d5433cd0c49a316465`, URL https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app.
-- **Validação manual pós-merge ainda pendente:** verificar com dados fictícios que papel confiável diferente de `professional` é recusado com HTTP 403/`ROLE_FORBIDDEN`, sem renovar atividade da sessão, alterar serviços ou gravar auditoria de sucesso.
-- **Limite:** o harness simula Sheets, Properties e LockService; não demonstra quotas, indisponibilidades ou falhas reais desses serviços. A atualização do registro de negócio e a escrita de auditoria continuam separadas; não declarar atomicidade. Considerar essa investigação na POC-05 somente se for proporcional ao objetivo acadêmico.
+- **Validação manual de propriedade — PASS:** A tentou alterar o serviço fictício de B no Preview de `dev`. A API retornou HTTP 404/`SERVICE_NOT_FOUND`; o serviço de B permaneceu `published` em `SERVICOS` e não houve evento de sucesso indevido em `AUDITORIA`.
+- **Validação manual do papel — PASS:** depois de sincronizar e publicar uma nova versão do Apps Script real, A teve seu papel fictício alterado temporariamente para `admin` e tentou pausar um serviço próprio. A API retornou HTTP 403/`ROLE_FORBIDDEN`; `ultima_atividade_em` não mudou, o serviço permaneceu `published` e a auditoria permaneceu intacta, sem sucesso indevido.
+- A tentativa anterior à sincronização do Apps Script havia retornado HTTP 200, evidenciando que o Web App publicado estava atrás do código versionado em GitHub. Após sincronizar `apps-script/conecta-local/Code.gs` e atualizar a implantação Web App existente, o mesmo cenário retornou o bloqueio esperado.
+- **Limite:** o harness automatizado simula Sheets, Properties e LockService; não demonstra quotas, indisponibilidades ou falhas reais desses serviços. A atualização do registro de negócio e a escrita de auditoria continuam separadas; não declarar atomicidade. Considerar essa investigação na POC-05 somente se for proporcional ao objetivo acadêmico.
+- **Limpeza da conta de teste:** antes de retomar o uso normal da conta A, confirmar que o papel foi restaurado para `professional`; não deixar a conta de demonstração com o papel temporário `admin`.
+
 
 ## 5. Arquitetura e decisões tecnológicas
 
