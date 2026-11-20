@@ -1713,8 +1713,10 @@ function appImageRemove_(payload, nowMs) {
         if (!service || String(service.id_profissional) !== String(profile.id_profissional)) {
             throw appFault_("IMAGE_NOT_FOUND", "Imagem não encontrada.");
         }
-        if (String(image.status) === "removed") return { removed: true, imageId: String(image.id_imagem) };
         appImageSetFilePrivate_(String(image.id_arquivo_drive));
+        if (String(image.status) === "removed") {
+            return { removed: true, imageId: String(image.id_imagem), alreadyRemoved: true };
+        }
         appUpdate_("IMAGENS", image._row, {
             status: "removed",
             atualizado_em: new Date(nowMs).toISOString()
