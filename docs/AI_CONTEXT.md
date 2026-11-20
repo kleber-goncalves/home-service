@@ -23,6 +23,8 @@
 - A pesquisa comunitária do Conecta Local está em preparação. Os questionários preliminares para moradores e profissionais estão em `PESQUISA_COMUNIDADE.md`; as orientações de aplicação e análise estão em `docs/GUIA_APLICACAO_PESQUISA_COMUNIDADE.md`; o roteiro detalhado existente permanece em `docs/ROTEIRO_PESQUISA_EXPLORATORIA.md`. Em 20/11/2026, os instrumentos ainda aguardam revisão do professor/orientador; coleta e análise não foram iniciadas/confirmadas. Não fabricar resultados nem iniciar a aplicação antes de confirmar os procedimentos acadêmicos e de participação voluntária.
 - Usar somente dados fictícios. Não configurar backend em Production nesta etapa.
 
+- A Etapa 4 (imagens no Google Drive) foi iniciada na branch de trabalho `feat/drive-image-upload`, criada a partir do head de `dev`. O desenho técnico está em `docs/ETAPA_4_IMAGENS_DRIVE.md` e o roadmap foi atualizado. **Ainda não há código de upload, permissões do Drive, pasta configurada ou validação manual.** O primeiro escopo será imagens de serviços (até 5 por serviço, JPG/JPEG/PNG/WebP, 5.000.000 bytes cada). O transporte planejado usa blocos retomáveis de 1 MiB via rota dedicada da Vercel, sem expor URI de sessão do Drive nem token OAuth ao navegador. O plano Vercel é Hobby; não fazer upgrade nem alterar billing/configurações para habilitar o beta de corpo 20 MiB. Preservar o limite dos endpoints atuais, manter o backend só em Preview e não modificar `dev`/`main` até concluir e aprovar a PR.
+
 ## 1. Instruções para a IA que assumir o projeto
 
 1. Leia este documento por inteiro antes de propor mudanças, especialmente em uma conversa nova.
