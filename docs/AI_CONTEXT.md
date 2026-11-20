@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 26c48caecbbd869bf9228cdd7df6bdbae78649df
-- **Data do commit:** 2026-11-20T20:07:19-03:00
-- **Mensagem do commit:** fix: autenticar proprietário antes de consultar configuração do Drive
+- **Commit de referência:** 78962bb693173c729af54dbec547934ef3413e5b
+- **Data do commit:** 2026-11-20T20:08:36-03:00
+- **Mensagem do commit:** docs: registrar CI aprovada e Preview Vercel pendente
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -473,13 +473,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 78962bb | 2026-11-20 | docs: registrar CI aprovada e Preview Vercel pendente |
+| 0490ab7 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 26c48ca | 2026-11-20 | fix: autenticar proprietário antes de consultar configuração do Drive |
 | e4f7711 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 2011e8f | 2026-11-20 | test: cobrir resposta 308 sem Range no upload retomável |
 | 214ac4a | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 7823f9d | 2026-11-20 | fix: tratar 308 sem Range como offset não confirmado |
 | 321d77c | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 013a237 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 7b8a8f2 | 2026-11-20 | test: validar sincronização em lote com falha parcial no Drive |
 
 <!-- END AUTO-GENERATED SECTION -->
