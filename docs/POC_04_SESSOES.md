@@ -1,6 +1,6 @@
 # POC-04 — sessão sintética com cookie via gateway
 
-> **Status nesta branch:** IMPLEMENTAÇÃO IMPLANTADA EM PREVIEW — ciclo básico de sessão sintética validado manualmente em navegador e Apps Script em 2026-11-14. Permanecem pendentes testes de expiração, cenários de borda em ambiente real, concorrência/replay operacional e limpeza dos recursos temporários.
+> **Status nesta branch (atualizado em 2026-11-20):** ciclo sintético validado no Preview e no Apps Script independente, incluindo cookie, Origin/Fetch Metadata, expiração com timestamps controlados, replay, concorrência e logout. O armazenamento temporário, nonces, segredo do Apps Script e variáveis Vercel exclusivas da branch foram limpos. Um novo Preview foi publicado como READY com as variáveis da POC-04 ausentes, mantendo a rota desabilitada. A remoção das funções auxiliares temporárias diretamente no editor do projeto Apps Script ainda não foi confirmada; falhas reais de infraestrutura e testes de carga não foram executados. A PR #14 permanece em Draft, sem merge.
 > **Branch:** `feat/poc-04-session-cookie`
 > **Base:** HEAD de `dev` em 2026-11-14.
 > **Escopo:** provar emissão/recepção de cookie, encaminhamento server-side, autoridade Apps Script, expiração, CSRF/Origin e logout/revogação, exclusivamente com dados sintéticos.
@@ -152,17 +152,16 @@ A execução GitHub Actions `Validate Home Service` #43631016460, associada ao c
 
 A validação seguinte, após a atualização dos documentos (`Validate Home Service` #43644117451), também concluiu SUCCESS: instalação/auditoria, POC-01/02/03/04, registro de ocorrências, ESLint e build passaram.
 
-### Pendências antes de encerrar a prova e decidir o merge
+### Pendências registradas na revisão inicial (14/11/2026)
 
-- [ ] Inspecionar visualmente, com sessão ativa, os atributos efetivos do cookie no DevTools (`HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/` e ausência de `Domain`).
-- [ ] Validar no Preview real Origin ausente/externa e `Sec-Fetch-Site` cross-site; a rejeição equivalente possui cobertura automatizada, mas não foi repetida manualmente no navegador.
-- [ ] Validar expiração real por inatividade (30 minutos) e absoluta (8 horas).
-- [ ] Executar ensaio operacional de replay e concorrência/LockService no Apps Script implantado.
-- [ ] Exercitar falha real de armazenamento, timeout e falha upstream; a CI contém testes simulados para parte desses caminhos.
-- [ ] Depois de guardar evidências, executar `poc04CleanupTemporaryStore()`, confirmar que somente o arquivo temporário registrado foi enviado à lixeira e remover manualmente a propriedade `POC04_HMAC_SECRET` se o projeto for descartado.
-- [ ] Atualizar a documentação com o resultado da limpeza, realizar revisão de segurança e decidir se a PR #14 pode sair de Draft. Não fazer merge antes dessas pendências e da revisão.
+> **Histórico:** esta lista reflete o estado antes dos ensaios adicionais realizados em 20/11/2026. Os resultados e o estado atual estão consolidados na seção 12.
 
-O deployment e a planilha temporária devem permanecer isolados e ser usados somente para concluir os testes listados. Nunca inserir variáveis POC-04 em Production.
+- Inspeção do cookie, testes negativos de Origin/Fetch Metadata, expiração ociosa/absoluta e ensaio operacional de replay/concorrência foram realizados posteriormente e estão descritos na seção 12.
+- A limpeza do arquivo temporário, dos nonces e da propriedade de segredo do Apps Script foi concluída e registrada na seção 12.
+- A remoção das funções auxiliares temporárias do editor do projeto Apps Script continua sem confirmação. Essas funções não aparecem no arquivo versionado `apps-script/poc-04/Code.gs`; não confundir isso com uma remoção confirmada no projeto remoto.
+- Falhas reais de armazenamento, timeout e upstream não foram provocadas no serviço implantado; há cobertura simulada para parte dos caminhos na CI. Não foram executados testes de carga.
+
+Nunca inserir variáveis POC-04 em Production. O estado do Preview após a retirada das variáveis está descrito na seção 12.
 
 ## 10. Matriz de cenários e critérios de aceite
 
@@ -192,31 +191,84 @@ O deployment e a planilha temporária devem permanecer isolados e ser usados som
 - Não conectar a tela `AuthDemoPage.jsx`, não aceitar e-mails ou senhas e não usar contas de negócio.
 - Não usar a planilha estrutural do produto.
 - Não implementar operação administrativa, perfil, catálogo ou autorização real.
-- O teste automatizado não demonstra contenção real do ScriptLock; executar teste manual concorrente separado antes de alegar concorrência comprovada.
+- O ensaio operacional no Apps Script implantado observou uma criação aceita e uma rejeição duplicada (`successfulCreates=1`, `duplicateRejections=1`), sob o lock do projeto. Isso comprova apenas o cenário sintético executado; não demonstra capacidade sob carga ou concorrência em escala.
 - O token não é protegido contra XSS que execute código same-origin. A POC mede HttpOnly e CSRF, não certifica política CSP ou ausência de XSS.
 - A consulta de Origin não autentica clientes HTTP fora do modelo de navegador.
 - Nenhuma evidência aprova uso em Production ou escala comercial.
 
 **Regra de interrupção:** se o token precisar sair para React, se o cookie for emitido antes da confirmação do Apps Script, se a assinatura/replay puder ser contornada ou se a planilha de negócio for necessária para facilitar os testes, interromper e reabrir o desenho.
 
-## 12. Estado de validação nesta revisão
+## 12. Consolidação dos ensaios, limpeza e estado atual — 2026-11-20
 
-- [x] Branch dedicada criada a partir da `dev`.
-- [x] Rota independente, com allowlist POC-04 própria.
-- [x] Conta e armazenamento exclusivamente sintéticos no código.
-- [x] Testes automatizados adicionados à suíte e ao workflow; CI atual concluída com sucesso (POC-04 33/33).
-- [x] Projeto Apps Script independente, Web App e armazenamento temporário implantados.
-- [x] Variáveis configuradas exclusivamente no Preview da branch dedicada e redeploy READY.
-- [x] Emissão, validação e renovação CSRF testadas no navegador real.
-- [x] Rejeição de CSRF incorreto testada no navegador real.
-- [x] Logout, revogação no Apps Script e rejeição posterior da sessão testados no navegador real.
-- [x] `SESSOES.revogada_em` e remoção do cookie após logout conferidos pelo responsável.
-- [ ] Inspeção visual de todos os atributos do cookie enquanto ativo.
-- [ ] Origin e Fetch Metadata negativos no Preview real.
-- [ ] Expiração ociosa e absoluta no Apps Script implantado.
-- [ ] Replay e concorrência operacional no Apps Script implantado.
-- [ ] Falhas reais de armazenamento, timeout e upstream.
-- [ ] Executar e comprovar `poc04CleanupTemporaryStore()` e remover a propriedade do segredo quando o projeto for descartado.
-- [ ] Revisão de segurança e decisão sobre retirar a PR #14 de Draft; não fazer merge enquanto houver pendências relevantes.
+### 12.1. Cookie, Origin e Fetch Metadata
 
-A POC-04 comprovou o ciclo básico de sessão sintética no ambiente Preview, mas continua isolada e não constitui autenticação de usuários.
+- [x] Cookie de sessão observado com nome `__Host-conecta_poc04_session` e atributos `HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=1800`; sem atributo `Domain`. `document.cookie` não expôs o cookie.
+- [x] Origin ausente no Preview: HTTP 403, `ORIGIN_REJECTED`.
+- [x] Origin externa (`https://example.com`) com contexto cross-site: HTTP 403, `ORIGIN_REJECTED`.
+- [x] Origin configurada corretamente com `Sec-Fetch-Site: cross-site`: HTTP 403, `ORIGIN_REJECTED`.
+- [x] Origin configurada corretamente com `Sec-Fetch-Site: same-origin` atravessou o filtro de origem e chegou à validação da ação, que respondeu HTTP 400, `ACTION_NOT_ALLOWED`. Esse caso foi usado para distinguir o bloqueio de origem do bloqueio posterior da allowlist.
+
+### 12.2. Expiração, replay e concorrência no Apps Script implantado
+
+Os ensaios usaram exclusivamente registros e tokens sintéticos. Os horários dos registros foram preparados para representar sessões expiradas; não foi necessário aguardar 30 minutos ou 8 horas reais.
+
+- [x] **Inatividade:** após preparar um registro sintético com atividade anterior ao limite, a validação retornou HTTP 401, `SESSION_EXPIRED`.
+- [x] **Validade absoluta:** o registro foi preparado com criação 8h01min anterior e atividade 1 minuto anterior; a validação retornou HTTP 401, `SESSION_EXPIRED`. Isso confirmou que atividade recente não supera o limite absoluto.
+- [x] **Replay:** a primeira chamada assinada com sessão sintética inexistente retornou envelope lógico de sessão inválida (`POC04_SESSION_INVALID`); a repetição idêntica foi recusada com `POC04_REPLAY_DETECTED`. O ensaio passou.
+- [x] **Concorrência:** duas tentativas concorrentes de criação da mesma sessão sintética resultaram em `successfulCreates=1` e `duplicateRejections=1`. O ensaio passou com o lock do Apps Script.
+- [x] A sessão temporária criada pelo ensaio operacional foi removida (`TEST_SESSION_REMOVED`).
+
+Esses resultados demonstram os cenários preparados, não teste de carga, garantia de escala ou auditoria independente.
+
+### 12.3. Limpeza do armazenamento e segredo
+
+- [x] `poc04CleanupTemporaryStore()` executada sem erro; moveu para a lixeira somente a planilha registrada pela propriedade específica da POC-04 e removeu propriedades de nonce com o prefixo exclusivo da POC-04.
+- [x] Verificação pós-limpeza: `spreadsheetRegistrationPresent=false`, `remainingNonceProperties=0` e, naquele momento, `secretPropertyPresent=true`.
+- [x] `poc04RetireTemporarySecret()` executada posteriormente; log confirmou `status=PASS` e `secretPropertyRemoved=true`.
+- [x] As quatro variáveis exclusivas da POC-04 foram removidas da Vercel no escopo da branch `feat/poc-04-session-cookie`: `POC04_ENABLED`, `POC04_ALLOWED_ORIGIN`, `POC04_APPS_SCRIPT_WEB_APP_URL` e `POC04_APPS_SCRIPT_HMAC_SECRET`. A consulta filtrada da branch retornou lista vazia.
+- [x] Nenhuma variável Production foi removida ou criada nesta limpeza; as variáveis Preview compartilhadas com `dev` foram preservadas.
+
+### 12.4. Deployment após desativação
+
+Em 20/11/2026 foi criado um novo deployment Preview a partir do commit `1f8c97f08c1c296b72a34873eda91977dad93bb9` da branch `feat/poc-04-session-cookie`. O build terminou em **READY**:
+
+- Deployment: `dpl_FMfuic8v7cQU3EavtMDmEyon8zCv`.
+- URL: https://home-service-2mhluk5j4-kleber-goncalves-s-projects.vercel.app
+- Branch alias: https://home-service-git-feat-poc-04-303944-kleber-goncalves-s-projects.vercel.app
+
+O novo Preview foi criado a partir do commit Git atual, sem reutilizar o snapshot de variáveis de um deployment antigo. Como as quatro variáveis da POC-04 estão ausentes, a funcionalidade permanece desabilitada. O estado READY comprova o build/deployment, não uma nova validação funcional após a desativação. `dev`, `main` e Production não foram alteradas.
+
+### 12.5. Código versionado versus funções auxiliares do editor
+
+O arquivo versionado `apps-script/poc-04/Code.gs` contém as funções permanentes da implementação e não contém as funções temporárias de preparação/verificação usadas nos ensaios. As rotinas abaixo foram adicionadas e executadas temporariamente no editor do projeto Apps Script durante os testes:
+
+- `poc04PrepareIdleExpirationTest()`
+- `poc04PrepareAbsoluteExpirationTest()`
+- `poc04RunMinimalOperationalChecks()`
+- `poc04VerifyCleanupState()`
+- `poc04RetireTemporarySecret()`
+
+A conexão disponível nesta sessão permitiu revisar e versionar arquivos GitHub, mas não editar diretamente o projeto Google Apps Script. Portanto, **não está confirmado que essas definições temporárias foram apagadas do editor remoto**. Antes de descartar o projeto de teste, remover manualmente somente essas funções auxiliares temporárias. Não apagar as rotinas permanentes `poc04InitializeTemporaryStore()` e `poc04CleanupTemporaryStore()` do arquivo versionado: elas fazem parte do procedimento delimitado de inicialização/limpeza da POC.
+
+### 12.6. Itens não executados e limites
+
+- Falhas reais de armazenamento/Sheets, timeout do upstream e indisponibilidade real do Apps Script **não foram provocadas**. A CI cobre simulações para parte desses caminhos; simulação não equivale a falha real no serviço.
+- Não foram feitos testes de carga, benchmark de throughput ou ensaio com múltiplos usuários reais. Isso não foi necessário para os cenários sintéticos de escopo acadêmico executados, e não se deve inferir capacidade de produção.
+- A revisão manual final de segurança e a decisão sobre retirar a PR #14 de Draft continuam pendentes.
+- A POC não implementa cadastro, login de usuários, recuperação de senha, papéis ou autorização real; não deve ser conectada a `AuthDemoPage.jsx`, à planilha estrutural ou à Production.
+
+### 12.7. Estado para continuidade
+
+- [x] Branch dedicada e rota independente.
+- [x] Testes automatizados POC-04 na CI (33/33 na execução registrada); a validação automatizada mais recente no head anterior às atualizações documentais também concluiu SUCCESS.
+- [x] Ciclo básico no navegador: emissão, cookie HttpOnly, validação, rotação CSRF, rejeição de CSRF incorreto, logout e revogação.
+- [x] Origin/Fetch Metadata negativos no Preview real.
+- [x] Expiração ociosa e absoluta com timestamps sintéticos controlados.
+- [x] Replay e concorrência operacional com tokens e registros sintéticos.
+- [x] Limpeza do armazenamento temporário, nonces e segredo do Apps Script.
+- [x] Retirada das variáveis Vercel exclusivas da branch e novo Preview READY com a POC desabilitada.
+- [ ] Confirmar a remoção das funções auxiliares temporárias diretamente no editor do projeto Apps Script, ou descartar o projeto de teste quando apropriado.
+- [ ] Revisão de segurança final e decisão sobre retirar a PR #14 de Draft.
+- [ ] Falhas reais de armazenamento/upstream permanecem não executadas e devem continuar documentadas como limitação, não como aprovação.
+
+A POC-04 concluiu os ensaios sintéticos previstos para cookie, Origin/CSRF, expiração, replay, concorrência e logout. O ambiente temporário foi limpo e a rota está desabilitada no Preview. Isso não representa autenticação real nem aprovação para Production.
