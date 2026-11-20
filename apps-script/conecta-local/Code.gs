@@ -1275,6 +1275,9 @@ function appImageDrivePutChunk_(state, bytes, startOffset) {
     var code = response.getResponseCode();
     if (code === 308) {
         var range = appImageResponseHeader_(response, "Range");
+        if (!range) {
+            throw appFault_("DRIVE_CHUNK_OFFSET_UNKNOWN", "O Google Drive não confirmou o intervalo recebido.");
+        }
         var match = range.match(/^bytes=0-(\d+)$/);
         if (!match) throw appFault_("DRIVE_CHUNK_OFFSET_UNKNOWN", "O Google Drive não confirmou o intervalo recebido.");
         return { completed: false, nextOffset: Number(match[1]) + 1 };
