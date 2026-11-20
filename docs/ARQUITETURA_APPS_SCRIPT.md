@@ -2,7 +2,7 @@
 
 > **Versão:** 0.2  
 > **Data da revisão:** 2026-11-14  
-> **Status:** POC-01 (#10), POC-02 (#11), interface demonstrativa (#13) e investigação experimental POC-03 (#12) estão integradas à `dev`. Os PRs #12 e #13 foram efetivamente merged em 2026-11-14; CI pós-merge de ambos concluiu SUCCESS. A interface continua visual, sem envio/persistência de credenciais. Cadastro, login, recuperação, sessão e armazenamento operacional de credenciais continuam não implementados. **POC-04 é a próxima etapa planejada e ainda não foi iniciada.** Nenhuma validação aprova o sistema para produção.  
+> **Status atualizado em 2026-11-20:** POC-01 (#10), POC-02 (#11), POC-03 experimental (#12), interface demonstrativa (#13) e protótipo funcional (#15–#18) estão integrados à `dev`. O fluxo principal utiliza Vercel Functions e Apps Script somente no Preview; `main`/Production permanece vitrine pública. A POC-04 continua isolada na PR #14, pronta para revisão e ainda não mesclada. Seus ensaios sintéticos e limpeza dos recursos temporários foram concluídos; a cópia atualizada de `Code.gs` apresentada pelo responsável não contém os cinco helpers. Revisão estática registrou dois bloqueios para reativação: leitura integral antes de checar limites de corpo/resposta e ausência de rate limiting/limite de emissão. O Preview está READY, mas a rota permanece desabilitada após a remoção das variáveis exclusivas e do segredo. Falhas reais de infraestrutura e testes de carga não foram executados. Nenhuma validação equivale a auditoria/certificação ou aprovação para produção.
 > **Escopo:** integração React/Vite, Google Apps Script, Google Sheets e Google Drive para a demonstração acadêmica.  
 > **Premissa:** manter Apps Script como autoridade de domínio e sessão; Vercel Functions atua apenas como gateway HTTP. Qualquer fluxo de autenticação e sessão deverá ser aprovado em provas isoladas com dados sintéticos.
 
@@ -451,21 +451,15 @@ A aba `USUARIOS` já prevê `senha_hash`, `senha_salt` e `senha_algoritmo`, mas 
 **Conclusão:** o PR #12 incorpora o código da prova, os testes e os resultados em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`. A POC demonstra compatibilidade experimental de Argon2id e validações auxiliares, mas **não aprova nenhum comparador para autenticação**, não cria cadastro/login e não libera credenciais reais. Não persistir senhas nem conectar esta prova ao fluxo de usuários até nova decisão técnica.
 ### 10.2. Sessões
 
-A modelagem prevê apenas o hash do token na aba SESSOES, 30 minutos de inatividade e duração absoluta de 8 horas. O token em claro não deve ser gravado na planilha nem em logs.
+A modelagem prevê persistir somente o hash do token na aba `SESSOES`, com 30 minutos de inatividade e duração absoluta de 8 horas. O token em claro não deve ser gravado na planilha nem em logs.
 
-Ainda não está decidido:
+**Sessão do protótipo principal:** o PR #15 integrou à demonstração funcional o fluxo de sessão por cookie HttpOnly emitido pela Vercel, validação server-side/Apps Script, CSRF, Origin, revogação e persistência em Sheets. A validação ponta a ponta foi registrada em 16/11/2026 no Preview da branch de implementação; repetir no Preview atualizado de `dev` após as integrações posteriores. Essa sessão pertence ao protótipo principal e não depende da POC-04.
 
-- como gerar token com aleatoriedade criptograficamente segura;
-- como a Vercel Function emitirá, receberá, apagará e encaminhará o token;
-- quais atributos de cookie e controles CSRF serão utilizados;
-- como Apps Script validará o hash do token, expiração e revogação;
-- como o fluxo funcionará em domínio de Preview e produção.
+**POC-04 — sessão sintética independente:** permanece na branch `feat/poc-04-session-cookie`, PR #14 pronta para revisão e ainda não mesclada, sem conexão com `AuthDemoPage.jsx` ou com o fluxo principal. Em 14 e 20/11/2026, ensaios sintéticos confirmaram cookie (`HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/`, sem `Domain`), CSRF, rejeição de Origin ausente/externa e Fetch Metadata cross-site, expiração por timestamps controlados, replay, concorrência, logout e revogação. A planilha temporária, nonces, segredo `POC04_HMAC_SECRET` e quatro variáveis Vercel exclusivas foram limpos. A cópia atualizada de `Code.gs` apresentada pelo responsável não contém os cinco helpers temporários. O Preview está READY, mas a rota permanece desabilitada.
 
-**Caminho candidato, ainda sem aprovação:** a Vercel Function emitir um cookie `HttpOnly`, `Secure` e `SameSite` adequado no domínio da aplicação. Em chamadas posteriores, a Function lê o cookie somente no servidor e encaminha o token ao Apps Script por envelope HMAC; o Apps Script permanece como autoridade da sessão e valida o hash armazenado na aba `SESSOES`.
+A cópia atualizada de `Code.gs` apresentada pelo responsável não contém as cinco funções auxiliares de ensaio; a conferência não substitui a responsabilidade do editor em manter a versão salva. A revisão estática final registrou dois bloqueios para reativação: os limites de corpo/resposta são verificados após leitura integral e não existe rate limiting/limite de emissão. Falhas reais de armazenamento, timeout/upstream e testes de carga não foram executados. Esses itens não foram corrigidos nesta etapa; a rota deve permanecer desabilitada. Evidências e limites em [`docs/POC_04_SESSOES.md`](./POC_04_SESSOES.md).
 
-A POC-04 está planejada, mas ainda não foi iniciada. O escopo, os estágios, o modelo de ameaça e os critérios de aceite estão em [`docs/POC_04_SESSOES.md`](./POC_04_SESSOES.md). Não escolher os atributos finais nem considerar o cookie seguro sem testar CSRF, validação estrita de `Origin`, expiração por inatividade e absoluta, logout, revogação, XSS, Preview e produção. Não expor o token à aplicação React, à URL ou aos logs.
-
-A limitação de TextOutput continua relevante para respostas diretas do Apps Script, mas o cookie seria emitido pela Function, não pelo Apps Script.
+A limitação de TextOutput continua relevante para respostas diretas do Apps Script; o cookie é emitido pela Function, não pelo Apps Script.
 
 Para token realmente aleatório e de alta entropia, o hash de validação armazenado no Sheets pode ser rápido; isso é diferente de hash de senha, que exige KDF lento.
 
@@ -555,7 +549,7 @@ Nenhuma implementação de autenticação, publicação anônima ou escrita oper
 1. **POC-01 — comunicação:** concluída e integrada pelo PR #10; testes manuais registrados em `docs/POC_01_COMUNICACAO.md`.
 2. **POC-02 — assinatura do gateway:** concluída e integrada pelo PR #11; permanece restrita a ações sintéticas `poc.*`, com evidências em `docs/POC_02_ASSINATURA_GATEWAY.md`.
 3. **POC-03 — KDF, política de entrada, blocklist e throttling:** investigação concluída e integrada pelo PR #12; nenhuma solução de senha/comparador foi aprovada para autenticação. Evidências e limites em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
-4. **Próxima etapa: POC-04 — sessão com cookie via gateway.** Primeiro revisar e aprovar o plano em `docs/POC_04_SESSOES.md`; depois executar somente provas isoladas com tokens e contas sintéticos. Não conectar login nem credenciais reais.
+4. **POC-04 — sessão sintética independente:** ensaios de cookie/CSRF/Origin, expiração controlada, replay e concorrência foram concluídos; recursos temporários e variáveis Vercel exclusivas foram limpos, e o Preview está desabilitado. A cópia atualizada de `Code.gs` apresentada pelo responsável não contém os cinco helpers. A PR #14 está pronta para revisão, mas ainda não foi mesclada. A revisão estática registrou dois bloqueios para reativação: limites de corpo/resposta após leitura integral e ausência de rate limiting/limite de emissão. Falhas reais de infraestrutura e testes de carga não foram executados. Não conectar login nem credenciais reais.
 5. **POC-05 — Sheets, locks e auditoria:** confirmar lote atômico, concorrência e falhas.
 6. **POC-06/07 — Drive e arquivos:** confirmar permissões, validações e limites.
 7. **POC-08/09 — implantação, abuso e quotas:** testar limites do ambiente de demonstração.

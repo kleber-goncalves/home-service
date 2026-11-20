@@ -56,6 +56,9 @@ jobs:
       - name: Run POC-03 password KDF compatibility tests
         run: npm run test:poc03
 
+      - name: Run POC-04 synthetic session tests
+        run: npm run test:poc04
+
       - name: Run LOO domain entity tests
         run: npm run test:loo
 

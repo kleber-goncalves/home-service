@@ -2,7 +2,7 @@
 
 > Documento de continuidade do projeto. Leia antes de sugerir ou realizar alterações. Reúne propósito, decisões, arquitetura planejada, estado implementado, regras de manutenção e limitações. A seção de snapshot ao final é atualizada pelo GitHub Actions.
 
-## Atualização vigente — 2026-11-18
+## Atualização vigente — 2026-11-20
 
 > Esta seção registra o estado mais recente conhecido. Consulte os SHAs e os arquivos do branch efetivamente em análise antes de realizar mudanças.
 
@@ -15,7 +15,7 @@
 - O gateway em `api/app.js` → `server/app-gateway.js` bloqueia as operações de negócio fora de Vercel Preview. Production permanece como vitrine pública, conforme decisão do responsável pelo projeto.
 - O Apps Script de negócio está em `apps-script/conecta-local/Code.gs`. O fluxo atual utiliza oito abas operacionais do Sheets: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`. A modelagem aprovada contempla 12 abas; as quatro restantes ainda não têm fluxo operacional implementado.
 - Argon2id (`hash-wasm@4.13.0`) e comparação de hash por `timingSafeEqual` estão integrados no gateway do protótipo. Isso atende à demonstração acadêmica, não constitui auditoria independente ou aprovação para produção.
-- A POC-04 continua separada na branch `feat/poc-04-session-cookie`, PR #14 em Draft. Já possui implementação e validações automatizadas/manuais parciais, mas ainda depende das verificações listadas em `corpo da PR #14` e no corpo da PR. Não conectar essa POC à autenticação principal.
+- A POC-04 continua separada na branch `feat/poc-04-session-cookie`, PR #14 pronta para revisão e ainda não mesclada; não é a sessão do protótipo principal. Ensaios sintéticos de cookie, CSRF, Origin/Fetch Metadata, expiração controlada, replay, concorrência, logout e revogação foram concluídos. O arquivo atualizado de `Code.gs` apresentado pelo responsável já não contém as cinco funções auxiliares de ensaio; as rotinas permanentes foram preservadas. A revisão estática de 20/11 registrou dois bloqueios para reativação: limites de corpo/resposta verificados após leitura integral e ausência de rate limiting/limite de emissão. A planilha temporária, nonces, segredo Apps Script e variáveis Vercel exclusivas foram limpos; o Preview está READY e a rota desabilitada. Falhas reais de infraestrutura e testes de carga não foram executados. Consultar `docs/POC_04_SESSOES.md`; não reativar nem conectar a POC ao login principal.
 - Usar somente dados fictícios. Não configurar backend em Production nesta etapa.
 
 ## 1. Instruções para a IA que assumir o projeto
@@ -98,7 +98,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 
 ## 4. Estado atual do repositório
 
-**Estado atualizado em 18/11/2026 — código funcional alinhado ao release `49354a46863d5a5eb36ce32e450b975d4087fe3b`; `dev` contém commits documentais posteriores da PR #20, enquanto `main` permanece no commit de release.**
+**Estado atualizado em 20/11/2026 — código funcional alinhado ao release `49354a46863d5a5eb36ce32e450b975d4087fe3b`; `dev` contém commits documentais posteriores da PR #20, enquanto `main` permanece no commit de release.**
 
 ### Implementado e integrado
 
@@ -121,7 +121,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 - O projeto é acadêmico e utiliza somente dados fictícios. Não inserir credenciais ou dados pessoais reais.
 - A modelagem prevê 12 abas/entidades; somente as oito listadas acima são atualmente utilizadas pelo backend de negócio. `CONTROLE_AUTENTICACAO`, `SERVICO_CIDADES`, `IMAGENS` e `DENUNCIAS` ainda não têm fluxos operacionais.
 - Ainda não implementados: recuperação/alteração de senha ou e-mail, edição e remoção de serviços, upload de imagens no Drive, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades.
-- A POC-04 está isolada na branch `feat/poc-04-session-cookie`, PR #14 em Draft. Não é a sessão do protótipo principal; concluir as verificações pendentes antes de decidir merge.
+- A POC-04 está isolada na branch `feat/poc-04-session-cookie`, PR #14 pronta para revisão e ainda não mesclada; não é a sessão do protótipo principal. Ensaios sintéticos de cookie, CSRF, Origin/Fetch Metadata, expiração controlada, replay, concorrência, logout e revogação foram concluídos. A cópia atualizada de `Code.gs` apresentada pelo responsável não contém as cinco funções auxiliares. A revisão estática registrou dois bloqueios para reativação: limites de corpo/resposta aplicados após leitura integral e ausência de rate limiting/limite de emissão. O armazenamento temporário, nonces, segredo Apps Script e variáveis Vercel exclusivas foram limpos; o Preview está READY e a rota desabilitada. Falhas reais de infraestrutura e testes de carga não foram executados. Ver `docs/POC_04_SESSOES.md`.
 
 ## 5. Arquitetura e decisões tecnológicas
 
@@ -146,7 +146,7 @@ Não foi escolhida uma aplicação Next.js. Não adicionar Express por padrão: 
 
 Fluxo de negócio implementado: React/Vite → `POST /api/app` → Vercel Function → Apps Script → Google Sheets. O Apps Script é a autoridade para validação de sessão, identidade, propriedade, transições e persistência. O navegador não chama Apps Script diretamente.
 
-A assinatura HMAC e o controle de replay foram provados na POC-02 e incorporados ao gateway de negócio. O cookie HttpOnly/Secure/SameSite, o CSRF e a validação de Origin fazem parte da autenticação do protótipo principal. A POC-04 é independente e permanece em validação; não é pré-requisito para a sessão já utilizada pelo protótipo. Google Sheets é uma solução simplificada para a demonstração acadêmica, não um banco relacional ou promessa de escala. Considerar cotas, concorrência, latência, integridade e recuperação de falhas.
+A assinatura HMAC e o controle de replay foram provados na POC-02 e incorporados ao gateway de negócio. O cookie HttpOnly/Secure/SameSite, o CSRF e a validação de Origin fazem parte da autenticação do protótipo principal. A POC-04 permanece independente, não integra essa autenticação e concluiu seus ensaios sintéticos. A PR #14 está pronta para revisão e ainda não foi mesclada. A revisão estática registrou dois bloqueios para reativação: limites de corpo/resposta somente após leitura integral e ausência de rate limiting/limite de emissão. O Preview permanece desabilitado após a limpeza; não reativar a POC antes de tratar os itens e preservar as restrições de ambiente. Google Sheets é uma solução simplificada para a demonstração acadêmica, não um banco relacional ou promessa de escala. Considerar cotas, concorrência, latência, integridade e recuperação de falhas.
 
 ### POC-01 — transporte real integrado e validado
 
@@ -201,10 +201,10 @@ O fluxo principal está implementado em `src/pages/AuthDemoPage.jsx`, `src/servi
 - Não há auditoria independente, certificação, teste de carga ou autorização para uso em produção.
 
 **POC-04 — sessão sintética independente**
-- A POC-04 possui implementação própria em `server/poc04-session-gateway.js`, `api/poc04/session.js` e `apps-script/poc-04/Code.gs`, com testes em `tests/poc04/`.
-- A PR #14 está em Draft e a branch `feat/poc-04-session-cookie` não integra o fluxo principal. A emissão/validação/rotação CSRF/logout tiveram validação manual parcial no Preview em 14/11/2026.
-- Antes de concluir a POC: conferir atributos efetivos do cookie, Origin ausente/externa e `Sec-Fetch-Site` cross-site, expiração ociosa/absoluta, replay e concorrência/LockService no Apps Script, falhas reais de armazenamento/timeout/upstream, limpeza dos recursos temporários e revisão final de segurança.
-- Não conectar a POC-04 ao `AuthDemoPage.jsx` nem tratar seus resultados como auditoria/certificação.
+- A implementação isolada está em `server/poc04-session-gateway.js`, `api/poc04/session.js` e `apps-script/poc-04/Code.gs`, com testes em `tests/poc04/` e CI via `npm run test:poc04`.
+- A PR #14 está pronta para revisão, aberta e ainda não mesclada; a branch `feat/poc-04-session-cookie` não integra o fluxo principal. Ensaios sintéticos de 14 e 20/11/2026 confirmaram cookie, CSRF, Origin/Fetch Metadata, expiração controlada, replay, concorrência, logout e revogação.
+- A limpeza removeu a planilha temporária do registro, os nonces POC-04, o segredo `POC04_HMAC_SECRET` e as quatro variáveis Vercel exclusivas da branch. O Preview novo está READY, mas a rota permanece desabilitada. A cópia atualizada de `Code.gs` apresentada pelo responsável não contém os cinco helpers temporários; as rotinas permanentes foram preservadas. A revisão estática registrou dois bloqueios para reativação: verificação de limites somente após leitura integral e ausência de rate limiting/limite de emissão.
+- Falhas reais de armazenamento/timeout/upstream, testes de carga e auditoria de segurança independente não foram executados. A revisão estática foi concluída, mas não é auditoria/certificação. Não reativar a POC-04 nem conectá-la ao `AuthDemoPage.jsx` antes de corrigir os dois itens de hardening.
 
 ### 5.5. Limites da plataforma
 
@@ -279,7 +279,7 @@ Em falhas: informar estado de carregamento/sucesso/erro; não declarar sucesso a
 ## 11. Documentação e registro de problemas
 
 - Este `AI_CONTEXT.md` descreve o estado atual e as regras de continuidade. Em uma conversa nova, leia-o por inteiro antes de qualquer alteração.
-- `POC_04_SESSOES.md` é o plano da próxima etapa; está em estado PLANEJAMENTO, não iniciada, e não autoriza implementar autenticação.
+- `POC_04_SESSOES.md` registra a implementação, os ensaios e a revisão estática da sessão sintética isolada. A cópia atualizada de `Code.gs` apresentada pelo responsável não contém os cinco helpers temporários. A PR #14 está pronta para revisão, mas não foi mesclada; dois pontos de hardening bloqueiam a reativação. A POC não implementa autenticação de usuários nem se conecta ao fluxo principal.
 - `ESPECIFICACAO_MVP.md` v0.4 consolida requisitos funcionais e as Fases 3 e 4; `MODELAGEM_DADOS.md` contém a modelagem lógica e o esquema físico aprovado conceitualmente (12 entidades/102 campos e 12 abas/102 colunas). Validações técnicas e implementação continuam pendentes.
 - `REGISTRO_DE_OCORRENCIAS.md` preserva o histórico de bugs, erros, vulnerabilidades e incidentes. Não criar ocorrência apenas por haver pendência de projeto ou risco conhecido ainda não observado como falha.
 - Atualize o contexto narrativo no mesmo trabalho quando decisões ou comportamentos relevantes mudarem.
@@ -297,7 +297,7 @@ Os comandos de validação são mantidos em `package.json`. O workflow de qualid
 4. ESLint.
 5. Build de produção do Vite.
 
-Os testes das POCs devem permanecer nos scripts npm e no workflow: `npm run test:poc01`, `npm run test:poc02` e `npm run test:poc03`. Não criar etapas E2E ou Lighthouse só para imitar outro projeto; introduzi-las quando houver fluxos reais que justifiquem esses testes.
+Os testes das POCs devem permanecer nos scripts npm e no workflow: `npm run test:poc01`, `npm run test:poc02`, `npm run test:poc03`, `npm run test:poc04` e `npm run test:loo`. Não criar etapas E2E ou Lighthouse só para imitar outro projeto; introduzi-las quando houver fluxos reais que justifiquem esses testes.
 
 A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substitui a conferência do deployment, do SHA publicado e testes manuais de navegação/responsividade. Não afirmar que o Google Apps Script, Sheets ou Drive estão funcionando antes de validar sua integração real.
 
@@ -309,12 +309,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** b2ab6da1f54f695e156c3e2111e19386c265ce04
-- **Data do commit:** 2026-11-18T16:26:27-03:00
-- **Mensagem do commit:** docs: corrigir estado das branches após PR #20
-- **Branch desta execução:** dev
+- **Commit de referência:** 98d83c558782227fe26bcb513639fd56fc99970b
+- **Data do commit:** 2026-11-20T15:22:44-03:00
+- **Mensagem do commit:** docs(poc-04): registrar decisão sobre limites aceitos
+- **Branch desta execução:** feat/poc-04-session-cookie
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 10
+- **Scripts npm:** 11
 - **Dependências de runtime:** 4
 - **Dependências de desenvolvimento:** 11
 - **Workflows:** 2
@@ -334,6 +334,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run test:poc02 | node --test tests/poc02/backend.test.js tests/poc02/apps-script.test.js |
 | npm run test:poc03 | node --test tests/poc03/apps-script.test.js |
 | npm run test:loo | node --test tests/loo/domain-entities.test.js |
+| npm run test:poc04 | node --test tests/poc04/gateway.test.js tests/poc04/apps-script.test.js |
 
 ### Variáveis declaradas no .env.example
 
@@ -341,6 +342,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 - APPS_SCRIPT_HMAC_SECRET
 - APPS_SCRIPT_WEB_APP_URL
+- POC04_ALLOWED_ORIGIN
+- POC04_APPS_SCRIPT_HMAC_SECRET
+- POC04_APPS_SCRIPT_WEB_APP_URL
+- POC04_ENABLED
 
 ### Dependências de runtime
 
@@ -409,13 +414,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| b2ab6da | 2026-11-18 | docs: corrigir estado das branches após PR #20 |
-| 11d2664 | 2026-11-18 | docs(ai-context): atualizar snapshot automaticamente |
-| 6c787ec | 2026-11-18 | docs: consolidar estado atual da demonstração acadêmica |
-| 49354a4 | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
-| 43d77af | 2026-11-17 | release: integrar dev em main (#19) |
-| 9177c35 | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
-| 7efc6bf | 2026-11-17 | docs: adicionar relatório integrador do Conecta Local |
-| 90abaab | 2026-11-17 | docs(ai-context): atualizar snapshot automaticamente |
+| 98d83c5 | 2026-11-20 | docs(poc-04): registrar decisão sobre limites aceitos |
+| 3dfdea0 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 7a207b3 | 2026-11-20 | docs(ai-context): atualizar estado de revisão da POC-04 |
+| 788bc02 | 2026-11-20 | docs(poc-04): remover duplicidade do estado final |
+| 13eb70b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 45bfb47 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 32c976c | 2026-11-20 | docs(architecture): registrar revisão final da POC-04 |
+| f99c50b | 2026-11-20 | docs(spec): atualizar estado e limites da POC-04 |
 
 <!-- END AUTO-GENERATED SECTION -->

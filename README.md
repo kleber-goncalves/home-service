@@ -4,7 +4,7 @@ Plataforma regional para aproximar pessoas que procuram serviços de profissiona
 
 O projeto tem finalidade acadêmica e busca demonstrar investigação de problemas, levantamento de requisitos, desenvolvimento web, modelagem, segurança e testes.
 
-## Estado atual — 18/11/2026
+## Estado atual — 20/11/2026
 
 A branch `dev` contém a demonstração acadêmica atual do Conecta Local. O PR #15 foi integrado em 16/11/2026 e trouxe o fluxo conectado ao Google Sheets: cadastro de profissional, confirmação demonstrativa por código, login, sessão, atualização de perfil, criação de serviços, pausa/publicação e consulta pública dos serviços publicados. O percurso ponta a ponta foi validado manualmente no Preview da branch de implementação em 16/11/2026, usando exclusivamente dados fictícios.
 
@@ -24,7 +24,7 @@ O projeto é acadêmico, usa somente dados fictícios e não deve receber creden
 - **Backend de negócio:** Google Apps Script em `apps-script/conecta-local/Code.gs`.
 - **Persistência operacional atual:** Google Sheets nas abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`.
 - **Orientação a objetos:** classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`, integradas pelo PR #16.
-- **POC-04:** permanece isolada na PR #14, em Draft; não faz parte da autenticação principal.
+- **POC-04:** permanece isolada na branch `feat/poc-04-session-cookie`, PR #14 pronta para revisão e ainda não mesclada. Os ensaios sintéticos foram concluídos; a cópia atualizada de `Code.gs` apresentada pelo responsável não contém os cinco helpers temporários. A revisão estática registrou dois bloqueios para reativação: limites de corpo/resposta após leitura integral e ausência de rate limiting/limite de emissão. O armazenamento temporário, o segredo Apps Script e as variáveis Vercel exclusivas foram limpos; o Preview está READY, mas a rota permanece desabilitada. A POC não integra a autenticação principal.
 
 **Limitações conhecidas da demonstração:** recuperação e alteração de senha/e-mail, edição e remoção de serviços, upload de imagens no Google Drive, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades ainda não estão implementados. A modelagem aprovada prevê 12 abas; o backend atual utiliza operacionalmente as oito listadas acima.
 
@@ -59,11 +59,12 @@ O GitHub Actions executa essas verificações em pushes e Pull Requests direcion
 - [POC-01 — Comunicação React, Vercel Functions e Apps Script](docs/POC_01_COMUNICACAO.md)
 - [POC-02 — HMAC e proteção contra replay](docs/POC_02_ASSINATURA_GATEWAY.md)
 - [POC-03 — Investigação de armazenamento de senhas](docs/POC_03_ARMAZENAMENTO_SENHAS.md)
+- [POC-04 — Sessão sintética via cookie](docs/POC_04_SESSOES.md)
 - [Orientação a objetos no backend](docs/LOO_ORIENTACAO_OBJETOS.md)
 - [Relatório integrador acadêmico](docs/PROJETO_INTEGRADOR_CONECTA_LOCAL.md)
 - [Registro público de ocorrências](docs/REGISTRO_DE_OCORRENCIAS.md)
 
-A POC-04 está isolada na branch `feat/poc-04-session-cookie`, PR #14 em Draft, e ainda não integra `dev`.
+A POC-04 está isolada na branch `feat/poc-04-session-cookie`; a PR #14 está pronta para revisão, aberta e ainda não mesclada em `dev`. Ela não integra o fluxo de autenticação principal.
 
 ## Créditos das imagens
 
