@@ -1681,6 +1681,9 @@ function appImageUploadCancel_(payload, nowMs) {
     }
     return appWithLock_(function () {
         var authorized = appImageRequireUpload_(payload, nowMs);
+        if (authorized.state.status === "completed") {
+            return { cancelled: false, completed: true };
+        }
         if (authorized.state.inFlight && nowMs - Number(authorized.state.inFlightAt || 0) < APP_IMAGE_IN_FLIGHT_STALE_MS) {
             throw appFault_("IMAGE_UPLOAD_BUSY", "Aguarde o bloco em andamento antes de cancelar.");
         }
