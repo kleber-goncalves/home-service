@@ -1,8 +1,8 @@
 # POC-04 — sessão sintética com cookie via gateway
 
-> **Status nesta branch (atualizado em 2026-11-20):** ciclo sintético validado no Preview e no Apps Script independente, incluindo cookie, Origin/Fetch Metadata, expiração com timestamps controlados, replay, concorrência e logout. O armazenamento temporário, nonces, segredo do Apps Script e variáveis Vercel exclusivas da branch foram limpos. Um novo Preview foi publicado como READY com as variáveis da POC-04 ausentes, mantendo a rota desabilitada. A remoção das funções auxiliares temporárias diretamente no editor do projeto Apps Script ainda não foi confirmada; falhas reais de infraestrutura e testes de carga não foram executados. A PR #14 permanece em Draft, sem merge.
+> **Status nesta branch (atualizado em 2026-11-20):** os ensaios sintéticos de cookie, CSRF/Origin, expiração controlada, replay, concorrência e logout foram concluídos. O armazenamento temporário, nonces, segredo Apps Script e variáveis Vercel exclusivas da branch foram limpos; o Preview está READY, mas a rota permanece desabilitada. O responsável apresentou uma versão atualizada do `Code.gs` do editor Apps Script sem as cinco funções auxiliares de ensaio; as rotinas permanentes foram preservadas. A revisão estática final identificou dois requisitos de hardening antes de qualquer reativação: limites de corpo/resposta aplicados após leitura integral e ausência de rate limiting/limite de emissão. Falhas reais de infraestrutura e testes de carga não foram executados. A PR #14 está pronta para revisão, aberta e não mesclada.
 > **Branch:** `feat/poc-04-session-cookie`
-> **Base:** HEAD de `dev` em 2026-11-14.
+> **Base inicial:** HEAD de `dev` em 2026-11-14; a branch foi reconciliada com `dev` pelo merge commit `51bf7d4b2d832ffa4927d0a8937bb303f476b89d` em 20/11/2026.
 > **Escopo:** provar emissão/recepção de cookie, encaminhamento server-side, autoridade Apps Script, expiração, CSRF/Origin e logout/revogação, exclusivamente com dados sintéticos.
 > **Fora do escopo:** cadastro, senha, login de usuários, recuperação, autorização de papéis, integração com `AuthDemoPage.jsx`, planilha estrutural e Production.
 
@@ -264,7 +264,7 @@ A consulta das variáveis Vercel escopadas à branch continuou retornando lista 
 
 ### 12.5. Código versionado versus funções auxiliares do editor
 
-O arquivo versionado `apps-script/poc-04/Code.gs` contém as funções permanentes da implementação e não contém as funções temporárias de preparação/verificação usadas nos ensaios. As rotinas abaixo foram adicionadas e executadas temporariamente no editor do projeto Apps Script durante os testes:
+O arquivo versionado `apps-script/poc-04/Code.gs` não contém as cinco funções temporárias de preparação/verificação usadas durante os ensaios. Em 20/11/2026, o responsável apresentou uma cópia atualizada do `Code.gs` proveniente do editor Apps Script, na qual as cinco definições abaixo já não aparecem:
 
 - `poc04PrepareIdleExpirationTest()`
 - `poc04PrepareAbsoluteExpirationTest()`
@@ -272,27 +272,43 @@ O arquivo versionado `apps-script/poc-04/Code.gs` contém as funções permanent
 - `poc04VerifyCleanupState()`
 - `poc04RetireTemporarySecret()`
 
-A conexão disponível nesta sessão permitiu revisar e versionar arquivos GitHub, mas não editar diretamente o projeto Google Apps Script. Portanto, **não está confirmado que essas definições temporárias foram apagadas do editor remoto**. Antes de descartar o projeto de teste, remover manualmente somente essas funções auxiliares temporárias. Não apagar as rotinas permanentes `poc04InitializeTemporaryStore()` e `poc04CleanupTemporaryStore()` do arquivo versionado: elas fazem parte do procedimento delimitado de inicialização/limpeza da POC.
+A conferência dessa cópia também preservou as rotinas permanentes `poc04InitializeTemporaryStore()` e `poc04CleanupTemporaryStore()`. Portanto, a remoção está confirmada no arquivo atualizado apresentado para revisão. O estado efetivamente salvo no editor remoto não pode ser consultado independentemente por esta integração; o responsável deve manter a versão apresentada salva no Apps Script antes de descartar o projeto de teste.
 
-### 12.6. Itens não executados e limites
+### 12.6. Revisão estática final e limites operacionais
 
-- Falhas reais de armazenamento/Sheets, timeout do upstream e indisponibilidade real do Apps Script **não foram provocadas**. A CI cobre simulações para parte desses caminhos; simulação não equivale a falha real no serviço.
-- Não foram feitos testes de carga, benchmark de throughput ou ensaio com múltiplos usuários reais. Isso não foi necessário para os cenários sintéticos de escopo acadêmico executados, e não se deve inferir capacidade de produção.
-- A revisão manual final de segurança e a decisão sobre retirar a PR #14 de Draft continuam pendentes.
-- A POC não implementa cadastro, login de usuários, recuperação de senha, papéis ou autorização real; não deve ser conectada a `AuthDemoPage.jsx`, à planilha estrutural ou à Production.
+A revisão estática do gateway, da Function e do Apps Script versionado foi realizada em 20/11/2026. Não foi identificado, no fluxo revisado, um bypass direto dos controles principais de origem, allowlist, HMAC, nonce, cookie, CSRF, expiração ou revogação. Isso não equivale a auditoria independente, certificação ou garantia de ausência de vulnerabilidades.
+
+Foram registrados dois pontos de hardening que devem ser resolvidos antes de reativar a POC ou reutilizar o desenho fora do ambiente sintético:
+
+1. **Limites após leitura integral:** o gateway verifica o limite de 8 KB da requisição depois de `request.text()`; o `Content-Length` é apenas uma checagem antecipada e pode estar ausente. De forma semelhante, a resposta upstream é integralmente lida com `upstream.text()` antes da verificação do limite de 8 KB. Os limites atuais não impedem que um corpo/resposta maior seja integralmente armazenado em memória antes da rejeição. A leitura deve aplicar o limite durante o consumo do stream.
+2. **Ausência de rate limiting/limite de emissão:** a ação de emissão não possui limitação operacional por origem, janela ou capacidade máxima do armazenamento. Requisições repetidas poderiam aumentar registros sintéticos e consumir cotas do Google Sheets/Apps Script. Definir controles de abuso, capacidade e limpeza antes de reativar.
+
+No estado atual, a rota segue desabilitada: as quatro variáveis exclusivas da POC-04 foram removidas do escopo da branch e o segredo correspondente foi retirado do Apps Script. Os pontos acima não foram corrigidos nesta atualização documental e **bloqueiam qualquer reativação**; não se deve adicionar novamente as variáveis para testar a rota sem tratar esses itens.
+
+Também permanecem não executados:
+
+- Falhas reais de armazenamento/Sheets, timeout do upstream e indisponibilidade real do Apps Script. A CI simula parte desses caminhos, o que não equivale a uma falha real no serviço.
+- Testes de carga, benchmark de throughput ou ensaios com usuários reais.
+- Auditoria de segurança independente, análise formal de ameaças ou certificação.
+
+A POC não implementa cadastro, login de usuários, recuperação de senha, papéis ou autorização real; não deve ser conectada a `AuthDemoPage.jsx`, à planilha estrutural ou à Production.
 
 ### 12.7. Estado para continuidade
 
 - [x] Branch dedicada e rota independente.
-- [x] Testes automatizados POC-04 na CI (33/33 na execução registrada); a validação automatizada mais recente no head anterior às atualizações documentais também concluiu SUCCESS.
-- [x] Ciclo básico no navegador: emissão, cookie HttpOnly, validação, rotação CSRF, rejeição de CSRF incorreto, logout e revogação.
+- [x] Testes automatizados POC-04 na CI (33/33 na execução registrada); validação completa recente do código e do relatório documentado em #44785115959.
+- [x] Ciclo sintético no navegador: emissão, cookie HttpOnly, validação, rotação CSRF, rejeição de CSRF incorreto, logout e revogação.
 - [x] Origin/Fetch Metadata negativos no Preview real.
 - [x] Expiração ociosa e absoluta com timestamps sintéticos controlados.
 - [x] Replay e concorrência operacional com tokens e registros sintéticos.
 - [x] Limpeza do armazenamento temporário, nonces e segredo do Apps Script.
-- [x] Retirada das variáveis Vercel exclusivas da branch e novo Preview READY com a POC desabilitada.
-- [ ] Confirmar a remoção das funções auxiliares temporárias diretamente no editor do projeto Apps Script, ou descartar o projeto de teste quando apropriado.
-- [ ] Revisão de segurança final e decisão sobre retirar a PR #14 de Draft.
-- [ ] Falhas reais de armazenamento/upstream permanecem não executadas e devem continuar documentadas como limitação, não como aprovação.
+- [x] Retirada das variáveis Vercel exclusivas da branch e Preview READY com a POC desabilitada.
+- [x] Remoção das cinco funções auxiliares na cópia atualizada do `Code.gs` apresentada pelo responsável; rotinas permanentes preservadas.
+- [x] Revisão estática final concluída e dois pontos de hardening registrados como bloqueios para reativação.
+- [x] Falhas reais de infraestrutura e testes de carga registrados explicitamente como não executados.
+- [ ] Corrigir leitura limitada por stream e implementar controles proporcionais de rate limiting/capacidade antes de qualquer reativação.
+- [ ] Merge da PR #14 em `dev`, pendente de decisão explícita do responsável e dos checks aplicáveis.
+
+A POC-04 concluiu os ensaios sintéticos previstos para cookie, Origin/CSRF, expiração, replay, concorrência e logout. O ambiente temporário foi limpo e a rota está desabilitada no Preview. A PR #14 está aberta e pronta para revisão, mas ainda não foi mesclada. Os itens de hardening acima impedem a reativação da rota; nada nesta POC representa autenticação real ou aprovação para Production.
 
 A POC-04 concluiu os ensaios sintéticos previstos para cookie, Origin/CSRF, expiração, replay, concorrência e logout. O ambiente temporário foi limpo e a rota está desabilitada no Preview. Isso não representa autenticação real nem aprovação para Production.
