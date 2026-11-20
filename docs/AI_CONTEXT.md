@@ -12,6 +12,7 @@
 - O PR #18 adicionou `docs/PROJETO_INTEGRADOR_CONECTA_LOCAL.md`. O PR #19 integrou `dev` em `main`.
 - O PR #19 sincronizou o núcleo do protótipo de `dev` com `main` por fast-forward, sem force push. Depois, o PR #20 atualizou quatro documentos em `dev`; em 20/11, a PR #14 adicionou à `dev` a POC-04 independente e desabilitada. `main` permanece em `49354a46863d5a5eb36ce32e450b975d4087fe3b`; portanto, o núcleo funcional da demonstração permanece alinhado, enquanto os arquivos exclusivos da POC-04 e as atualizações documentais estão somente em `dev`.
 - A PR #23 concluiu o ciclo de vida dos serviços em `dev` (edição e remoção lógica). Em 20/11/2026, após a sincronização do Apps Script e a publicação da implantação Web App existente, o responsável confirmou que os testes manuais passaram no Preview fixo da branch `dev`; o deployment `dpl_FT5dFsPzB6B1phwGywur4ewjRkZS` está `READY` no commit `e6d231c`. `main` permanece inalterada.
+- A Etapa 3 está em desenvolvimento na branch `feat/service-city-coverage`: o Apps Script passa a usar `SERVICO_CIDADES` para associar vários municípios ao mesmo serviço, mantém fallback para serviços legados sem vínculos, e a interface/consulta pública consomem a cobertura. A CI passou no commit de código `9114eaf99d600e52913219d67af7b13560ca17a1`; ainda não está integrada em `dev` e depende de sincronização/publicação do Apps Script e teste manual após o merge.
 - O ambiente Preview de `dev` contém variáveis `CONECTA_LOCAL_*` com escopo Preview; os valores são secretos e não devem ser lidos, copiados para documentação ou compartilhados. A Production permanece sem variáveis de backend.
 - O gateway em `api/app.js` → `server/app-gateway.js` bloqueia as operações de negócio fora de Vercel Preview. Production permanece como vitrine pública, conforme decisão do responsável pelo projeto.
 - O Apps Script de negócio está em `apps-script/conecta-local/Code.gs`. O fluxo atual utiliza oito abas operacionais do Sheets: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`. A modelagem aprovada contempla 12 abas; as quatro restantes ainda não têm fluxo operacional implementado.
@@ -152,6 +153,21 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 - **Apps Script real:** após o merge, o responsável confirmou que sincronizou `apps-script/conecta-local/Code.gs` e publicou uma nova versão na implantação Web App existente, preservando a implantação e suas configurações.
 - **Preview e validação manual — PASS em 20/11/2026:** o deployment `dpl_FT5dFsPzB6B1phwGywur4ewjRkZS` ficou `READY` no commit `e6d231ce5cc978338bce23010d2003c7f551fd7c`. O alias fixo de `dev` (`https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app/`) foi conferido e aponta para esse deployment. O responsável confirmou que executou os testes manuais da etapa nesse ambiente e que todos passaram.
 - **Limites:** o harness automatizado usa mocks para Sheets/Properties/LockService; a confirmação manual é específica aos cenários executados pelo responsável. A gravação do registro de serviço e a escrita de auditoria continuam separadas; não declarar atomicidade. Manter dados fictícios e backend restrito ao Preview.
+
+### Etapa 3 — Descoberta por cidade e categoria (em desenvolvimento na branch `feat/service-city-coverage`)
+
+- A base desta branch é `dev`; a implementação ainda não foi integrada em `dev` nem disponibilizada no Preview fixo usado para testes reais.
+- O Apps Script passa a ler e gravar a relação `SERVICO_CIDADES` para associar um serviço a um ou mais municípios. A criação exige pelo menos uma cidade ativa; IDs inexistentes, duplicados e cidades inativas em novas associações são recusados.
+- Na edição, vínculos já existentes com cidades posteriormente inativadas podem ser preservados; não é permitido criar novas associações com cidades inativas.
+- Serviços legados sem linhas em `SERVICO_CIDADES` continuam usando a cidade principal do profissional como fallback até serem editados. A edição passa então a gravar os vínculos do próprio serviço.
+- `service.listMine` e `public.services` retornam `cityIds` e `cities`; a busca textual da homepage usa a lista de municípios atendidos.
+- O catálogo público mantém serviços publicados quando sua categoria é posteriormente inativada, conforme a regra aprovada. Categorias ativas continuam sendo a fonte dos filtros dinâmicos quando há serviços persistidos; a homepage preserva as categorias ilustrativas quando não há serviços reais carregados.
+- O formulário do profissional permite marcar múltiplos municípios na criação/edição. A cidade principal é sugerida por padrão somente quando ainda está ativa.
+- Testes adicionados em `tests/authorization/apps-script.test.js` cobrem fallback legado, múltiplas cidades, lista vazia/duplicada/inativa, substituição de vínculos e catálogo após inativação de categoria. Gateway e entidade também validam o contrato `cityIds`.
+- **CI — PASS no commit de código `9114eaf99d600e52913219d67af7b13560ca17a1`:** execução push #44817408060 e execução PR #44817414307 concluíram SUCCESS, incluindo autorização/ownership, LOO, POC-01/02/03/04, auditoria de dependências de produção, registro de ocorrências, ESLint e build. O snapshot automatizado posterior altera somente este documento.
+- **Validação pendente:** integrar a PR, sincronizar `apps-script/conecta-local/Code.gs` com o Apps Script real e publicar uma nova versão na implantação Web App existente; depois validar no Preview fixo de `dev` com dados fictícios. O check de Preview da Vercel ainda apresenta `build-rate-limit`, portanto nenhum Preview desta etapa foi declarado pronto.
+- **Limites:** operações em `SERVICOS`, `SERVICO_CIDADES` e `AUDITORIA` não são uma transação atômica. Não declarar atomicidade nem habilitar backend em Production.
+
 
 ## 5. Arquitetura e decisões tecnológicas
 

@@ -116,17 +116,33 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 3 — Melhorar a descoberta por cidade e categoria
 
+**Em desenvolvimento na branch `feat/service-city-coverage`; ainda não integrada em `dev`.**
+
 **Objetivo:** aproximar o catálogo da proposta regional sem construir busca sofisticada.
 
-**Escopo sugerido:**
-- Usar as categorias e cidades já cadastradas como dados de referência.
-- Se a demonstração realmente precisar de atendimento em várias cidades por serviço, implementar a relação `SERVICO_CIDADES` com validação de IDs e duplicidade.
-- Definir se os filtros serão aplicados no backend ou no frontend conforme volume e simplicidade; não criar infraestrutura de busca separada.
-- Exibir estados vazios e combinações de filtros de maneira clara.
+**Implementado nesta branch:**
+- Usa `CATEGORIAS` e `CIDADES` ativas como fonte dos filtros do catálogo.
+- Implementa a relação `SERVICO_CIDADES` para permitir um ou mais municípios por serviço.
+- Valida no Apps Script IDs existentes, cidades ativas, ausência de duplicidade e pelo menos um município por serviço.
+- Preserva vínculos antigos com cidade posteriormente inativada durante a edição, sem permitir novas associações inativas.
+- Mantém fallback para serviços legados sem linhas em `SERVICO_CIDADES`, usando a cidade principal do profissional até a primeira edição do serviço.
+- Retorna a cobertura por serviço em `service.listMine` e `public.services`; a busca textual da homepage considera todos os municípios vinculados.
+- Mantém serviços publicados visíveis quando sua categoria é inativada posteriormente, conforme a regra da especificação.
+- Acrescenta seleção de múltiplos municípios ao formulário de criação/edição do profissional.
 
-**Critério de conclusão:** um serviço só aparece nas localidades e categorias permitidas, e os filtros retornam resultados coerentes.
+**Validação automatizada — PASS:**
+- Execução do workflow no push #44817408060 e no evento da PR #44817414307 no commit de código `9114eaf99d600e52913219d67af7b13560ca17a1`, ambas SUCCESS.
+- Authorization/ownership, LOO, POC-01/02/03/04, auditoria de dependências de produção, registro de ocorrências, ESLint e build passaram.
 
-**Prioridade:** média. É valiosa para modelagem relacional e consulta de dados, mas não precisa anteceder a conclusão do CRUD.
+**Validação pendente antes de concluir:**
+- Integrar a PR em `dev`.
+- Sincronizar o arquivo Apps Script real e publicar nova versão na implantação Web App existente.
+- Confirmar no Preview fixo atualizado de `dev` criação e edição com duas cidades, pesquisa por qualquer cidade atendida, recusa de cidade inválida/inativa, compatibilidade dos serviços antigos e preservação da visibilidade quando uma categoria for inativada.
+- Confirmar que a Vercel aponta o alias fixo de `dev` ao novo deployment antes dos testes manuais.
+
+**Limites:** não criar infraestrutura de busca separada; não implementar geolocalização. Vínculos em Sheets e auditoria não são atômicos. Manter dados fictícios e backend restrito ao Preview.
+
+**Critério de conclusão:** os filtros por categoria/cidade representam os dados cadastrados, cada serviço pode ter múltiplos municípios com validação no backend e os serviços antigos permanecem descobertos sem migração destrutiva.
 
 ### Etapa 4 — Imagens no Google Drive
 
