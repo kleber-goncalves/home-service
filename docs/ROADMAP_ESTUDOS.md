@@ -109,13 +109,16 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 - Harness do Apps Script cobre edição própria, tentativa de editar serviço de outro profissional, remoção lógica, tentativa de remover serviço de outro profissional, proteção de estados e bloqueio por papel.
 - Testes do gateway verificam que `service.update` e `service.remove` só encaminham os campos permitidos e o token derivado da sessão.
 - Testes da entidade `Servico` cobrem os payloads de edição e remoção lógica.
-- A suíte aproveita os comandos existentes `npm run test:authorization` e `npm run test:loo`; a CI ainda precisa confirmar o novo conjunto de testes.
+- A execução [Validate Home Service #44810635555](https://github.com/kleber-goncalves/home-service/actions/runs/44810635555) concluiu **SUCCESS** no commit funcional `e1a1dc326d59b711dabd0eab6032f6994baa0f5f`: 22/22 testes de autorização/ownership e 7/7 testes LOO passaram; POC-01/02/03/04, auditoria bloqueante de dependências de produção, registro de ocorrências, ESLint e build também passaram.
+- O head atual da PR recebeu depois somente um snapshot gerado em `docs/AI_CONTEXT.md`; o diff foi conferido e não modifica código, testes ou dependências. A execução PR-triggered #44810654723 para esse commit de snapshot ficou `action_required` com zero jobs, devido ao gate do bot, não por falha da suíte.
 
-**Validação pendente antes de integrar:**
-- Executar CI completa e corrigir eventuais falhas.
-- Após integrar, sincronizar e publicar a versão atualizada de `apps-script/conecta-local/Code.gs` na implantação Web App real existente; preservar o ID/URL e as Script Properties.
+**Validação pendente antes de integrar/concluir:**
+- A CI completa está aprovada no head de código; revisar a PR e decidir a integração em `dev`.
+- Depois do merge, sincronizar e publicar a versão atualizada de `apps-script/conecta-local/Code.gs` na implantação Web App real existente; preservar o ID/URL e as Script Properties.
 - Testar no Preview de `dev` a edição de serviço próprio, a recusa de edição/remoção de serviço de outro profissional e a remoção lógica com conferência de `SERVICOS` e `AUDITORIA`.
 - Confirmar que serviço removido desaparece da vitrine pública e continua no histórico do proprietário.
+
+**Preview da branch:** o deployment `dpl_2ZXGHjMJ3dx2urhGjf3rtXucJKsk` concluiu **READY** no commit de código `e1a1dc326d59b711dabd0eab6032f6994baa0f5f`. Esse Preview comprova o build do frontend, mas não possui variáveis privadas `CONECTA_LOCAL_*`; portanto, não foi usado como validação ponta a ponta do backend.
 
 **Limites:** não implementar fluxo administrativo de suspensão/remoção, publicação completa de rascunhos, associação `SERVICO_CIDADES`, preço avançado ou upload de imagens nesta etapa. Gravação do dado e gravação de auditoria continuam separadas; não afirmar atomicidade.
 
