@@ -147,7 +147,7 @@ export default function HomePage() {
                 <CategorySection
                     selectedCategory={selectedCategory}
                     onSelect={selectCategory}
-                    catalogCategories={catalogCategories}
+                    catalogCategories={realServices.length ? catalogCategories : []}
                 />
                 <ProfessionalSection
                     professionals={visibleProfessionals}
