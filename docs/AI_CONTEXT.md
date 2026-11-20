@@ -341,9 +341,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 7adb714a9f783c2942ac4b12515759ba5fe2daa4
-- **Data do commit:** 2026-11-20T18:04:20-03:00
-- **Mensagem do commit:** feat(catalog): add service city coverage in Apps Script
+- **Commit de referência:** 49b8b1c13323fc2df3c835e0db847c3f14e131a4
+- **Data do commit:** 2026-11-20T18:04:29-03:00
+- **Mensagem do commit:** feat(catalog): add city IDs to service domain
 - **Branch desta execução:** feat/service-city-coverage
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -447,13 +447,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 49b8b1c | 2026-11-20 | feat(catalog): add city IDs to service domain |
+| 08babcb | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 7adb714 | 2026-11-20 | feat(catalog): add service city coverage in Apps Script |
 | 429a6fe | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 95582c5 | 2026-11-20 | Merge pull request #24 from kleber-goncalves/docs/record-service-lifecycle-validation |
 | 14d48d2 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 261f1a7 | 2026-11-20 | docs(roadmap): remover etapa duplicada na ordem |
 | 96ea06c | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 5990683 | 2026-11-20 | docs(roadmap): ajustar ordem das proximas etapas |
-| 5574c3b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
