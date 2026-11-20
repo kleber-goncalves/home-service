@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** f6222bd6c249de3453f9cbb40199c594f2c030da
-- **Data do commit:** 2026-11-20T19:59:53-03:00
-- **Mensagem do commit:** test: corrigir inspeção de Script Properties no harness
+- **Commit de referência:** 0d0f9d08b40d8e7b87b5354a9a7a6085d702d147
+- **Data do commit:** 2026-11-20T20:00:27-03:00
+- **Mensagem do commit:** fix: limitar leitura do stream a 1 MiB na rota de imagens
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -473,13 +473,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 0d0f9d0 | 2026-11-20 | fix: limitar leitura do stream a 1 MiB na rota de imagens |
+| 9b45df3 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | f6222bd | 2026-11-20 | test: corrigir inspeção de Script Properties no harness |
 | bc8321a | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | bf67dc8 | 2026-11-20 | fix: impedir cancelamento de recibo de upload concluído |
 | 0ea22b3 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 3388af5 | 2026-11-20 | test: recuperar upload concluído após resposta perdida |
 | 65c87ff | 2026-11-20 | fix: manter recibo de conclusão para recuperar resposta perdida |
-| 36eb061 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 8e1b016 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
