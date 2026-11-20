@@ -37,7 +37,11 @@ function mapPublicService(service) {
         description: service.description,
         image: imageForCategory(service.category),
         imageAlt: "Imagem ilustrativa de " + service.category + ".",
-        city: service.city,
+        city: Array.isArray(service.cities) && service.cities.length
+            ? service.cities.map((item) => item.name + " - " + item.state).join(", ")
+            : service.city,
+        cityIds: Array.isArray(service.cityIds) ? service.cityIds : [],
+        cities: Array.isArray(service.cities) ? service.cities : [],
         professionalName: service.professional,
         whatsapp: service.whatsapp,
         isPersisted: true,
@@ -143,7 +147,7 @@ export default function HomePage() {
                 <CategorySection
                     selectedCategory={selectedCategory}
                     onSelect={selectCategory}
-                    catalogCategories={realServices.length ? catalogCategories : []}
+                    catalogCategories={catalogCategories}
                 />
                 <ProfessionalSection
                     professionals={visibleProfessionals}
