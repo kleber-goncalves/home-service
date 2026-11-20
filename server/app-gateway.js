@@ -38,6 +38,10 @@ const BROWSER_ACTIONS = new Set([
     "service.update",
     "service.remove",
     "service.setStatus",
+    "image.upload.start",
+    "image.upload.status",
+    "image.upload.cancel",
+    "image.remove",
 ]);
 
 const RESPONSE_HEADERS = {
@@ -248,6 +252,18 @@ function mapAppsScriptError(output) {
         STORE_SCHEMA_INVALID: [503, "A estrutura da planilha não corresponde ao modelo esperado."],
         STORE_BUSY: [503, "A planilha está ocupada. Tente novamente."],
         APP_OPERATION_FAILED: [502, "Não foi possível concluir a operação no armazenamento."],
+        IMAGE_UPLOAD_NOT_FOUND: [404, "A sessão de envio não foi encontrada."],
+        IMAGE_NOT_FOUND: [404, "Imagem não encontrada."],
+        IMAGE_SIZE_INVALID: [400, "A imagem deve ter até 5 MB."],
+        IMAGE_MIME_INVALID: [415, "Use uma imagem JPG, PNG ou WebP."],
+        IMAGE_CONTENT_INVALID: [415, "O conteúdo do arquivo não corresponde ao formato informado."],
+        IMAGE_UPLOAD_IN_PROGRESS: [409, "Já existe um envio em andamento para este serviço."],
+        IMAGE_UPLOAD_EXPIRED: [409, "A sessão de envio expirou. Inicie novamente."],
+        IMAGE_LIMIT_REACHED: [409, "O serviço já atingiu o limite de cinco imagens."],
+        IMAGE_PERMISSION_SYNC_FAILED: [502, "Não foi possível atualizar a permissão da imagem."],
+        DRIVE_FOLDER_NOT_CONFIGURED: [503, "A pasta privada do Drive ainda não foi configurada."],
+        DRIVE_FOLDER_NOT_PRIVATE: [503, "A pasta do Drive precisa estar privada."],
+        DRIVE_AUTH_UNAVAILABLE: [503, "A autorização do Google Drive não está disponível."],
     };
     const [status, fallback] = known[code] || [400, "Não foi possível concluir a operação."];
     return { code, status, message: code === "INVALID_INPUT" ? output?.error?.message || fallback : fallback };
@@ -323,7 +339,7 @@ export function createAppHandler({
         }
 
         const sessionToken = parseSessionCookie(request.headers.get("cookie"));
-        const protectedActions = new Set(["auth.me", "auth.logout", "profile.update", "service.listMine", "service.create", "service.update", "service.remove", "service.setStatus"]);
+        const protectedActions = new Set(["auth.me", "auth.logout", "profile.update", "service.listMine", "service.create", "service.update", "service.remove", "service.setStatus", "image.upload.start", "image.upload.status", "image.upload.cancel", "image.remove"]);
         if (protectedActions.has(action) && !sessionToken) {
             return fail(requestId, "SESSION_INVALID", "Entre novamente para continuar.", 401, clearSessionCookie());
         }
@@ -430,6 +446,23 @@ export function createAppHandler({
                             apresentacao: payload.apresentacao,
                             id_cidade_principal: payload.id_cidade_principal,
                             whatsapp: payload.whatsapp,
+                            tokenHash,
+                        };
+                    } else if (action === "image.upload.start") {
+                        forwardedPayload = {
+                            serviceId: payload.serviceId,
+                            fileSize: payload.fileSize,
+                            mimeType: payload.mimeType,
+                            tokenHash,
+                        };
+                    } else if (action === "image.upload.status" || action === "image.upload.cancel") {
+                        forwardedPayload = {
+                            uploadId: payload.uploadId,
+                            tokenHash,
+                        };
+                    } else if (action === "image.remove") {
+                        forwardedPayload = {
+                            imageId: payload.imageId,
                             tokenHash,
                         };
                     } else {
