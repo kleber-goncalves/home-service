@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** b1447609a0f34c2dd1a7d2918644405f0b80921c
-- **Data do commit:** 2026-11-20T19:46:14-03:00
-- **Mensagem do commit:** test: cobrir autorização e permissões do upload de imagens
+- **Commit de referência:** 55a1cb5cfb21edb6e66497765986ca9432db2ef7
+- **Data do commit:** 2026-11-20T19:47:25-03:00
+- **Mensagem do commit:** feat: expor rota dedicada para upload de imagens
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -470,13 +470,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 55a1cb5 | 2026-11-20 | feat: expor rota dedicada para upload de imagens |
+| ec207be | 2026-11-20 | feat: adicionar gateway dedicado para blocos de imagem |
+| f64d6c5 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | b144760 | 2026-11-20 | test: cobrir autorização e permissões do upload de imagens |
 | c285e1d | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 0e8761f | 2026-11-20 | feat: iniciar backend de upload retomável de imagens no Drive |
 | 09c6128 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | e62af45 | 2026-11-20 | docs: registrar início da etapa 4 no contexto técnico |
-| 82b8b8a | 2026-11-20 | docs: incluir desenho da etapa 4 no README |
-| 5eebe16 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| e15c956 | 2026-11-20 | docs: priorizar etapa 4 com upload retomável no Drive |
 
 <!-- END AUTO-GENERATED SECTION -->
