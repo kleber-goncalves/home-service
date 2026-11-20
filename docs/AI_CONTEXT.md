@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 764cb9e13be64945c1504e64a07d0d68da32d491
-- **Data do commit:** 2026-11-20T20:01:45-03:00
-- **Mensagem do commit:** test: corrigir verificação de reserva liberada no harness
+- **Commit de referência:** 3684f7de30da639f5fda4249fef701a8acde90b6
+- **Data do commit:** 2026-11-20T20:02:57-03:00
+- **Mensagem do commit:** fix: criar prévias locais sem estado dentro de efeito React
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -473,13 +473,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 3684f7d | 2026-11-20 | fix: criar prévias locais sem estado dentro de efeito React |
+| 584c17c | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 764cb9e | 2026-11-20 | test: corrigir verificação de reserva liberada no harness |
 | fbd5186 | 2026-11-20 | docs: registrar implementação parcial da etapa 4 |
 | 16aceb7 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 7967484 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | cca7879 | 2026-11-20 | fix: mapear erros da API Drive nas ações de imagem |
 | 9c2abfc | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 4c6946e | 2026-11-20 | test: validar rejeição por stream acima de 1 MiB |
-| 0d0f9d0 | 2026-11-20 | fix: limitar leitura do stream a 1 MiB na rota de imagens |
 
 <!-- END AUTO-GENERATED SECTION -->
