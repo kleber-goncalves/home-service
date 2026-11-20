@@ -243,6 +243,25 @@ Após as atualizações documentais, a branch recebeu outro deployment Preview n
 
 O primeiro novo Preview foi criado a partir do commit Git da POC-04, sem reutilizar o snapshot de variáveis de um deployment antigo. O segundo Preview inclui somente as atualizações documentais. Como as quatro variáveis da POC-04 estão ausentes, a funcionalidade permanece desabilitada em ambos. O estado READY comprova o build/deployment, não uma nova validação funcional após a desativação. `dev`, `main` e Production não foram alteradas.
 
+#### Reconciliação da branch com `dev` — 20/11/2026
+
+A branch `feat/poc-04-session-cookie` recebeu a branch `dev` por um merge commit, preservando ambas as linhas de histórico e sem force push:
+
+- Merge commit: `51bf7d4b2d832ffa4927d0a8937bb303f476b89d`.
+- Primeiro pai: head anterior da POC-04 (`88d1853bb3f33b07120e4a894b306ffb4ee0a345`).
+- Segundo pai: head de `dev` incorporado (`0af5a2e250c3adf444c6478e5becad3948451da0`).
+- Comparação atual com `dev`: zero commits atrás; PR #14 reconhecida como `mergeable=true`. A PR continua em Draft e **não foi mesclada em `dev`**.
+- O workflow `Validate Home Service` #44784729150 concluiu SUCCESS no commit de merge. POC-01/02/03/04, LOO, auditoria de dependências, registro de ocorrências, ESLint e build passaram.
+- Os commits posteriores `d5a7217` e `0ecb4e4` atualizaram somente `docs/AI_CONTEXT.md`; não alteraram código, testes ou dependências.
+
+O Preview do commit final documental `0ecb4e404261c3703a11156b355fb1722e6e9d2f` também concluiu **READY**:
+
+- Deployment: `dpl_GemyvjMvtFRAWD4ohVXzTGyzY9Pm`.
+- URL do deployment: https://home-service-4hkhyeu1z-kleber-goncalves-s-projects.vercel.app
+- Alias da branch: https://home-service-git-feat-poc-04-303944-kleber-goncalves-s-projects.vercel.app
+
+A consulta das variáveis Vercel escopadas à branch continuou retornando lista vazia. A rota permanece desabilitada. `dev`, `main` e Production não foram alteradas pela reconciliação.
+
 ### 12.5. Código versionado versus funções auxiliares do editor
 
 O arquivo versionado `apps-script/poc-04/Code.gs` contém as funções permanentes da implementação e não contém as funções temporárias de preparação/verificação usadas nos ensaios. As rotinas abaixo foram adicionadas e executadas temporariamente no editor do projeto Apps Script durante os testes:
