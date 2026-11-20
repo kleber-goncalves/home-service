@@ -359,9 +359,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 5f221bd635103d5030e68ce21adbf1c7eb181f3c
-- **Data do commit:** 2026-11-20T19:05:24-03:00
-- **Mensagem do commit:** docs: atualizar estado atual do prototipo no README
+- **Commit de referência:** 3ddcda1d6cad8a16e59d669463c5214b9026ca5d
+- **Data do commit:** 2026-11-20T19:05:29-03:00
+- **Mensagem do commit:** docs: atualizar relatorio integrador com validacoes recentes
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -465,6 +465,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 3ddcda1 | 2026-11-20 | docs: atualizar relatorio integrador com validacoes recentes |
 | 5f221bd | 2026-11-20 | docs: atualizar estado atual do prototipo no README |
 | a17f241 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | fdd2b9e | 2026-11-20 | docs: registrar validacao manual da cobertura por cidades |
@@ -472,6 +473,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 1b785c7 | 2026-11-20 | docs: atualizar estado da etapa 3 após integração |
 | 7774048 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 5003604 | 2026-11-20 | Merge pull request #25 from kleber-goncalves/feat/service-city-coverage |
-| 5888677 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
