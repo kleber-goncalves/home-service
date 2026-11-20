@@ -321,9 +321,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 3c307d0c7647e3306b2ada1e7160d6d956142804
-- **Data do commit:** 2026-11-20T15:56:16-03:00
-- **Mensagem do commit:** docs(roadmap): incluir gate de papel profissional
+- **Commit de referência:** a166540503cbebb6e5606a5753cb88bb584bb36f
+- **Data do commit:** 2026-11-20T15:56:22-03:00
+- **Mensagem do commit:** docs(relatorio): documentar validacao de papel
 - **Branch desta execução:** feat/authorization-integrity
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -427,13 +427,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| a166540 | 2026-11-20 | docs(relatorio): documentar validacao de papel |
+| 1d60376 | 2026-11-20 | docs(mvp): documentar gate de papel na autorizacao |
 | 3c307d0 | 2026-11-20 | docs(roadmap): incluir gate de papel profissional |
 | 48fe723 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | f25de9b | 2026-11-20 | docs(arquitetura): documentar gate de papel profissional |
 | 6bf149f | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 8f9eddd | 2026-11-20 | test(authz): verify trusted professional role |
 | 9c707bc | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| f2ef3c3 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 74f569f | 2026-11-20 | fix(authz): map role denial to forbidden |
 
 <!-- END AUTO-GENERATED SECTION -->
