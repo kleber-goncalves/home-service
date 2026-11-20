@@ -47,6 +47,11 @@ const HEADERS = {
         "status", "criado_em", "atualizado_em", "publicado_em",
     ],
     SERVICO_CIDADES: ["id_servico_cidade", "id_servico", "id_cidade", "criado_em"],
+    IMAGENS: [
+        "id_imagem", "id_profissional", "id_servico", "id_arquivo_drive",
+        "tipo_mime", "tamanho_bytes", "ordem_exibicao", "status",
+        "criado_em", "atualizado_em",
+    ],
     AUDITORIA: [
         "id_evento", "id_usuario_ator", "tipo_ator", "acao",
         "entidade_afetada", "id_registro_afetado", "resultado",
@@ -137,6 +142,7 @@ function createHarness(options = {}) {
     const properties = new Map([
         ["CONECTA_LOCAL_HMAC_SECRET", SECRET],
         ["CONECTA_LOCAL_SPREADSHEET_ID", SPREADSHEET_ID],
+        ["CONECTA_LOCAL_DRIVE_FOLDER_ID", "synthetic-drive-folder-00000001"],
     ]);
 
     const sessionCreatedAt = new Date(NOW - 60_000).toISOString();
@@ -245,6 +251,7 @@ function createHarness(options = {}) {
             },
         ],
         SERVICO_CIDADES: options.serviceCityRecords || [],
+        IMAGENS: options.imageRecords || [],
         SERVICOS: [
             {
                 id_servico: SERVICE_A,
@@ -356,9 +363,12 @@ function createHarness(options = {}) {
                 };
             },
             getUuid() {
-                const id = "synthetic-event-" + uuidCounter;
+                const id = "00000000-0000-4000-8000-" + String(uuidCounter).padStart(12, "0");
                 uuidCounter += 1;
                 return id;
+            },
+            base64Decode(value) {
+                return Array.from(Buffer.from(String(value), "base64"), (byte) => byte > 127 ? byte - 256 : byte);
             },
         },
         PropertiesService: {
@@ -389,6 +399,115 @@ function createHarness(options = {}) {
             },
         },
     };
+
+    let driveSessionCounter = 1;
+    let driveFileCounter = 1;
+    const driveSessions = new Map();
+    const driveFiles = new Map();
+    const driveCalls = [];
+
+    function driveResponse(status, headers = {}, body = "") {
+        return {
+            getResponseCode() { return status; },
+            getAllHeaders() { return headers; },
+            getContentText() { return body; },
+        };
+    }
+
+    const fakeUrlFetch = {
+        fetch(url, requestOptions = {}) {
+            driveCalls.push({ url, options: requestOptions });
+            if (String(url).indexOf("uploadType=resumable") !== -1 && String(requestOptions.method).toLowerCase() === "post") {
+                const sessionId = "synthetic-upload-" + driveSessionCounter++;
+                const sessionUri = "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&upload_id=" + sessionId;
+                const metadata = JSON.parse(String(requestOptions.payload));
+                driveSessions.set(sessionUri, {
+                    sessionUri,
+                    mimeType: metadata.mimeType,
+                    size: Number(requestOptions.headers["X-Upload-Content-Length"]),
+                    folderId: metadata.parents[0],
+                    received: 0,
+                    file: null,
+                });
+                return driveResponse(200, { Location: sessionUri });
+            }
+
+            const session = driveSessions.get(String(url));
+            if (!session) return driveResponse(404);
+            const range = String(requestOptions.headers?.["Content-Range"] || "");
+            if (range === "bytes */" + session.size) {
+                if (session.file) return driveResponse(200, {}, JSON.stringify(session.file));
+                const headers = session.received
+                    ? { Range: "bytes=0-" + (session.received - 1) }
+                    : {};
+                return driveResponse(308, headers);
+            }
+
+            const match = range.match(/^bytes (\d+)-(\d+)\/(\d+)$/);
+            if (!match) return driveResponse(400);
+            const start = Number(match[1]);
+            const end = Number(match[2]);
+            const total = Number(match[3]);
+            const bytes = Array.isArray(requestOptions.payload)
+                ? requestOptions.payload.length
+                : Buffer.byteLength(String(requestOptions.payload || ""));
+            if (start !== session.received || total !== session.size || end - start + 1 !== bytes) {
+                return driveResponse(400);
+            }
+            session.received += bytes;
+            if (session.received < session.size) {
+                return driveResponse(308, { Range: "bytes=0-" + (session.received - 1) });
+            }
+            const fileId = "synthetic-drive-file-" + driveFileCounter++;
+            session.file = {
+                id: fileId,
+                name: "synthetic-image.png",
+                mimeType: session.mimeType,
+                size: String(session.size),
+                parents: [session.folderId],
+            };
+            const fileState = {
+                id: fileId,
+                size: session.size,
+                mimeType: session.mimeType,
+                sharing: "PRIVATE",
+                trashed: false,
+                sharingHistory: [],
+                setSharing(access, permission) {
+                    this.sharing = access;
+                    this.sharingHistory.push({ access, permission });
+                },
+                setTrashed(value) { this.trashed = Boolean(value); },
+                getId() { return this.id; },
+                getSize() { return this.size; },
+                getMimeType() { return this.mimeType; },
+            };
+            driveFiles.set(fileId, fileState);
+            return driveResponse(200, {}, JSON.stringify(session.file));
+        },
+    };
+
+    const folderId = "synthetic-drive-folder-00000001";
+    const driveApp = {
+        Access: { PRIVATE: "PRIVATE", ANYONE_WITH_LINK: "ANYONE_WITH_LINK" },
+        Permission: { VIEW: "VIEW" },
+        getFolderById(id) {
+            if (id !== folderId) throw new Error("Unknown synthetic folder");
+            return {
+                getId() { return folderId; },
+                getSharingAccess() { return "PRIVATE"; },
+            };
+        },
+        getFileById(id) {
+            const file = driveFiles.get(String(id));
+            if (!file) throw new Error("Unknown synthetic file");
+            return file;
+        },
+    };
+
+    context.UrlFetchApp = fakeUrlFetch;
+    context.ScriptApp = { getOAuthToken: () => "synthetic-drive-oauth-token" };
+    context.DriveApp = driveApp;
 
     runInNewContext(SOURCE, context, { filename: "conecta-local/Code.gs" });
 
@@ -435,7 +554,7 @@ function createHarness(options = {}) {
         );
     }
 
-    return { call, records };
+    return { call, records, driveFiles, driveSessions, driveCalls, properties };
 }
 
 test("service.listMine retorna somente os serviços do profissional da sessão", () => {
@@ -931,3 +1050,196 @@ test("papel diferente de professional não autoriza editar ou remover serviços"
         assert.equal(harness.records("AUDITORIA").length, 0);
     }
 });
+
+
+function createPngBytes(size = 24) {
+    const bytes = Buffer.alloc(size, 0);
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(bytes);
+    return bytes;
+}
+
+function startPngUpload(harness, tokenHash = TOKEN_HASH_A, serviceId = SERVICE_A) {
+    const bytes = createPngBytes();
+    const started = harness.call("image.upload.start", {
+        tokenHash,
+        serviceId,
+        fileSize: bytes.length,
+        mimeType: "image/png",
+    });
+    assert.equal(started.ok, true);
+    const uploaded = harness.call("image.upload.chunk", {
+        tokenHash,
+        uploadId: started.data.uploadId,
+        startOffset: 0,
+        totalSize: bytes.length,
+        chunkBase64: bytes.toString("base64"),
+    });
+    return { bytes, started, uploaded };
+}
+
+test("image.upload.start e image.upload.chunk gravam metadados somente após confirmação do Drive", () => {
+    const harness = createHarness();
+    const { uploaded } = startPngUpload(harness);
+
+    assert.equal(uploaded.ok, true);
+    assert.equal(uploaded.data.completed, true);
+    assert.equal(uploaded.data.image.status, "active");
+    assert.equal(uploaded.data.image.order, 1);
+    assert.equal(uploaded.data.image.mimeType, "image/png");
+    assert.equal(uploaded.data.image.sizeBytes, 24);
+    assert.match(uploaded.data.image.url, /^https:\/\/drive\.google\.com\/uc\?export=view&id=/);
+
+    const rows = harness.records("IMAGENS");
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].id_servico, SERVICE_A);
+    assert.equal(rows[0].id_profissional, "");
+    assert.equal(rows[0].id_arquivo_drive, "synthetic-drive-file-1");
+    assert.equal(rows[0].status, "active");
+    assert.equal(harness.driveFiles.get("synthetic-drive-file-1").sharing, "ANYONE_WITH_LINK");
+
+    const audit = harness.records("AUDITORIA").find((event) => event.acao === "image.upload");
+    assert.ok(audit);
+    assert.equal(audit.id_usuario_ator, USER_A);
+    assert.equal(audit.resultado, "success");
+});
+
+test("image.upload.start rejeita tamanho acima de 5.000.000 bytes", () => {
+    const harness = createHarness();
+    const result = harness.call("image.upload.start", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        fileSize: 5_000_001,
+        mimeType: "image/png",
+    });
+    assert.equal(result.ok, false);
+    assert.equal(result.error.code, "IMAGE_SIZE_INVALID");
+    assert.equal(harness.driveCalls.length, 0);
+    assert.equal(harness.records("IMAGENS").length, 0);
+});
+
+test("image.upload.start rejeita MIME não permitido", () => {
+    const harness = createHarness();
+    const result = harness.call("image.upload.start", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        fileSize: 24,
+        mimeType: "image/svg+xml",
+    });
+    assert.equal(result.ok, false);
+    assert.equal(result.error.code, "IMAGE_MIME_INVALID");
+    assert.equal(harness.driveCalls.length, 0);
+});
+
+test("image.upload.start não permite que um profissional envie imagem para serviço de outro", () => {
+    const harness = createHarness();
+    const result = harness.call("image.upload.start", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_B,
+        fileSize: 24,
+        mimeType: "image/png",
+    });
+    assert.equal(result.ok, false);
+    assert.equal(result.error.code, "SERVICE_NOT_FOUND");
+    assert.equal(harness.driveCalls.length, 0);
+    assert.equal(harness.records("IMAGENS").length, 0);
+});
+
+test("image.upload.chunk rejeita conteúdo cujo cabeçalho binário não corresponde ao MIME", () => {
+    const harness = createHarness();
+    const started = harness.call("image.upload.start", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        fileSize: 24,
+        mimeType: "image/png",
+    });
+    assert.equal(started.ok, true);
+
+    const invalid = Buffer.alloc(24, 65);
+    const result = harness.call("image.upload.chunk", {
+        tokenHash: TOKEN_HASH_A,
+        uploadId: started.data.uploadId,
+        startOffset: 0,
+        totalSize: invalid.length,
+        chunkBase64: invalid.toString("base64"),
+    });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.error.code, "IMAGE_CONTENT_INVALID");
+    assert.equal(harness.records("IMAGENS").length, 0);
+    assert.equal(harness.driveCalls.filter((call) => String(call.options.method).toLowerCase() === "put").length, 0);
+});
+
+test("as imagens de serviço publicado ficam públicas e são restringidas ao pausar", () => {
+    const harness = createHarness();
+    const { uploaded } = startPngUpload(harness);
+    assert.equal(uploaded.ok, true);
+
+    const file = harness.driveFiles.get("synthetic-drive-file-1");
+    assert.equal(file.sharing, "ANYONE_WITH_LINK");
+
+    const paused = harness.call("service.setStatus", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        status: "paused",
+    });
+    assert.equal(paused.ok, true);
+    assert.equal(file.sharing, "PRIVATE");
+
+    const published = harness.call("service.setStatus", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        status: "published",
+    });
+    assert.equal(published.ok, true);
+    assert.equal(file.sharing, "ANYONE_WITH_LINK");
+});
+
+test("image.remove restringe acesso antes de marcar a imagem como removida", () => {
+    const harness = createHarness();
+    const { uploaded } = startPngUpload(harness);
+    assert.equal(uploaded.ok, true);
+    const imageId = uploaded.data.image.id;
+    const file = harness.driveFiles.get("synthetic-drive-file-1");
+
+    const removed = harness.call("image.remove", {
+        tokenHash: TOKEN_HASH_A,
+        imageId,
+    });
+    assert.equal(removed.ok, true);
+    assert.equal(removed.data.removed, true);
+    assert.equal(file.sharing, "PRIVATE");
+    assert.equal(harness.records("IMAGENS")[0].status, "removed");
+
+    const mine = harness.call("service.listMine", { tokenHash: TOKEN_HASH_A });
+    assert.equal(mine.ok, true);
+    assert.deepEqual(mine.data.services[0].images, []);
+});
+
+test("image.upload.cancel libera a reserva do serviço e não cria metadados", () => {
+    const harness = createHarness();
+    const bytes = createPngBytes();
+    const started = harness.call("image.upload.start", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        fileSize: bytes.length,
+        mimeType: "image/png",
+    });
+    assert.equal(started.ok, true);
+
+    const cancelled = harness.call("image.upload.cancel", {
+        tokenHash: TOKEN_HASH_A,
+        uploadId: started.data.uploadId,
+    });
+    assert.equal(cancelled.ok, true);
+    assert.equal(cancelled.data.cancelled, true);
+    assert.equal(harness.records("IMAGENS").length, 0);
+
+    const restarted = harness.call("image.upload.start", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        fileSize: bytes.length,
+        mimeType: "image/png",
+    });
+    assert.equal(restarted.ok, true);
+});
+
