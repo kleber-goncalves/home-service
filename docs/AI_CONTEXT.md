@@ -311,10 +311,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 70247ff10f31391c958676b2cbb883b75d5d158f
-- **Data do commit:** 2026-11-20T15:42:22-03:00
-- **Mensagem do commit:** docs(readme): remover referencia fixa a head documental
-- **Branch desta execução:** dev
+- **Commit de referência:** f6048bc4e698d4591b2960fa3464f5ab166fd146
+- **Data do commit:** 2026-11-20T15:50:13-03:00
+- **Mensagem do commit:** test(authz): cover Apps Script ownership boundaries
+- **Branch desta execução:** feat/authorization-integrity
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 11
 - **Dependências de runtime:** 4
@@ -416,13 +416,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| f6048bc | 2026-11-20 | test(authz): cover Apps Script ownership boundaries |
+| a9fd8a1 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 9843ae5 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 70247ff | 2026-11-20 | docs(readme): remover referencia fixa a head documental |
 | bbdc638 | 2026-11-20 | docs(ai-context): alinhar historico e estado das branches |
 | 69c76b1 | 2026-11-20 | docs(poc-04): identificar estado pre-merge como historico |
 | 00437cd | 2026-11-20 | docs(arquitetura): esclarecer integracao posterior de senhas |
 | 501a14b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| bb250e3 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| f4293c4 | 2026-11-20 | docs(roadmap): ajustar marcacoes para markdown |
-| 7ec7a41 | 2026-11-20 | docs(poc-03): registrar integracao posterior no prototipo |
 
 <!-- END AUTO-GENERATED SECTION -->
