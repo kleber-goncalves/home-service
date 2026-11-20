@@ -126,12 +126,13 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 ### Trabalho em andamento — Etapa 1: autorização e integridade
 
 - Branch de trabalho: `feat/authorization-integrity`, criada a partir da `dev`.
-- O gateway foi reforçado para encaminhar somente os campos permitidos em `profile.update` e somente o token derivado do cookie; `service.listMine` também encaminha apenas o token derivado.
-- `tests/authorization/apps-script.test.js` executa o arquivo real `apps-script/conecta-local/Code.gs` em Node/VM com duas contas, perfis, sessões e serviços sintéticos, usando mocks de Sheets, Properties e LockService.
+- O gateway encaminha somente os campos permitidos em `profile.update` e o token derivado do cookie; `service.listMine` também encaminha somente o token derivado.
+- O Apps Script usa `appRequireProfessionalSession_` para exigir o papel confiável `professional` nas operações de atualização de perfil, listagem, criação e alteração de estado de serviços. Papel diferente recebe `ROLE_FORBIDDEN`; o papel enviado pelo navegador não é considerado.
+- `tests/authorization/apps-script.test.js` executa o `apps-script/conecta-local/Code.gs` real em Node/VM com duas contas, perfis, sessões e serviços sintéticos, usando mocks de Sheets, Properties e LockService.
 - `tests/authorization/gateway.test.js` verifica sanitização dos payloads de perfil/listagem/status e bloqueio de `session.create` na allowlist do navegador.
-- O workflow `Validate Home Service` inclui `npm run test:authorization`; a execução #44796841453 concluiu SUCCESS no commit `97d3bda1908b51ea92d96be1ddb4c011f253dc24`.
-- **Limite:** os testes automatizados simulam os serviços Google. Antes de integrar a etapa, ainda é necessário validar acesso cruzado com duas contas fictícias no Preview real de `dev`, conferir a planilha e registrar o resultado da auditoria.
-- A atualização de negócio e a escrita de auditoria continuam separadas; não declarar atomicidade. Considerar essa investigação na POC-05 se for proporcional ao objetivo acadêmico.
+- O workflow `Validate Home Service` inclui `npm run test:authorization`. A execução completa #44797468279 concluiu **SUCCESS** no commit `a166540503cbebb6e5606a5753cb88bb584bb36f`; a suíte nova teve **17 testes PASS e 0 FAIL** (12 Apps Script e 5 gateway).
+- **Limite:** os testes automatizados simulam Sheets, Properties e LockService. Antes de integrar a etapa, ainda é necessário validar acesso cruzado com duas contas fictícias no Preview real de `dev`, conferir a planilha e registrar o resultado da auditoria.
+- A atualização do registro de negócio e a escrita de auditoria continuam separadas; não declarar atomicidade. Considerar essa investigação na POC-05 somente se for proporcional ao objetivo acadêmico.
 
 ## 5. Arquitetura e decisões tecnológicas
 
