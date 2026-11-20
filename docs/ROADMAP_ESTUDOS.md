@@ -91,17 +91,38 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 2 — Completar o ciclo de vida dos serviços
 
+**Em andamento na branch `feat/service-lifecycle`; ainda não integrada em `dev`.**
+
 **Objetivo:** transformar o CRUD atual em uma jornada mais completa para o profissional e praticar regras de domínio.
 
-**Escopo:**
-- Editar os dados de um serviço próprio.
-- Remover logicamente um serviço, sem apagar histórico de auditoria.
-- Preservar as regras de estado: rascunho, publicado, pausado e removido.
-- Validar no backend campos, limites, propriedade e transições.
-- Registrar criação, edição, pausa, publicação e remoção na auditoria.
-- Atualizar a interface para refletir o estado retornado pelo backend, sem declarar sucesso antes da confirmação.
+**Implementado nesta branch:**
+- Editar os campos atuais do serviço: nome, categoria e descrição.
+- Remover logicamente um serviço, mudando o estado para `removed`, sem apagar a linha original nem o histórico de auditoria.
+- Manter o proprietário derivado da sessão validada; o navegador não define `id_profissional`, papel ou estado administrativo.
+- Bloquear edição/remoção de serviços `suspended` ou `removed` e impedir que o profissional reative esses estados.
+- Preservar o estado `published` ou `paused` ao editar; a remoção retira o serviço do catálogo público porque a consulta pública considera somente serviços publicados.
+- Registrar `service.update` e `service.remove` na aba `AUDITORIA`.
+- Atualizar a interface para apresentar estados, permitir edição e pedir confirmação antes da remoção.
+- Alinhar os limites de nome (5–100 caracteres) e descrição (10–1.000 caracteres) à modelagem de dados.
 
-**Critério de conclusão:** o profissional consegue manter seus próprios serviços do início ao fim; outro profissional não consegue alterá-los; estados e auditoria permanecem coerentes.
+**Cobertura automatizada adicionada:**
+- Harness do Apps Script cobre edição própria, tentativa de editar serviço de outro profissional, remoção lógica, tentativa de remover serviço de outro profissional, proteção de estados e bloqueio por papel.
+- Testes do gateway verificam que `service.update` e `service.remove` só encaminham os campos permitidos e o token derivado da sessão.
+- Testes da entidade `Servico` cobrem os payloads de edição e remoção lógica.
+- A execução [Validate Home Service #44810635555](https://github.com/kleber-goncalves/home-service/actions/runs/44810635555) concluiu **SUCCESS** no commit funcional `e1a1dc326d59b711dabd0eab6032f6994baa0f5f`: 22/22 testes de autorização/ownership e 7/7 testes LOO passaram; POC-01/02/03/04, auditoria bloqueante de dependências de produção, registro de ocorrências, ESLint e build também passaram.
+- O head atual da PR recebeu depois somente um snapshot gerado em `docs/AI_CONTEXT.md`; o diff foi conferido e não modifica código, testes ou dependências. A execução PR-triggered #44810654723 para esse commit de snapshot ficou `action_required` com zero jobs, devido ao gate do bot, não por falha da suíte.
+
+**Validação pendente antes de integrar/concluir:**
+- A CI completa está aprovada no head de código; revisar a PR e decidir a integração em `dev`.
+- Depois do merge, sincronizar e publicar a versão atualizada de `apps-script/conecta-local/Code.gs` na implantação Web App real existente; preservar o ID/URL e as Script Properties.
+- Testar no Preview de `dev` a edição de serviço próprio, a recusa de edição/remoção de serviço de outro profissional e a remoção lógica com conferência de `SERVICOS` e `AUDITORIA`.
+- Confirmar que serviço removido desaparece da vitrine pública e continua no histórico do proprietário.
+
+**Preview da branch:** o deployment `dpl_2ZXGHjMJ3dx2urhGjf3rtXucJKsk` concluiu **READY** no commit de código `e1a1dc326d59b711dabd0eab6032f6994baa0f5f`. Esse Preview comprova o build do frontend, mas não possui variáveis privadas `CONECTA_LOCAL_*`; portanto, não foi usado como validação ponta a ponta do backend.
+
+**Limites:** não implementar fluxo administrativo de suspensão/remoção, publicação completa de rascunhos, associação `SERVICO_CIDADES`, preço avançado ou upload de imagens nesta etapa. Gravação do dado e gravação de auditoria continuam separadas; não afirmar atomicidade.
+
+**Critério de conclusão:** o profissional consegue editar e remover logicamente somente os próprios serviços; estados e auditoria permanecem coerentes; os novos fluxos são confirmados no Preview com dados fictícios.
 
 **Prioridade:** alta. Entrega valor funcional e ensina CRUD, validação em camadas, autorização, modelagem de estado e persistência.
 

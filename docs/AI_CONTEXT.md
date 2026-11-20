@@ -139,6 +139,22 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 - **Limpeza da conta de teste:** antes de retomar o uso normal da conta A, confirmar que o papel foi restaurado para `professional`; não deixar a conta de demonstração com o papel temporário `admin`.
 
 
+### Etapa 2 — Ciclo de vida dos serviços (em implementação na branch `feat/service-lifecycle`)
+
+- Base da branch: `dev` no commit `b75da38569e023eb717e380c9451f540e11c9ec6`; a branch de trabalho é `feat/service-lifecycle`. Nenhuma alteração foi integrada em `dev` ou `main` nesta etapa.
+- Novas ações protegidas no Apps Script e gateway: `service.update` e `service.remove`. Ambas exigem sessão, CSRF e papel confiável `professional`.
+- `service.update` permite editar somente nome, categoria e descrição; o Apps Script deriva proprietário da sessão, confere o ID do serviço e não aceita mass assignment de proprietário, papel, status, preço ou timestamps.
+- `service.remove` faz remoção lógica: altera `SERVICOS.status` para `removed`, mantém a linha e registra `service.remove` em `AUDITORIA`.
+- Serviços `suspended` ou `removed` não podem ser editados/removidos pelo profissional; também não podem ser reativados com `service.setStatus`. Somente `published` e `paused` alternam nesses estados.
+- A edição preserva estado, proprietário, preço, `criado_em` e `publicado_em`. Categoria inativada já associada pode ser mantida, mas uma categoria inativa não pode ser escolhida para outra associação.
+- Os limites de nome e descrição foram alinhados à modelagem: nome de 5 a 100 caracteres; descrição de 10 a 1.000.
+- A interface em `src/pages/AuthDemoPage.jsx` reutiliza o formulário para criação/edição, apresenta estados `draft`, `published`, `paused`, `suspended` e `removed`, confirma antes da remoção e atualiza a tela somente após resposta de sucesso.
+- A suíte existente foi ampliada: testes Apps Script em `tests/authorization/apps-script.test.js`, gateway em `tests/authorization/gateway.test.js` e entidade em `tests/loo/domain-entities.test.js`. A execução [Validate Home Service #44810635555](https://github.com/kleber-goncalves/home-service/actions/runs/44810635555) concluiu **SUCCESS** no commit funcional `e1a1dc326d59b711dabd0eab6032f6994baa0f5f`: autorização/ownership 22/22 PASS, LOO 7/7 PASS, POC-01/02/03/04, auditoria de produção, registro de ocorrências, ESLint e build passaram.
+- O Preview da branch concluiu READY no deployment `dpl_2ZXGHjMJ3dx2urhGjf3rtXucJKsk`, mas não possui variáveis privadas `CONECTA_LOCAL_*`; portanto, comprova somente o build do frontend, não o fluxo backend.
+- A validação ponta a ponta no Preview de `dev` depende de integrar a branch, sincronizar `apps-script/conecta-local/Code.gs` com o editor Apps Script real e publicar uma nova versão da implantação Web App existente, preservando a URL/ID e as Script Properties.
+- Não implementar nesta etapa gestão administrativa, publicação completa de rascunhos, associação `SERVICO_CIDADES`, preços avançados ou imagens. A gravação de negócio e a auditoria continuam separadas; não declarar atomicidade.
+
+
 ## 5. Arquitetura e decisões tecnológicas
 
 ### 5.1. Frontend
@@ -327,10 +343,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** ceb0efe4515b3bed0aceb7b1ea99b53f32997c20
-- **Data do commit:** 2026-11-20T17:14:58-03:00
-- **Mensagem do commit:** docs(roadmap): concluir etapa de autorizacao e integridade
-- **Branch desta execução:** dev
+- **Commit de referência:** 6f4cbad30be19fe27b4de22bdb2645f9fa4d2b33
+- **Data do commit:** 2026-11-20T17:24:23-03:00
+- **Mensagem do commit:** docs(roadmap): registrar ci e preview da etapa 2
+- **Branch desta execução:** feat/service-lifecycle
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
 - **Dependências de runtime:** 4
@@ -433,13 +449,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| ceb0efe | 2026-11-20 | docs(roadmap): concluir etapa de autorizacao e integridade |
-| aa9e7a8 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 68050d3 | 2026-11-20 | docs(ai-context): registrar integracao da etapa de autorizacao |
-| d1918cf | 2026-11-20 | docs(roadmap): registrar merge e validacao de propriedade |
-| 66d319b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 1bf5548 | 2026-11-20 | Merge pull request #22 from kleber-goncalves/feat/authorization-integrity |
-| 54142fc | 2026-11-20 | docs(ai-context): atualizar estado da etapa de autorizacao |
-| 819d809 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 6f4cbad | 2026-11-20 | docs(roadmap): registrar ci e preview da etapa 2 |
+| 1c09910 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| e1a1dc3 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| c02aaa0 | 2026-11-20 | docs(prototipo): atualizar fluxo de gestao de servicos |
+| 97c26eb | 2026-11-20 | docs(ai-context): registrar etapa 2 de servicos |
+| 7392e99 | 2026-11-20 | docs(roadmap): registrar implementacao da etapa 2 |
+| 58780c9 | 2026-11-20 | docs(arquitetura): documentar edicao e remocao logica |
+| 12b1cb1 | 2026-11-20 | docs(mvp): atualizar estado do ciclo de servicos |
 
 <!-- END AUTO-GENERATED SECTION -->

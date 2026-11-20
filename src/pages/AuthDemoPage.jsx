@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
     ArrowLeft, ArrowRight, Check, Info, LockKeyhole, LogOut,
-    Mail, Plus, ShieldCheck, UserRound, Wrench, X,
+    Mail, Pencil, Plus, ShieldCheck, Trash2, UserRound, Wrench, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,7 +43,14 @@ function getPasswordValidation(password) {
 }
 
 function formatStatus(status) {
-    return status === "published" ? "Publicado" : "Em pausa";
+    const labels = {
+        draft: "Rascunho",
+        published: "Publicado",
+        paused: "Em pausa",
+        suspended: "Suspenso",
+        removed: "Removido",
+    };
+    return labels[status] || "Estado desconhecido";
 }
 
 export default function AuthDemoPage({ initialMode = "login" }) {
@@ -59,6 +66,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
     const [services, setServices] = useState([]);
     const [newService, setNewService] = useState(EMPTY_SERVICE);
     const [showServiceForm, setShowServiceForm] = useState(false);
+    const [editingServiceId, setEditingServiceId] = useState(null);
     const [notice, setNotice] = useState(null);
     const [pageLoading, setPageLoading] = useState(true);
     const [busy, setBusy] = useState(false);
@@ -68,6 +76,15 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         () => services.filter((service) => service.status === "published").length,
         [services],
     );
+    const pausedServices = useMemo(
+        () => services.filter((service) => service.status === "paused").length,
+        [services],
+    );
+    const removedServices = useMemo(
+        () => services.filter((service) => service.status === "removed").length,
+        [services],
+    );
+    const editingService = services.find((service) => service.id === editingServiceId) || null;
 
     useEffect(() => {
         let active = true;
@@ -248,39 +265,107 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         }
     }
 
-    async function createService(event) {
+    function cancelServiceForm() {
+        setShowServiceForm(false);
+        setEditingServiceId(null);
+        setNewService({
+            ...EMPTY_SERVICE,
+            categoryId: catalog.categories[0]?.id || "",
+        });
+    }
+
+    function toggleServiceForm() {
+        if (showServiceForm) {
+            cancelServiceForm();
+            return;
+        }
+        setEditingServiceId(null);
+        setNewService({
+            ...EMPTY_SERVICE,
+            categoryId: catalog.categories[0]?.id || "",
+        });
+        setShowServiceForm(true);
+        setNotice(null);
+    }
+
+    function startEditingService(service) {
+        setEditingServiceId(service.id);
+        setNewService({
+            title: service.title,
+            categoryId: service.categoryId || "",
+            description: service.description,
+        });
+        setShowServiceForm(true);
+        setNotice(null);
+    }
+
+    async function saveService(event) {
         event.preventDefault();
         if (!newService.categoryId) {
             setNotice({ title: "Selecione uma categoria", message: "O catálogo ainda não oferece uma categoria ativa.", tone: "warning" });
             return;
         }
+
         setBusy(true);
         setNotice(null);
         try {
-            const result = await appRequest("service.create", {
+            const payload = {
                 categoryId: newService.categoryId,
                 title: newService.title,
                 description: newService.description,
-            }, csrfToken);
-            setServices((current) => [result.service, ...current]);
-            setNewService((current) => ({
-                ...EMPTY_SERVICE,
-                categoryId: current.categoryId || catalog.categories[0]?.id || "",
-            }));
-            setShowServiceForm(false);
+            };
+            const result = editingServiceId
+                ? await appRequest("service.update", { serviceId: editingServiceId, ...payload }, csrfToken)
+                : await appRequest("service.create", payload, csrfToken);
+
+            if (editingServiceId) {
+                setServices((current) => current.map((item) => item.id === editingServiceId ? result.service : item));
+            } else {
+                setServices((current) => [result.service, ...current]);
+            }
+
+            cancelServiceForm();
+            setNotice(editingServiceId
+                ? { title: "Serviço atualizado", message: "As alterações foram confirmadas e salvas na planilha.", tone: "info" }
+                : { title: "Serviço salvo na planilha", message: "O serviço foi cadastrado e já pode aparecer na vitrine pública.", tone: "info" });
+        } catch (error) {
             setNotice({
-                title: "Serviço salvo na planilha",
-                message: "O serviço foi cadastrado e já pode aparecer na vitrine pública.",
+                title: editingServiceId ? "Não foi possível atualizar" : "Não foi possível salvar",
+                message: error.message,
+                tone: "warning",
+            });
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    async function removeService(service) {
+        const confirmed = window.confirm(
+            "Remover logicamente o serviço “" + service.title + "”? O registro será preservado no histórico e deixará de aparecer na vitrine.",
+        );
+        if (!confirmed) return;
+
+        setBusy(true);
+        setNotice(null);
+        try {
+            const result = await appRequest("service.remove", {
+                serviceId: service.id,
+            }, csrfToken);
+            setServices((current) => current.map((item) => item.id === service.id ? result.service : item));
+            setNotice({
+                title: "Serviço removido",
+                message: "O serviço foi retirado da vitrine. Seu registro e histórico foram preservados.",
                 tone: "info",
             });
         } catch (error) {
-            setNotice({ title: "Não foi possível salvar", message: error.message, tone: "warning" });
+            setNotice({ title: "Não foi possível remover", message: error.message, tone: "warning" });
         } finally {
             setBusy(false);
         }
     }
 
     async function toggleService(service) {
+        if (service.status !== "published" && service.status !== "paused") return;
         const nextStatus = service.status === "published" ? "paused" : "published";
         setBusy(true);
         setNotice(null);
@@ -374,8 +459,13 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                         </article>
                         <article className="demo-stat-card">
                             <span>Em pausa</span>
-                            <strong>{services.length - activeServices}</strong>
+                            <strong>{pausedServices}</strong>
                             <small>Podem ser reativados</small>
+                        </article>
+                        <article className="demo-stat-card">
+                            <span>Removidos</span>
+                            <strong>{removedServices}</strong>
+                            <small>Registros preservados</small>
                         </article>
                     </section>
 
@@ -403,53 +493,76 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                                 <span className="section-eyebrow">Gestão de serviços</span>
                                 <h2>Meus serviços</h2>
                             </div>
-                            <Button type="button" onClick={() => setShowServiceForm((value) => !value)}>
+                            <Button type="button" onClick={toggleServiceForm} disabled={busy}>
                                 {showServiceForm ? <X size={17} aria-hidden="true" /> : <Plus size={17} aria-hidden="true" />}
                                 {showServiceForm ? "Cancelar" : "Novo serviço"}
                             </Button>
                         </div>
 
                         {showServiceForm && (
-                            <form className="demo-new-service-form" onSubmit={createService}>
+                            <form className="demo-new-service-form" onSubmit={saveService}>
+                                <h3>{editingServiceId ? "Editar serviço" : "Novo serviço"}</h3>
                                 <div className="demo-new-service-fields">
                                     <label>
                                         Nome do serviço
-                                        <Input value={newService.title} onChange={(event) => setNewService((current) => ({ ...current, title: event.target.value }))} placeholder="Ex.: Instalação de chuveiro" maxLength={80} minLength={3} required />
+                                        <Input value={newService.title} onChange={(event) => setNewService((current) => ({ ...current, title: event.target.value }))} placeholder="Ex.: Instalação de chuveiro" maxLength={100} minLength={5} required />
                                     </label>
                                     <label>
                                         Categoria
                                         <select value={newService.categoryId} onChange={(event) => setNewService((current) => ({ ...current, categoryId: event.target.value }))} required>
+                                            {editingService && !catalog.categories.some((category) => category.id === editingService.categoryId) && (
+                                                <option value={editingService.categoryId}>{editingService.category} (inativa)</option>
+                                            )}
                                             {catalog.categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
                                         </select>
                                     </label>
                                 </div>
                                 <label>
                                     Descrição
-                                    <textarea value={newService.description} onChange={(event) => setNewService((current) => ({ ...current, description: event.target.value }))} placeholder="Descreva o serviço oferecido." maxLength={500} minLength={10} rows={3} required />
+                                    <textarea value={newService.description} onChange={(event) => setNewService((current) => ({ ...current, description: event.target.value }))} placeholder="Descreva o serviço oferecido." maxLength={1000} minLength={10} rows={3} required />
                                 </label>
-                                <Button type="submit" disabled={busy}><Check size={16} aria-hidden="true" /> {busy ? "Salvando..." : "Salvar na planilha"}</Button>
+                                <Button type="submit" disabled={busy}><Check size={16} aria-hidden="true" /> {busy ? "Salvando..." : editingServiceId ? "Salvar alterações" : "Salvar na planilha"}</Button>
                             </form>
                         )}
 
                         <div className="demo-service-list">
-                            {services.length ? services.map((service) => (
-                                <article className="demo-service-item" key={service.id}>
-                                    <div className="demo-service-icon"><Wrench size={19} aria-hidden="true" /></div>
-                                    <div className="demo-service-copy">
-                                        <div className="demo-service-title-row">
-                                            <h3>{service.title}</h3>
-                                            <span className={service.status === "published" ? "demo-service-status is-published" : "demo-service-status is-paused"}>
-                                                {formatStatus(service.status)}
-                                            </span>
+                            {services.length ? services.map((service) => {
+                                const canToggle = service.status === "published" || service.status === "paused";
+                                const canEdit = ["draft", "published", "paused"].includes(service.status);
+                                const canRemove = canEdit;
+                                return (
+                                    <article className="demo-service-item" key={service.id}>
+                                        <div className="demo-service-icon"><Wrench size={19} aria-hidden="true" /></div>
+                                        <div className="demo-service-copy">
+                                            <div className="demo-service-title-row">
+                                                <h3>{service.title}</h3>
+                                                <span className={`demo-service-status is-${service.status}`}>
+                                                    {formatStatus(service.status)}
+                                                </span>
+                                            </div>
+                                            <span className="demo-service-category">{service.category}</span>
+                                            <p>{service.description}</p>
                                         </div>
-                                        <span className="demo-service-category">{service.category}</span>
-                                        <p>{service.description}</p>
-                                    </div>
-                                    <Button type="button" variant="secondary" size="sm" disabled={busy} onClick={() => toggleService(service)}>
-                                        {service.status === "published" ? "Pausar" : "Publicar"}
-                                    </Button>
-                                </article>
-                            )) : (
+                                        <div className="demo-service-actions">
+                                            {canEdit && (
+                                                <Button type="button" variant="secondary" size="sm" disabled={busy} onClick={() => startEditingService(service)}>
+                                                    <Pencil size={14} aria-hidden="true" /> Editar
+                                                </Button>
+                                            )}
+                                            {canToggle && (
+                                                <Button type="button" variant="secondary" size="sm" disabled={busy} onClick={() => toggleService(service)}>
+                                                    {service.status === "published" ? "Pausar" : "Publicar"}
+                                                </Button>
+                                            )}
+                                            {canRemove && (
+                                                <Button type="button" variant="secondary" size="sm" disabled={busy} onClick={() => removeService(service)}>
+                                                    <Trash2 size={14} aria-hidden="true" /> Remover
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </article>
+                                );
+                            }) : (
                                 <div className="empty-results">
                                     <h3>Você ainda não cadastrou serviços</h3>
                                     <p>Adicione seu primeiro serviço para começar a aparecer na vitrine pública.</p>

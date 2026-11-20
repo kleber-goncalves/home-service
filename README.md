@@ -6,7 +6,7 @@ O projeto tem finalidade acadêmica e busca demonstrar investigação de problem
 
 ## Estado atual — 20/11/2026
 
-A branch `dev` contém a demonstração acadêmica funcional do Conecta Local. O PR #15 integrou cadastro, confirmação demonstrativa por código, login, sessão, atualização de perfil, criação de serviços, pausa/publicação e consulta pública com persistência no Google Sheets. Os PRs #16 (orientação a objetos), #17 (preservação dos serviços de exemplo) e #18 (relatório integrador) também foram integrados.
+A branch `dev` contém a demonstração acadêmica funcional do Conecta Local. Os PRs #15 a #22 integraram cadastro, confirmação demonstrativa por código, login, sessão, atualização de perfil, criação e gestão de estado dos serviços, controles de autorização, persistência no Google Sheets, testes e documentação. A branch `feat/service-lifecycle` amplia o ciclo dos serviços com edição e remoção lógica; essa etapa permanece em validação e ainda não foi integrada.
 
 O PR #19 sincronizou o núcleo do protótipo de `dev` com `main`; a PR #20 atualizou documentação em `dev`. Em 20/11/2026, a PR #14 foi integrada a `dev` pelo merge commit `adb51e2f1de8b9d47fb59205938b3e33e21739a1`. Ela adiciona a POC-04 de sessão sintética como rota independente, mas **não a conecta ao login principal e permanece desabilitada**. `main` permanece em `49354a46863d5a5eb36ce32e450b975d4087fe3b`; o head corrente de `dev` pode ser consultado diretamente no GitHub.
 
@@ -28,7 +28,7 @@ O projeto é acadêmico, usa somente dados fictícios e não deve receber creden
 - **Orientação a objetos:** classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`, integradas pelo PR #16.
 - **POC-04:** integrada à `dev` pela PR #14 em 20/11/2026, como experimento independente de sessão sintética. O armazenamento temporário, nonces, segredo Apps Script e variáveis Vercel exclusivas foram limpos; a rota permanece desabilitada. Dois itens de hardening continuam bloqueando qualquer reativação: leitura limitada por stream e controles de rate limiting/capacidade. A POC não integra a autenticação principal e não deve ser ativada para a demonstração atual.
 
-**Limitações conhecidas da demonstração:** recuperação e alteração de senha/e-mail, edição e remoção de serviços, upload de imagens no Google Drive, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades ainda não estão implementados. A modelagem aprovada prevê 12 abas; o backend atual utiliza operacionalmente as oito listadas acima.
+**Limitações conhecidas da demonstração:** recuperação e alteração de senha/e-mail, upload de imagens no Google Drive, painel administrativo, denúncias/moderação, gestão administrativa de categorias/cidades e associação operacional de múltiplas cidades por serviço ainda não estão implementados. A edição e a remoção lógica dos serviços estão em desenvolvimento na branch `feat/service-lifecycle`, aguardando validação antes da integração. A modelagem aprovada prevê 12 abas; o backend atual utiliza operacionalmente as oito listadas acima.
 
 ## Executar localmente
 

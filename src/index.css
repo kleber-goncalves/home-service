@@ -533,7 +533,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
 .demo-dashboard-notice svg { flex: 0 0 auto; margin-top: 1px; }
 .demo-dashboard-notice p { margin: 0; font-size: .72rem; line-height: 1.65; }
 .demo-dashboard-notice strong { color: #64470c; }
-.demo-dashboard-stats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 15px; margin: 19px 0; }
+.demo-dashboard-stats { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 15px; margin: 19px 0; }
 .demo-stat-card {
     display: grid;
     gap: 5px;
@@ -621,6 +621,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
     font-size: .72rem;
 }
 .demo-new-service-form textarea { resize: vertical; }
+.demo-new-service-form h3 { margin: 0; color: var(--navy); font-size: .86rem; font-weight: 800; }
 .demo-service-list { display: grid; }
 .demo-service-item {
     display: flex;
@@ -645,9 +646,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
 .demo-service-status { padding: 4px 7px; border-radius: 999px; font-size: .57rem; font-weight: 800; }
 .demo-service-status.is-published { color: #23734d; background: #edf9f2; }
 .demo-service-status.is-paused { color: #87621c; background: #fff6e4; }
+.demo-service-status.is-draft { color: #526782; background: #eef2f7; }
+.demo-service-status.is-suspended { color: #9b3b3b; background: #fff0f0; }
+.demo-service-status.is-removed { color: #687588; background: #f0f2f5; }
 .demo-service-category { display: block; margin-top: 5px; color: #8190a4; font-size: .62rem; font-weight: 700; }
 .demo-service-copy p { margin: 7px 0 0; color: #6c7f97; font-size: .69rem; line-height: 1.6; }
-.demo-service-item > .ui-button { flex: 0 0 auto; }
+.demo-service-actions { display: flex; flex: 0 0 auto; flex-wrap: wrap; align-items: center; gap: 7px; }
+.demo-service-actions .ui-button { flex: 0 0 auto; }
 .demo-dashboard-footer {
     display: flex;
     justify-content: space-between;
@@ -677,7 +682,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
     .demo-dashboard-welcome h1 { font-size: 1.85rem; }
     .demo-dashboard-welcome p { font-size: .77rem; }
     .demo-profile-avatar { width: 48px; height: 48px; border-radius: 14px; }
-    .demo-dashboard-stats { gap: 8px; }
+    .demo-dashboard-stats { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
     .demo-stat-card { padding: 13px 11px; }
     .demo-stat-card span { font-size: .59rem; }
     .demo-stat-card strong { font-size: 1.45rem; }
@@ -690,7 +695,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
     .demo-new-service-fields { grid-template-columns: 1fr; }
     .demo-service-item { flex-wrap: wrap; gap: 10px; }
     .demo-service-copy { flex-basis: calc(100% - 54px); }
-    .demo-service-item > .ui-button { margin-left: 52px; }
+    .demo-service-actions { flex-basis: calc(100% - 52px); margin-left: 52px; }
     .demo-dashboard-footer { flex-direction: column; gap: 6px; }
     .demo-credentials-card { align-items: flex-start; flex-direction: column; }
 }

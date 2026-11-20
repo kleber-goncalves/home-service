@@ -11,7 +11,7 @@
 3. A interface mostra o código demonstrativo de confirmação; ao confirmar, o status da conta muda para `active`.
 4. Login verifica a senha no servidor e cria uma sessão com token HttpOnly; a planilha armazena somente o hash do token.
 5. O profissional consulta seus dados e os serviços associados à conta.
-6. É possível criar um serviço e alternar o status entre `published` e `paused`; as mudanças são gravadas na aba `SERVICOS`.
+6. É possível criar e editar serviços próprios, alternar entre `published` e `paused` e solicitar remoção lógica. A edição altera nome, categoria e descrição; a remoção muda o estado para `removed`, preserva a linha na aba `SERVICOS` e registra a ação em `AUDITORIA`.
 7. A homepage consulta serviços publicados e apresenta nome do profissional, categoria, cidade e contato de WhatsApp.
 8. Logout revoga a sessão no Apps Script e limpa o cookie.
 
@@ -28,7 +28,7 @@
 - Usar somente dados fictícios; não cadastrar credenciais ou dados pessoais reais.
 - O código de confirmação é mostrado na interface, sem envio de e-mail.
 - Não há recuperação de senha nesta rodada.
-- Upload de imagens no Drive, edição completa do perfil e painel administrativo ficam para a próxima etapa.
+- Upload de imagens no Drive, edição completa do perfil e painel administrativo ficam para etapas futuras. A edição/remoção de serviços da branch `feat/service-lifecycle` ainda depende de integração e validação manual no Preview antes de ser considerada disponível em `dev`.
 - O protótipo é acadêmico e não foi dimensionado para produção ou escala comercial.
 - A POC-04 continua separada. A sessão da aplicação usa a implementação nova desta branch, não a conta sintética da POC-04.
 

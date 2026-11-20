@@ -36,6 +36,8 @@ var APP_ALLOWED_ACTIONS = [
     "profile.update",
     "service.listMine",
     "service.create",
+    "service.update",
+    "service.remove",
     "service.setStatus"
 ];
 
@@ -173,6 +175,8 @@ function appDispatch_(action, payload, nowMs, secret) {
     if (action === "profile.update") return appUpdateProfile_(payload, nowMs);
     if (action === "service.listMine") return appListMyServices_(payload, nowMs);
     if (action === "service.create") return appCreateService_(payload, nowMs);
+    if (action === "service.update") return appUpdateService_(payload, nowMs);
+    if (action === "service.remove") return appRemoveService_(payload, nowMs);
     if (action === "service.setStatus") return appSetServiceStatus_(payload, nowMs);
     throw appFault_("ACTION_NOT_ALLOWED", "A operação não está liberada.");
 }
@@ -698,8 +702,8 @@ function appCreateService_(payload, nowMs) {
         var category = appFind_("CATEGORIAS", "id_categoria", payload.categoryId);
         if (!category || String(category.status) !== "active") throw appFault_("CATEGORY_INVALID", "Selecione uma categoria válida.");
 
-        var title = appText_(payload.title, 3, 80, "Nome do serviço");
-        var description = appText_(payload.description, 10, 500, "Descrição");
+        var title = appText_(payload.title, 5, 100, "Nome do serviço");
+        var description = appText_(payload.description, 10, 1000, "Descrição");
         var nowIso = new Date(nowMs).toISOString();
 
         var serviceId = Utilities.getUuid();
@@ -723,6 +727,102 @@ function appCreateService_(payload, nowMs) {
     });
 }
 
+function appUpdateService_(payload, nowMs) {
+    if (!appHasKeys_(payload, ["tokenHash", "serviceId", "categoryId", "title", "description"])) {
+        throw appFault_("INVALID_INPUT", "Preencha os campos obrigatórios do serviço.");
+    }
+
+    return appWithLock_(function () {
+        var state = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, true);
+        var profile = appGetProfile_(String(state.user.id_usuario));
+        if (!profile) throw appFault_("PROFILE_UNAVAILABLE", "O perfil profissional não está disponível.");
+
+        var service = appFind_("SERVICOS", "id_servico", String(payload.serviceId));
+        if (!service || String(service.id_profissional) !== String(profile.id_profissional)) {
+            throw appFault_("SERVICE_NOT_FOUND", "Serviço não encontrado.");
+        }
+        if (["suspended", "removed"].indexOf(String(service.status)) !== -1) {
+            throw appFault_("SERVICE_STATE_LOCKED", "Este serviço não pode mais ser alterado pelo profissional.");
+        }
+
+        var category = appFind_("CATEGORIAS", "id_categoria", String(payload.categoryId));
+        var keepsExistingCategory = String(payload.categoryId) === String(service.id_categoria);
+        if (
+            !category
+            || (!keepsExistingCategory && String(category.status) !== "active")
+        ) {
+            throw appFault_("CATEGORY_INVALID", "Selecione uma categoria ativa.");
+        }
+
+        var title = appText_(payload.title, 5, 100, "Nome do serviço");
+        var description = appText_(payload.description, 10, 1000, "Descrição");
+        var nowIso = new Date(nowMs).toISOString();
+
+        appUpdate_("SERVICOS", service._row, {
+            id_categoria: String(category.id_categoria),
+            nome_servico: title,
+            descricao: description,
+            atualizado_em: nowIso
+        });
+        appAudit_(
+            String(state.user.id_usuario),
+            "user",
+            "service.update",
+            "SERVICOS",
+            String(service.id_servico),
+            "success",
+            "Dados do serviço atualizados."
+        );
+
+        return {
+            updated: true,
+            service: appGetServicesForUser_(String(state.user.id_usuario))
+                .filter(function (item) { return item.id === String(service.id_servico); })[0]
+        };
+    });
+}
+
+function appRemoveService_(payload, nowMs) {
+    if (!appHasKeys_(payload, ["tokenHash", "serviceId"])) {
+        throw appFault_("INVALID_INPUT", "Não foi possível remover o serviço.");
+    }
+
+    return appWithLock_(function () {
+        var state = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, true);
+        var profile = appGetProfile_(String(state.user.id_usuario));
+        if (!profile) throw appFault_("PROFILE_UNAVAILABLE", "O perfil profissional não está disponível.");
+
+        var service = appFind_("SERVICOS", "id_servico", String(payload.serviceId));
+        if (!service || String(service.id_profissional) !== String(profile.id_profissional)) {
+            throw appFault_("SERVICE_NOT_FOUND", "Serviço não encontrado.");
+        }
+        if (["suspended", "removed"].indexOf(String(service.status)) !== -1) {
+            throw appFault_("SERVICE_STATE_LOCKED", "Este serviço não pode ser removido pelo profissional.");
+        }
+
+        var nowIso = new Date(nowMs).toISOString();
+        appUpdate_("SERVICOS", service._row, {
+            status: "removed",
+            atualizado_em: nowIso
+        });
+        appAudit_(
+            String(state.user.id_usuario),
+            "user",
+            "service.remove",
+            "SERVICOS",
+            String(service.id_servico),
+            "success",
+            "Serviço removido logicamente pelo profissional."
+        );
+
+        return {
+            removed: true,
+            service: appGetServicesForUser_(String(state.user.id_usuario))
+                .filter(function (item) { return item.id === String(service.id_servico); })[0]
+        };
+    });
+}
+
 function appSetServiceStatus_(payload, nowMs) {
     if (!appHasKeys_(payload, ["tokenHash", "serviceId", "status"])) {
         throw appFault_("INVALID_INPUT", "Não foi possível atualizar o serviço.");
@@ -740,6 +840,9 @@ function appSetServiceStatus_(payload, nowMs) {
         var service = appFind_("SERVICOS", "id_servico", String(payload.serviceId));
         if (!service || String(service.id_profissional) !== String(profile.id_profissional)) {
             throw appFault_("SERVICE_NOT_FOUND", "Serviço não encontrado.");
+        }
+        if (["published", "paused"].indexOf(String(service.status)) === -1) {
+            throw appFault_("SERVICE_STATE_LOCKED", "Este serviço não pode ter o estado alterado pelo profissional.");
         }
 
         var nowIso = new Date(nowMs).toISOString();

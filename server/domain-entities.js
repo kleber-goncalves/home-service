@@ -73,6 +73,24 @@ export class Servico {
         };
     }
 
+    toUpdatePayload() {
+        return {
+            serviceId: this.serviceId,
+            categoryId: this.categoryId,
+            title: this.title,
+            description: this.description,
+        };
+    }
+
+    remover() {
+        this.status = "removed";
+        return this;
+    }
+
+    toRemovalPayload() {
+        return { serviceId: this.serviceId };
+    }
+
     publicar() {
         this.status = SERVICE_STATUS.PUBLISHED;
         return this;

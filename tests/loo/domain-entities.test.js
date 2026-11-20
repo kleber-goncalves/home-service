@@ -94,3 +94,36 @@ test("Servico pode ser publicado por método de domínio", () => {
         status: "published",
     });
 });
+
+
+test("Servico monta payload de edição sem transportar dados de proprietário ou estado", () => {
+    const servico = new Servico({
+        serviceId: "servico-ficticio-04",
+        categoryId: "categoria-ficticia-02",
+        title: "Reparo hidráulico",
+        description: "Descrição atualizada do serviço demonstrativo.",
+        status: "published",
+    });
+
+    assert.deepEqual(servico.toUpdatePayload(), {
+        serviceId: "servico-ficticio-04",
+        categoryId: "categoria-ficticia-02",
+        title: "Reparo hidráulico",
+        description: "Descrição atualizada do serviço demonstrativo.",
+    });
+});
+
+test("Servico representa remoção lógica sem transformar a operação em exclusão física", () => {
+    const servico = new Servico({
+        serviceId: "servico-ficticio-05",
+        status: "published",
+    });
+
+    const resultado = servico.remover();
+
+    assert.equal(resultado, servico);
+    assert.equal(servico.status, "removed");
+    assert.deepEqual(servico.toRemovalPayload(), {
+        serviceId: "servico-ficticio-05",
+    });
+});
