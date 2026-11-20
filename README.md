@@ -4,6 +4,8 @@ Plataforma regional para aproximar pessoas que procuram serviços de profissiona
 
 O projeto tem finalidade acadêmica e busca demonstrar investigação de problemas, levantamento de requisitos, desenvolvimento web, modelagem, segurança e testes.
 
+**Contexto acadêmico:** o Conecta Local está sendo desenvolvido no âmbito de um curso Técnico em Informática. Ele não é o Projeto Integrador do curso de Análise e Desenvolvimento de Sistemas da Uniube.
+
 ## Estado atual — 20/11/2026
 
 A branch `dev` contém a demonstração acadêmica funcional do Conecta Local. As integrações mais recentes concluíram três frentes importantes:
@@ -58,7 +60,9 @@ O GitHub Actions executa essas verificações em pushes e Pull Requests direcion
 
 - [Contexto técnico para IAs e desenvolvedores](docs/AI_CONTEXT.md)
 - [Roteiro de evolução acadêmica e prioridades](docs/ROADMAP_ESTUDOS.md)
-- [Roteiro de pesquisa exploratória com moradores e profissionais](docs/ROTEIRO_PESQUISA_EXPLORATORIA.md)
+- [Questionários preliminares para moradores e profissionais](PESQUISA_COMUNIDADE.md)
+- [Guia de aplicação da pesquisa com a comunidade](docs/GUIA_APLICACAO_PESQUISA_COMUNIDADE.md)
+- [Roteiro detalhado de pesquisa exploratória](docs/ROTEIRO_PESQUISA_EXPLORATORIA.md)
 - [Ativar o protótipo funcional com Google Sheets](docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md)
 - [Fluxo da área do profissional](docs/PROTOTIPO_DEMO_LOCAL.md)
 - [Especificação funcional do MVP (em revisão)](docs/ESPECIFICACAO_MVP.md)
