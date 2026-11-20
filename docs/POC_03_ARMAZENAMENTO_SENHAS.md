@@ -1,6 +1,6 @@
 # POC-03 — viabilidade de derivação e armazenamento de senhas
 
-> **Status atualizado em 2026-11-14 — POC-03 incorporada à `dev` pelo PR #12:** PBKDF2 artesanal via `Utilities` foi reprovado; Argon2id com `hash-wasm@4.13.0` passou nos vetores independentes e em cinco medições do perfil `m=19456 KiB,t=2,p=1` (142, 130, 86, 280 e 61 ms; mediana 130 ms). A fonte candidata de salt passou 256/256 testes de UUIDv4; a política de entrada passou 14/14; blocklist didática passou 10/10 e uma consulta real ao Pwned Passwords passou usando somente o vetor público fixo `password`. Ensaios sintéticos de throttling persistente/concorrente foram concluídos e os recursos temporários foram limpos. **Nada disso aprova Argon2id, comparação de hash, cadastro, login ou sessão para credenciais reais.** O comparador XOR não tem garantia formal de tempo constante; o helper Node `timingSafeEqual` continua isolado e não integrado. Persistem pendências de arquitetura, revisão de segurança, proteção contra abuso/lockout DoS e integração de políticas ao fluxo de autenticação.
+> **Histórico da investigação — atualizado em 2026-11-20:** a POC-03 foi integrada pelo PR #12 e avaliou PBKDF2 via `Utilities` (reprovado), Argon2id com `hash-wasm@4.13.0`, salts UUIDv4, política de entrada, blocklist didática, Pwned Passwords e throttling sintético. A conclusão original de NO-GO para integrar um comparador descreve o estado da investigação isolada em 13/11/2026. **Posteriormente, o protótipo principal integrou Argon2id no gateway Node/Vercel e comparação de hashes com `node:crypto.timingSafeEqual`**, conforme registrado em `docs/AI_CONTEXT.md` e no código de `server/app-gateway.js`. Essa integração é destinada à demonstração acadêmica com credenciais fictícias; não representa auditoria independente nem aprovação para produção. A blocklist didática/Pwned Passwords permanece pesquisa isolada, sem afirmar que foi integrada ao cadastro/login.
 > **Escopo:** comprovar primitivas, compatibilidade, vetores de referência e custo de execução no runtime real do Google Apps Script.
 > **Ambiente:** projeto Apps Script separado, sem implantação como Web App, sem planilha de negócio e sem credenciais reais.
 
@@ -325,7 +325,7 @@ A execução automatizada em Node/VM é complementar e não substitui o resultad
 - **Política de entrada:** PASS 14/14 no Apps Script real para 15–128 code points, NFC, até 512 bytes UTF-8, preservação de espaços/case e rejeição de controles/UTF-16 malformado.
 - **Blocklist / Pwned Passwords:** POC-03D passou 10/10 cenários simulados no Apps Script real e uma única consulta HTTPS real com a senha pública fixa `password`; apenas o prefixo SHA-1 de cinco caracteres foi enviado, com `Add-Padding: true`. Não houve uso de senha pessoal nem persistência.
 - **Throttling:** o modelo lógico passou 6/6. Ensaios sintéticos posteriores validaram persistência/concorrência com Script Properties/ScriptLock e atualização de uma planilha temporária isolada; a sonda de planilha e seus metadados foram limpos. Isso não constitui rate limiter operacional nem resolve lockout DoS.
-- **Autenticação/login: continua bloqueado.** Não há formato de armazenamento de senha aprovado, comparador aprovado, integração de blocklist, controle operacional de frequência ou mitigação suficiente de lockout DoS. A arquitetura e dependências ainda exigem revisão.
+- **Estado histórico da POC isolada (13/11/2026):** a autenticação/login estava bloqueada naquele estágio, pois o comparador XOR não tinha garantia formal de tempo constante e o helper Node ainda não estava integrado. Essa decisão foi posteriormente superada pela integração separada do gateway principal, documentada na seção 8.21. A aprovação continua restrita ao protótipo acadêmico e não autoriza produção ou credenciais reais.
 
 
 ### 8.13. Política de entrada de senha — execução manual concluída
@@ -530,7 +530,7 @@ A validação estrutural antecipada é aceitável porque a representação e o t
 - **Uso permitido nesta POC:** somente dados sintéticos e testes isolados. O XOR não será descrito como comparação segura para autenticação; o helper Node não será descrito como integração concluída. Não enviar senha, hash/verifier ou salt ao React, não registrar esses valores e não criar endpoint público de comparação.
 - **Critério para reabrir a decisão:** apresentar um desenho de ameaça e protocolo verificável que mantenha a autoridade do Apps Script, com testes de autenticação interna, nonce/replay, fail closed, limites/timeout, erros e ausência de exposição de material de credencial. Caso isso não possa ser provado sem improviso, reabrir a arquitetura em vez de aceitar o comparador XOR por conveniência.
 
-**Consequência:** POC-03C registra a decisão de não integrar qualquer comparador ao fluxo nesta etapa. A POC-03D foi validada manualmente em 2026-11-14; consultar a seção 8.20. Argon2id continua apenas candidato experimental. Não há aprovação para cadastro, login, recuperação, armazenamento de verificadores ou sessão, e credenciais reais continuam proibidas.
+**Consequência histórica:** a POC-03C registrou a decisão de não integrar o comparador naquele ciclo. Depois, o protótipo principal adotou o helper Node com `timingSafeEqual` e Argon2id, sem reutilizar o comparador XOR do harness Apps Script. A POC-03D foi validada manualmente em 2026-11-14; consultar a seção 8.20. A integração posterior permanece limitada a credenciais fictícias no Preview e não equivale a aprovação de produção.
 
 ### 8.20. POC-03D — blocklist local e Pwned Passwords (protótipo isolado)
 
@@ -572,3 +572,18 @@ A validação estrutural antecipada é aceitável porque a representação e o t
 **Limites:** a execução manual confirma a conectividade HTTPS do Apps Script isolado, o escopo externo concedido e o parsing de uma resposta real. Não comprova disponibilidade contínua, SLA, anonimato absoluto, nem comportamento do serviço para todas as senhas. A lista local é pequena/didática; o avaliador e a consulta remota ainda não estão conectados a cadastro/login. A CI usa Node/VM e mocks, portanto não substitui a execução manual no runtime Google. A finalidade continua exclusivamente acadêmica, com dados fictícios. SHA-1 é usado exclusivamente no protocolo de consulta por faixa, nunca para armazenamento ou verificação de senha.
 
 Referência técnica: [Pwned Passwords API — busca por faixa, k-anonymity, prevalência e padding](https://haveibeenpwned.com/api/v3#PwnedPasswords).
+
+
+### 8.21. Integração posterior no protótipo principal — 20/11/2026
+
+A decisão NO-GO da seção 8.19 é histórica e se referia à comparação de hashes dentro do Apps Script e ao helper Node ainda isolado na data de 13/11/2026. O protótipo principal evoluiu depois por uma integração separada:
+
+- O gateway `server/app-gateway.js` utiliza Argon2id por meio de `hash-wasm@4.13.0`, com perfil documentado `m=19456 KiB,t=2,p=1`.
+- A comparação de hashes é executada no runtime Node por `node:crypto.timingSafeEqual`, através do helper server-side, com buffers de mesmo tamanho.
+- A senha em texto puro não é encaminhada ao Apps Script; o gateway deriva o verificador e encaminha somente os dados necessários para o fluxo de negócio.
+- A política de entrada de senha de 15 a 128 code points Unicode, normalização NFC e rejeição de controles foi incorporada ao fluxo do protótipo conforme a documentação de contexto.
+- A validação operacional registrada é restrita ao Preview e a credenciais fictícias. Não houve auditoria criptográfica independente, benchmark de carga, certificação ou aprovação para Production.
+- A blocklist pequena de demonstração e a consulta Pwned Passwords testada com vetor público fixo não devem ser descritas como proteção integrada ao cadastro/login sem implementação e evidência específicas.
+- O comparador XOR do harness Apps Script continua experimental e não deve ser reutilizado no fluxo de autenticação.
+
+Portanto, **o estado atual é: Argon2id e comparação Node integrados ao protótipo acadêmico; pesquisa de blocklist externa permanece isolada; credenciais reais e Production continuam proibidas.**
