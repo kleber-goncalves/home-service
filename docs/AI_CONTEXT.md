@@ -341,9 +341,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 922bc153902a8213efd7c43bc3e736196c95b449
-- **Data do commit:** 2026-11-20T18:05:02-03:00
-- **Mensagem do commit:** feat(ui): style service city selector
+- **Commit de referência:** 545e449446b8d42683f339eec0784b74d46e1a12
+- **Data do commit:** 2026-11-20T18:05:35-03:00
+- **Mensagem do commit:** test(gateway): cover service city payloads
 - **Branch desta execução:** feat/service-city-coverage
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -447,13 +447,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 545e449 | 2026-11-20 | test(gateway): cover service city payloads |
+| 59b5572 | 2026-11-20 | test(authorization): cover service city coverage |
+| 751cad1 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 922bc15 | 2026-11-20 | feat(ui): style service city selector |
 | a944a3d | 2026-11-20 | feat(ui): clarify multi-city service search |
 | 664ef99 | 2026-11-20 | feat(catalog): filter with all service coverage cities |
 | 72907dd | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | af2784e | 2026-11-20 | feat(ui): allow selecting cities for each service |
-| 178d256 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 5606f1f | 2026-11-20 | feat(catalog): forward city IDs through service gateway |
-| 49b8b1c | 2026-11-20 | feat(catalog): add city IDs to service domain |
 
 <!-- END AUTO-GENERATED SECTION -->
