@@ -364,12 +364,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** b76135e0495841ab886fbeb444310477e7d7528d
-- **Data do commit:** 2026-11-20T19:47:50-03:00
-- **Mensagem do commit:** test: cobrir autenticação e limite da rota de upload de imagens
+- **Commit de referência:** 0ef51d7f3a4b1ee06b3c4f2a3152a08c2a51ac6a
+- **Data do commit:** 2026-11-20T19:48:09-03:00
+- **Mensagem do commit:** ci: executar testes do gateway de upload de imagens
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 12
+- **Scripts npm:** 13
 - **Dependências de runtime:** 4
 - **Dependências de desenvolvimento:** 11
 - **Workflows:** 2
@@ -391,6 +391,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run test:loo | node --test tests/loo/domain-entities.test.js |
 | npm run test:poc04 | node --test tests/poc04/gateway.test.js tests/poc04/apps-script.test.js |
 | npm run test:authorization | node --test tests/authorization/apps-script.test.js tests/authorization/gateway.test.js |
+| npm run test:images | node --test tests/images/upload-gateway.test.js |
 
 ### Variáveis declaradas no .env.example
 
@@ -470,13 +471,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 0ef51d7 | 2026-11-20 | ci: executar testes do gateway de upload de imagens |
+| 77aadc9 | 2026-11-20 | test: adicionar comando dedicado para upload de imagens |
+| 4711263 | 2026-11-20 | test: verificar allowlist das operações de imagem no gateway |
+| 241b155 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | b76135e | 2026-11-20 | test: cobrir autenticação e limite da rota de upload de imagens |
 | 5e6b235 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | a7ee539 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 98ea68f | 2026-11-20 | feat: integrar ações de imagem ao gateway autenticado |
-| 55a1cb5 | 2026-11-20 | feat: expor rota dedicada para upload de imagens |
-| ec207be | 2026-11-20 | feat: adicionar gateway dedicado para blocos de imagem |
-| f64d6c5 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| b144760 | 2026-11-20 | test: cobrir autorização e permissões do upload de imagens |
 
 <!-- END AUTO-GENERATED SECTION -->
