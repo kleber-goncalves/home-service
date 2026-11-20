@@ -321,9 +321,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** f66e15713974be6f0eeacf35c193895ca6039e3f
-- **Data do commit:** 2026-11-20T15:54:47-03:00
-- **Mensagem do commit:** fix(authz): enforce professional role for profile and service actions
+- **Commit de referência:** 74f569f1d5a3004af5ed492d1dc43526a651a199
+- **Data do commit:** 2026-11-20T15:54:50-03:00
+- **Mensagem do commit:** fix(authz): map role denial to forbidden
 - **Branch desta execução:** feat/authorization-integrity
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -427,6 +427,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 74f569f | 2026-11-20 | fix(authz): map role denial to forbidden |
 | f66e157 | 2026-11-20 | fix(authz): enforce professional role for profile and service actions |
 | 0af2a70 | 2026-11-20 | docs(ai-context): registrar etapa de autorizacao em andamento |
 | b70c0c8 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
@@ -434,6 +435,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 97d3bda | 2026-11-20 | docs(readme): incluir comando de testes de autorizacao |
 | b6189df | 2026-11-20 | docs(relatorio): acrescentar cenarios de autorizacao |
 | 7811439 | 2026-11-20 | docs(mvp): registrar cobertura automatizada de autorizacao |
-| e30db68 | 2026-11-20 | docs(arquitetura): registrar autorizacao implementada e limites |
 
 <!-- END AUTO-GENERATED SECTION -->
