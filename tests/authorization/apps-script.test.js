@@ -405,6 +405,7 @@ function createHarness(options = {}) {
     const driveSessions = new Map();
     const driveFiles = new Map();
     const driveCalls = [];
+    let omitNextChunkRange = false;
 
     function driveResponse(status, headers = {}, body = "") {
         return {
@@ -456,6 +457,10 @@ function createHarness(options = {}) {
             }
             session.received += bytes;
             if (session.received < session.size) {
+                if (omitNextChunkRange) {
+                    omitNextChunkRange = false;
+                    return driveResponse(308);
+                }
                 return driveResponse(308, { Range: "bytes=0-" + (session.received - 1) });
             }
             const fileId = "synthetic-drive-file-" + driveFileCounter++;
@@ -554,7 +559,15 @@ function createHarness(options = {}) {
         );
     }
 
-    return { call, records, driveFiles, driveSessions, driveCalls, properties };
+    return {
+        call,
+        records,
+        driveFiles,
+        driveSessions,
+        driveCalls,
+        properties,
+        omitNextChunkRange() { omitNextChunkRange = true; },
+    };
 }
 
 test("service.listMine retorna somente os serviços do profissional da sessão", () => {
@@ -1326,4 +1339,31 @@ test("pausar serviço tenta restringir todas as imagens mesmo quando uma permiss
     assert.equal(firstFile.sharing, "ANYONE_WITH_LINK");
     assert.equal(secondFile.sharing, "PRIVATE", "A segunda imagem também deve ter a permissão atualizada.");
     assert.equal(harness.records("SERVICOS").find((service) => service.id_servico === SERVICE_A).status, "published");
+});
+
+
+test("image.upload.chunk trata 308 sem Range como offset não confirmado", () => {
+    const harness = createHarness();
+    const bytes = Buffer.alloc(1024 * 1024 + 17, 0x61);
+    Buffer.from([0xff, 0xd8, 0xff]).copy(bytes);
+    const started = harness.call("image.upload.start", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        fileSize: bytes.length,
+        mimeType: "image/jpeg",
+    });
+    assert.equal(started.ok, true);
+    harness.omitNextChunkRange();
+
+    const result = harness.call("image.upload.chunk", {
+        tokenHash: TOKEN_HASH_A,
+        uploadId: started.data.uploadId,
+        startOffset: 0,
+        totalSize: bytes.length,
+        chunkBase64: bytes.subarray(0, 1024 * 1024).toString("base64"),
+    });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.error.code, "DRIVE_CHUNK_OFFSET_UNKNOWN");
+    assert.equal(harness.records("IMAGENS").length, 0);
 });
