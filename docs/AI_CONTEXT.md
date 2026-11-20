@@ -2,7 +2,7 @@
 
 > Documento de continuidade do projeto. Leia antes de sugerir ou realizar alterações. Reúne propósito, decisões, arquitetura planejada, estado implementado, regras de manutenção e limitações. A seção de snapshot ao final é atualizada pelo GitHub Actions.
 
-## Atualização vigente — 2026-11-18
+## Atualização vigente — 2026-11-20
 
 > Esta seção registra o estado mais recente conhecido. Consulte os SHAs e os arquivos do branch efetivamente em análise antes de realizar mudanças.
 
