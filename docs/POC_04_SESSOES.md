@@ -251,7 +251,7 @@ A branch `feat/poc-04-session-cookie` recebeu a branch `dev` por um merge commit
 - Merge commit: `51bf7d4b2d832ffa4927d0a8937bb303f476b89d`.
 - Primeiro pai: head anterior da POC-04 (`88d1853bb3f33b07120e4a894b306ffb4ee0a345`).
 - Segundo pai: head de `dev` incorporado (`0af5a2e250c3adf444c6478e5becad3948451da0`).
-- Comparação atual com `dev`: zero commits atrás; PR #14 reconhecida como `mergeable=true`. A PR continua em Draft e **não foi mesclada em `dev`**.
+- Registro daquele momento, antes da decisão final: a comparação com `dev` mostrava zero commits atrás e a PR #14 estava em Draft, ainda não mesclada. Esse era o estado observado antes da integração final documentada na seção 12.8.
 - O workflow `Validate Home Service` #44784729150 concluiu SUCCESS no commit de merge. POC-01/02/03/04, LOO, auditoria de dependências, registro de ocorrências, ESLint e build passaram.
 - Os commits posteriores `d5a7217` e `0ecb4e4` atualizaram somente `docs/AI_CONTEXT.md`; não alteraram código, testes ou dependências.
 
