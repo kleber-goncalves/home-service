@@ -1293,8 +1293,8 @@ test("image.upload.status recupera recibo quando a conclusão já foi gravada no
         "O recibo de conclusão deve permanecer disponível durante a janela de recuperação."
     );
     assert.equal(
-        harness.properties.get("CONECTA_LOCAL_IMAGE_SERVICE_UPLOAD_V1_" + SERVICE_A),
-        null,
+        harness.properties.has("CONECTA_LOCAL_IMAGE_SERVICE_UPLOAD_V1_" + SERVICE_A),
+        false,
         "A conclusão deve liberar a reserva para novos envios no mesmo serviço."
     );
 });
