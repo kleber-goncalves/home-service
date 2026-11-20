@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 55a1cb5cfb21edb6e66497765986ca9432db2ef7
-- **Data do commit:** 2026-11-20T19:47:25-03:00
-- **Mensagem do commit:** feat: expor rota dedicada para upload de imagens
+- **Commit de referência:** 98ea68f970b995c476ae31b19f6958f03866d189
+- **Data do commit:** 2026-11-20T19:47:28-03:00
+- **Mensagem do commit:** feat: integrar ações de imagem ao gateway autenticado
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -470,6 +470,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 98ea68f | 2026-11-20 | feat: integrar ações de imagem ao gateway autenticado |
 | 55a1cb5 | 2026-11-20 | feat: expor rota dedicada para upload de imagens |
 | ec207be | 2026-11-20 | feat: adicionar gateway dedicado para blocos de imagem |
 | f64d6c5 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
@@ -477,6 +478,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | c285e1d | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 0e8761f | 2026-11-20 | feat: iniciar backend de upload retomável de imagens no Drive |
 | 09c6128 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| e62af45 | 2026-11-20 | docs: registrar início da etapa 4 no contexto técnico |
 
 <!-- END AUTO-GENERATED SECTION -->
