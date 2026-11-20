@@ -55,6 +55,7 @@ export default function HomePage() {
     const [hasSearched, setHasSearched] = useState(false);
     const [realServices, setRealServices] = useState([]);
     const [catalogCategories, setCatalogCategories] = useState([]);
+    const [catalogCities, setCatalogCities] = useState([]);
 
     useEffect(() => {
         let active = true;
@@ -70,8 +71,9 @@ export default function HomePage() {
             if (servicesResult.status === "fulfilled" && Array.isArray(servicesResult.value)) {
                 setRealServices(servicesResult.value.map(mapPublicService));
             }
-            if (catalogResult.status === "fulfilled" && Array.isArray(catalogResult.value?.categories)) {
-                setCatalogCategories(catalogResult.value.categories);
+            if (catalogResult.status === "fulfilled" && catalogResult.value) {
+                setCatalogCategories(Array.isArray(catalogResult.value.categories) ? catalogResult.value.categories : []);
+                setCatalogCities(Array.isArray(catalogResult.value.cities) ? catalogResult.value.cities : []);
             }
         }
 
@@ -143,7 +145,14 @@ export default function HomePage() {
         <>
             <SiteHeader />
             <main id="conteudo" tabIndex="-1">
-                <HeroSearch query={query} city={city} onQueryChange={setQuery} onCityChange={setCity} onSubmit={submitSearch} />
+                <HeroSearch
+                    query={query}
+                    city={city}
+                    onQueryChange={setQuery}
+                    onCityChange={setCity}
+                    onSubmit={submitSearch}
+                    availableCities={realServices.length ? catalogCities : []}
+                />
                 <CategorySection
                     selectedCategory={selectedCategory}
                     onSelect={selectCategory}
