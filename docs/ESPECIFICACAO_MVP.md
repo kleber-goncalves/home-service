@@ -16,13 +16,15 @@ O projeto é uma demonstração acadêmica. O sistema deverá simular fluxos coe
 
 O MVP não será um marketplace transacional: não intermediará pagamentos, contratos, agendamentos ou conversas internas. O contato ocorrerá diretamente entre visitante e profissional, principalmente pelo WhatsApp público informado no perfil.
 
-## 2. Estado atual do projeto — 18/11/2026
+## 2. Estado atual do projeto — 20/11/2026
 
 A branch `dev` contém a demonstração acadêmica atual do Conecta Local. O PR #15 foi integrado em 16/11/2026 e acrescentou a área do profissional conectada ao Google Sheets via Vercel Function e Google Apps Script. O fluxo implementado contempla cadastro, confirmação por código demonstrativo, login, sessão, atualização de perfil, criação de serviço, pausa/publicação e consulta pública de serviços publicados.
 
 A validação manual ponta a ponta do PR #15 foi realizada em Preview em 16/11/2026, com dados fictícios. Ela confirmou catálogo, cadastro/ativação, persistência na planilha, login, criação de serviço, pausa/publicação, logout e novo login/refresh. Como os PRs #16 (orientação a objetos) e #17 (correção da vitrine) foram integrados depois, a jornada completa precisa ser repetida no Preview atualizado de `dev` antes do encerramento da demonstração.
 
-Os PRs #18 (relatório integrador) e #19 (integração de `dev` em `main`) também foram concluídos. O PR #19 levou o código funcional ao commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`. Depois, a PR #20 atualizou apenas documentação em `dev`; `main` permanece no commit de release e `dev` está à frente somente por esses documentos e pelo snapshot automático. O código funcional permanece alinhado.
+Os PRs #18 (relatório integrador) e #19 (integração de `dev` em `main`) foram concluídos. O PR #19 levou o núcleo funcional anterior ao commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`. Posteriormente, a PR #25 integrou a cobertura por múltiplas cidades exclusivamente em `dev`, pelo merge commit `5003604a51def9bdf58df9845d36c2ec75a4452e`; portanto, `dev` contém essa evolução adicional e `main` permanece inalterada no commit de release.
+
+A PR #25 adicionou a relação `SERVICO_CIDADES` e a seleção de múltiplas cidades por serviço. Em 20/11/2026, o responsável confirmou a sincronização/publicação do Apps Script real e informou que os testes manuais no Preview de `dev` passaram: a edição de um serviço existente atualizou a aba `SERVICO_CIDADES`; a homepage encontrou o serviço pela cidade já cadastrada; e, com uma segunda cidade temporária vinculada ao mesmo serviço, a pesquisa pública encontrou o serviço nas duas localidades. A CI do merge também concluiu SUCCESS e o Preview está READY. A cidade adicional foi usada somente para teste; sua limpeza na planilha deve ser confirmada antes de encerrar a organização dos dados demonstrativos.
 
 **O que está implementado na demonstração**
 - Homepage pública e filtros locais sobre dados de exemplo e serviços retornados pelo backend.
@@ -30,6 +32,7 @@ Os PRs #18 (relatório integrador) e #19 (integração de `dev` em `main`) tamb�
 - Atualização do perfil profissional.
 - Criação, pausa e publicação de serviços, com persistência nas abas operacionais do Sheets.
 - Consulta pública dos serviços publicados e canal de contato informado pelo profissional.
+- Associação de um ou mais municípios por serviço por meio de `SERVICO_CIDADES`, com pesquisa pública considerando as localidades vinculadas.
 - Gateway com Argon2id, HMAC, proteção contra replay, CSRF, validação de Origin e controle de sessão.
 - Classes de domínio `Usuario`, `Profissional` e `Servico`, integradas pelo PR #16.
 
@@ -38,12 +41,12 @@ Os PRs #18 (relatório integrador) e #19 (integração de `dev` em `main`) tamb�
 - Envio real de e-mail; a confirmação de cadastro é demonstrativa.
 - Upload, armazenamento e controle de permissões de imagens no Google Drive.
 - Painel administrativo, denúncias, moderação e gestão administrativa de categorias/cidades.
-- Associação completa de múltiplas cidades por serviço e pesquisa remota/geográfica.
+- Pesquisa remota/geográfica e geolocalização.
 
-A modelagem aprovada prevê 12 abas. O Apps Script de negócio atualmente utiliza oito: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`. As abas `CONTROLE_AUTENTICACAO`, `SERVICO_CIDADES`, `IMAGENS` e `DENUNCIAS` ainda não têm fluxos operacionais implementados.
+A modelagem aprovada prevê 12 abas. O Apps Script de negócio utiliza nove: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS`, `SERVICO_CIDADES` e `AUDITORIA`. As abas `CONTROLE_AUTENTICACAO`, `IMAGENS` e `DENUNCIAS` ainda não têm fluxos operacionais implementados.
 
 **Ambientes**
-- **Preview de `dev`:** ambiente destinado à demonstração funcional; a jornada deve ser revalidada após as últimas integrações.
+- **Preview de `dev`:** ambiente destinado à demonstração funcional. A PR #25 foi integrada e a validação manual principal da cobertura por múltiplas cidades foi confirmada pelo responsável em 20/11/2026.
 - **Production (`main`):** permanece como vitrine pública. O gateway bloqueia operações de negócio fora de Vercel Preview e não há variáveis Production do backend.
 
 O projeto é acadêmico, usa exclusivamente dados fictícios e não está aprovado para produção ou uso comercial. Não inserir credenciais ou dados pessoais reais.

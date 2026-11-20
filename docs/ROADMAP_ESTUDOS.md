@@ -116,11 +116,11 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 3 — Melhorar a descoberta por cidade e categoria
 
-**Código integrado em `dev` pela PR #25 em 20/11/2026; validação manual real pendente.**
+**Status: validação funcional principal concluída em 20/11/2026; limpeza dos dados temporários de teste a confirmar.**
 
 **Objetivo:** aproximar o catálogo da proposta regional sem construir busca sofisticada.
 
-**Implementado e integrado:**
+**Implementado e integrado pela PR #25 em `dev`:**
 - Usa `CATEGORIAS` e `CIDADES` do catálogo ativo como fonte dos filtros e sugestões da homepage.
 - Implementa a relação `SERVICO_CIDADES` para permitir um ou mais municípios por serviço.
 - Valida no Apps Script IDs existentes, cidades ativas, ausência de duplicidade e pelo menos um município por serviço.
@@ -136,15 +136,26 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 - Auditoria bloqueante de dependências de produção, POC-01/02/03/04, autorização/ownership, LOO, registro de ocorrências, ESLint e build passaram.
 - Preview fixo de `dev` está READY no deployment `dpl_4n5E7JLaUQPHezVk8ymGRXZSS7Bx`.
 
-**Pendente para concluir a etapa:**
-- Sincronizar `apps-script/conecta-local/Code.gs` no projeto Google Apps Script real.
-- Salvar e publicar nova versão na implantação Web App existente, preservando URL/ID, Script Properties, permissões e identidade de execução.
-- No Preview fixo atualizado de `dev`, validar criação/edição com duas cidades, busca por cada município, recusa de cidade inválida/inativa, compatibilidade dos serviços antigos e visibilidade quando uma categoria for inativada.
-- Usar somente dados fictícios. Não configurar backend em Production.
+**Validação manual no Preview de `dev` — PASS, confirmada pelo responsável em 20/11/2026:**
+- O responsável confirmou a sincronização do `apps-script/conecta-local/Code.gs` no projeto Apps Script e a publicação de uma nova versão na implantação Web App existente.
+- Ao editar um serviço que já existia e salvar a cidade selecionada, a aba `SERVICO_CIDADES` foi atualizada imediatamente.
+- Na homepage pública, o serviço foi encontrado pela cidade já cadastrada na planilha.
+- Para testar a relação múltipla, foi adicionada uma segunda cidade temporária; o mesmo serviço foi associado às duas cidades e salvo.
+- O responsável confirmou que a homepage encontrou o mesmo serviço nas duas cidades e que os testes executados passaram.
+- O ensaio confirma a persistência do vínculo múltiplo no Sheets e a descoberta pública por cada cidade. A confirmação é baseada no relato do responsável; não foram fornecidos logs individuais ou capturas de cada operação.
 
-**Limites:** não criar infraestrutura de busca separada; não implementar geolocalização. Vínculos em Sheets e auditoria não são atômicos.
+**Cenários adicionais não comprovados nesta rodada:**
+- Recusa de IDs inexistentes, cidades inativas e cidades duplicadas por chamadas inválidas.
+- Preservação de vínculos legados sem associação explícita e comportamento após inativação de categoria.
+- Esses cenários continuam cobertos ou parcialmente cobertos pela suíte automatizada conforme os testes existentes, mas não devem ser descritos como validação manual real.
 
-**Critério de conclusão:** além da CI e do Preview, a integração Apps Script/Sheets e os cenários manuais de cobertura regional devem ser confirmados.
+**Limpeza dos dados de demonstração:**
+- A segunda cidade foi criada apenas como dado temporário de teste. Confirmar sua remoção da aba `CIDADES` e a remoção dos vínculos correspondentes em `SERVICO_CIDADES`, preservando a cidade original e os dados permanentes.
+- Não excluir registros permanentes de serviços nem linhas de outros serviços.
+
+**Limites:** não criar infraestrutura de busca separada; não implementar geolocalização. Vínculos em Sheets e auditoria não são atômicos. Usar somente dados fictícios e não configurar backend em Production.
+
+**Critério principal de conclusão atendido:** Apps Script sincronizado/publicado, serviço associado a duas cidades, persistência conferida na aba `SERVICO_CIDADES` e busca pública aprovada nas duas localidades. A limpeza do registro temporário é uma tarefa de higiene dos dados, não uma falha funcional da implementação.
 
 ### Etapa 4 — Imagens no Google Drive
 
@@ -199,9 +210,9 @@ Reavaliar somente quando houver exigência acadêmica explícita ou uma necessid
 
 ## 6. Ordem prática recomendada
 
-1. **Agora:** concluir a Etapa 3 — sincronizar/publicar o Apps Script real e executar os testes manuais no Preview fixo de `dev`.
-2. **Depois, conforme necessidade:** Etapa 4 — imagens no Google Drive, somente se trouxer ganho real para a apresentação.
-3. **Em paralelo à preparação da entrega:** Etapa 5 — pesquisa acadêmica e acabamento.
+1. **Agora:** confirmar a limpeza da cidade temporária e dos vínculos de teste em `SERVICO_CIDADES`, preservando os dados permanentes.
+2. **Depois, conforme necessidade:** avaliar a Etapa 4 (imagens no Google Drive) somente se trouxer ganho real para a apresentação.
+3. **Em paralelo à preparação da entrega:** priorizar a Etapa 5 — pesquisa acadêmica, revisão final e acabamento da apresentação.
 
 Trabalhar uma etapa por branch/PR, sempre partindo de `dev`. Integrar somente depois das verificações pertinentes. Não alterar `main` sem uma decisão explícita de publicação.
 

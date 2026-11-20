@@ -30,7 +30,7 @@
 - O código de confirmação é mostrado na interface, sem envio de e-mail.
 - Não há recuperação de senha nesta rodada.
 - Upload de imagens no Drive, edição completa do perfil e painel administrativo ficam para etapas futuras. A edição de nome/categoria/descrição e a remoção lógica de serviços foram integradas em `dev` pela PR #23 e validadas pelo responsável no Preview atualizado em 20/11/2026.
-- A cobertura por múltiplas cidades foi integrada em `dev` pela PR #25. A CI passou e o Preview está READY. Ainda é necessário sincronizar/publicar `apps-script/conecta-local/Code.gs` no Apps Script real e executar os testes manuais de integração com Sheets no alias fixo de `dev`.
+- A cobertura por múltiplas cidades foi integrada em `dev` pela PR #25. A CI passou, o Preview está READY e o responsável confirmou em 20/11/2026 a sincronização/publicação do Apps Script real. Nos testes manuais, a edição de um serviço existente atualizou `SERVICO_CIDADES`; a homepage encontrou o serviço pela cidade já cadastrada e, após associar temporariamente duas cidades ao mesmo serviço, encontrou-o pelas duas localidades. O responsável informou que os testes passaram. A segunda cidade foi criada apenas para teste: confirmar sua remoção de `CIDADES` e dos vínculos de teste em `SERVICO_CIDADES`, preservando a cidade original e registros permanentes.
 - O protótipo é acadêmico e não foi dimensionado para produção ou escala comercial.
 - A POC-04 continua separada. A sessão da aplicação usa a implementação nova desta branch, não a conta sintética da POC-04.
 
