@@ -4,6 +4,8 @@
 
 ## Atualização vigente — 2026-11-20
 
+- Em 20/11/2026, o responsável esclareceu o contexto acadêmico: o Conecta Local está sendo desenvolvido em um curso Técnico em Informática, e não como Projeto Integrador do curso de ADS da Uniube. Não associar o projeto à Uniube.
+
 > Esta seção registra o estado mais recente conhecido. Consulte os SHAs e os arquivos do branch efetivamente em análise antes de realizar mudanças.
 
 - O PR #15 (`feat/prototipo-demo-profissional` → `dev`) foi integrado em 16/11/2026. O protótipo funcional com cadastro, confirmação demonstrativa, login, sessão, perfil, criação/pausa/publicação de serviços e persistência no Google Sheets está na branch `dev`.
@@ -18,7 +20,7 @@
 - O Apps Script de negócio está em `apps-script/conecta-local/Code.gs`. O fluxo atual utiliza nove abas operacionais do Sheets: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS`, `SERVICO_CIDADES` e `AUDITORIA`. A modelagem aprovada contempla 12 abas; `CONTROLE_AUTENTICACAO`, `IMAGENS` e `DENUNCIAS` ainda não têm fluxo operacional implementado.
 - Argon2id (`hash-wasm@4.13.0`) e comparação de hash por `timingSafeEqual` estão integrados no gateway do protótipo. Isso atende à demonstração acadêmica, não constitui auditoria independente ou aprovação para produção.
 - A POC-04 foi integrada à branch `dev` pela PR #14 em 20/11/2026 (merge commit `adb51e2f1de8b9d47fb59205938b3e33e21739a1`), mas continua independente do login principal e desabilitada. Os ensaios sintéticos foram concluídos; os recursos temporários, nonces, segredo Apps Script e variáveis Vercel exclusivas foram limpos. A revisão estática identificou dois bloqueios para qualquer reativação: leitura de corpos/respostas limitada somente após leitura integral e ausência de rate limiting/limite de emissão. O responsável aceitou manter esses pontos como limitações documentadas deste ciclo; não reativar nem conectar a POC ao login principal. Falhas reais de infraestrutura e testes de carga não foram executados. Consultar `docs/POC_04_SESSOES.md`.
-- A Etapa 5 de pesquisa acadêmica tem instrumento preparado em `docs/ROTEIRO_PESQUISA_EXPLORATORIA.md`; coleta e análise ainda pendentes. Não fabricar resultados e confirmar com o orientador os procedimentos para participação voluntária.
+- A pesquisa comunitária do Conecta Local está em preparação. Os questionários preliminares para moradores e profissionais estão em `PESQUISA_COMUNIDADE.md`; as orientações de aplicação e análise estão em `docs/GUIA_APLICACAO_PESQUISA_COMUNIDADE.md`; o roteiro detalhado existente permanece em `docs/ROTEIRO_PESQUISA_EXPLORATORIA.md`. Em 20/11/2026, os instrumentos ainda aguardam revisão do professor/orientador; coleta e análise não foram iniciadas/confirmadas. Não fabricar resultados nem iniciar a aplicação antes de confirmar os procedimentos acadêmicos e de participação voluntária.
 - Usar somente dados fictícios. Não configurar backend em Production nesta etapa.
 
 ## 1. Instruções para a IA que assumir o projeto
@@ -47,7 +49,7 @@
 - **Repositório:** https://github.com/kleber-goncalves/home-service
 - **Deploy informado:** https://home-service-blush.vercel.app/
 - **Tipo:** plataforma web regional de divulgação e descoberta de serviços.
-- **Finalidade:** projeto acadêmico integrador, com possibilidade de evolução após a entrega.
+- **Finalidade:** projeto acadêmico de desenvolvimento web realizado no contexto de um curso Técnico em Informática, com possibilidade de evolução após a entrega. O responsável esclareceu em 20/11/2026 que este projeto não pertence ao curso de Análise e Desenvolvimento de Sistemas da Uniube; não atribuir a ele essa instituição ou curso.
 - **Públicos:** pessoas que procuram serviços locais; profissionais autônomos e pequenos empreendedores; administradores da plataforma.
 - **Objetivo:** facilitar a divulgação de serviços por profissionais e permitir que moradores encontrem opções na própria região.
 - **Jornada pública pretendida:** **PESQUISAR → DESCOBRIR → CONHECER → ENTRAR EM CONTATO**.
