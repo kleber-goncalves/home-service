@@ -360,9 +360,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 4010c83c7bacc907c4b10ace9a8d89befb7d5cfd
-- **Data do commit:** 2026-11-20T19:23:43-03:00
-- **Mensagem do commit:** docs: adicionar guia de aplicação da pesquisa comunitária
+- **Commit de referência:** ea65aa10947751dc7eceb893a2778a8608c17ac2
+- **Data do commit:** 2026-11-20T19:23:52-03:00
+- **Mensagem do commit:** docs: corrigir contexto acadêmico e indexar pesquisa comunitária
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -466,13 +466,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| ea65aa1 | 2026-11-20 | docs: corrigir contexto acadêmico e indexar pesquisa comunitária |
+| 68d81aa | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 4010c83 | 2026-11-20 | docs: adicionar guia de aplicação da pesquisa comunitária |
 | c500597 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 93407e7 | 2026-11-20 | docs: adicionar questionários preliminares da pesquisa comunitária |
 | 1dcaaff | 2026-11-20 | docs(ai-context): confirmar limpeza e estado da etapa 5 |
 | 103219b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 404d5ed | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 95dc6cd | 2026-11-20 | docs: confirmar encerramento da etapa 3 em ESPECIFICACAO_MVP.md |
-| a18a99e | 2026-11-20 | docs: confirmar encerramento da etapa 3 em PROTOTIPO_DEMO_LOCAL.md |
 
 <!-- END AUTO-GENERATED SECTION -->
