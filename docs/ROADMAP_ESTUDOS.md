@@ -50,7 +50,7 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 1 — Autorização e integridade dos dados
 
-**Próxima prioridade.**
+**Em andamento — cobertura automatizada inicial adicionada na branch `feat/authorization-integrity`.**
 
 **Por que vem primeiro:** é o aprendizado de maior valor para um sistema com contas e dados privados. Uma interface pode funcionar perfeitamente para o próprio usuário e ainda permitir acesso indevido a dados de outra conta se a validação do backend estiver incompleta.
 
