@@ -25,11 +25,14 @@ export default function ServiceImageManager({ service, csrfToken, onServicesChan
     const remainingSlots = Math.max(0, MAX_ACTIVE_IMAGES - images.length);
     const canUpload = !["suspended", "removed"].includes(service.status) && remainingSlots > 0;
 
-    useEffect(() => {
-        const urls = selectedFiles.map((file) => URL.createObjectURL(file));
-        setPreviewUrls(urls);
-        return () => urls.forEach((url) => URL.revokeObjectURL(url));
-    }, [selectedFiles]);
+    useEffect(() => () => {
+        previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    }, [previewUrls]);
+
+    function replaceSelectedFiles(files) {
+        setSelectedFiles(files);
+        setPreviewUrls(files.map((file) => URL.createObjectURL(file)));
+    }
 
     function selectFiles(event) {
         const files = Array.from(event.target.files || []);
@@ -51,13 +54,13 @@ export default function ServiceImageManager({ service, csrfToken, onServicesChan
         if (accepted.length > remainingSlots) {
             errors.push("Você pode selecionar somente mais " + remainingSlots + " imagem(ns) para este serviço.");
         }
-        setSelectedFiles(limited);
+        replaceSelectedFiles(limited);
         setProgress(0);
         setMessage(errors.join(" "));
     }
 
     function removeSelectedFile(index) {
-        setSelectedFiles((current) => current.filter((_, currentIndex) => currentIndex !== index));
+        replaceSelectedFiles(selectedFiles.filter((_, currentIndex) => currentIndex !== index));
         setProgress(0);
     }
 
@@ -95,14 +98,14 @@ export default function ServiceImageManager({ service, csrfToken, onServicesChan
                 completedCount += 1;
                 if (controller.signal.aborted) break;
             }
-            setSelectedFiles((current) => current.slice(completedCount));
+            replaceSelectedFiles(selectedFiles.slice(completedCount));
             await refreshImages();
             setMessage(controller.signal.aborted
                 ? "Envio interrompido. Os arquivos concluídos foram salvos."
                 : "As imagens foram enviadas e os registros foram confirmados.");
         } catch (error) {
             if (completedCount > 0) {
-                setSelectedFiles((current) => current.slice(completedCount));
+                replaceSelectedFiles(selectedFiles.slice(completedCount));
             }
             setMessage(error.name === "AbortError" ? "Envio cancelado. Nenhum bloco incompleto foi registrado." : error.message || "Não foi possível concluir o envio das imagens.");
             try {
