@@ -1242,3 +1242,26 @@ test("image.upload.cancel libera a reserva do serviço e não cria metadados", (
     });
     assert.equal(restarted.ok, true);
 });
+
+
+test("image.remove repetido reafirma a permissão privada sem duplicar auditoria", () => {
+    const harness = createHarness();
+    const { uploaded } = startPngUpload(harness);
+    assert.equal(uploaded.ok, true);
+    const imageId = uploaded.data.image.id;
+    const file = harness.driveFiles.get("synthetic-drive-file-1");
+
+    const first = harness.call("image.remove", { tokenHash: TOKEN_HASH_A, imageId });
+    assert.equal(first.ok, true);
+    assert.equal(file.sharing, "PRIVATE");
+
+    file.sharing = "ANYONE_WITH_LINK";
+    const second = harness.call("image.remove", { tokenHash: TOKEN_HASH_A, imageId });
+    assert.equal(second.ok, true);
+    assert.equal(second.data.alreadyRemoved, true);
+    assert.equal(file.sharing, "PRIVATE");
+    assert.equal(harness.records("IMAGENS")[0].status, "removed");
+
+    const audit = harness.records("AUDITORIA").filter((event) => event.acao === "image.remove");
+    assert.equal(audit.length, 1);
+});
