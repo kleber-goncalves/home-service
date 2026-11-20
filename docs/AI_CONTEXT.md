@@ -311,9 +311,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 781143912f469e5e3691a7c573abbdaca252da4e
-- **Data do commit:** 2026-11-20T15:52:15-03:00
-- **Mensagem do commit:** docs(mvp): registrar cobertura automatizada de autorizacao
+- **Commit de referência:** 97d3bda1908b51ea92d96be1ddb4c011f253dc24
+- **Data do commit:** 2026-11-20T15:52:21-03:00
+- **Mensagem do commit:** docs(readme): incluir comando de testes de autorizacao
 - **Branch desta execução:** feat/authorization-integrity
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -417,13 +417,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 97d3bda | 2026-11-20 | docs(readme): incluir comando de testes de autorizacao |
+| b6189df | 2026-11-20 | docs(relatorio): acrescentar cenarios de autorizacao |
 | 7811439 | 2026-11-20 | docs(mvp): registrar cobertura automatizada de autorizacao |
 | e30db68 | 2026-11-20 | docs(arquitetura): registrar autorizacao implementada e limites |
 | 2c3455f | 2026-11-20 | docs(roadmap): document authorization coverage and remaining preview check |
 | b42ea99 | 2026-11-20 | docs(roadmap): mark authorization stage in progress |
 | 2b5e37f | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | d111592 | 2026-11-20 | test(authz): verify list endpoint session binding |
-| 86e93b5 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 2af9dd4 | 2026-11-20 | ci(authz): run authorization ownership tests |
 
 <!-- END AUTO-GENERATED SECTION -->
