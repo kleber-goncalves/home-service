@@ -311,9 +311,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 4c128530097d3e29f1d61352259b19218c8d0a8d
-- **Data do commit:** 2026-11-20T15:40:07-03:00
-- **Mensagem do commit:** docs: criar roadmap de evolucao academica
+- **Commit de referência:** 08a1ee7f09b6e6e06aa2be9ea71a0caf679dbb40
+- **Data do commit:** 2026-11-20T15:40:58-03:00
+- **Mensagem do commit:** docs(poc-04): registrar merge em dev e estado desabilitado
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 11
@@ -416,13 +416,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 08a1ee7 | 2026-11-20 | docs(poc-04): registrar merge em dev e estado desabilitado |
+| 0024b3e | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 528a637 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 4c12853 | 2026-11-20 | docs: criar roadmap de evolucao academica |
 | 322992e | 2026-11-20 | docs(poc-03): registrar integracao posterior no prototipo |
 | 1919a0d | 2026-11-20 | docs(arquitetura): sincronizar implementacao atual |
 | aedf073 | 2026-11-20 | docs(mvp): atualizar estado das validacoes |
 | 737c616 | 2026-11-20 | docs(relatorio): atualizar evidencias de validacao |
-| 869b205 | 2026-11-20 | docs(ai-context): corrigir estado atual e continuidade |
-| 8aa977c | 2026-11-20 | docs(poc-04): registrar merge em dev e estado desabilitado |
-| 55f2ecf | 2026-11-20 | docs: atualizar estado do projeto e prioridades |
 
 <!-- END AUTO-GENERATED SECTION -->
