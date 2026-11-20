@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** bdaa51f27adf77159caee2e6e96f2a90109c5638
-- **Data do commit:** 2026-11-20T19:56:34-03:00
-- **Mensagem do commit:** test: cobrir upload em blocos e reconciliação no navegador
+- **Commit de referência:** acf3bbe9e1e4577789003f441ff09b6ac15df3bf
+- **Data do commit:** 2026-11-20T19:56:40-03:00
+- **Mensagem do commit:** test: incluir testes do cliente de upload de imagens
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -473,6 +473,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| acf3bbe | 2026-11-20 | test: incluir testes do cliente de upload de imagens |
 | bdaa51f | 2026-11-20 | test: cobrir upload em blocos e reconciliação no navegador |
 | d7ea292 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 3eb578c | 2026-11-20 | feat: adicionar cancelamento de envio na área profissional |
@@ -480,6 +481,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 2bb6daa | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 592b57f | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | ab3cb24 | 2026-11-20 | style: adicionar layout responsivo para imagens dos serviços |
-| d1a3e90 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
