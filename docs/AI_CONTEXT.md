@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** acf3bbe9e1e4577789003f441ff09b6ac15df3bf
-- **Data do commit:** 2026-11-20T19:56:40-03:00
-- **Mensagem do commit:** test: incluir testes do cliente de upload de imagens
+- **Commit de referência:** 0c0d0b7215786352c304976c06007cbfd6f34347
+- **Data do commit:** 2026-11-20T19:57:46-03:00
+- **Mensagem do commit:** test: garantir privacidade em remoção idempotente de imagem
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -473,13 +473,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 0c0d0b7 | 2026-11-20 | test: garantir privacidade em remoção idempotente de imagem |
+| dab7b48 | 2026-11-20 | fix: reafirmar privacidade ao repetir remoção de imagem |
+| 1b1fc9d | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 7efc5b8 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | acf3bbe | 2026-11-20 | test: incluir testes do cliente de upload de imagens |
 | bdaa51f | 2026-11-20 | test: cobrir upload em blocos e reconciliação no navegador |
 | d7ea292 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 3eb578c | 2026-11-20 | feat: adicionar cancelamento de envio na área profissional |
-| 4331823 | 2026-11-20 | feat: recuperar progresso e permitir cancelamento seguro do upload |
-| 2bb6daa | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 592b57f | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| ab3cb24 | 2026-11-20 | style: adicionar layout responsivo para imagens dos serviços |
 
 <!-- END AUTO-GENERATED SECTION -->
