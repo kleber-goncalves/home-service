@@ -285,6 +285,8 @@ Foram registrados dois pontos de hardening que devem ser resolvidos antes de rea
 
 No estado atual, a rota segue desabilitada: as quatro variáveis exclusivas da POC-04 foram removidas do escopo da branch e o segredo correspondente foi retirado do Apps Script. Os pontos acima não foram corrigidos nesta atualização documental e **bloqueiam qualquer reativação**; não se deve adicionar novamente as variáveis para testar a rota sem tratar esses itens.
 
+**Decisão do responsável — 20/11/2026:** não implementar esses dois itens de hardening neste ciclo. Eles permanecem registrados como limitações conhecidas e aceitas para o escopo acadêmico desta POC desativada. A decisão **não impede integrar o código à branch `dev`**, desde que a rota continue desativada e sem variáveis/segredos `POC04_*`. Os dois itens continuam impedindo qualquer reativação da POC, uso com credenciais reais ou promoção para Production.
+
 Também permanecem não executados:
 
 - Falhas reais de armazenamento/Sheets, timeout do upstream e indisponibilidade real do Apps Script. A CI simula parte desses caminhos, o que não equivale a uma falha real no serviço.
