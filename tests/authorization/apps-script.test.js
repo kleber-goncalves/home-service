@@ -238,7 +238,7 @@ function createHarness(options = {}) {
                 bairros_regioes: "",
                 modalidade_preco: "not_informed",
                 valor_preco: "",
-                status: "published",
+                status: options.serviceAStatus || "published",
                 criado_em: sessionCreatedAt,
                 atualizado_em: sessionCreatedAt,
                 publicado_em: sessionCreatedAt,
@@ -614,4 +614,201 @@ test("papel diferente de professional não autoriza operações profissionais", 
         new Date(NOW - 60_000).toISOString(),
     );
     assert.equal(harness.records("AUDITORIA").length, 0);
+});
+
+
+test("service.update altera somente os campos permitidos do próprio serviço e audita o ator da sessão", () => {
+    const harness = createHarness();
+    const result = harness.call("service.update", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        categoryId: CATEGORY_ID,
+        title: "Serviço A atualizado",
+        description: "Descrição atualizada para validar a edição do serviço próprio.",
+        id_usuario: USER_B,
+        id_profissional: PROFILE_B,
+        papel: "admin",
+        status: "removed",
+        publicado_em: "data-forjada",
+    });
+
+    assert.equal(result.ok, true);
+    const services = harness.records("SERVICOS");
+    const serviceA = services.find((service) => service.id_servico === SERVICE_A);
+    const serviceB = services.find((service) => service.id_servico === SERVICE_B);
+
+    assert.equal(serviceA.nome_servico, "Serviço A atualizado");
+    assert.equal(serviceA.descricao, "Descrição atualizada para validar a edição do serviço próprio.");
+    assert.equal(serviceA.id_categoria, CATEGORY_ID);
+    assert.equal(serviceA.id_profissional, PROFILE_A);
+    assert.equal(serviceA.status, "published");
+    assert.equal(serviceA.publicado_em, serviceA.criado_em);
+    assert.equal(serviceB.nome_servico, "Serviço da conta B");
+
+    const audit = harness.records("AUDITORIA").find((event) =>
+        event.acao === "service.update" && event.id_registro_afetado === SERVICE_A,
+    );
+    assert.ok(audit);
+    assert.equal(audit.id_usuario_ator, USER_A);
+    assert.equal(audit.resultado, "success");
+    assert.equal(result.data.service.title, "Serviço A atualizado");
+});
+
+test("profissional A não consegue editar serviço pertencente ao profissional B", () => {
+    const harness = createHarness();
+    const result = harness.call("service.update", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_B,
+        categoryId: CATEGORY_ID,
+        title: "Tentativa de invasão",
+        description: "Tentativa de alteração de serviço pertencente a outra conta.",
+    });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.error.code, "SERVICE_NOT_FOUND");
+    assert.equal(
+        harness.records("SERVICOS").find((service) => service.id_servico === SERVICE_B).nome_servico,
+        "Serviço da conta B",
+    );
+    assert.equal(
+        harness.records("AUDITORIA").some((event) => event.acao === "service.update" && event.resultado === "success"),
+        false,
+    );
+});
+
+test("serviço suspenso ou removido não pode ser editado pelo profissional", () => {
+    for (const status of ["suspended", "removed"]) {
+        const harness = createHarness({ serviceAStatus: status });
+        const result = harness.call("service.update", {
+            tokenHash: TOKEN_HASH_A,
+            serviceId: SERVICE_A,
+            categoryId: CATEGORY_ID,
+            title: "Alteração não permitida",
+            description: "Esta edição deve ser recusada pelo estado do serviço.",
+        });
+
+        assert.equal(result.ok, false, "estado " + status);
+        assert.equal(result.error.code, "SERVICE_STATE_LOCKED", "estado " + status);
+        assert.equal(
+            harness.records("SERVICOS").find((service) => service.id_servico === SERVICE_A).status,
+            status,
+        );
+        assert.equal(
+            harness.records("AUDITORIA").some((event) => event.acao === "service.update" && event.resultado === "success"),
+            false,
+        );
+    }
+});
+
+test("service.remove marca o serviço próprio como removed e preserva o registro e a auditoria", () => {
+    const harness = createHarness();
+    const result = harness.call("service.remove", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        id_usuario: USER_B,
+        id_profissional: PROFILE_B,
+        papel: "admin",
+    });
+
+    assert.equal(result.ok, true);
+    const services = harness.records("SERVICOS");
+    const serviceA = services.find((service) => service.id_servico === SERVICE_A);
+    assert.ok(serviceA, "a linha original deve permanecer na planilha");
+    assert.equal(serviceA.status, "removed");
+    assert.equal(serviceA.id_profissional, PROFILE_A);
+    assert.equal(serviceA.nome_servico, "Serviço da conta A");
+    assert.equal(services.length, 2);
+
+    const audit = harness.records("AUDITORIA").find((event) =>
+        event.acao === "service.remove" && event.id_registro_afetado === SERVICE_A,
+    );
+    assert.ok(audit);
+    assert.equal(audit.id_usuario_ator, USER_A);
+    assert.equal(audit.resultado, "success");
+    assert.equal(result.data.removed, true);
+    assert.equal(result.data.service.status, "removed");
+});
+
+test("profissional A não consegue remover serviço pertencente ao profissional B", () => {
+    const harness = createHarness();
+    const result = harness.call("service.remove", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_B,
+    });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.error.code, "SERVICE_NOT_FOUND");
+    assert.equal(
+        harness.records("SERVICOS").find((service) => service.id_servico === SERVICE_B).status,
+        "published",
+    );
+    assert.equal(
+        harness.records("AUDITORIA").some((event) => event.acao === "service.remove" && event.resultado === "success"),
+        false,
+    );
+});
+
+test("serviço suspenso ou já removido não pode ser removido novamente pelo profissional", () => {
+    for (const status of ["suspended", "removed"]) {
+        const harness = createHarness({ serviceAStatus: status });
+        const result = harness.call("service.remove", {
+            tokenHash: TOKEN_HASH_A,
+            serviceId: SERVICE_A,
+        });
+
+        assert.equal(result.ok, false, "estado " + status);
+        assert.equal(result.error.code, "SERVICE_STATE_LOCKED", "estado " + status);
+        assert.equal(
+            harness.records("SERVICOS").find((service) => service.id_servico === SERVICE_A).status,
+            status,
+        );
+        assert.equal(harness.records("AUDITORIA").length, 0);
+    }
+});
+
+test("serviço removido ou suspenso não pode ser reativado pelo profissional", () => {
+    for (const status of ["suspended", "removed"]) {
+        const harness = createHarness({ serviceAStatus: status });
+        const result = harness.call("service.setStatus", {
+            tokenHash: TOKEN_HASH_A,
+            serviceId: SERVICE_A,
+            status: "published",
+        });
+
+        assert.equal(result.ok, false, "estado " + status);
+        assert.equal(result.error.code, "SERVICE_STATE_LOCKED", "estado " + status);
+        assert.equal(
+            harness.records("SERVICOS").find((service) => service.id_servico === SERVICE_A).status,
+            status,
+        );
+        assert.equal(harness.records("AUDITORIA").length, 0);
+    }
+});
+
+test("papel diferente de professional não autoriza editar ou remover serviços", () => {
+    for (const action of ["service.update", "service.remove"]) {
+        const harness = createHarness({ userARole: "admin" });
+        const payload = action === "service.update"
+            ? {
+                tokenHash: TOKEN_HASH_A,
+                serviceId: SERVICE_A,
+                categoryId: CATEGORY_ID,
+                title: "Edição recusada",
+                description: "Ação bloqueada para papel diferente de professional.",
+            }
+            : { tokenHash: TOKEN_HASH_A, serviceId: SERVICE_A };
+        const result = harness.call(action, payload);
+
+        assert.equal(result.ok, false, action);
+        assert.equal(result.error.code, "ROLE_FORBIDDEN", action);
+        assert.equal(
+            harness.records("SERVICOS").find((service) => service.id_servico === SERVICE_A).status,
+            "published",
+        );
+        assert.equal(
+            harness.records("SESSOES").find((session) => session.token_hash === TOKEN_HASH_A).ultima_atividade_em,
+            new Date(NOW - 60_000).toISOString(),
+        );
+        assert.equal(harness.records("AUDITORIA").length, 0);
+    }
 });
