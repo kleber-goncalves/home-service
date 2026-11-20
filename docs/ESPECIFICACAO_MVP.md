@@ -36,7 +36,6 @@ Os PRs #18 (relatório integrador) e #19 (integração de `dev` em `main`) tamb�
 **Limites e itens ainda não implementados**
 - Recuperação/alteração de senha e alteração de e-mail com confirmação.
 - Envio real de e-mail; a confirmação de cadastro é demonstrativa.
-- Edição e remoção de serviços.
 - Upload, armazenamento e controle de permissões de imagens no Google Drive.
 - Painel administrativo, denúncias, moderação e gestão administrativa de categorias/cidades.
 - Associação completa de múltiplas cidades por serviço e pesquisa remota/geográfica.
@@ -176,7 +175,7 @@ A conta poderá atender várias cidades e bairros. O endereço residencial compl
 
 Um profissional poderá cadastrar vários serviços, sem limite numérico fixo no MVP.
 
-**Estado atual da demonstração:** criação, pausa e publicação estão implementadas e integradas ao Sheets. Edição e remoção de serviços ainda não estão implementadas. O fluxo de múltiplas cidades por serviço também não está concluído; a associação prevista em `SERVICO_CIDADES` permanece futura.
+**Estado atual da demonstração:** criação, pausa e publicação estão implementadas e integradas ao Sheets. Na branch `feat/service-lifecycle`, edição e remoção lógica de serviços também foram implementadas, com validação de propriedade no Apps Script, preservação dos registros e auditoria. A integração em `dev` e o teste manual no Preview atualizado permanecem pendentes. O fluxo de múltiplas cidades por serviço também não está concluído; a associação prevista em `SERVICO_CIDADES` permanece futura.
 
 | Campo | Regra |
 |---|---|
