@@ -310,5 +310,3 @@ A POC não implementa cadastro, login de usuários, recuperação de senha, pap�
 - [ ] Merge da PR #14 em `dev`, pendente de decisão explícita do responsável e dos checks aplicáveis.
 
 A POC-04 concluiu os ensaios sintéticos previstos para cookie, Origin/CSRF, expiração, replay, concorrência e logout. O ambiente temporário foi limpo e a rota está desabilitada no Preview. A PR #14 está aberta e pronta para revisão, mas ainda não foi mesclada. Os itens de hardening acima impedem a reativação da rota; nada nesta POC representa autenticação real ou aprovação para Production.
-
-A POC-04 concluiu os ensaios sintéticos previstos para cookie, Origin/CSRF, expiração, replay, concorrência e logout. O ambiente temporário foi limpo e a rota está desabilitada no Preview. Isso não representa autenticação real nem aprovação para Production.
