@@ -139,6 +139,21 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 - **Limpeza da conta de teste:** antes de retomar o uso normal da conta A, confirmar que o papel foi restaurado para `professional`; não deixar a conta de demonstração com o papel temporário `admin`.
 
 
+### Etapa 2 — Ciclo de vida dos serviços (em implementação na branch `feat/service-lifecycle`)
+
+- Base da branch: `dev` no commit `b75da38569e023eb717e380c9451f540e11c9ec6`; a branch de trabalho é `feat/service-lifecycle`. Nenhuma alteração foi integrada em `dev` ou `main` nesta etapa.
+- Novas ações protegidas no Apps Script e gateway: `service.update` e `service.remove`. Ambas exigem sessão, CSRF e papel confiável `professional`.
+- `service.update` permite editar somente nome, categoria e descrição; o Apps Script deriva proprietário da sessão, confere o ID do serviço e não aceita mass assignment de proprietário, papel, status, preço ou timestamps.
+- `service.remove` faz remoção lógica: altera `SERVICOS.status` para `removed`, mantém a linha e registra `service.remove` em `AUDITORIA`.
+- Serviços `suspended` ou `removed` não podem ser editados/removidos pelo profissional; também não podem ser reativados com `service.setStatus`. Somente `published` e `paused` alternam nesses estados.
+- A edição preserva estado, proprietário, preço, `criado_em` e `publicado_em`. Categoria inativada já associada pode ser mantida, mas uma categoria inativa não pode ser escolhida para outra associação.
+- Os limites de nome e descrição foram alinhados à modelagem: nome de 5 a 100 caracteres; descrição de 10 a 1.000.
+- A interface em `src/pages/AuthDemoPage.jsx` reutiliza o formulário para criação/edição, apresenta estados `draft`, `published`, `paused`, `suspended` e `removed`, confirma antes da remoção e atualiza a tela somente após resposta de sucesso.
+- A suíte existente foi ampliada: testes Apps Script em `tests/authorization/apps-script.test.js`, gateway em `tests/authorization/gateway.test.js` e entidade em `tests/loo/domain-entities.test.js`. A CI e a validação manual no Preview continuam pendentes.
+- Antes de validar no Preview de `dev`, será necessário integrar a branch, sincronizar `apps-script/conecta-local/Code.gs` com o editor Apps Script real e publicar uma nova versão da implantação Web App existente, preservando a URL/ID e as Script Properties.
+- Não implementar nesta etapa gestão administrativa, publicação completa de rascunhos, associação `SERVICO_CIDADES`, preços avançados ou imagens. A gravação de negócio e a auditoria continuam separadas; não declarar atomicidade.
+
+
 ## 5. Arquitetura e decisões tecnológicas
 
 ### 5.1. Frontend
