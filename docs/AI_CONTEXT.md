@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 73f3bf91de6d391c311c55da4759618a39cc4416
-- **Data do commit:** 2026-11-20T19:50:40-03:00
-- **Mensagem do commit:** test: diagnosticar exceção interna da rotina de imagens
+- **Commit de referência:** 957c0d002f5284fe7dc322186cad7969e030b151
+- **Data do commit:** 2026-11-20T19:51:11-03:00
+- **Mensagem do commit:** test: corrigir contexto do payload no diagnóstico do Apps Script
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -471,13 +471,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 957c0d0 | 2026-11-20 | test: corrigir contexto do payload no diagnóstico do Apps Script |
+| a3b0c2a | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 73f3bf9 | 2026-11-20 | test: diagnosticar exceção interna da rotina de imagens |
 | 7420671 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 77cc108 | 2026-11-20 | test: incluir diagnóstico de falha no envio do primeiro bloco |
 | 2e37c80 | 2026-11-20 | test: detalhar erro da integração simulada de imagens |
 | b3392f9 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 0ef51d7 | 2026-11-20 | ci: executar testes do gateway de upload de imagens |
-| 77aadc9 | 2026-11-20 | test: adicionar comando dedicado para upload de imagens |
-| 4711263 | 2026-11-20 | test: verificar allowlist das operações de imagem no gateway |
 
 <!-- END AUTO-GENERATED SECTION -->
