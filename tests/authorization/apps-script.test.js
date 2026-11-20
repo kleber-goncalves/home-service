@@ -1298,3 +1298,32 @@ test("image.upload.status recupera recibo quando a conclusão já foi gravada no
         "A conclusão deve liberar a reserva para novos envios no mesmo serviço."
     );
 });
+
+
+test("pausar serviço tenta restringir todas as imagens mesmo quando uma permissão falha", () => {
+    const harness = createHarness();
+    const first = startPngUpload(harness);
+    const second = startPngUpload(harness);
+    assert.equal(first.uploaded.ok, true);
+    assert.equal(second.uploaded.ok, true);
+
+    const firstFile = harness.driveFiles.get("synthetic-drive-file-1");
+    const secondFile = harness.driveFiles.get("synthetic-drive-file-2");
+    const originalSetSharing = firstFile.setSharing.bind(firstFile);
+    firstFile.setSharing = (access, permission) => {
+        if (access === "PRIVATE") throw new Error("synthetic permission failure");
+        return originalSetSharing(access, permission);
+    };
+
+    const paused = harness.call("service.setStatus", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        status: "paused",
+    });
+
+    assert.equal(paused.ok, false);
+    assert.equal(paused.error.code, "IMAGE_PERMISSION_SYNC_FAILED");
+    assert.equal(firstFile.sharing, "ANYONE_WITH_LINK");
+    assert.equal(secondFile.sharing, "PRIVATE", "A segunda imagem também deve ter a permissão atualizada.");
+    assert.equal(harness.records("SERVICOS").find((service) => service.id_servico === SERVICE_A).status, "published");
+});
