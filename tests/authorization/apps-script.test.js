@@ -1265,3 +1265,36 @@ test("image.remove repetido reafirma a permissão privada sem duplicar auditoria
     const audit = harness.records("AUDITORIA").filter((event) => event.acao === "image.remove");
     assert.equal(audit.length, 1);
 });
+
+
+test("image.upload.status recupera recibo quando a conclusão já foi gravada no Sheets", () => {
+    const harness = createHarness();
+    const { started, uploaded } = startPngUpload(harness);
+    assert.equal(uploaded.ok, true);
+
+    const drivePutCount = harness.driveCalls.filter((call) => String(call.options.method).toLowerCase() === "put").length;
+    const status = harness.call("image.upload.status", {
+        tokenHash: TOKEN_HASH_A,
+        uploadId: started.data.uploadId,
+    });
+
+    assert.equal(status.ok, true);
+    assert.equal(status.data.completed, true);
+    assert.equal(status.data.image.id, uploaded.data.image.id);
+    assert.equal(status.data.image.status, "active");
+    assert.equal(
+        harness.driveCalls.filter((call) => String(call.options.method).toLowerCase() === "put").length,
+        drivePutCount,
+        "A consulta do recibo não deve enviar blocos novamente ao Drive."
+    );
+    assert.equal(
+        harness.properties.getProperty("CONECTA_LOCAL_IMAGE_UPLOAD_V1_" + started.data.uploadId) !== null,
+        true,
+        "O recibo de conclusão deve permanecer disponível durante a janela de recuperação."
+    );
+    assert.equal(
+        harness.properties.getProperty("CONECTA_LOCAL_IMAGE_SERVICE_UPLOAD_V1_" + SERVICE_A),
+        null,
+        "A conclusão deve liberar a reserva para novos envios no mesmo serviço."
+    );
+});
