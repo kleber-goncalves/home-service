@@ -1288,15 +1288,21 @@ function appImageDrivePutChunk_(state, bytes, startOffset) {
     throw appFault_("DRIVE_CHUNK_REJECTED", "O Google Drive recusou o bloco enviado.");
 }
 
-function appImageFinalizeUpload_(state, file) {
+function appImageFinalizeUpload_(state, driveMetadata) {
     var folderId = String(state.folderId);
-    if (String(file.mimeType) !== String(state.mimeType)
-        || Number(file.size) !== Number(state.fileSize)
-        || file.parents.indexOf(folderId) === -1) {
+    if (!appIsPlainObject_(driveMetadata)
+        || typeof driveMetadata.id !== "string"
+        || !driveMetadata.id
+        || String(driveMetadata.mimeType) !== String(state.mimeType)
+        || Number(driveMetadata.size) !== Number(state.fileSize)
+        || !Array.isArray(driveMetadata.parents)
+        || driveMetadata.parents.indexOf(folderId) === -1) {
         try {
-            var invalidFile = DriveApp.getFileById(String(file.id));
-            invalidFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
-            invalidFile.setTrashed(true);
+            if (driveMetadata && driveMetadata.id) {
+                var invalidDriveFile = DriveApp.getFileById(String(driveMetadata.id));
+                invalidDriveFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
+                invalidDriveFile.setTrashed(true);
+            }
         } catch (ignored) {}
         appImageDeleteUploadState_(state);
         throw appFault_("DRIVE_FILE_VALIDATION_FAILED", "O arquivo concluído no Google Drive não corresponde ao envio.");
@@ -1324,20 +1330,24 @@ function appImageFinalizeUpload_(state, file) {
             throw appFault_("IMAGE_LIMIT_REACHED", "O serviço já atingiu o limite de imagens ativas.");
         }
 
-        var file = DriveApp.getFileById(String(file.id));
-        file.setSharing(
-            String(service.status) === "published" ? DriveApp.Access.ANYONE_WITH_LINK : DriveApp.Access.PRIVATE,
-            DriveApp.Permission.VIEW
-        );
+        var driveFile;
+        try {
+            driveFile = DriveApp.getFileById(String(driveMetadata.id));
+            driveFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
+        } catch (error) {
+            appImageDeleteUploadState_(currentState);
+            throw appFault_("IMAGE_PERMISSION_SYNC_FAILED", "Não foi possível manter privada a imagem concluída no Google Drive.");
+        }
 
         var nowIso = new Date().toISOString();
         var imageId = Utilities.getUuid();
+        var imageRow;
         try {
-            appAppend_("IMAGENS", {
+            imageRow = appAppend_("IMAGENS", {
                 id_imagem: imageId,
                 id_profissional: "",
                 id_servico: String(service.id_servico),
-                id_arquivo_drive: String(file.getId()),
+                id_arquivo_drive: String(driveFile.getId()),
                 tipo_mime: String(currentState.mimeType),
                 tamanho_bytes: Number(currentState.fileSize),
                 ordem_exibicao: Number(currentState.order),
@@ -1347,11 +1357,39 @@ function appImageFinalizeUpload_(state, file) {
             });
             appAudit_(String(user.id_usuario), "user", "image.upload", "IMAGENS", imageId, "success", "Imagem de serviço enviada ao Drive.");
         } catch (error) {
+            if (imageRow) {
+                try {
+                    appUpdate_("IMAGENS", imageRow, {
+                        status: "removed",
+                        atualizado_em: new Date().toISOString()
+                    });
+                } catch (ignored) {}
+            }
             try {
-                file.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
-                file.setTrashed(true);
+                driveFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
+                driveFile.setTrashed(true);
             } catch (ignored) {}
+            appImageDeleteUploadState_(currentState);
             throw appFault_("IMAGE_METADATA_SAVE_FAILED", "O arquivo foi recebido, mas não foi possível registrar seus metadados. O arquivo foi restringido.");
+        }
+
+        if (String(service.status) === "published") {
+            try {
+                driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+            } catch (error) {
+                try {
+                    driveFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
+                    driveFile.setTrashed(true);
+                } catch (ignored) {}
+                try {
+                    appUpdate_("IMAGENS", imageRow, {
+                        status: "removed",
+                        atualizado_em: new Date().toISOString()
+                    });
+                } catch (ignored) {}
+                appImageDeleteUploadState_(currentState);
+                throw appFault_("IMAGE_PERMISSION_SYNC_FAILED", "Não foi possível liberar a imagem. O arquivo foi restringido e o vínculo foi removido.");
+            }
         }
 
         appImageDeleteUploadState_(currentState);
@@ -1364,7 +1402,7 @@ function appImageFinalizeUpload_(state, file) {
                 sizeBytes: Number(currentState.fileSize),
                 status: "active",
                 url: String(service.status) === "published"
-                    ? appImagePublicUrl_(String(file.getId()))
+                    ? appImagePublicUrl_(String(driveFile.getId()))
                     : null
             }
         };
