@@ -183,8 +183,7 @@ Reavaliar somente quando houver exigência acadêmica explícita ou uma necessid
 
 1. **Agora:** Etapa 3 — revisar a descoberta por cidade e categoria, começando por mapear o que já funciona no catálogo e implementar somente as lacunas necessárias.
 2. **Depois, conforme necessidade:** Etapa 4 — imagens no Google Drive, somente se trouxer ganho real para a apresentação.
-3. **Somente se agregar valor à apresentação:** Etapa 4 — imagens no Drive.
-4. **Em paralelo à preparação da entrega:** Etapa 5 — pesquisa acadêmica e acabamento.
+3. **Em paralelo à preparação da entrega:** Etapa 5 — pesquisa acadêmica e acabamento.
 
 Trabalhar uma etapa por branch/PR, sempre partindo de `dev`. Integrar somente depois das verificações pertinentes. Não alterar `main` sem uma decisão explícita de publicação.
 
