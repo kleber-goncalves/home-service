@@ -1440,6 +1440,20 @@ function appImageUploadStart_(payload, nowMs) {
         throw appFault_("IMAGE_SIZE_INVALID", "Cada imagem deve ter entre 12 bytes e 5.000.000 bytes.");
     }
     if (!appImageMimeAllowed_(mimeType)) throw appFault_("IMAGE_MIME_INVALID", "Use uma imagem JPG, PNG ou WebP.");
+
+    var preflightSession = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, false);
+    var preflightProfile = appGetProfile_(String(preflightSession.user.id_usuario));
+    var preflightService = preflightProfile
+        ? appFind_("SERVICOS", "id_servico", String(payload.serviceId))
+        : null;
+    if (!preflightProfile || !preflightService
+        || String(preflightService.id_profissional) !== String(preflightProfile.id_profissional)) {
+        throw appFault_("SERVICE_NOT_FOUND", "Serviço não encontrado.");
+    }
+    if (["suspended", "removed"].indexOf(String(preflightService.status)) !== -1) {
+        throw appFault_("SERVICE_STATE_LOCKED", "Este serviço não permite imagens.");
+    }
+
     appImageSheet_();
     var folderId = appImagePrivateFolderId_();
 
