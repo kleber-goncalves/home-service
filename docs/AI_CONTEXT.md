@@ -300,9 +300,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** b7f5132a65cef706441fd793eb0c9b37cfe061e7
-- **Data do commit:** 2026-11-20T14:25:03-03:00
-- **Mensagem do commit:** docs(poc-04): consolidar ensaios e limpeza do ambiente
+- **Commit de referência:** b7e0e2680f635de032cf5e20ded54279394966eb
+- **Data do commit:** 2026-11-20T14:25:22-03:00
+- **Mensagem do commit:** docs(arquitetura): atualizar estado de validacao da poc-04
 - **Branch desta execução:** feat/poc-04-session-cookie
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 10
@@ -403,13 +403,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| b7e0e26 | 2026-11-20 | docs(arquitetura): atualizar estado de validacao da poc-04 |
+| d10b72e | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | b7f5132 | 2026-11-20 | docs(poc-04): consolidar ensaios e limpeza do ambiente |
 | 1f8c97f | 2026-11-14 | docs(ai-context): distinguir sessao sintetica de autenticacao real |
 | 71eb586 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
 | d24ce51 | 2026-11-14 | docs(ai-context): corrigir estado da PR e CI da POC-04 |
 | 1358cab | 2026-11-14 | docs(poc-04): registrar CI apos atualizacao documental |
 | fa0ddde | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| 0bb0671 | 2026-11-14 | docs(ai-context): atualizar snapshot automaticamente |
-| fd91bec | 2026-11-14 | docs(poc-04): registrar validacao manual em Preview |
 
 <!-- END AUTO-GENERATED SECTION -->
