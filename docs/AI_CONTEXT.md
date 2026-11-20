@@ -321,9 +321,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 74f569f1d5a3004af5ed492d1dc43526a651a199
-- **Data do commit:** 2026-11-20T15:54:50-03:00
-- **Mensagem do commit:** fix(authz): map role denial to forbidden
+- **Commit de referência:** 8f9eddd893c94ff370c838dc3154052337001009
+- **Data do commit:** 2026-11-20T15:55:37-03:00
+- **Mensagem do commit:** test(authz): verify trusted professional role
 - **Branch desta execução:** feat/authorization-integrity
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -427,13 +427,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 8f9eddd | 2026-11-20 | test(authz): verify trusted professional role |
+| 9c707bc | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| f2ef3c3 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 74f569f | 2026-11-20 | fix(authz): map role denial to forbidden |
 | f66e157 | 2026-11-20 | fix(authz): enforce professional role for profile and service actions |
 | 0af2a70 | 2026-11-20 | docs(ai-context): registrar etapa de autorizacao em andamento |
 | b70c0c8 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | e071968 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 97d3bda | 2026-11-20 | docs(readme): incluir comando de testes de autorizacao |
-| b6189df | 2026-11-20 | docs(relatorio): acrescentar cenarios de autorizacao |
-| 7811439 | 2026-11-20 | docs(mvp): registrar cobertura automatizada de autorizacao |
 
 <!-- END AUTO-GENERATED SECTION -->
