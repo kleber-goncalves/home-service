@@ -362,10 +362,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** ea65aa10947751dc7eceb893a2778a8608c17ac2
-- **Data do commit:** 2026-11-20T19:23:52-03:00
-- **Mensagem do commit:** docs: corrigir contexto acadêmico e indexar pesquisa comunitária
-- **Branch desta execução:** dev
+- **Commit de referência:** 8988e02b2d79f8301edefdd164f13be8003a6e20
+- **Data do commit:** 2026-11-20T19:40:29-03:00
+- **Mensagem do commit:** docs: definir arquitetura segura da etapa 4 de imagens no Drive
+- **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
 - **Dependências de runtime:** 4
@@ -468,13 +468,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 8988e02 | 2026-11-20 | docs: definir arquitetura segura da etapa 4 de imagens no Drive |
+| add204f | 2026-11-20 | docs: corrigir contexto do curso e registrar pesquisa comunitária |
+| c7b6523 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | ea65aa1 | 2026-11-20 | docs: corrigir contexto acadêmico e indexar pesquisa comunitária |
 | 68d81aa | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 4010c83 | 2026-11-20 | docs: adicionar guia de aplicação da pesquisa comunitária |
 | c500597 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 93407e7 | 2026-11-20 | docs: adicionar questionários preliminares da pesquisa comunitária |
-| 1dcaaff | 2026-11-20 | docs(ai-context): confirmar limpeza e estado da etapa 5 |
-| 103219b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 404d5ed | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
