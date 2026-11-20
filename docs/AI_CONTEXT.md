@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 0ef51d7f3a4b1ee06b3c4f2a3152a08c2a51ac6a
-- **Data do commit:** 2026-11-20T19:48:09-03:00
-- **Mensagem do commit:** ci: executar testes do gateway de upload de imagens
+- **Commit de referência:** 77cc108d5361c2fa50f5d880581fff54c5b3fc37
+- **Data do commit:** 2026-11-20T19:49:49-03:00
+- **Mensagem do commit:** test: incluir diagnóstico de falha no envio do primeiro bloco
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -471,13 +471,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 77cc108 | 2026-11-20 | test: incluir diagnóstico de falha no envio do primeiro bloco |
+| 2e37c80 | 2026-11-20 | test: detalhar erro da integração simulada de imagens |
+| b3392f9 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 0ef51d7 | 2026-11-20 | ci: executar testes do gateway de upload de imagens |
 | 77aadc9 | 2026-11-20 | test: adicionar comando dedicado para upload de imagens |
 | 4711263 | 2026-11-20 | test: verificar allowlist das operações de imagem no gateway |
 | 241b155 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | b76135e | 2026-11-20 | test: cobrir autenticação e limite da rota de upload de imagens |
-| 5e6b235 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| a7ee539 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 98ea68f | 2026-11-20 | feat: integrar ações de imagem ao gateway autenticado |
 
 <!-- END AUTO-GENERATED SECTION -->
