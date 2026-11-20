@@ -150,3 +150,24 @@ test("gateway não expõe session.create nem operações internas na allowlist d
     assert.equal(body.error.code, "ACTION_NOT_ALLOWED");
     assert.equal(fetchCalled, false);
 });
+
+test("gateway não encaminha identidade enviada pelo cliente em service.listMine", async () => {
+    let forwarded;
+    const handler = createHarness(async (_url, options) => {
+        const form = new URLSearchParams(options.body);
+        forwarded = JSON.parse(form.get("payload"));
+        return upstreamResponse(form);
+    });
+
+    const response = await handler(buildRequest("service.listMine", {
+        id_usuario: "user-b",
+        id_profissional: "profile-b",
+        papel: "admin",
+        tokenHash: "9".repeat(64),
+    }));
+
+    assert.equal(response.status, 200);
+    assert.deepEqual(forwarded, {
+        tokenHash: createHash("sha256").update(SESSION_TOKEN, "utf8").digest("hex"),
+    });
+});
