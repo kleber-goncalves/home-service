@@ -209,8 +209,8 @@ test("gateway de imagem rejeita blocos maiores que 1 MiB", async () => {
     }));
     const body = await response.json();
 
-    assert.equal(response.status, 400);
-    assert.equal(body.error.code, "IMAGE_CHUNK_INVALID");
+    assert.equal(response.status, 413);
+    assert.equal(body.error.code, "REQUEST_TOO_LARGE");
     assert.equal(fetchCalled, false);
 });
 
