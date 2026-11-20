@@ -357,9 +357,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** c2d2ad1882d94ac3fde418ceaa562d0d6fed1861
-- **Data do commit:** 2026-11-20T18:08:53-03:00
-- **Mensagem do commit:** docs: registrar etapa de cobertura por cidade
+- **Commit de referência:** 08e004e43fc23575b7544bfe819d5f041e0fd14d
+- **Data do commit:** 2026-11-20T18:11:28-03:00
+- **Mensagem do commit:** fix(catalog): align example categories with catalog taxonomy
 - **Branch desta execução:** feat/service-city-coverage
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -463,13 +463,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 08e004e | 2026-11-20 | fix(catalog): align example categories with catalog taxonomy |
+| 1a29f6b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | c2d2ad1 | 2026-11-20 | docs: registrar etapa de cobertura por cidade |
 | af16c4f | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | eb40db9 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 9114eaf | 2026-11-20 | fix(catalog): preserve example categories when catalog is empty |
 | b700d53 | 2026-11-20 | fix(ui): default to an active service city |
 | 1bc99b3 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| f7088de | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 491b05a | 2026-11-20 | test(domain): include service city coverage payload |
 
 <!-- END AUTO-GENERATED SECTION -->
