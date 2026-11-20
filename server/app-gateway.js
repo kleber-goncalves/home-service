@@ -35,6 +35,8 @@ const BROWSER_ACTIONS = new Set([
     "profile.update",
     "service.listMine",
     "service.create",
+    "service.update",
+    "service.remove",
     "service.setStatus",
 ]);
 
@@ -237,6 +239,7 @@ function mapAppsScriptError(output) {
         CATEGORY_INVALID: [400, "Selecione uma categoria válida."],
         CITY_INVALID: [400, "Selecione uma cidade válida."],
         SERVICE_NOT_FOUND: [404, "Serviço não encontrado."],
+        SERVICE_STATE_LOCKED: [409, "Este serviço não pode mais ser alterado pelo profissional."],
         PROFILE_UNAVAILABLE: [409, "O perfil profissional não está disponível."],
         SESSION_INVALID: [401, "Entre novamente para continuar."],
         SESSION_EXPIRED: [401, "Sua sessão expirou. Entre novamente."],
@@ -320,7 +323,7 @@ export function createAppHandler({
         }
 
         const sessionToken = parseSessionCookie(request.headers.get("cookie"));
-        const protectedActions = new Set(["auth.me", "auth.logout", "profile.update", "service.listMine", "service.create", "service.setStatus"]);
+        const protectedActions = new Set(["auth.me", "auth.logout", "profile.update", "service.listMine", "service.create", "service.update", "service.remove", "service.setStatus"]);
         if (protectedActions.has(action) && !sessionToken) {
             return fail(requestId, "SESSION_INVALID", "Entre novamente para continuar.", 401, clearSessionCookie());
         }
@@ -438,6 +441,23 @@ export function createAppHandler({
                     const service = new Servico(payload);
                     forwardedPayload = {
                         ...service.toCreatePayload(),
+                        tokenHash: forwardedPayload.tokenHash,
+                    };
+                } else if (action === "service.update") {
+                    const service = new Servico({
+                        serviceId: payload.serviceId,
+                        categoryId: payload.categoryId,
+                        title: payload.title,
+                        description: payload.description,
+                    });
+                    forwardedPayload = {
+                        ...service.toUpdatePayload(),
+                        tokenHash: forwardedPayload.tokenHash,
+                    };
+                } else if (action === "service.remove") {
+                    const service = new Servico({ serviceId: payload.serviceId });
+                    forwardedPayload = {
+                        ...service.toRemovalPayload(),
                         tokenHash: forwardedPayload.tokenHash,
                     };
                 } else if (action === "service.setStatus") {
