@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 3eb578cda09fdce9e7ba654b1372d16e10cc6da4
-- **Data do commit:** 2026-11-20T19:56:18-03:00
-- **Mensagem do commit:** feat: adicionar cancelamento de envio na área profissional
+- **Commit de referência:** bdaa51f27adf77159caee2e6e96f2a90109c5638
+- **Data do commit:** 2026-11-20T19:56:34-03:00
+- **Mensagem do commit:** test: cobrir upload em blocos e reconciliação no navegador
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -391,7 +391,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run test:loo | node --test tests/loo/domain-entities.test.js |
 | npm run test:poc04 | node --test tests/poc04/gateway.test.js tests/poc04/apps-script.test.js |
 | npm run test:authorization | node --test tests/authorization/apps-script.test.js tests/authorization/gateway.test.js |
-| npm run test:images | node --test tests/images/upload-gateway.test.js |
+| npm run test:images | node --test tests/images/upload-gateway.test.js tests/images/image-api.test.js |
 
 ### Variáveis declaradas no .env.example
 
@@ -473,13 +473,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| bdaa51f | 2026-11-20 | test: cobrir upload em blocos e reconciliação no navegador |
+| d7ea292 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 3eb578c | 2026-11-20 | feat: adicionar cancelamento de envio na área profissional |
 | 4331823 | 2026-11-20 | feat: recuperar progresso e permitir cancelamento seguro do upload |
 | 2bb6daa | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 592b57f | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | ab3cb24 | 2026-11-20 | style: adicionar layout responsivo para imagens dos serviços |
 | d1a3e90 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 8bca869 | 2026-11-20 | feat: exibir imagem cadastrada do serviço na vitrine |
-| 93c577e | 2026-11-20 | refactor: atualizar lista após operações com imagens |
 
 <!-- END AUTO-GENERATED SECTION -->
