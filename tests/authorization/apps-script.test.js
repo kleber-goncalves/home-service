@@ -1255,12 +1255,13 @@ test("diagnóstico temporário: expõe a exceção interna da rotina de bloco", 
         mimeType: "image/png",
     });
     assert.equal(started.ok, true);
-    const result = harness.context.appImageUploadChunk_({
+    const payload = harness.context.JSON.parse(JSON.stringify({
         tokenHash: TOKEN_HASH_A,
         uploadId: started.data.uploadId,
         startOffset: 0,
         totalSize: bytes.length,
         chunkBase64: bytes.toString("base64"),
-    }, NOW);
+    }));
+    const result = harness.context.appImageUploadChunk_(payload, NOW);
     assert.equal(result.completed, true);
 });
