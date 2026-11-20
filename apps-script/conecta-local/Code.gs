@@ -280,6 +280,106 @@ function appGetProfile_(userId) {
     return appFind_("PROFISSIONAIS", "id_usuario", userId);
 }
 
+function appBuildServiceCityIndex_() {
+    var citiesById = {};
+    appRecords_("CIDADES").forEach(function (city) {
+        citiesById[String(city.id_cidade)] = city;
+    });
+    var cityIdsByService = {};
+    appRecords_("SERVICO_CIDADES").forEach(function (link) {
+        var serviceId = String(link.id_servico);
+        var cityId = String(link.id_cidade);
+        if (!cityIdsByService[serviceId]) cityIdsByService[serviceId] = [];
+        if (cityIdsByService[serviceId].indexOf(cityId) === -1) cityIdsByService[serviceId].push(cityId);
+    });
+    return { citiesById: citiesById, cityIdsByService: cityIdsByService };
+}
+
+function appGetServiceCityIds_(serviceId, fallbackCityId, index) {
+    var cityIndex = index || appBuildServiceCityIndex_();
+    var linked = cityIndex.cityIdsByService[String(serviceId)] || [];
+    if (linked.length) return linked.slice();
+    return fallbackCityId ? [String(fallbackCityId)] : [];
+}
+
+function appGetServiceCities_(cityIds, index) {
+    var cityIndex = index || appBuildServiceCityIndex_();
+    return (Array.isArray(cityIds) ? cityIds : [])
+        .map(function (cityId) { return cityIndex.citiesById[String(cityId)] || null; })
+        .filter(function (city) { return Boolean(city); })
+        .map(function (city) {
+            return { id: String(city.id_cidade), name: String(city.nome), state: String(city.uf), status: String(city.status) };
+        });
+}
+
+function appServiceCityLabel_(cities) {
+    return (Array.isArray(cities) ? cities : [])
+        .map(function (city) { return String(city.name) + " - " + String(city.state); })
+        .join(", ");
+}
+
+function appNormalizeServiceCityIds_(cityIds, preservedCityIds, index) {
+    if (!Array.isArray(cityIds) || cityIds.length === 0) {
+        throw appFault_("CITY_INVALID", "Selecione pelo menos uma cidade atendida.");
+    }
+    var cityIndex = index || appBuildServiceCityIndex_();
+    var preserved = {};
+    (Array.isArray(preservedCityIds) ? preservedCityIds : []).forEach(function (cityId) {
+        preserved[String(cityId)] = true;
+    });
+    var seen = {};
+    return cityIds.map(function (value) {
+        if (typeof value !== "string" || !value.trim()) {
+            throw appFault_("CITY_INVALID", "Selecione cidades válidas.");
+        }
+        var cityId = value.trim();
+        if (seen[cityId]) throw appFault_("INVALID_INPUT", "Não repita uma cidade no mesmo serviço.");
+        seen[cityId] = true;
+        var city = cityIndex.citiesById[cityId];
+        if (!city || (String(city.status) !== "active" && !preserved[cityId])) {
+            throw appFault_("CITY_INVALID", "Uma das cidades selecionadas não está disponível.");
+        }
+        return cityId;
+    });
+}
+
+function appReplaceServiceCities_(serviceId, cityIds, fallbackCityId, nowMs) {
+    var existingRows = appRecords_("SERVICO_CIDADES").filter(function (link) {
+        return String(link.id_servico) === String(serviceId);
+    });
+    var existingIds = [];
+    existingRows.forEach(function (link) {
+        var cityId = String(link.id_cidade);
+        if (existingIds.indexOf(cityId) === -1) existingIds.push(cityId);
+    });
+    var preservedIds = existingIds.length ? existingIds : (fallbackCityId ? [String(fallbackCityId)] : []);
+    var index = appBuildServiceCityIndex_();
+    var normalizedIds = appNormalizeServiceCityIds_(cityIds, preservedIds, index);
+    var desired = {};
+    normalizedIds.forEach(function (cityId) { desired[cityId] = true; });
+
+    var kept = {};
+    var rowsToDelete = [];
+    existingRows.forEach(function (link) {
+        var cityId = String(link.id_cidade);
+        if (!desired[cityId] || kept[cityId]) rowsToDelete.push(link);
+        else kept[cityId] = true;
+    });
+    var nowIso = new Date(nowMs).toISOString();
+    normalizedIds.forEach(function (cityId) {
+        if (kept[cityId]) return;
+        appAppend_("SERVICO_CIDADES", {
+            id_servico_cidade: Utilities.getUuid(),
+            id_servico: String(serviceId),
+            id_cidade: cityId,
+            criado_em: nowIso
+        });
+    });
+    rowsToDelete.sort(function (left, right) { return right._row - left._row; })
+        .forEach(function (link) { appSheet_("SERVICO_CIDADES").deleteRow(link._row); });
+    return normalizedIds;
+}
+
 function appEnsureSeedData_() {
     var categories = appRecords_("CATEGORIAS");
     if (categories.length === 0) {
@@ -665,10 +765,12 @@ function appGetServicesForUser_(userId) {
     var categories = appRecords_("CATEGORIAS");
     var categoryMap = {};
     categories.forEach(function (item) { categoryMap[String(item.id_categoria)] = String(item.nome); });
-
+    var cityIndex = appBuildServiceCityIndex_();
     return appRecords_("SERVICOS")
         .filter(function (item) { return String(item.id_profissional) === String(profile.id_profissional); })
         .map(function (item) {
+            var cityIds = appGetServiceCityIds_(item.id_servico, profile.id_cidade_principal, cityIndex);
+            var cities = appGetServiceCities_(cityIds, cityIndex);
             return {
                 id: String(item.id_servico),
                 categoryId: String(item.id_categoria),
@@ -677,7 +779,10 @@ function appGetServicesForUser_(userId) {
                 description: String(item.descricao),
                 status: String(item.status),
                 priceMode: String(item.modalidade_preco || "not_informed"),
-                price: item.valor_preco === "" ? null : Number(item.valor_preco)
+                price: item.valor_preco === "" ? null : Number(item.valor_preco),
+                cityIds: cityIds,
+                cities: cities,
+                city: appServiceCityLabel_(cities)
             };
         });
 }
@@ -691,21 +796,18 @@ function appListMyServices_(payload, nowMs) {
 }
 
 function appCreateService_(payload, nowMs) {
-    var required = ["tokenHash", "categoryId", "title", "description"];
-    if (!appHasKeys_(payload, required)) throw appFault_("INVALID_INPUT", "Preencha o nome, categoria e descrição do serviço.");
-
+    var required = ["tokenHash", "categoryId", "title", "description", "cityIds"];
+    if (!appHasKeys_(payload, required)) throw appFault_("INVALID_INPUT", "Preencha nome, categoria, descrição e cidades do serviço.");
     return appWithLock_(function () {
         var state = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, true);
         var profile = appGetProfile_(String(state.user.id_usuario));
         if (!profile) throw appFault_("PROFILE_UNAVAILABLE", "O perfil profissional não está disponível.");
-
         var category = appFind_("CATEGORIAS", "id_categoria", payload.categoryId);
         if (!category || String(category.status) !== "active") throw appFault_("CATEGORY_INVALID", "Selecione uma categoria válida.");
-
+        var cityIds = appNormalizeServiceCityIds_(payload.cityIds, []);
         var title = appText_(payload.title, 5, 100, "Nome do serviço");
         var description = appText_(payload.description, 10, 1000, "Descrição");
         var nowIso = new Date(nowMs).toISOString();
-
         var serviceId = Utilities.getUuid();
         appAppend_("SERVICOS", {
             id_servico: serviceId,
@@ -721,22 +823,23 @@ function appCreateService_(payload, nowMs) {
             atualizado_em: nowIso,
             publicado_em: nowIso
         });
-
-        appAudit_(String(state.user.id_usuario), "user", "service.create", "SERVICOS", serviceId, "success", "Serviço demonstrativo cadastrado.");
-        return { created: true, service: appGetServicesForUser_(String(state.user.id_usuario)).filter(function (item) { return item.id === serviceId; })[0] };
+        appReplaceServiceCities_(serviceId, cityIds, "", nowMs);
+        appAudit_(String(state.user.id_usuario), "user", "service.create", "SERVICOS", serviceId, "success", "Serviço demonstrativo cadastrado. Cidades: " + cityIds.join(", "));
+        return {
+            created: true,
+            service: appGetServicesForUser_(String(state.user.id_usuario)).filter(function (item) { return item.id === serviceId; })[0]
+        };
     });
 }
 
 function appUpdateService_(payload, nowMs) {
-    if (!appHasKeys_(payload, ["tokenHash", "serviceId", "categoryId", "title", "description"])) {
+    if (!appHasKeys_(payload, ["tokenHash", "serviceId", "categoryId", "title", "description", "cityIds"])) {
         throw appFault_("INVALID_INPUT", "Preencha os campos obrigatórios do serviço.");
     }
-
     return appWithLock_(function () {
         var state = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, true);
         var profile = appGetProfile_(String(state.user.id_usuario));
         if (!profile) throw appFault_("PROFILE_UNAVAILABLE", "O perfil profissional não está disponível.");
-
         var service = appFind_("SERVICOS", "id_servico", String(payload.serviceId));
         if (!service || String(service.id_profissional) !== String(profile.id_profissional)) {
             throw appFault_("SERVICE_NOT_FOUND", "Serviço não encontrado.");
@@ -744,36 +847,25 @@ function appUpdateService_(payload, nowMs) {
         if (["suspended", "removed"].indexOf(String(service.status)) !== -1) {
             throw appFault_("SERVICE_STATE_LOCKED", "Este serviço não pode mais ser alterado pelo profissional.");
         }
-
         var category = appFind_("CATEGORIAS", "id_categoria", String(payload.categoryId));
         var keepsExistingCategory = String(payload.categoryId) === String(service.id_categoria);
-        if (
-            !category
-            || (!keepsExistingCategory && String(category.status) !== "active")
-        ) {
+        if (!category || (!keepsExistingCategory && String(category.status) !== "active")) {
             throw appFault_("CATEGORY_INVALID", "Selecione uma categoria ativa.");
         }
-
+        var cityIndex = appBuildServiceCityIndex_();
+        var currentCityIds = appGetServiceCityIds_(service.id_servico, profile.id_cidade_principal, cityIndex);
+        var cityIds = appNormalizeServiceCityIds_(payload.cityIds, currentCityIds, cityIndex);
         var title = appText_(payload.title, 5, 100, "Nome do serviço");
         var description = appText_(payload.description, 10, 1000, "Descrição");
         var nowIso = new Date(nowMs).toISOString();
-
         appUpdate_("SERVICOS", service._row, {
             id_categoria: String(category.id_categoria),
             nome_servico: title,
             descricao: description,
             atualizado_em: nowIso
         });
-        appAudit_(
-            String(state.user.id_usuario),
-            "user",
-            "service.update",
-            "SERVICOS",
-            String(service.id_servico),
-            "success",
-            "Dados do serviço atualizados."
-        );
-
+        appReplaceServiceCities_(String(service.id_servico), cityIds, profile.id_cidade_principal, nowMs);
+        appAudit_(String(state.user.id_usuario), "user", "service.update", "SERVICOS", String(service.id_servico), "success", "Dados do serviço atualizados. Cidades: " + cityIds.join(", "));
         return {
             updated: true,
             service: appGetServicesForUser_(String(state.user.id_usuario))
@@ -864,14 +956,11 @@ function appGetPublicServices_() {
     var users = appRecords_("USUARIOS");
     var profiles = appRecords_("PROFISSIONAIS");
     var categories = appRecords_("CATEGORIAS");
-    var cities = appRecords_("CIDADES");
     var usersById = {};
-    var cityById = {};
     var categoryById = {};
     var profileById = {};
-
+    var cityIndex = appBuildServiceCityIndex_();
     users.forEach(function (item) { usersById[String(item.id_usuario)] = item; });
-    cities.forEach(function (item) { cityById[String(item.id_cidade)] = item; });
     categories.forEach(function (item) { categoryById[String(item.id_categoria)] = item; });
     profiles.forEach(function (item) { profileById[String(item.id_profissional)] = item; });
 
@@ -880,26 +969,25 @@ function appGetPublicServices_() {
             var profile = profileById[String(service.id_profissional)];
             var user = profile ? usersById[String(profile.id_usuario)] : null;
             var category = categoryById[String(service.id_categoria)];
-            return String(service.status) === "published"
-                && profile
-                && user
-                && String(user.status) === "active"
-                && category
-                && String(category.status) === "active";
+            return String(service.status) === "published" && profile && user
+                && String(user.status) === "active" && category;
         })
-        .slice(-100)
-        .reverse()
+        .slice(-100).reverse()
         .map(function (service) {
             var profile = profileById[String(service.id_profissional)];
-            var city = cityById[String(profile.id_cidade_principal)];
             var category = categoryById[String(service.id_categoria)];
+            var cityIds = appGetServiceCityIds_(service.id_servico, profile.id_cidade_principal, cityIndex);
+            var cities = appGetServiceCities_(cityIds, cityIndex);
             return {
                 id: String(service.id_servico),
+                categoryId: String(service.id_categoria),
                 title: String(service.nome_servico),
                 description: String(service.descricao),
                 category: String(category.nome),
                 professional: String(profile.nome_publico),
-                city: city ? String(city.nome) + " - " + String(city.uf) : "",
+                cityIds: cityIds,
+                cities: cities,
+                city: appServiceCityLabel_(cities),
                 whatsapp: String(profile.whatsapp || "")
             };
         });
