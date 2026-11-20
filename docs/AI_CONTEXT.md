@@ -359,9 +359,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 78fabb82eab0eeadebe7be1962e116151b36a944
-- **Data do commit:** 2026-11-20T19:08:18-03:00
-- **Mensagem do commit:** docs: listar roteiro de pesquisa no README
+- **Commit de referência:** 6fef0961ece090058599c0049f01131f750c802e
+- **Data do commit:** 2026-11-20T19:08:23-03:00
+- **Mensagem do commit:** docs: preparar etapa de pesquisa exploratoria
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -465,6 +465,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 6fef096 | 2026-11-20 | docs: preparar etapa de pesquisa exploratoria |
 | 78fabb8 | 2026-11-20 | docs: listar roteiro de pesquisa no README |
 | 6442194 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 6824975 | 2026-11-20 | docs: adicionar instrumento de pesquisa exploratoria |
@@ -472,6 +473,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 700ae4a | 2026-11-20 | docs: detalhar testes de cobertura e fontes Cetic |
 | e4acd4c | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | f33def6 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 3ddcda1 | 2026-11-20 | docs: atualizar relatorio integrador com validacoes recentes |
 
 <!-- END AUTO-GENERATED SECTION -->
