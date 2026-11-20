@@ -417,8 +417,17 @@ export function createAppHandler({
                 let forwardedPayload = { ...payload };
                 if (protectedActions.has(action)) {
                     const tokenHash = createHash("sha256").update(sessionToken, "utf8").digest("hex");
-                    if (action === "auth.me" || action === "auth.logout") {
+
+                    if (action === "auth.me" || action === "auth.logout" || action === "service.listMine") {
                         forwardedPayload = { tokenHash };
+                    } else if (action === "profile.update") {
+                        forwardedPayload = {
+                            nome_publico: payload.nome_publico,
+                            apresentacao: payload.apresentacao,
+                            id_cidade_principal: payload.id_cidade_principal,
+                            whatsapp: payload.whatsapp,
+                            tokenHash,
+                        };
                     } else {
                         forwardedPayload.tokenHash = tokenHash;
                     }
