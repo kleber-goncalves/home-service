@@ -327,9 +327,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 291241bc9cbc95df9cfa8f3eca60a82989fcacaa
-- **Data do commit:** 2026-11-20T17:19:41-03:00
-- **Mensagem do commit:** feat(services): adicionar edicao e remocao na area profissional
+- **Commit de referência:** 3da8bd19d2e07a5e5b50c414054915989496f68c
+- **Data do commit:** 2026-11-20T17:19:43-03:00
+- **Mensagem do commit:** style(services): adaptar controles de servicos e estados
 - **Branch desta execução:** feat/service-lifecycle
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -433,6 +433,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 3da8bd1 | 2026-11-20 | style(services): adaptar controles de servicos e estados |
 | 291241b | 2026-11-20 | feat(services): adicionar edicao e remocao na area profissional |
 | d951458 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 72ed6ab | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
@@ -440,6 +441,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | fd104a1 | 2026-11-20 | test(services): verificar allowlist e sanitizacao de edicao/remocao |
 | caf1044 | 2026-11-20 | test(services): cobrir edicao e remocao logica no Apps Script |
 | c5b778a | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| e30217a | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
