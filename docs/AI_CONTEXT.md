@@ -341,10 +341,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 261f1a72aac091ff087a095424da3763f448e58d
-- **Data do commit:** 2026-11-20T17:48:35-03:00
-- **Mensagem do commit:** docs(roadmap): remover etapa duplicada na ordem
-- **Branch desta execução:** docs/record-service-lifecycle-validation
+- **Commit de referência:** 95582c53bbfe9dec28ff52851c4a7d5dab3b51e7
+- **Data do commit:** 2026-11-20T17:53:07-03:00
+- **Mensagem do commit:** Merge pull request #24 from kleber-goncalves/docs/record-service-lifecycle-validation
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
 - **Dependências de runtime:** 4
@@ -447,13 +447,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 95582c5 | 2026-11-20 | Merge pull request #24 from kleber-goncalves/docs/record-service-lifecycle-validation |
+| 14d48d2 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 261f1a7 | 2026-11-20 | docs(roadmap): remover etapa duplicada na ordem |
 | 96ea06c | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 5990683 | 2026-11-20 | docs(roadmap): ajustar ordem das proximas etapas |
 | 5574c3b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | f25c94c | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | f109ed6 | 2026-11-20 | docs(prototipo): atualizar estado do ciclo de vida |
-| ae38c65 | 2026-11-20 | docs(spec): atualizar validacao de servicos |
-| 96469b4 | 2026-11-20 | docs(roadmap): concluir etapa de ciclo de vida |
 
 <!-- END AUTO-GENERATED SECTION -->
