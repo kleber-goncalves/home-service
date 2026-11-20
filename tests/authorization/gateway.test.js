@@ -171,3 +171,67 @@ test("gateway não encaminha identidade enviada pelo cliente em service.listMine
         tokenHash: createHash("sha256").update(SESSION_TOKEN, "utf8").digest("hex"),
     });
 });
+
+
+test("gateway permite service.update, mas encaminha apenas os campos editáveis e a sessão derivada", async () => {
+    let forwarded;
+    const handler = createHarness(async (_url, options) => {
+        const form = new URLSearchParams(options.body);
+        forwarded = {
+            action: form.get("action"),
+            payload: JSON.parse(form.get("payload")),
+        };
+        return upstreamResponse(form);
+    });
+
+    const response = await handler(buildRequest("service.update", {
+        serviceId: "service-a",
+        categoryId: "category-a",
+        title: "Serviço atualizado",
+        description: "Descrição atualizada no teste do gateway.",
+        tokenHash: "9".repeat(64),
+        id_usuario: "user-b",
+        id_profissional: "profile-b",
+        papel: "admin",
+        status: "removed",
+        ownerId: "user-b",
+    }));
+
+    assert.equal(response.status, 200);
+    assert.equal(forwarded.action, "service.update");
+    assert.deepEqual(forwarded.payload, {
+        serviceId: "service-a",
+        categoryId: "category-a",
+        title: "Serviço atualizado",
+        description: "Descrição atualizada no teste do gateway.",
+        tokenHash: createHash("sha256").update(SESSION_TOKEN, "utf8").digest("hex"),
+    });
+});
+
+test("gateway permite service.remove e não encaminha identidade ou estado enviados pelo navegador", async () => {
+    let forwarded;
+    const handler = createHarness(async (_url, options) => {
+        const form = new URLSearchParams(options.body);
+        forwarded = {
+            action: form.get("action"),
+            payload: JSON.parse(form.get("payload")),
+        };
+        return upstreamResponse(form);
+    });
+
+    const response = await handler(buildRequest("service.remove", {
+        serviceId: "service-a",
+        tokenHash: "9".repeat(64),
+        id_usuario: "user-b",
+        id_profissional: "profile-b",
+        papel: "admin",
+        status: "published",
+    }));
+
+    assert.equal(response.status, 200);
+    assert.equal(forwarded.action, "service.remove");
+    assert.deepEqual(forwarded.payload, {
+        serviceId: "service-a",
+        tokenHash: createHash("sha256").update(SESSION_TOKEN, "utf8").digest("hex"),
+    });
+});
