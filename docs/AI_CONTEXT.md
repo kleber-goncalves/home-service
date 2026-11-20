@@ -327,9 +327,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** d1918cf809e5a24181b2bd5c846828f6e6f0254a
-- **Data do commit:** 2026-11-20T16:30:59-03:00
-- **Mensagem do commit:** docs(roadmap): registrar merge e validacao de propriedade
+- **Commit de referência:** ceb0efe4515b3bed0aceb7b1ea99b53f32997c20
+- **Data do commit:** 2026-11-20T17:14:58-03:00
+- **Mensagem do commit:** docs(roadmap): concluir etapa de autorizacao e integridade
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -433,13 +433,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| ceb0efe | 2026-11-20 | docs(roadmap): concluir etapa de autorizacao e integridade |
+| aa9e7a8 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 68050d3 | 2026-11-20 | docs(ai-context): registrar integracao da etapa de autorizacao |
 | d1918cf | 2026-11-20 | docs(roadmap): registrar merge e validacao de propriedade |
 | 66d319b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 1bf5548 | 2026-11-20 | Merge pull request #22 from kleber-goncalves/feat/authorization-integrity |
 | 54142fc | 2026-11-20 | docs(ai-context): atualizar estado da etapa de autorizacao |
 | 819d809 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| bd2b721 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| a166540 | 2026-11-20 | docs(relatorio): documentar validacao de papel |
-| 1d60376 | 2026-11-20 | docs(mvp): documentar gate de papel na autorizacao |
 
 <!-- END AUTO-GENERATED SECTION -->
