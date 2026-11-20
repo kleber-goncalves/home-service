@@ -58,6 +58,7 @@ O GitHub Actions executa essas verificações em pushes e Pull Requests direcion
 
 - [Contexto técnico para IAs e desenvolvedores](docs/AI_CONTEXT.md)
 - [Roteiro de evolução acadêmica e prioridades](docs/ROADMAP_ESTUDOS.md)
+- [Roteiro de pesquisa exploratória com moradores e profissionais](docs/ROTEIRO_PESQUISA_EXPLORATORIA.md)
 - [Ativar o protótipo funcional com Google Sheets](docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md)
 - [Fluxo da área do profissional](docs/PROTOTIPO_DEMO_LOCAL.md)
 - [Especificação funcional do MVP (em revisão)](docs/ESPECIFICACAO_MVP.md)
