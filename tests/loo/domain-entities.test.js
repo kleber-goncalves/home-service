@@ -57,6 +57,7 @@ test("Servico cria o payload esperado sem transportar campos internos", () => {
         categoryId: "categoria-ficticia-01",
         title: "Instalação de chuveiro",
         description: "Instalação demonstrativa para teste acadêmico.",
+        cityIds: ["cidade-ficticia-01", "cidade-ficticia-02"],
         status: "draft",
     });
 
@@ -64,6 +65,7 @@ test("Servico cria o payload esperado sem transportar campos internos", () => {
         categoryId: "categoria-ficticia-01",
         title: "Instalação de chuveiro",
         description: "Instalação demonstrativa para teste acadêmico.",
+        cityIds: ["cidade-ficticia-01", "cidade-ficticia-02"],
     });
 });
 
@@ -102,6 +104,7 @@ test("Servico monta payload de edição sem transportar dados de proprietário o
         categoryId: "categoria-ficticia-02",
         title: "Reparo hidráulico",
         description: "Descrição atualizada do serviço demonstrativo.",
+        cityIds: ["cidade-ficticia-02"],
         status: "published",
     });
 
@@ -110,6 +113,7 @@ test("Servico monta payload de edição sem transportar dados de proprietário o
         categoryId: "categoria-ficticia-02",
         title: "Reparo hidráulico",
         description: "Descrição atualizada do serviço demonstrativo.",
+        cityIds: ["cidade-ficticia-02"],
     });
 });
 
