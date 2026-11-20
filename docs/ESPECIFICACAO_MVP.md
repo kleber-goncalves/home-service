@@ -1,6 +1,6 @@
 # Especificação funcional do MVP — Conecta Local
 
-> **Status:** requisitos funcionais e modelos lógico e físico aprovados conceitualmente; validações técnicas e implementação pendentes  
+> **Status:** versão 0.4 — requisitos e modelagem consolidados; demonstração acadêmica parcialmente implementada e integrada. Estado técnico atualizado em 18/11/2026 na seção 2. Os requisitos das seções seguintes descrevem o escopo pretendido e não devem ser confundidos com funcionalidades já entregues.  
 > **Versão:** 0.4  
 > **Data da consolidação:** 2026-11-10  
 > **Escopo:** requisitos funcionais, regras de negócio, dados demonstrativos e critérios técnicos para o MVP acadêmico.  
@@ -16,28 +16,44 @@ O projeto é uma demonstração acadêmica. O sistema deverá simular fluxos coe
 
 O MVP não será um marketplace transacional: não intermediará pagamentos, contratos, agendamentos ou conversas internas. O contato ocorrerá diretamente entre visitante e profissional, principalmente pelo WhatsApp público informado no perfil.
 
-## 2. Estado atual do projeto
+## 2. Estado atual do projeto — 18/11/2026
 
-A branch `dev` contém uma homepage demonstrativa em React + Vite. A busca e os filtros atuais funcionam somente sobre dados ilustrativos no frontend; o campo de cidade ainda não realiza pesquisa geográfica.
+A branch `dev` contém a demonstração acadêmica atual do Conecta Local. O PR #15 foi integrado em 16/11/2026 e acrescentou a área do profissional conectada ao Google Sheets via Vercel Function e Google Apps Script. O fluxo implementado contempla cadastro, confirmação por código demonstrativo, login, sessão, atualização de perfil, criação de serviço, pausa/publicação e consulta pública de serviços publicados.
 
-Ainda não estão implementados ou integrados:
-- cadastro e autenticação de profissionais;
-- backend/API operacional;
-- Google Sheets como armazenamento operacional;
-- Google Drive para uploads reais;
-- pesquisa remota;
-- perfis e serviços reais;
-- painel do profissional ou painel administrativo;
-- denúncias e moderação operacionais;
-- envio de e-mails.
+A validação manual ponta a ponta do PR #15 foi realizada em Preview em 16/11/2026, com dados fictícios. Ela confirmou catálogo, cadastro/ativação, persistência na planilha, login, criação de serviço, pausa/publicação, logout e novo login/refresh. Como os PRs #16 (orientação a objetos) e #17 (correção da vitrine) foram integrados depois, a jornada completa precisa ser repetida no Preview atualizado de `dev` antes do encerramento da demonstração.
 
-A arquitetura técnica em prova de conceito é React/Vite → Vercel Function (gateway HTTP) → Google Apps Script → Google Sheets/Drive. A rota `/api/backend` e a assinatura HMAC das POCs-01/02 estão integradas à `dev` e restritas a ações sintéticas. A rota isolada `/api/poc04/session`, na branch `feat/poc-04-session-cookie`, foi implantada e teve seu ciclo básico de sessão sintética validado manualmente no Preview (emissão, validação, CSRF, logout e revogação). Permanecem pendentes testes de expiração e cenários operacionais adicionais. Nenhuma dessas provas implementa autenticação de usuários ou armazenamento operacional.
+Os PRs #18 (relatório integrador) e #19 (integração de `dev` em `main`) também foram concluídos. O PR #19 levou o código funcional ao commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`. Depois, a PR #20 atualizou apenas documentação em `dev`; `main` permanece no commit de release e `dev` está à frente somente por esses documentos e pelo snapshot automático. O código funcional permanece alinhado.
+
+**O que está implementado na demonstração**
+- Homepage pública e filtros locais sobre dados de exemplo e serviços retornados pelo backend.
+- Cadastro, confirmação demonstrativa, login/logout e sessão por cookie HttpOnly.
+- Atualização do perfil profissional.
+- Criação, pausa e publicação de serviços, com persistência nas abas operacionais do Sheets.
+- Consulta pública dos serviços publicados e canal de contato informado pelo profissional.
+- Gateway com Argon2id, HMAC, proteção contra replay, CSRF, validação de Origin e controle de sessão.
+- Classes de domínio `Usuario`, `Profissional` e `Servico`, integradas pelo PR #16.
+
+**Limites e itens ainda não implementados**
+- Recuperação/alteração de senha e alteração de e-mail com confirmação.
+- Envio real de e-mail; a confirmação de cadastro é demonstrativa.
+- Edição e remoção de serviços.
+- Upload, armazenamento e controle de permissões de imagens no Google Drive.
+- Painel administrativo, denúncias, moderação e gestão administrativa de categorias/cidades.
+- Associação completa de múltiplas cidades por serviço e pesquisa remota/geográfica.
+
+A modelagem aprovada prevê 12 abas. O Apps Script de negócio atualmente utiliza oito: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`. As abas `CONTROLE_AUTENTICACAO`, `SERVICO_CIDADES`, `IMAGENS` e `DENUNCIAS` ainda não têm fluxos operacionais implementados.
+
+**Ambientes**
+- **Preview de `dev`:** ambiente destinado à demonstração funcional; a jornada deve ser revalidada após as últimas integrações.
+- **Production (`main`):** permanece como vitrine pública. O gateway bloqueia operações de negócio fora de Vercel Preview e não há variáveis Production do backend.
+
+O projeto é acadêmico, usa exclusivamente dados fictícios e não está aprovado para produção ou uso comercial. Não inserir credenciais ou dados pessoais reais.
 
 ## 3. Classificação e leitura dos requisitos
 
 - **Decisão funcional aprovada:** comportamento escolhido para o MVP nesta rodada de levantamento.
 - **Validação técnica pendente:** requisito aprovado conceitualmente, mas cuja viabilidade, segurança ou comportamento ainda precisa ser comprovado.
-- **Implementado:** funcionalidade presente no código e validada. Nenhum dos fluxos de backend descritos neste documento deve ser considerado implementado por estar especificado.
+- **Implementado na demonstração integrada em `dev`:** funcionalidade presente no código e, quando indicado, validada manualmente no Preview. A evidência de validação é específica ao fluxo e à data informados; não presume que todas as alterações posteriores tenham sido retestadas.
 - **Fora do MVP:** funcionalidade explicitamente excluída da primeira entrega.
 
 A especificação deve ser usada como referência para a modelagem. Não transformar uma pendência técnica em decisão por conveniência nem apresentar propostas futuras como comportamento já existente.
@@ -97,7 +113,7 @@ A conta poderá atender várias cidades e bairros. O endereço residencial compl
 
 ### 6.3. Cadastro, autenticação e conta
 
-**Modelo escolhido para a demonstração:** autenticação própria com e-mail e senha, implementada no Apps Script, sem Firebase ou outro provedor. A aprovação é funcional e acadêmica; os mecanismos criptográficos e o gerenciamento de sessão continuam bloqueados por validação técnica.
+**Modelo escolhido para a demonstração:** autenticação própria com e-mail e senha, usando Apps Script como autoridade de negócio e Vercel Function como gateway de confiança. A implementação foi integrada em `dev` pelo PR #15 e validada manualmente em Preview em 16/11/2026, com dados fictícios. Isso não representa aprovação para produção.
 
 **Cadastro e ativação**
 1. O visitante informa os dados exigidos e uma senha.
@@ -115,7 +131,7 @@ A conta poderá atender várias cidades e bairros. O endereço residencial compl
 - Rejeitar senhas comuns ou conhecidamente comprometidas.
 - Não exigir troca periódica sem motivo.
 - Nunca armazenar senha em texto puro, nem registrar senha em logs.
-- O algoritmo e os parâmetros de armazenamento ainda não foram aprovados tecnicamente.
+- A implementação da demonstração utiliza Argon2id via `hash-wasm@4.13.0` no gateway Node.js, com perfil `m=19456 KiB,t=2,p=1` investigado na POC-03 (mediana aproximada de 130 ms nas medições registradas). Hash, salt e identificador do algoritmo são enviados ao Apps Script; a comparação é feita no servidor com `timingSafeEqual`. Não tratar esses resultados como auditoria independente ou aprovação para produção.
 
 **Login e tentativas**
 - Respostas de erro genéricas, sem revelar se o e-mail está cadastrado.
@@ -129,22 +145,22 @@ A conta poderá atender várias cidades e bairros. O endereço residencial compl
 - Duração máxima de 8 horas.
 - Logout invalida a sessão imediatamente.
 - Alteração/recuperação de senha, suspensão ou encerramento da conta invalidam todas as sessões existentes.
-- A POC-04 demonstrou parcialmente, em Preview e com dados sintéticos, o transporte por cookie HttpOnly emitido pela Vercel e validado pelo Apps Script, incluindo rotação/rejeição CSRF e logout com revogação. Isso ainda não aprova a estratégia para autenticação real: testar expiração ociosa/absoluta, Origin/Fetch Metadata negativos no ambiente real, replay/concorrência, falhas operacionais, XSS e limpeza antes de uma decisão arquitetural. Não conectar `AuthDemoPage.jsx` nem credenciais reais.
+- A demonstração principal utiliza o cookie `__Host-conecta_local_session` emitido pela Vercel Function com `HttpOnly; Secure; SameSite=Strict; Path=/`, sem `Domain`. O token original não é exposto ao React; o Apps Script recebe e valida seu hash. CSRF, Origin, HMAC, logout e revogação fazem parte do fluxo integrado. A validação manual ponta a ponta foi realizada no Preview do PR #15 em 16/11/2026; repetir no Preview atualizado de `dev`. A POC-04 continua independente e possui pendências próprias.
 
-**Recuperação de senha**
+**Recuperação de senha — requisito futuro, ainda não implementado**
 - O profissional informa o e-mail; a resposta não deve permitir enumerar contas.
 - Código de 6 dígitos, validade de 10 minutos, até 5 tentativas, uso único e intervalo de 60 segundos entre solicitações.
 - Um novo código invalida o anterior.
 - Durante a demonstração, o código aparece na interface. No futuro, poderá ser enviado por e-mail.
 - Após validar o código, o profissional cadastra nova senha conforme a política aprovada; as sessões anteriores são invalidadas.
 
-**Alteração de senha**
+**Alteração de senha — requisito futuro, ainda não implementado**
 - Exigir senha atual, nova senha e confirmação.
 - Validar a nova senha no backend.
 - Invalidar todas as sessões anteriores.
 - Registrar o evento de auditoria sem armazenar senhas.
 
-**Alteração de e-mail**
+**Alteração de e-mail — requisito futuro, ainda não implementado**
 - O profissional solicita a mudança autenticado.
 - Verificar se o novo endereço já está em uso.
 - Enviar/gerar código de confirmação de 6 dígitos para o novo endereço; na demonstração, exibir o código na interface.
@@ -159,6 +175,8 @@ A conta poderá atender várias cidades e bairros. O endereço residencial compl
 ### 6.4. Serviços
 
 Um profissional poderá cadastrar vários serviços, sem limite numérico fixo no MVP.
+
+**Estado atual da demonstração:** criação, pausa e publicação estão implementadas e integradas ao Sheets. Edição e remoção de serviços ainda não estão implementadas. O fluxo de múltiplas cidades por serviço também não está concluído; a associação prevista em `SERVICO_CIDADES` permanece futura.
 
 | Campo | Regra |
 |---|---|
@@ -224,7 +242,7 @@ O administrador poderá cadastrar, editar, desativar e reativar categorias. Cate
 
 ### 6.6. Imagens e visibilidade no Google Drive
 
-A decisão funcional é que o Apps Script altere as permissões dos arquivos conforme a elegibilidade:
+A decisão funcional é que o Apps Script altere as permissões dos arquivos conforme a elegibilidade. **O fluxo de upload e gerenciamento de permissões no Drive ainda não está implementado na demonstração.**
 - serviço publicado e conta ativa: permitir visualização pública por link;
 - serviço pausado, suspenso ou removido: restringir o arquivo;
 - conta suspensa ou encerrada: restringir as imagens associadas.
@@ -235,7 +253,7 @@ O comportamento pretendido utiliza permissões equivalentes a `ANYONE_WITH_LINK`
 
 ### 6.7. Denúncias
 
-Qualquer visitante poderá denunciar um perfil ou serviço sem criar conta.
+Qualquer visitante poderá denunciar um perfil ou serviço sem criar conta. **O recebimento e a gestão de denúncias ainda não estão implementados.**
 
 **Motivos**
 - Informações falsas.
@@ -390,30 +408,21 @@ As quantidades são uma base inicial para demonstração, não um limite de arqu
 - funcionamento offline para operações privadas ou administrativas;
 - limites de volume, analytics e relatórios avançados sem necessidade acadêmica.
 
-## 12. Validações técnicas obrigatórias antes da autenticação
+## 12. Estado das validações técnicas e pendências
 
-A escolha funcional por Apps Script + e-mail/senha próprios não encerra a análise técnica. A proposta arquitetural adota Vercel Functions como gateway HTTP e Apps Script como backend de negócio. O fluxo React/Vite → Vercel Function → Web App Apps Script, a assinatura servidor-servidor, o possível cookie HttpOnly emitido pela Vercel, os limites de Content Service/TextOutput e a ordem das provas de conceito estão detalhados em [ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md). Antes de integrar autenticação, fazer provas de conceito isoladas com dados sintéticos para validar:
+As provas de conceito de transporte, assinatura, armazenamento de senha e o fluxo de autenticação principal foram executadas em ambiente controlado com dados sintéticos. A existência desses controles não equivale a auditoria independente, certificação ou aprovação para Production.
 
-1. **Hash de senha:** Apps Script não deve armazenar senha em texto puro nem usar um digest rápido isolado como substituto de um KDF de senha. A referência oficial de `Utilities` documenta digest e HMAC; não se deve presumir a existência de uma função nativa pronta para Argon2id, scrypt ou PBKDF2. Avaliar uma implementação PBKDF2-HMAC-SHA-256 revisada e testada, ou uma estratégia demonstrativa mais restrita que não seja confundida com segurança de produção. Validar salt individual, parâmetros, comparação segura e desempenho.
-2. **Sessão no navegador:** comprovar como token/sessão será transportado, persistido, renovado, expirado e revogado. A Vercel Function poderá emitir cookie HttpOnly no domínio da aplicação, enquanto o Apps Script permanece a autoridade da sessão. Validar atributos Secure/SameSite, CSRF, Origin, redirecionamentos, exposição a XSS, logout e revogação antes de aprovar a estratégia.
-3. **Concorrência e bloqueios:** validar contadores de tentativas, bloqueio de 15 minutos, limites de códigos e operações concorrentes. Evitar que um terceiro consiga bloquear uma conta indefinidamente por abuso da regra de tentativas.
-4. **Autorização:** testar que usuário comum não consegue alterar papel, proprietário ou estado enviando payload manipulado; testar acesso cruzado entre profissionais.
-5. **Google Drive:** validar a troca entre acesso por link e privado em arquivos individuais, falhas parciais e a política da conta. Confirmar que esconder a URL na interface não é tratado como controle de acesso.
-6. **Integração:** testar POST same-origin React→Vercel Function, POST form-urlencoded Vercel→Apps Script, assinatura da chamada servidor-servidor, redirecionamento, timeout, resposta JSON, quotas, limites de execução e tratamento de exceções. O navegador não deverá chamar o Apps Script diretamente nem depender de CORS com o domínio Google.
-7. **E-mail futuro:** quando for ativado, revisar permissões, remetente, quotas e tratamento de falha de envio. O fluxo demonstrativo não deve exibir códigos em produção.
+1. **Comunicação e HMAC — implementados:** POC-01 e POC-02 foram integradas à `dev`; assinatura HMAC-SHA-256, timestamp, nonce e proteção contra replay foram validados em ensaios automatizados e manuais. O backend de negócio possui sua própria validação de assinatura.
+2. **Armazenamento de senha — integrado à demonstração:** Argon2id via `hash-wasm@4.13.0`, perfil `m=19456 KiB,t=2,p=1`, e comparação no gateway com `timingSafeEqual`. O valor de desempenho registrado na POC é uma medição pontual, não uma garantia de capacidade ou certificação.
+3. **Sessão principal — integrada:** cookie HttpOnly/Secure/SameSite, CSRF, Origin, hash de token no Sheets, logout e revogação foram exercitados no fluxo principal do PR #15 no Preview em 16/11/2026. Repetir os casos no Preview de `dev` após as integrações #16 e #17.
+4. **POC-04 — sessão sintética independente:** a PR #14 permanece em Draft e não integra o login principal. Ensaios no Preview/App Script em 14 e 20/11/2026 confirmaram cookie HttpOnly/Secure/SameSite, CSRF, Origin/Fetch Metadata, expiração ociosa e absoluta com timestamps sintéticos controlados, replay e concorrência sintética; logout e revogação também foram verificados. A planilha temporária, nonces, segredo Apps Script e variáveis Vercel exclusivas foram limpos; o novo Preview está READY, com a rota desabilitada. A remoção das funções auxiliares no editor remoto Apps Script ainda não foi confirmada. Falhas reais de armazenamento/upstream e testes de carga não foram executados; revisão de segurança final pendente. Consultar `docs/POC_04_SESSOES.md`.
+5. **Autorização:** o Apps Script valida propriedade do perfil/serviço nas operações atuais. Ainda é necessário documentar ensaios adversariais de acesso cruzado entre profissionais, alteração de payload e tentativas de manipular estado/proprietário.
+6. **Persistência e integridade:** o backend utiliza Google Sheets para a demonstração. Não presumir transação relacional ou atomicidade entre todas as operações; validar concorrência, consistência de gravação e auditoria. A modelagem contém 12 abas, mas apenas oito são usadas operacionalmente.
+7. **Google Drive:** upload e gerenciamento de permissões de imagens ainda não implementados. Antes de introduzi-los, validar permissões individuais, transições público/privado, falhas parciais e reconciliação.
+8. **E-mail e recuperação:** envio real, recuperação de senha e alteração de e-mail ainda não implementados. Se forem incluídos futuramente, revisar quotas, privacidade e tratamento seguro dos códigos.
+9. **Limites operacionais:** não há auditoria independente, teste de carga ou aprovação de segurança para produção. Avaliar cotas do Apps Script, latência, concorrência, backup, monitoramento e gestão de incidentes antes de qualquer uso fora da demonstração.
 
-8. **Consistência Sheets + auditoria:** validar que atualização de negócio e inserção do evento utilizam o mesmo `spreadsheets.batchUpdate` no mesmo arquivo e falham em conjunto; testar a gravação separada de eventos de falha.
-9. **Permissões Drive + reconciliação:** testar etapas separadas, confirmação de revogação, falhas parciais e rotina idempotente que compare permissões reais com a elegibilidade calculada.
-
-**Critério de bloqueio:** se a prova de conceito não conseguir atender aos requisitos mínimos, não implementar autenticação, permissões ou transações por improviso. Registrar a limitação e reapresentar alternativas antes de prosseguir.
-
-Referências técnicas oficiais para a prova de conceito:
-- [Apps Script — Utilities](https://developers.google.com/apps-script/reference/utilities/utilities)
-- [Apps Script — TextOutput](https://developers.google.com/apps-script/reference/content/text-output)
-- [Apps Script — Drive Access](https://developers.google.com/apps-script/reference/drive/access)
-- [Apps Script — Cotas e limites](https://developers.google.com/apps-script/guides/services/quotas)
-- [OWASP — Password Storage Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)
-- [NIST SP 800-63B-4](https://pages.nist.gov/800-63-4/sp800-63b.html)
+**Critério de bloqueio:** manter a demonstração restrita ao Preview, com dados fictícios. Não habilitar o backend em Production nem aceitar credenciais/dados pessoais reais. Registrar evidências por ambiente e data; não declarar testes manuais concluídos sem executá-los.
 
 ## 13. Pesquisa de campo e limitações acadêmicas
 
@@ -431,5 +440,5 @@ O esquema físico das 12 abas foi aprovado conceitualmente e também está docum
 
 A estrutura planejada contém um único arquivo Google Sheets com 12 abas. O arquivo estrutural foi criado pelo responsável pelo projeto e sua exportação foi conferida; as abas e cabeçalhos estão presentes. Isso não significa que os registros sintéticos, o backend Apps Script ou as integrações com Drive tenham sido implementados.
 
-**Próxima etapa:** revisar [ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md) e executar as provas de conceito, começando pelo transporte entre Vercel e Apps Script. A criação inicial da planilha está concluída e não deve ser repetida. Provas de conceito de senha, transporte de sessão, códigos, concorrência, autorização, auditoria e permissões/reconciliação do Drive continuam obrigatórias antes de ativar esses fluxos.
+**Estado em 18/11/2026:** modelagem e planilha estrutural estão concluídas; o backend da demonstração usa oito abas e o fluxo principal de cadastro/login/serviços foi implementado. A próxima validação é repetir a jornada ponta a ponta no Preview atualizado de `dev`, concluir a POC-04 em sua PR independente e registrar as evidências. Drive, administração, denúncias, recuperação de senha e demais requisitos não implementados permanecem como evolução posterior.
 
