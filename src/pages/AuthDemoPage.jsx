@@ -272,7 +272,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         setNewService({
             ...EMPTY_SERVICE,
             categoryId: catalog.categories[0]?.id || "",
-            cityIds: currentUser?.cityId ? [currentUser.cityId] : (catalog.cities[0]?.id ? [catalog.cities[0].id] : []),
+            cityIds: catalog.cities.some((city) => city.id === currentUser?.cityId) ? [currentUser.cityId] : (catalog.cities[0]?.id ? [catalog.cities[0].id] : []),
         });
     }
 
@@ -285,7 +285,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         setNewService({
             ...EMPTY_SERVICE,
             categoryId: catalog.categories[0]?.id || "",
-            cityIds: currentUser?.cityId ? [currentUser.cityId] : (catalog.cities[0]?.id ? [catalog.cities[0].id] : []),
+            cityIds: catalog.cities.some((city) => city.id === currentUser?.cityId) ? [currentUser.cityId] : (catalog.cities[0]?.id ? [catalog.cities[0].id] : []),
         });
         setShowServiceForm(true);
         setNotice(null);
