@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 03ff7ce767f3f6c1ac7aea81abd3eb14d176ce31
-- **Data do commit:** 2026-11-20T19:58:04-03:00
-- **Mensagem do commit:** fix: mapear erros de upload e Drive com códigos seguros
+- **Commit de referência:** 3388af57b87de74ddca9329de226f9b26541281c
+- **Data do commit:** 2026-11-20T19:58:46-03:00
+- **Mensagem do commit:** test: recuperar upload concluído após resposta perdida
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -473,13 +473,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 3388af5 | 2026-11-20 | test: recuperar upload concluído após resposta perdida |
+| 65c87ff | 2026-11-20 | fix: manter recibo de conclusão para recuperar resposta perdida |
+| 36eb061 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 8e1b016 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 03ff7ce | 2026-11-20 | fix: mapear erros de upload e Drive com códigos seguros |
 | 43d0c91 | 2026-11-20 | fix: mapear erros do ciclo de vida de imagens no gateway |
 | d5e9546 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 0c0d0b7 | 2026-11-20 | test: garantir privacidade em remoção idempotente de imagem |
-| dab7b48 | 2026-11-20 | fix: reafirmar privacidade ao repetir remoção de imagem |
-| 1b1fc9d | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 7efc5b8 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| acf3bbe | 2026-11-20 | test: incluir testes do cliente de upload de imagens |
 
 <!-- END AUTO-GENERATED SECTION -->
