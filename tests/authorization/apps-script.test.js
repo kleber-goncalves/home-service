@@ -554,7 +554,7 @@ function createHarness(options = {}) {
         );
     }
 
-    return { call, records, driveFiles, driveSessions, driveCalls, properties, context };
+    return { call, records, driveFiles, driveSessions, driveCalls, properties };
 }
 
 test("service.listMine retorna somente os serviços do profissional da sessão", () => {
@@ -1241,28 +1241,4 @@ test("image.upload.cancel libera a reserva do serviço e não cria metadados", (
         mimeType: "image/png",
     });
     assert.equal(restarted.ok, true);
-});
-
-
-
-test("diagnóstico temporário: expõe a exceção interna da rotina de bloco", () => {
-    const harness = createHarness();
-    const bytes = createPngBytes();
-    const started = harness.call("image.upload.start", {
-        tokenHash: TOKEN_HASH_A,
-        serviceId: SERVICE_A,
-        fileSize: bytes.length,
-        mimeType: "image/png",
-    });
-    assert.equal(started.ok, true);
-    const payloadText = JSON.stringify({
-        tokenHash: TOKEN_HASH_A,
-        uploadId: started.data.uploadId,
-        startOffset: 0,
-        totalSize: bytes.length,
-        chunkBase64: bytes.toString("base64"),
-    });
-    const payload = runInNewContext("JSON.parse(" + JSON.stringify(payloadText) + ")", harness.context);
-    const result = harness.context.appImageUploadChunk_(payload, NOW);
-    assert.equal(result.completed, true);
 });
