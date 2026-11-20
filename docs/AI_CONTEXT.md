@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 37313515a8daf4ecea49b242a18ab90e7825e438
-- **Data do commit:** 2026-11-20T19:53:48-03:00
-- **Mensagem do commit:** feat: adicionar cliente para upload de imagens em blocos
+- **Commit de referência:** b59218da4eac56de06c6a298c54859fdc8a62eb2
+- **Data do commit:** 2026-11-20T19:54:25-03:00
+- **Mensagem do commit:** feat: adicionar interface de gerenciamento de imagens de serviços
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -446,6 +446,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/components/home/hero-search.jsx
 - src/components/home/home-sections.jsx
 - src/components/home/site-header.jsx
+- src/components/professional/service-image-manager.jsx
 - src/components/ui/badge.jsx
 - src/components/ui/button.jsx
 - src/components/ui/card.jsx
@@ -472,13 +473,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| b59218d | 2026-11-20 | feat: adicionar interface de gerenciamento de imagens de serviços |
+| 09ed57b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 3731351 | 2026-11-20 | feat: adicionar cliente para upload de imagens em blocos |
 | 5c38093 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | da13ebb | 2026-11-20 | test: remover diagnóstico temporário do upload de imagens |
 | 4829719 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | bc21454 | 2026-11-20 | fix: corrigir finalização e compensação do upload de imagens |
 | bd36a31 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| a37431b | 2026-11-20 | test: criar payload diagnóstico no contexto Apps Script |
-| db879ab | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
