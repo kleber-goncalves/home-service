@@ -268,6 +268,15 @@ function mapAppsScriptError(output) {
         DRIVE_FOLDER_NOT_CONFIGURED: [503, "A pasta privada do Drive ainda não foi configurada."],
         DRIVE_FOLDER_NOT_PRIVATE: [503, "A pasta do Drive precisa estar privada."],
         DRIVE_AUTH_UNAVAILABLE: [503, "A autorização do Google Drive não está disponível."],
+        DRIVE_UPLOAD_START_FAILED: [502, "Não foi possível iniciar o envio no Google Drive."],
+        DRIVE_STATUS_UNAVAILABLE: [502, "Não foi possível consultar o progresso no Google Drive."],
+        DRIVE_STATUS_INVALID: [502, "O Google Drive retornou um progresso inválido."],
+        DRIVE_FILE_METADATA_INVALID: [502, "O Google Drive retornou metadados inválidos."],
+        DRIVE_CHUNK_TRANSPORT_FAILED: [502, "A comunicação com o Google Drive foi interrompida."],
+        DRIVE_CHUNK_OFFSET_UNKNOWN: [502, "O Google Drive não confirmou o bloco enviado."],
+        DRIVE_CHUNK_REJECTED: [502, "O Google Drive recusou o bloco enviado."],
+        DRIVE_FILE_VALIDATION_FAILED: [502, "O arquivo recebido não passou pela validação final."],
+        IMAGE_METADATA_SAVE_FAILED: [502, "Não foi possível registrar os metadados da imagem."],
     };
     const [status, fallback] = known[code] || [400, "Não foi possível concluir a operação."];
     return { code, status, message: code === "INVALID_INPUT" ? output?.error?.message || fallback : fallback };
