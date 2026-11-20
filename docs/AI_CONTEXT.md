@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 8bca869ad067d73443492bd53d76956c13547de7
-- **Data do commit:** 2026-11-20T19:55:02-03:00
-- **Mensagem do commit:** feat: exibir imagem cadastrada do serviço na vitrine
+- **Commit de referência:** ab3cb240a68ab89b30f05016630c933b73cad427
+- **Data do commit:** 2026-11-20T19:55:13-03:00
+- **Mensagem do commit:** style: adicionar layout responsivo para imagens dos serviços
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -473,13 +473,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| ab3cb24 | 2026-11-20 | style: adicionar layout responsivo para imagens dos serviços |
+| d1a3e90 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 8bca869 | 2026-11-20 | feat: exibir imagem cadastrada do serviço na vitrine |
 | 93c577e | 2026-11-20 | refactor: atualizar lista após operações com imagens |
 | 564f339 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 98a032a | 2026-11-20 | feat: integrar gerenciador de imagens à área profissional |
 | 31e17f5 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | b59218d | 2026-11-20 | feat: adicionar interface de gerenciamento de imagens de serviços |
-| 09ed57b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 3731351 | 2026-11-20 | feat: adicionar cliente para upload de imagens em blocos |
 
 <!-- END AUTO-GENERATED SECTION -->
