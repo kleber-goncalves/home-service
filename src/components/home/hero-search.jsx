@@ -28,7 +28,7 @@ export default function HeroSearch({ query, city, onQueryChange, onCityChange, o
                         </label>
                         <Button type="submit" size="lg" className="search-submit">Buscar <ArrowRight size={17} aria-hidden="true" /></Button>
                     </form>
-                    <p className="search-hint">Nesta prévia, a busca usa perfis ilustrativos. A consulta por cidade ainda não está conectada.</p>
+                    <p className="search-hint">A busca considera os municípios de atendimento vinculados a cada serviço.</p>
                 </div>
                 <div className="hero-visual">
                     <img src="https://images.pexels.com/photos/27928762/pexels-photo-27928762.jpeg?auto=compress&cs=tinysrgb&w=1600" alt="Profissional trabalhando em um painel elétrico residencial." fetchPriority="high" loading="eager" />
