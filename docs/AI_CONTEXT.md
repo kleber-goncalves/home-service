@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 4c6946eb0b63117ad00399fe5134498574cfdba2
-- **Data do commit:** 2026-11-20T20:00:32-03:00
-- **Mensagem do commit:** test: validar rejeição por stream acima de 1 MiB
+- **Commit de referência:** cca78793f39328aefd9aca1e3e623ff01f161902
+- **Data do commit:** 2026-11-20T20:00:42-03:00
+- **Mensagem do commit:** fix: mapear erros da API Drive nas ações de imagem
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -473,13 +473,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| cca7879 | 2026-11-20 | fix: mapear erros da API Drive nas ações de imagem |
+| 9c2abfc | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 4c6946e | 2026-11-20 | test: validar rejeição por stream acima de 1 MiB |
 | 0d0f9d0 | 2026-11-20 | fix: limitar leitura do stream a 1 MiB na rota de imagens |
 | 9b45df3 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | f6222bd | 2026-11-20 | test: corrigir inspeção de Script Properties no harness |
 | bc8321a | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | bf67dc8 | 2026-11-20 | fix: impedir cancelamento de recibo de upload concluído |
-| 0ea22b3 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 3388af5 | 2026-11-20 | test: recuperar upload concluído após resposta perdida |
 
 <!-- END AUTO-GENERATED SECTION -->
