@@ -159,19 +159,27 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 4 — Imagens no Google Drive
 
-**Objetivo:** permitir que o profissional associe imagens ao perfil ou aos serviços.
+**Status: em andamento — desenho técnico definido em `docs/ETAPA_4_IMAGENS_DRIVE.md`; implementação e validação ainda pendentes.**
 
-**Escopo mínimo:**
-- Upload de JPG, PNG ou WebP com limite definido na especificação.
-- Validar tamanho, tipo real do conteúdo e propriedade no backend.
-- Guardar metadados e ID do arquivo no Sheets; manter a pasta raiz privada.
-- Tornar público somente o arquivo elegível a um serviço publicado e conta ativa.
-- Revogar acesso público ao pausar/remover/suspender, verificando o resultado.
-- Tratar falhas parciais entre Sheets e Drive; nunca exibir sucesso antes de confirmar as etapas.
+O responsável escolheu prosseguir com esta etapa em 20/11/2026, mantendo o escopo acadêmico e o plano Vercel Hobby.
 
-**Critério de conclusão:** upload, exibição, pausa e remoção funcionam com dados fictícios e as permissões do Drive seguem os estados do serviço.
+**Decisão de transporte:** upload retomável do Google Drive com blocos binários de 1 MiB enviados por uma rota dedicada da Vercel e encaminhados ao Apps Script sob HMAC. O URI de sessão do Drive e o token OAuth ficam somente no Apps Script. Essa estratégia preserva o limite de 5.000.000 bytes sem depender da opção beta de 20 MiB da Vercel, que exige memória de 4 GB indisponível no plano Hobby.
 
-**Prioridade:** média/baixa. Tem grande valor visual, mas é mais complexa por envolver um segundo serviço externo e permissões. Fazer somente quando o fluxo de serviços estiver estável e houver tempo.
+**Escopo inicial — imagens de serviços:**
+- Iniciar sessão de upload após validar sessão, proprietário, serviço, tamanho e MIME.
+- Enviar blocos sequenciais de 1 MiB; validar assinatura binária, offset, tamanho total e sequência no backend.
+- Guardar intenção e URI retomável somente em Script Properties; não gravar metadados ativos antes de o Drive confirmar a conclusão.
+- Armazenar arquivos na pasta raiz privada e metadados na aba `IMAGENS`.
+- Permitir no máximo 5 imagens ativas por serviço, nos formatos JPG/JPEG, PNG ou WebP, até 5.000.000 bytes cada.
+- Tornar público por link somente arquivo pertencente a serviço publicado e conta ativa; restringir ao pausar, remover ou tornar inelegível.
+- Implementar cancelamento, expiração, compensação de falha parcial e remoção lógica.
+- Mostrar prévia, progresso e estado de erro na interface.
+
+**Não faz parte do primeiro ciclo:** foto de perfil, galeria avançada, painel de mídia e operação em Production.
+
+**Critério de conclusão:** upload, listagem, exibição, pausa/publicação e remoção validados em Preview com arquivos fictícios/licenciados, pasta Drive privada e permissões individuais conferidas no Drive real.
+
+**Dependências manuais:** inspecionar o manifesto `appsscript.json` existente, acrescentar os escopos necessários sem substituir configurações atuais, criar pasta raiz privada, adicionar Script Property com seu ID e autorizar o Drive na conta que executa o Web App. Não criar outro projeto/implantação Apps Script nem alterar segredo HMAC ou variáveis Production.
 
 ### Etapa 5 — Pesquisa acadêmica e acabamento da apresentação
 
@@ -214,9 +222,9 @@ Reavaliar somente quando houver exigência acadêmica explícita ou uma necessid
 
 ## 6. Ordem prática recomendada
 
-1. **Agora:** aplicar a pesquisa exploratória com base em `docs/ROTEIRO_PESQUISA_EXPLORATORIA.md`, somente após confirmar com o professor/orientador o procedimento adequado e mantendo a coleta sem dados identificáveis.
-2. **Depois da coleta:** analisar respostas reais e atualizar o relatório e a apresentação, incluindo limitações da amostra.
-3. **Somente se houver ganho claro para a demonstração:** reavaliar a Etapa 4 (imagens no Google Drive), sem comprometer o prazo acadêmico.
+1. **Agora:** concluir a Etapa 4 em `feat/drive-image-upload`, com upload de imagens de serviços, testes automatizados e validação manual no Preview.
+2. **Depois:** retomar a pesquisa comunitária já documentada em `PESQUISA_COMUNIDADE.md` e `docs/GUIA_APLICACAO_PESQUISA_COMUNIDADE.md`, somente após orientação do professor do curso Técnico em Informática e confirmação do procedimento aplicável. O responsável decidiu deixar a coleta para depois.
+3. **Na preparação da entrega:** revisar acessibilidade, responsividade, roteiro de demonstração e relatório acadêmico, registrando as limitações reais.
 
 Trabalhar uma etapa por branch/PR, sempre partindo de `dev`. Integrar somente depois das verificações pertinentes. Não alterar `main` sem uma decisão explícita de publicação.
 
