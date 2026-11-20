@@ -11,7 +11,7 @@ O núcleo demonstrativo já está implementado na branch `dev`:
 - Cadastro com confirmação de código demonstrativo.
 - Login e sessão com cookie protegido.
 - Perfil profissional.
-- Criação, pausa e publicação de serviços.
+- Criação, edição, pausa, publicação e remoção lógica de serviços.
 - Persistência no Google Sheets por Vercel Function e Google Apps Script.
 - Controles de gateway, HMAC, Argon2id, comparação de hashes e validações de entrada.
 - Classes de domínio `Usuario`, `Profissional` e `Servico`.
@@ -91,40 +91,28 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 2 — Completar o ciclo de vida dos serviços
 
-**Em andamento na branch `feat/service-lifecycle`; ainda não integrada em `dev`.**
+**Status: concluída em 20/11/2026. PR #23 integrada exclusivamente em `dev`.**
 
-**Objetivo:** transformar o CRUD atual em uma jornada mais completa para o profissional e praticar regras de domínio.
+**Implementação integrada:**
+- `service.update` permite editar nome, categoria e descrição, com identidade e proprietário derivados da sessão validada.
+- `service.remove` realiza remoção lógica, preserva a linha em `SERVICOS` e registra a ação em `AUDITORIA`.
+- O backend rejeita mass assignment e impede que o profissional edite/remova serviços de outra pessoa ou altere estados administrativos (`suspended` e `removed`).
+- A edição preserva estado, proprietário, preço e timestamps relevantes. A interface apresenta os estados e confirma a remoção.
 
-**Implementado nesta branch:**
-- Editar os campos atuais do serviço: nome, categoria e descrição.
-- Remover logicamente um serviço, mudando o estado para `removed`, sem apagar a linha original nem o histórico de auditoria.
-- Manter o proprietário derivado da sessão validada; o navegador não define `id_profissional`, papel ou estado administrativo.
-- Bloquear edição/remoção de serviços `suspended` ou `removed` e impedir que o profissional reative esses estados.
-- Preservar o estado `published` ou `paused` ao editar; a remoção retira o serviço do catálogo público porque a consulta pública considera somente serviços publicados.
-- Registrar `service.update` e `service.remove` na aba `AUDITORIA`.
-- Atualizar a interface para apresentar estados, permitir edição e pedir confirmação antes da remoção.
-- Alinhar os limites de nome (5–100 caracteres) e descrição (10–1.000 caracteres) à modelagem de dados.
+**Validação automatizada — PASS:**
+- A PR #23 foi integrada pelo merge commit `0f9e887347444deb1307e65d127d969e595c81ed`.
+- A execução [Validate Home Service #44812170065](https://github.com/kleber-goncalves/home-service/actions/runs/44812170065) concluiu **SUCCESS** no merge commit: POC-01 12/12, POC-02 20/20, POC-03 26/26, POC-04 33/33, autorização/ownership 22/22 e LOO 7/7; auditoria de dependências de produção, registro de ocorrências, ESLint e build também passaram.
 
-**Cobertura automatizada adicionada:**
-- Harness do Apps Script cobre edição própria, tentativa de editar serviço de outro profissional, remoção lógica, tentativa de remover serviço de outro profissional, proteção de estados e bloqueio por papel.
-- Testes do gateway verificam que `service.update` e `service.remove` só encaminham os campos permitidos e o token derivado da sessão.
-- Testes da entidade `Servico` cobrem os payloads de edição e remoção lógica.
-- A execução [Validate Home Service #44810635555](https://github.com/kleber-goncalves/home-service/actions/runs/44810635555) concluiu **SUCCESS** no commit funcional `e1a1dc326d59b711dabd0eab6032f6994baa0f5f`: 22/22 testes de autorização/ownership e 7/7 testes LOO passaram; POC-01/02/03/04, auditoria bloqueante de dependências de produção, registro de ocorrências, ESLint e build também passaram.
-- O head atual da PR recebeu depois somente um snapshot gerado em `docs/AI_CONTEXT.md`; o diff foi conferido e não modifica código, testes ou dependências. A execução PR-triggered #44810654723 para esse commit de snapshot ficou `action_required` com zero jobs, devido ao gate do bot, não por falha da suíte.
+**Validação integrada no ambiente real — PASS em 20/11/2026:**
+- O responsável confirmou a sincronização do `apps-script/conecta-local/Code.gs` e a publicação de uma nova versão na implantação Web App existente.
+- O Preview de `dev` ficou `READY` no deployment `dpl_FT5dFsPzB6B1phwGywur4ewjRkZS`, commit `e6d231ce5cc978338bce23010d2003c7f551fd7c`.
+- O alias fixo usado nos testes foi `https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app/`; sua resolução para o deployment atualizado foi conferida.
+- O responsável informou que executou os testes manuais da etapa e que todos passaram. Esse registro reflete a confirmação do responsável, sem inventar logs ou resultados individuais não compartilhados.
 
-**Validação pendente antes de integrar/concluir:**
-- A CI completa está aprovada no head de código; revisar a PR e decidir a integração em `dev`.
-- Depois do merge, sincronizar e publicar a versão atualizada de `apps-script/conecta-local/Code.gs` na implantação Web App real existente; preservar o ID/URL e as Script Properties.
-- Testar no Preview de `dev` a edição de serviço próprio, a recusa de edição/remoção de serviço de outro profissional e a remoção lógica com conferência de `SERVICOS` e `AUDITORIA`.
-- Confirmar que serviço removido desaparece da vitrine pública e continua no histórico do proprietário.
+**Limites:** os testes automatizados simulam Sheets/Properties/LockService; não comprovam quotas ou falhas reais dos serviços Google. A gravação de negócio e a auditoria continuam separadas; não afirmar atomicidade. Manter dados fictícios e backend restrito ao Preview.
 
-**Preview da branch:** o deployment `dpl_2ZXGHjMJ3dx2urhGjf3rtXucJKsk` concluiu **READY** no commit de código `e1a1dc326d59b711dabd0eab6032f6994baa0f5f`. Esse Preview comprova o build do frontend, mas não possui variáveis privadas `CONECTA_LOCAL_*`; portanto, não foi usado como validação ponta a ponta do backend.
+**Critério de conclusão atendido:** edição e remoção lógica estão integradas em `dev`, com autorização e propriedade impostas no backend; os testes automatizados passaram e o responsável confirmou a validação manual no Preview atualizado.
 
-**Limites:** não implementar fluxo administrativo de suspensão/remoção, publicação completa de rascunhos, associação `SERVICO_CIDADES`, preço avançado ou upload de imagens nesta etapa. Gravação do dado e gravação de auditoria continuam separadas; não afirmar atomicidade.
-
-**Critério de conclusão:** o profissional consegue editar e remover logicamente somente os próprios serviços; estados e auditoria permanecem coerentes; os novos fluxos são confirmados no Preview com dados fictícios.
-
-**Prioridade:** alta. Entrega valor funcional e ensina CRUD, validação em camadas, autorização, modelagem de estado e persistência.
 
 ### Etapa 3 — Melhorar a descoberta por cidade e categoria
 
@@ -193,10 +181,9 @@ Reavaliar somente quando houver exigência acadêmica explícita ou uma necessid
 
 ## 6. Ordem prática recomendada
 
-1. **Agora:** Etapa 2 — completar o ciclo de vida dos serviços (editar e remover serviços).
-2. **Depois, conforme necessidade:** Etapa 3 — localidades/categorias.
-3. **Somente se agregar valor à apresentação:** Etapa 4 — imagens no Drive.
-4. **Em paralelo à preparação da entrega:** Etapa 5 — pesquisa acadêmica e acabamento.
+1. **Agora:** Etapa 3 — revisar a descoberta por cidade e categoria, começando por mapear o que já funciona no catálogo e implementar somente as lacunas necessárias.
+2. **Depois, conforme necessidade:** Etapa 4 — imagens no Google Drive, somente se trouxer ganho real para a apresentação.
+3. **Em paralelo à preparação da entrega:** Etapa 5 — pesquisa acadêmica e acabamento.
 
 Trabalhar uma etapa por branch/PR, sempre partindo de `dev`. Integrar somente depois das verificações pertinentes. Não alterar `main` sem uma decisão explícita de publicação.
 
