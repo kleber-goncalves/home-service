@@ -309,9 +309,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 32c976c629f3b7f98fd5e46c7b5777d68ad7662c
-- **Data do commit:** 2026-11-20T15:16:08-03:00
-- **Mensagem do commit:** docs(architecture): registrar revisão final da POC-04
+- **Commit de referência:** 788bc02cca79e0249c554c09236f03d606b7c13c
+- **Data do commit:** 2026-11-20T15:17:02-03:00
+- **Mensagem do commit:** docs(poc-04): remover duplicidade do estado final
 - **Branch desta execução:** feat/poc-04-session-cookie
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 11
@@ -414,13 +414,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 788bc02 | 2026-11-20 | docs(poc-04): remover duplicidade do estado final |
+| 13eb70b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 45bfb47 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 32c976c | 2026-11-20 | docs(architecture): registrar revisão final da POC-04 |
 | f99c50b | 2026-11-20 | docs(spec): atualizar estado e limites da POC-04 |
 | 89a792f | 2026-11-20 | docs(readme): atualizar status da POC-04 |
 | 483c292 | 2026-11-20 | docs(poc-04): registrar limpeza e revisão estática final |
 | 86bdb98 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 3952311 | 2026-11-20 | docs(poc-04): registrar reconciliacao e preview final |
-| 0ecb4e4 | 2026-11-20 | docs(ai-context): alinhar data do estado vigente |
-| d5a7217 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
