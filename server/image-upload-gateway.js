@@ -92,6 +92,33 @@ function buildSessionCookie(token) {
         + "; HttpOnly; Secure; SameSite=Strict";
 }
 
+async function readChunkBody(request) {
+    const reader = request.body?.getReader();
+    if (!reader) return Buffer.alloc(0);
+
+    const chunks = [];
+    let totalBytes = 0;
+    try {
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            if (!(value instanceof Uint8Array)) {
+                throw Object.assign(new Error("Invalid request stream."), { code: "INVALID_REQUEST_BODY" });
+            }
+            totalBytes += value.byteLength;
+            if (totalBytes > CHUNK_BYTES) {
+                try { await reader.cancel(); } catch { /* body is already over the limit */ }
+                throw Object.assign(new Error("Request chunk exceeds the upload limit."), { code: "REQUEST_TOO_LARGE" });
+            }
+            chunks.push(Buffer.from(value));
+        }
+    } finally {
+        try { reader.releaseLock(); } catch { /* reader may have been cancelled */ }
+    }
+
+    return Buffer.concat(chunks, totalBytes);
+}
+
 function deriveCsrfToken(sessionToken, secret) {
     const csrfKey = createHmac("sha256", Buffer.from(secret, "utf8"))
         .update("CONECTA_LOCAL_CSRF_KEY_V1", "utf8")
@@ -247,8 +274,11 @@ export function createImageUploadHandler({
 
         let chunk;
         try {
-            chunk = Buffer.from(await request.arrayBuffer());
-        } catch {
+            chunk = await readChunkBody(request);
+        } catch (error) {
+            if (error?.code === "REQUEST_TOO_LARGE") {
+                return fail(requestId, "REQUEST_TOO_LARGE", "Cada bloco deve ter no máximo 1 MiB.", 413);
+            }
             return fail(requestId, "INVALID_REQUEST_BODY", "Não foi possível ler o bloco enviado.", 400);
         }
 
