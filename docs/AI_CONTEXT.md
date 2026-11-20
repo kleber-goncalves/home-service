@@ -360,9 +360,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 95dc6cdb4d8695241d71184edc81ceb290f309ef
-- **Data do commit:** 2026-11-20T19:09:22-03:00
-- **Mensagem do commit:** docs: confirmar encerramento da etapa 3 em ESPECIFICACAO_MVP.md
+- **Commit de referência:** 93407e7e9a3d930788793c5fde173f7980315ad7
+- **Data do commit:** 2026-11-20T19:23:20-03:00
+- **Mensagem do commit:** docs: adicionar questionários preliminares da pesquisa comunitária
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -466,13 +466,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 93407e7 | 2026-11-20 | docs: adicionar questionários preliminares da pesquisa comunitária |
+| 1dcaaff | 2026-11-20 | docs(ai-context): confirmar limpeza e estado da etapa 5 |
+| 103219b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 404d5ed | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 95dc6cd | 2026-11-20 | docs: confirmar encerramento da etapa 3 em ESPECIFICACAO_MVP.md |
 | a18a99e | 2026-11-20 | docs: confirmar encerramento da etapa 3 em PROTOTIPO_DEMO_LOCAL.md |
 | 0985730 | 2026-11-20 | docs: confirmar encerramento da etapa 3 em ROADMAP_ESTUDOS.md |
 | 24b189f | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 3dd0f4c | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| e713f29 | 2026-11-20 | docs: vincular instrumento de pesquisa ao relatorio |
-| 0ce90da | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 6fef096 | 2026-11-20 | docs: preparar etapa de pesquisa exploratoria |
 
 <!-- END AUTO-GENERATED SECTION -->
