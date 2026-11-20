@@ -123,7 +123,7 @@ class FakeSheet {
     }
 }
 
-function createHarness() {
+function createHarness(options = {}) {
     let uuidCounter = 1;
     let requestCounter = 1;
     let nonceCounter = 1;
@@ -143,7 +143,7 @@ function createHarness() {
                 senha_hash: "0".repeat(64),
                 senha_salt: "0".repeat(32),
                 senha_algoritmo: "argon2id$v=19$m=19456,t=2,p=1",
-                papel: "professional",
+                papel: options.userARole || "professional",
                 status: "active",
                 email_verificado_em: sessionCreatedAt,
                 criado_em: sessionCreatedAt,
@@ -590,6 +590,28 @@ test("token de sessão inválido não permite alteração de serviço", () => {
     assert.equal(
         harness.records("SERVICOS").find((service) => service.id_servico === SERVICE_A).status,
         "published",
+    );
+    assert.equal(harness.records("AUDITORIA").length, 0);
+});
+
+
+test("papel diferente de professional não autoriza operações profissionais", () => {
+    const harness = createHarness({ userARole: "admin" });
+    const result = harness.call("service.setStatus", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        status: "paused",
+    });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.error.code, "ROLE_FORBIDDEN");
+    assert.equal(
+        harness.records("SERVICOS").find((service) => service.id_servico === SERVICE_A).status,
+        "published",
+    );
+    assert.equal(
+        harness.records("SESSOES").find((session) => session.token_hash === TOKEN_HASH_A).ultima_atividade_em,
+        new Date(NOW - 60_000).toISOString(),
     );
     assert.equal(harness.records("AUDITORIA").length, 0);
 });
