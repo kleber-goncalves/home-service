@@ -311,9 +311,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 00437cd65197aa0969e6995558ffc2dac59f1865
-- **Data do commit:** 2026-11-20T15:42:13-03:00
-- **Mensagem do commit:** docs(arquitetura): esclarecer integracao posterior de senhas
+- **Commit de referência:** 70247ff10f31391c958676b2cbb883b75d5d158f
+- **Data do commit:** 2026-11-20T15:42:22-03:00
+- **Mensagem do commit:** docs(readme): remover referencia fixa a head documental
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 11
@@ -416,13 +416,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 70247ff | 2026-11-20 | docs(readme): remover referencia fixa a head documental |
+| bbdc638 | 2026-11-20 | docs(ai-context): alinhar historico e estado das branches |
+| 69c76b1 | 2026-11-20 | docs(poc-04): identificar estado pre-merge como historico |
 | 00437cd | 2026-11-20 | docs(arquitetura): esclarecer integracao posterior de senhas |
 | 501a14b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | bb250e3 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | f4293c4 | 2026-11-20 | docs(roadmap): ajustar marcacoes para markdown |
 | 7ec7a41 | 2026-11-20 | docs(poc-03): registrar integracao posterior no prototipo |
-| 08a1ee7 | 2026-11-20 | docs(poc-04): registrar merge em dev e estado desabilitado |
-| 0024b3e | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 528a637 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
