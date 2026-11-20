@@ -341,9 +341,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 96469b4fbb318e8400d23bab3e67872eabad6126
-- **Data do commit:** 2026-11-20T17:47:31-03:00
-- **Mensagem do commit:** docs(roadmap): concluir etapa de ciclo de vida
+- **Commit de referência:** f109ed6f0c5ffe323e5973af393115087b40d5b8
+- **Data do commit:** 2026-11-20T17:47:35-03:00
+- **Mensagem do commit:** docs(prototipo): atualizar estado do ciclo de vida
 - **Branch desta execução:** docs/record-service-lifecycle-validation
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -447,13 +447,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| f109ed6 | 2026-11-20 | docs(prototipo): atualizar estado do ciclo de vida |
+| ae38c65 | 2026-11-20 | docs(spec): atualizar validacao de servicos |
 | 96469b4 | 2026-11-20 | docs(roadmap): concluir etapa de ciclo de vida |
 | 069773a | 2026-11-20 | docs(ai-context): registrar ciclo de vida validado |
 | e6d231c | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 0f9e887 | 2026-11-20 | Merge pull request #23 from kleber-goncalves/feat/service-lifecycle |
 | 451d3be | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | a4c5282 | 2026-11-20 | docs(ai-context): registrar ci e preview da etapa 2 |
-| 6f4cbad | 2026-11-20 | docs(roadmap): registrar ci e preview da etapa 2 |
-| 1c09910 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
