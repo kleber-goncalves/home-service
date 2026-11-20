@@ -50,19 +50,11 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 1 — Autorização e integridade dos dados
 
-**Em andamento — PR #22 integrada em `dev`; validação manual da propriedade concluída.** Falta somente a conferência pós-merge da proteção explícita de papel no Preview atualizado.
+**Validação técnica concluída em 20/11/2026; PR #22 integrada exclusivamente em `dev`.** A etapa atendeu aos critérios de isolamento de propriedade e autorização por papel confiável no backend real do Apps Script.
 
-**Por que vem primeiro:** é o aprendizado de maior valor para um sistema com contas e dados privados. Uma interface pode funcionar perfeitamente para o próprio usuário e ainda permitir acesso indevido a dados de outra conta se a validação do backend estiver incompleta.
+**Por que veio primeiro:** é o aprendizado de maior valor para um sistema com contas e dados privados. Uma interface pode funcionar perfeitamente para o próprio usuário e ainda permitir acesso indevido a dados de outra conta se a validação do backend estiver incompleta.
 
-**Escopo enxuto:**
-- Usar contas inteiramente fictícias, profissionais A e B.
-- Confirmar que A só consulta e altera os próprios dados e serviços.
-- Verificar que trocar IDs de serviço/proprietário no payload não permite assumir propriedade.
-- Verificar que o navegador não consegue executar operações ignorando as regras do Apps Script.
-- Confirmar que operações recusadas não alteram dados e não registram sucesso indevido.
-- Conferir que as mudanças relevantes deixam os eventos esperados na aba `AUDITORIA`.
-
-**Implementação integrada em `dev` pela PR #22:**
+**Implementação integrada pela PR #22:**
 - O gateway reduz o payload de `profile.update` aos campos editáveis permitidos e deriva o token de sessão do cookie; `service.listMine` encaminha somente esse token.
 - O Apps Script usa `appRequireProfessionalSession_` para exigir o papel confiável `professional` nas operações de perfil e serviços. O papel recebido do navegador não é autoridade; papel diferente é recusado com `ROLE_FORBIDDEN` (HTTP 403).
 - A identidade e o perfil são derivados da sessão validada; a propriedade do serviço é conferida no backend.
@@ -75,20 +67,25 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 - A execução final `Validate Home Service #44797635404` concluiu **SUCCESS** no head da PR `54142fca94b71e72b19cee7dbaae2d6467db4dd0`; todos os passos do job passaram, incluindo auditoria bloqueante de dependências de produção, POC-01/02/03/04, autorização, LOO, registro de ocorrências, ESLint e build.
 - A PR #22 foi integrada exclusivamente em `dev` pelo merge commit `1bf55488539c5e4874573f77737827c1089504cc`, em 20/11/2026. `main` permaneceu inalterada.
 
-**Validação manual de propriedade no Preview de `dev` — 20/11/2026:**
+**Validação manual de propriedade — PASS em 20/11/2026:**
 - O profissional B criou um serviço fictício; autenticado como A, o responsável tentou executar `service.setStatus` usando o ID do serviço de B.
 - A API respondeu HTTP **404**, com `error.code: SERVICE_NOT_FOUND`.
 - O registro de B permaneceu `published` na aba `SERVICOS`; a aba `AUDITORIA` não recebeu evento de sucesso indevido.
-- **Resultado: PASS** para isolamento de propriedade. Esse ensaio foi realizado no Preview anterior ao merge e confirma a regra de propriedade que já existia em `dev`; não equivale à validação manual da nova checagem de papel.
+- Esse ensaio confirmou o isolamento de propriedade que já existia em `dev`, antes do merge da PR #22.
 
-**Única validação manual residual para fechar a etapa:**
-- No Preview atualizado de `dev`, validar com dados fictícios que uma sessão associada a papel confiável diferente de `professional` recebe HTTP 403/`ROLE_FORBIDDEN`.
-- Confirmar que a recusa não renova a atividade da sessão, não altera dados de serviços e não registra evento de sucesso na auditoria.
-- O Preview atualizado está **READY** no deployment `dpl_GuadbXiGjb6MtQnRNENf4S6Xp5bP`, commit `66d319bccccd879ba8b037d5433cd0c49a316465`: https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app
+**Validação manual de papel no Apps Script real — PASS em 20/11/2026:**
+- O arquivo `apps-script/conecta-local/Code.gs` do projeto Apps Script real foi sincronizado com a versão de `dev` e uma nova versão foi publicada na implantação Web App existente.
+- Com a conta fictícia A temporariamente marcada como `admin`, foi enviada uma operação `service.setStatus` para um serviço pertencente à própria A.
+- A API respondeu HTTP **403**, com `error.code: ROLE_FORBIDDEN`.
+- A aba `SESSOES` manteve o valor de `ultima_atividade_em`; a aba `SERVICOS` permaneceu intacta, com o serviço `published`; a aba `AUDITORIA` não recebeu sucesso indevido.
+- A tentativa anterior, executada antes de atualizar o Apps Script, havia retornado HTTP 200; foi preservada como evidência de que o Web App publicado estava desatualizado. Após a sincronização e publicação, o mesmo cenário foi recusado corretamente.
+- O aviso adicional `Fetch failed loading` do Console não alterou a interpretação do resultado: a resposta HTTP efetivamente recebida foi 403 com `ROLE_FORBIDDEN`.
 
-**Limites técnicos:** o harness simula Sheets, Locks e Properties; não comprova quotas, falhas reais dos serviços Google ou atomicidade entre gravação de negócio e auditoria. As duas gravações continuam separadas. Avaliar atomicidade/compensação na POC-05 somente se houver justificativa acadêmica.
+**Limites técnicos:** o harness automatizado simula Sheets, Locks e Properties; não comprova quotas, falhas reais dos serviços Google ou atomicidade entre gravação de negócio e auditoria. As gravações de negócio e auditoria continuam separadas. Avaliar atomicidade/compensação na POC-05 somente se houver justificativa acadêmica.
 
-**Critério de conclusão:** identidade, propriedade, estado e papel são impostos no Apps Script; tentativas indevidas são recusadas sem alterar recursos alheios nem registrar sucesso falso; e os cenários manuais relevantes são conferidos no Preview com dados fictícios.
+**Encerramento operacional:** antes de retomar o uso normal da conta fictícia A, confirmar que seu campo `papel` voltou a `professional`. Não deixar a conta de demonstração com papel temporário `admin`.
+
+**Critério de conclusão atendido:** identidade, propriedade, estado e papel são impostos no Apps Script; as tentativas indevidas foram recusadas sem alterar recursos alheios ou registrar sucesso falso; os cenários manuais foram conferidos no Preview com dados fictícios.
 
 **Limite:** manter uma bateria pequena e focada. Não transformar esta etapa em pentest amplo, scanner automático ou teste de carga.
 
@@ -175,11 +172,10 @@ Reavaliar somente quando houver exigência acadêmica explícita ou uma necessid
 
 ## 6. Ordem prática recomendada
 
-1. **Agora:** Etapa 1 — autorização e integridade.
-2. **Em seguida:** Etapa 2 — editar e remover serviços.
-3. **Depois, conforme necessidade:** Etapa 3 — localidades/categorias.
-4. **Somente se agregar valor à apresentação:** Etapa 4 — imagens no Drive.
-5. **Em paralelo à preparação da entrega:** Etapa 5 — pesquisa acadêmica e acabamento.
+1. **Agora:** Etapa 2 — completar o ciclo de vida dos serviços (editar e remover serviços).
+2. **Depois, conforme necessidade:** Etapa 3 — localidades/categorias.
+3. **Somente se agregar valor à apresentação:** Etapa 4 — imagens no Drive.
+4. **Em paralelo à preparação da entrega:** Etapa 5 — pesquisa acadêmica e acabamento.
 
 Trabalhar uma etapa por branch/PR, sempre partindo de `dev`. Integrar somente depois das verificações pertinentes. Não alterar `main` sem uma decisão explícita de publicação.
 
