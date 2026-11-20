@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ImagePlus, LoaderCircle, Trash2, UploadCloud, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { appRequest } from "@/services/app-api";
@@ -19,6 +19,7 @@ export default function ServiceImageManager({ service, csrfToken, onServicesChan
     const [removingId, setRemovingId] = useState(null);
     const [progress, setProgress] = useState(0);
     const [message, setMessage] = useState("");
+    const abortControllerRef = useRef(null);
 
     const images = Array.isArray(service.images) ? service.images.filter((image) => image.status === "active") : [];
     const remainingSlots = Math.max(0, MAX_ACTIVE_IMAGES - images.length);
@@ -72,6 +73,9 @@ export default function ServiceImageManager({ service, csrfToken, onServicesChan
             return;
         }
 
+        const controller = new AbortController();
+        abortControllerRef.current = controller;
+        let completedCount = 0;
         setUploading(true);
         setMessage("");
         setProgress(0);
@@ -82,23 +86,32 @@ export default function ServiceImageManager({ service, csrfToken, onServicesChan
                     serviceId: service.id,
                     file,
                     csrfToken,
+                    signal: controller.signal,
                     onProgress: (fileProgress) => {
                         const totalProgress = ((index + fileProgress / 100) / selectedFiles.length) * 100;
                         setProgress(Math.round(totalProgress));
                     },
                 });
+                completedCount += 1;
+                if (controller.signal.aborted) break;
             }
-            setSelectedFiles([]);
+            setSelectedFiles((current) => current.slice(completedCount));
             await refreshImages();
-            setMessage("As imagens foram enviadas e os registros foram confirmados.");
+            setMessage(controller.signal.aborted
+                ? "Envio interrompido. Os arquivos concluídos foram salvos."
+                : "As imagens foram enviadas e os registros foram confirmados.");
         } catch (error) {
-            setMessage(error.message || "Não foi possível concluir o envio das imagens.");
+            if (completedCount > 0) {
+                setSelectedFiles((current) => current.slice(completedCount));
+            }
+            setMessage(error.name === "AbortError" ? "Envio cancelado. Nenhum bloco incompleto foi registrado." : error.message || "Não foi possível concluir o envio das imagens.");
             try {
                 await refreshImages();
             } catch {
                 // Preserve a mensagem principal do envio.
             }
         } finally {
+            abortControllerRef.current = null;
             setUploading(false);
         }
     }
@@ -193,6 +206,11 @@ export default function ServiceImageManager({ service, csrfToken, onServicesChan
                                     {uploading ? <LoaderCircle size={16} className="animate-spin" aria-hidden="true" /> : <UploadCloud size={16} aria-hidden="true" />}
                                     {uploading ? "Enviando " + progress + "%" : "Enviar " + selectedFiles.length + " imagem(ns)"}
                                 </Button>
+                                {uploading && (
+                                    <Button type="button" variant="secondary" onClick={() => abortControllerRef.current?.abort()}>
+                                        <X size={15} aria-hidden="true" /> Cancelar envio
+                                    </Button>
+                                )}
                                 {uploading && (
                                     <div className="demo-service-image-progress" role="progressbar" aria-label="Progresso do envio" aria-valuemin="0" aria-valuemax="100" aria-valuenow={progress}>
                                         <span style={{ width: progress + "%" }} />
