@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 957c0d002f5284fe7dc322186cad7969e030b151
-- **Data do commit:** 2026-11-20T19:51:11-03:00
-- **Mensagem do commit:** test: corrigir contexto do payload no diagnóstico do Apps Script
+- **Commit de referência:** a37431ba843cf1daff12fd287d7198a010029445
+- **Data do commit:** 2026-11-20T19:51:48-03:00
+- **Mensagem do commit:** test: criar payload diagnóstico no contexto Apps Script
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -471,13 +471,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| a37431b | 2026-11-20 | test: criar payload diagnóstico no contexto Apps Script |
+| db879ab | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 957c0d0 | 2026-11-20 | test: corrigir contexto do payload no diagnóstico do Apps Script |
 | a3b0c2a | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 73f3bf9 | 2026-11-20 | test: diagnosticar exceção interna da rotina de imagens |
 | 7420671 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 77cc108 | 2026-11-20 | test: incluir diagnóstico de falha no envio do primeiro bloco |
 | 2e37c80 | 2026-11-20 | test: detalhar erro da integração simulada de imagens |
-| b3392f9 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 0ef51d7 | 2026-11-20 | ci: executar testes do gateway de upload de imagens |
 
 <!-- END AUTO-GENERATED SECTION -->
