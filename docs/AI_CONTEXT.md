@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 5a88027cf73cfb8d9e669e5a45f4de6915e2df45
-- **Data do commit:** 2026-11-20T20:04:11-03:00
-- **Mensagem do commit:** fix: tentar sincronizar todas as permissões de imagens do serviço
+- **Commit de referência:** 7b8a8f2e3d1e2723598388e47e98350508337a38
+- **Data do commit:** 2026-11-20T20:04:20-03:00
+- **Mensagem do commit:** test: validar sincronização em lote com falha parcial no Drive
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -473,6 +473,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 7b8a8f2 | 2026-11-20 | test: validar sincronização em lote com falha parcial no Drive |
 | 5a88027 | 2026-11-20 | fix: tentar sincronizar todas as permissões de imagens do serviço |
 | 3a26997 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 3684f7d | 2026-11-20 | fix: criar prévias locais sem estado dentro de efeito React |
@@ -480,6 +481,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 764cb9e | 2026-11-20 | test: corrigir verificação de reserva liberada no harness |
 | fbd5186 | 2026-11-20 | docs: registrar implementação parcial da etapa 4 |
 | 16aceb7 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 7967484 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
