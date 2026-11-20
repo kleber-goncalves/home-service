@@ -35,7 +35,7 @@ Evitar tarefas que apenas aumentem a arquitetura, criem infraestrutura sem neces
 
 ### Etapa 0 — Encerramento do núcleo demonstrativo
 
-<badge>Concluída</badge>
+**Status: concluída.**
 
 **Objetivo:** manter uma versão funcional e reproduzível para apresentação.
 
@@ -50,7 +50,7 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 1 — Autorização e integridade dos dados
 
-<badge color="success">Próxima prioridade</badge>
+**Próxima prioridade.**
 
 **Por que vem primeiro:** é o aprendizado de maior valor para um sistema com contas e dados privados. Uma interface pode funcionar perfeitamente para o próprio usuário e ainda permitir acesso indevido a dados de outra conta se a validação do backend estiver incompleta.
 
