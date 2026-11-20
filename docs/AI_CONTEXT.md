@@ -359,9 +359,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 1b785c7ea72fcf144e5536522c67c8ca225d962f
-- **Data do commit:** 2026-11-20T18:28:35-03:00
-- **Mensagem do commit:** docs: atualizar estado da etapa 3 após integração
+- **Commit de referência:** fdd2b9ef33eb6a25be202a6e306b7d284ed1bc8e
+- **Data do commit:** 2026-11-20T19:01:21-03:00
+- **Mensagem do commit:** docs: registrar validacao manual da cobertura por cidades
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -465,13 +465,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| fdd2b9e | 2026-11-20 | docs: registrar validacao manual da cobertura por cidades |
+| d6dffac | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 1b785c7 | 2026-11-20 | docs: atualizar estado da etapa 3 após integração |
 | 7774048 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 5003604 | 2026-11-20 | Merge pull request #25 from kleber-goncalves/feat/service-city-coverage |
 | 5888677 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 525e71c | 2026-11-20 | docs: registrar CI final da descoberta regional |
 | 99a9700 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| c59e341 | 2026-11-20 | docs: registrar filtros de categorias e cidades |
-| b451d12 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
