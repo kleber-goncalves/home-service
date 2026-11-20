@@ -236,7 +236,12 @@ Em 20/11/2026 foi criado um novo deployment Preview a partir do commit `1f8c97f0
 - URL: https://home-service-2mhluk5j4-kleber-goncalves-s-projects.vercel.app
 - Branch alias: https://home-service-git-feat-poc-04-303944-kleber-goncalves-s-projects.vercel.app
 
-O novo Preview foi criado a partir do commit Git atual, sem reutilizar o snapshot de variáveis de um deployment antigo. Como as quatro variáveis da POC-04 estão ausentes, a funcionalidade permanece desabilitada. O estado READY comprova o build/deployment, não uma nova validação funcional após a desativação. `dev`, `main` e Production não foram alteradas.
+Após as atualizações documentais, a branch recebeu outro deployment Preview no commit `6c9821a7cf00255e69562c3685eaef39f0d33119`, também concluído como **READY**:
+
+- Deployment: `dpl_3qB79vEVjT9qzhT3BprxvriQeHhx`.
+- URL: https://home-service-qg2tfilj7-kleber-goncalves-s-projects.vercel.app
+
+O primeiro novo Preview foi criado a partir do commit Git da POC-04, sem reutilizar o snapshot de variáveis de um deployment antigo. O segundo Preview inclui somente as atualizações documentais. Como as quatro variáveis da POC-04 estão ausentes, a funcionalidade permanece desabilitada em ambos. O estado READY comprova o build/deployment, não uma nova validação funcional após a desativação. `dev`, `main` e Production não foram alteradas.
 
 ### 12.5. Código versionado versus funções auxiliares do editor
 
