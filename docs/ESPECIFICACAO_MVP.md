@@ -175,7 +175,9 @@ A conta poderá atender várias cidades e bairros. O endereço residencial compl
 
 Um profissional poderá cadastrar vários serviços, sem limite numérico fixo no MVP.
 
-**Estado atual da demonstração:** criação, edição, pausa, publicação e remoção lógica estão implementadas e integradas ao Sheets em `dev`. A PR #23 adicionou `service.update` e `service.remove`, com validação de sessão/papel/propriedade no Apps Script, preservação do registro na remoção e auditoria. Em 20/11/2026, após o responsável sincronizar e publicar a versão atualizada do Apps Script, ele confirmou que os testes manuais passaram no Preview fixo atualizado de `dev`. O fluxo de múltiplas cidades por serviço ainda não está concluído; a associação prevista em `SERVICO_CIDADES` permanece futura.
+**Estado atual da demonstração em `dev`:** criação, edição, pausa, publicação e remoção lógica estão integradas ao Sheets. A PR #23 adicionou `service.update` e `service.remove`, com validação de sessão/papel/propriedade no Apps Script, preservação do registro na remoção e auditoria. Em 20/11/2026, após o responsável sincronizar e publicar a versão atualizada do Apps Script, ele confirmou que os testes manuais passaram no Preview fixo atualizado de `dev`.
+
+**Etapa 3 em desenvolvimento na branch `feat/service-city-coverage`:** implementação de múltiplos municípios por serviço via `SERVICO_CIDADES`, com validação no Apps Script, fallback para serviços antigos sem vínculos e busca pública por qualquer município associado. O código e a CI estão atualizados nessa branch, mas a integração em `dev`, a sincronização do Apps Script real e a validação manual no Preview de `dev` permanecem pendentes.
 
 | Campo | Regra |
 |---|---|

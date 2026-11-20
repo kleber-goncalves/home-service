@@ -189,6 +189,7 @@ test("gateway permite service.update, mas encaminha apenas os campos editáveis 
         categoryId: "category-a",
         title: "Serviço atualizado",
         description: "Descrição atualizada no teste do gateway.",
+        cityIds: ["city-a", "city-b"],
         tokenHash: "9".repeat(64),
         id_usuario: "user-b",
         id_profissional: "profile-b",
@@ -204,6 +205,38 @@ test("gateway permite service.update, mas encaminha apenas os campos editáveis 
         categoryId: "category-a",
         title: "Serviço atualizado",
         description: "Descrição atualizada no teste do gateway.",
+        cityIds: ["city-a", "city-b"],
+        tokenHash: createHash("sha256").update(SESSION_TOKEN, "utf8").digest("hex"),
+    });
+});
+
+
+test("gateway encaminha cityIds e remove identidade e estado forjados em service.create", async () => {
+    let forwarded;
+    const handler = createHarness(async (_url, options) => {
+        const form = new URLSearchParams(options.body);
+        forwarded = { action: form.get("action"), payload: JSON.parse(form.get("payload")) };
+        return upstreamResponse(form);
+    });
+    const response = await handler(buildRequest("service.create", {
+        categoryId: "category-a",
+        title: "Serviço em dois municípios",
+        description: "Descrição fictícia suficiente para validar o gateway.",
+        cityIds: ["city-a", "city-b"],
+        tokenHash: "9".repeat(64),
+        id_usuario: "user-b",
+        id_profissional: "profile-b",
+        papel: "admin",
+        status: "removed",
+        ownerId: "user-b",
+    }));
+    assert.equal(response.status, 200);
+    assert.equal(forwarded.action, "service.create");
+    assert.deepEqual(forwarded.payload, {
+        categoryId: "category-a",
+        title: "Serviço em dois municípios",
+        description: "Descrição fictícia suficiente para validar o gateway.",
+        cityIds: ["city-a", "city-b"],
         tokenHash: createHash("sha256").update(SESSION_TOKEN, "utf8").digest("hex"),
     });
 });

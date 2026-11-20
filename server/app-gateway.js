@@ -449,6 +449,7 @@ export function createAppHandler({
                         categoryId: payload.categoryId,
                         title: payload.title,
                         description: payload.description,
+                        cityIds: payload.cityIds,
                     });
                     forwardedPayload = {
                         ...service.toUpdatePayload(),

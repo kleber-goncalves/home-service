@@ -22,6 +22,7 @@ const EMPTY_SERVICE = {
     title: "",
     categoryId: "",
     description: "",
+    cityIds: [],
 };
 
 function getPasswordValidation(password) {
@@ -271,6 +272,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         setNewService({
             ...EMPTY_SERVICE,
             categoryId: catalog.categories[0]?.id || "",
+            cityIds: catalog.cities.some((city) => city.id === currentUser?.cityId) ? [currentUser.cityId] : (catalog.cities[0]?.id ? [catalog.cities[0].id] : []),
         });
     }
 
@@ -283,6 +285,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         setNewService({
             ...EMPTY_SERVICE,
             categoryId: catalog.categories[0]?.id || "",
+            cityIds: catalog.cities.some((city) => city.id === currentUser?.cityId) ? [currentUser.cityId] : (catalog.cities[0]?.id ? [catalog.cities[0].id] : []),
         });
         setShowServiceForm(true);
         setNotice(null);
@@ -294,13 +297,27 @@ export default function AuthDemoPage({ initialMode = "login" }) {
             title: service.title,
             categoryId: service.categoryId || "",
             description: service.description,
+            cityIds: Array.isArray(service.cityIds) ? service.cityIds.slice() : [],
         });
         setShowServiceForm(true);
         setNotice(null);
     }
 
+    function toggleServiceCity(cityId) {
+        setNewService((current) => ({
+            ...current,
+            cityIds: current.cityIds.includes(cityId)
+                ? current.cityIds.filter((id) => id !== cityId)
+                : [...current.cityIds, cityId],
+        }));
+    }
+
     async function saveService(event) {
         event.preventDefault();
+        if (!newService.cityIds.length) {
+            setNotice({ title: "Selecione uma cidade", message: "Escolha ao menos um município atendido pelo serviço.", tone: "warning" });
+            return;
+        }
         if (!newService.categoryId) {
             setNotice({ title: "Selecione uma categoria", message: "O catálogo ainda não oferece uma categoria ativa.", tone: "warning" });
             return;
@@ -313,6 +330,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                 categoryId: newService.categoryId,
                 title: newService.title,
                 description: newService.description,
+                cityIds: newService.cityIds,
             };
             const result = editingServiceId
                 ? await appRequest("service.update", { serviceId: editingServiceId, ...payload }, csrfToken)
@@ -521,6 +539,27 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                                     Descrição
                                     <textarea value={newService.description} onChange={(event) => setNewService((current) => ({ ...current, description: event.target.value }))} placeholder="Descreva o serviço oferecido." maxLength={1000} minLength={10} rows={3} required />
                                 </label>
+                                <fieldset className="demo-service-cities">
+                                    <legend>Municípios atendidos</legend>
+                                    <p>Selecione uma ou mais cidades onde este serviço pode ser encontrado.</p>
+                                    <div className="demo-service-city-options">
+                                        {[
+                                            ...catalog.cities,
+                                            ...(editingService?.cities || []).filter((city) => !catalog.cities.some((item) => item.id === city.id)),
+                                        ].map((city) => (
+                                            <label className="demo-service-city-option" key={city.id}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={newService.cityIds.includes(city.id)}
+                                                    onChange={() => toggleServiceCity(city.id)}
+                                                    disabled={busy}
+                                                />
+                                                <span>{city.name} - {city.state}{city.status === "inactive" ? " (inativa — vínculo existente)" : ""}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                    {!catalog.cities.length && <small>Não há cidades ativas cadastradas na planilha.</small>}
+                                </fieldset>
                                 <Button type="submit" disabled={busy}><Check size={16} aria-hidden="true" /> {busy ? "Salvando..." : editingServiceId ? "Salvar alterações" : "Salvar na planilha"}</Button>
                             </form>
                         )}
@@ -542,6 +581,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                                             </div>
                                             <span className="demo-service-category">{service.category}</span>
                                             <p>{service.description}</p>
+                                            {service.city && <span className="demo-service-city-summary">Atende: {service.city}</span>}
                                         </div>
                                         <div className="demo-service-actions">
                                             {canEdit && (

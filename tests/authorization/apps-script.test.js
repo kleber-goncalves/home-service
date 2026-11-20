@@ -17,6 +17,7 @@ const SERVICE_A = "service-synthetic-a";
 const SERVICE_B = "service-synthetic-b";
 const CATEGORY_ID = "category-synthetic";
 const CITY_ID = "city-synthetic";
+const CITY_ID_B = "city-synthetic-b";
 
 const SOURCE = readFileSync(
     new URL("../../apps-script/conecta-local/Code.gs", import.meta.url),
@@ -45,6 +46,7 @@ const HEADERS = {
         "descricao", "bairros_regioes", "modalidade_preco", "valor_preco",
         "status", "criado_em", "atualizado_em", "publicado_em",
     ],
+    SERVICO_CIDADES: ["id_servico_cidade", "id_servico", "id_cidade", "criado_em"],
     AUDITORIA: [
         "id_evento", "id_usuario_ator", "tipo_ator", "acao",
         "entidade_afetada", "id_registro_afetado", "resultado",
@@ -107,6 +109,11 @@ class FakeSheet {
 
     appendRow(row) {
         this.values.push(row.slice());
+        return this;
+    }
+
+    deleteRow(rowNumber) {
+        this.values.splice(rowNumber - 1, 1);
         return this;
     }
 
@@ -212,7 +219,7 @@ function createHarness(options = {}) {
             {
                 id_categoria: CATEGORY_ID,
                 nome: "Serviços demonstrativos",
-                status: "active",
+                status: options.categoryStatus || "active",
                 criado_em: sessionCreatedAt,
                 atualizado_em: sessionCreatedAt,
             },
@@ -227,7 +234,17 @@ function createHarness(options = {}) {
                 criado_em: sessionCreatedAt,
                 atualizado_em: sessionCreatedAt,
             },
+            {
+                id_cidade: CITY_ID_B,
+                nome: "Outra Cidade Fictícia",
+                uf: "MG",
+                codigo_ibge: "",
+                status: options.cityBStatus || "active",
+                criado_em: sessionCreatedAt,
+                atualizado_em: sessionCreatedAt,
+            },
         ],
+        SERVICO_CIDADES: options.serviceCityRecords || [],
         SERVICOS: [
             {
                 id_servico: SERVICE_A,
@@ -533,6 +550,7 @@ test("criação de serviço deriva o proprietário da sessão e ignora IDs de pr
         categoryId: CATEGORY_ID,
         title: "Serviço criado pela conta A",
         description: "Descrição fictícia válida para testar a origem do proprietário.",
+        cityIds: [CITY_ID],
         id_usuario: USER_B,
         id_profissional: PROFILE_B,
         papel: "admin",
@@ -625,6 +643,7 @@ test("service.update altera somente os campos permitidos do próprio serviço e 
         categoryId: CATEGORY_ID,
         title: "Serviço A atualizado",
         description: "Descrição atualizada para validar a edição do serviço próprio.",
+            cityIds: [CITY_ID],
         id_usuario: USER_B,
         id_profissional: PROFILE_B,
         papel: "admin",
@@ -662,6 +681,7 @@ test("profissional A não consegue editar serviço pertencente ao profissional B
         categoryId: CATEGORY_ID,
         title: "Tentativa de invasão",
         description: "Tentativa de alteração de serviço pertencente a outra conta.",
+            cityIds: [CITY_ID],
     });
 
     assert.equal(result.ok, false);
@@ -685,6 +705,7 @@ test("serviço suspenso ou removido não pode ser editado pelo profissional", ()
             categoryId: CATEGORY_ID,
             title: "Alteração não permitida",
             description: "Esta edição deve ser recusada pelo estado do serviço.",
+            cityIds: [CITY_ID],
         });
 
         assert.equal(result.ok, false, "estado " + status);
@@ -785,6 +806,103 @@ test("serviço removido ou suspenso não pode ser reativado pelo profissional", 
     }
 });
 
+
+test("service.listMine mantém cidade principal nos serviços antigos sem relação SERVICO_CIDADES", () => {
+    const harness = createHarness();
+    const result = harness.call("service.listMine", { tokenHash: TOKEN_HASH_A });
+    assert.equal(result.ok, true);
+    assert.deepEqual(result.data.services[0].cityIds, [CITY_ID]);
+    assert.equal(result.data.services[0].city, "Cidade Fictícia - MG");
+});
+
+test("service.create grava múltiplas cidades na relação SERVICO_CIDADES", () => {
+    const harness = createHarness();
+    const result = harness.call("service.create", {
+        tokenHash: TOKEN_HASH_A,
+        categoryId: CATEGORY_ID,
+        title: "Serviço em duas cidades",
+        description: "Descrição fictícia válida para cobertura em mais de um município.",
+        cityIds: [CITY_ID, CITY_ID_B],
+    });
+    assert.equal(result.ok, true);
+    assert.deepEqual(result.data.service.cityIds, [CITY_ID, CITY_ID_B]);
+    assert.deepEqual(
+        harness.records("SERVICO_CIDADES")
+            .filter((link) => link.id_servico === result.data.service.id)
+            .map((link) => link.id_cidade),
+        [CITY_ID, CITY_ID_B],
+    );
+});
+
+test("service.create rejeita cidade vazia, duplicada ou inativa", () => {
+    const cases = [
+        { cityIds: [], code: "CITY_INVALID" },
+        { cityIds: [CITY_ID, CITY_ID], code: "INVALID_INPUT" },
+        { cityIds: [CITY_ID_B], code: "CITY_INVALID", cityBStatus: "inactive" },
+    ];
+    cases.forEach(({ cityIds, code, cityBStatus }) => {
+        const harness = createHarness({ cityBStatus });
+        const result = harness.call("service.create", {
+            tokenHash: TOKEN_HASH_A,
+            categoryId: CATEGORY_ID,
+            title: "Serviço com cidade inválida",
+            description: "Descrição fictícia válida para validar municípios.",
+            cityIds,
+        });
+        assert.equal(result.ok, false);
+        assert.equal(result.error.code, code);
+        assert.equal(harness.records("SERVICOS").length, 2);
+        assert.equal(harness.records("SERVICO_CIDADES").length, 0);
+        assert.equal(harness.records("AUDITORIA").length, 0);
+    });
+});
+
+test("service.update substitui os vínculos de cidade somente do serviço próprio", () => {
+    const harness = createHarness({
+        serviceCityRecords: [{
+            id_servico_cidade: "link-service-a-city-a",
+            id_servico: SERVICE_A,
+            id_cidade: CITY_ID,
+            criado_em: new Date(NOW - 60_000).toISOString(),
+        }],
+    });
+    const result = harness.call("service.update", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        categoryId: CATEGORY_ID,
+        title: "Serviço A atualizado",
+        description: "Descrição atualizada para testar troca de município.",
+        cityIds: [CITY_ID_B],
+    });
+    assert.equal(result.ok, true);
+    assert.deepEqual(result.data.service.cityIds, [CITY_ID_B]);
+    assert.deepEqual(
+        harness.records("SERVICO_CIDADES")
+            .filter((link) => link.id_servico === SERVICE_A)
+            .map((link) => link.id_cidade),
+        [CITY_ID_B],
+    );
+    assert.equal(harness.records("SERVICO_CIDADES").some((link) => link.id_servico === SERVICE_B), false);
+});
+
+test("catálogo público usa cidades vinculadas e preserva serviço publicado com categoria inativa", () => {
+    const harness = createHarness({
+        categoryStatus: "inactive",
+        serviceCityRecords: [{
+            id_servico_cidade: "link-service-a-city-b",
+            id_servico: SERVICE_A,
+            id_cidade: CITY_ID_B,
+            criado_em: new Date(NOW - 60_000).toISOString(),
+        }],
+    });
+    const result = harness.call("public.services", {});
+    assert.equal(result.ok, true);
+    assert.equal(result.data.length, 2);
+    const serviceA = result.data.find((service) => service.id === SERVICE_A);
+    assert.deepEqual(serviceA.cityIds, [CITY_ID_B]);
+    assert.equal(serviceA.city, "Outra Cidade Fictícia - MG");
+});
+
 test("papel diferente de professional não autoriza editar ou remover serviços", () => {
     for (const action of ["service.update", "service.remove"]) {
         const harness = createHarness({ userARole: "admin" });
@@ -795,6 +913,7 @@ test("papel diferente de professional não autoriza editar ou remover serviços"
                 categoryId: CATEGORY_ID,
                 title: "Edição recusada",
                 description: "Ação bloqueada para papel diferente de professional.",
+            cityIds: [CITY_ID],
             }
             : { tokenHash: TOKEN_HASH_A, serviceId: SERVICE_A };
         const result = harness.call(action, payload);
