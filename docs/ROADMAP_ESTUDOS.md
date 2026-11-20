@@ -116,7 +116,7 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 3 — Melhorar a descoberta por cidade e categoria
 
-**Status: validação funcional principal concluída em 20/11/2026; limpeza dos dados temporários de teste a confirmar.**
+**Status: concluída em 20/11/2026 — validação funcional principal e limpeza dos dados temporários confirmadas.**
 
 **Objetivo:** aproximar o catálogo da proposta regional sem construir busca sofisticada.
 
@@ -149,13 +149,13 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 - Preservação de vínculos legados sem associação explícita e comportamento após inativação de categoria.
 - Esses cenários continuam cobertos ou parcialmente cobertos pela suíte automatizada conforme os testes existentes, mas não devem ser descritos como validação manual real.
 
-**Limpeza dos dados de demonstração:**
-- A segunda cidade foi criada apenas como dado temporário de teste. Confirmar sua remoção da aba `CIDADES` e a remoção dos vínculos correspondentes em `SERVICO_CIDADES`, preservando a cidade original e os dados permanentes.
-- Não excluir registros permanentes de serviços nem linhas de outros serviços.
+**Limpeza dos dados de demonstração — concluída:**
+- O responsável confirmou que a segunda cidade, criada apenas para o teste, e seus vínculos correspondentes foram removidos de `CIDADES` e `SERVICO_CIDADES`.
+- A planilha voltou a manter somente a cidade original; o serviço permanente e os demais registros foram preservados.
 
 **Limites:** não criar infraestrutura de busca separada; não implementar geolocalização. Vínculos em Sheets e auditoria não são atômicos. Usar somente dados fictícios e não configurar backend em Production.
 
-**Critério principal de conclusão atendido:** Apps Script sincronizado/publicado, serviço associado a duas cidades, persistência conferida na aba `SERVICO_CIDADES` e busca pública aprovada nas duas localidades. A limpeza do registro temporário é uma tarefa de higiene dos dados, não uma falha funcional da implementação.
+**Critério de conclusão atendido:** Apps Script sincronizado/publicado, serviço associado a duas cidades, persistência conferida na aba `SERVICO_CIDADES`, busca pública aprovada nas duas localidades e dados temporários removidos após o ensaio.
 
 ### Etapa 4 — Imagens no Google Drive
 
@@ -214,9 +214,9 @@ Reavaliar somente quando houver exigência acadêmica explícita ou uma necessid
 
 ## 6. Ordem prática recomendada
 
-1. **Agora:** confirmar a limpeza da cidade temporária e dos vínculos de teste em `SERVICO_CIDADES`, preservando os dados permanentes.
-2. **Depois, conforme necessidade:** avaliar a Etapa 4 (imagens no Google Drive) somente se trouxer ganho real para a apresentação.
-3. **Em paralelo à preparação da entrega:** priorizar a Etapa 5 — pesquisa acadêmica, revisão final e acabamento da apresentação.
+1. **Agora:** aplicar a pesquisa exploratória com base em `docs/ROTEIRO_PESQUISA_EXPLORATORIA.md`, somente após confirmar com o professor/orientador o procedimento adequado e mantendo a coleta sem dados identificáveis.
+2. **Depois da coleta:** analisar respostas reais e atualizar o relatório e a apresentação, incluindo limitações da amostra.
+3. **Somente se houver ganho claro para a demonstração:** reavaliar a Etapa 4 (imagens no Google Drive), sem comprometer o prazo acadêmico.
 
 Trabalhar uma etapa por branch/PR, sempre partindo de `dev`. Integrar somente depois das verificações pertinentes. Não alterar `main` sem uma decisão explícita de publicação.
 
