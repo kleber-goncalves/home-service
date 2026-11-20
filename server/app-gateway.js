@@ -227,6 +227,7 @@ function mapAppsScriptError(output) {
         INVALID_CREDENTIALS: [401, "E-mail ou senha inválidos."],
         ACCOUNT_PENDING: [403, "Confirme seu e-mail antes de entrar."],
         ACCOUNT_UNAVAILABLE: [403, "Esta conta não está disponível."],
+        ROLE_FORBIDDEN: [403, "Sua conta não possui permissão para esta operação."],
         VERIFICATION_FAILED: [400, "O código de confirmação não confere."],
         VERIFICATION_EXPIRED: [400, "O código de confirmação expirou."],
         INVALID_INPUT: [400, output?.error?.message || "Revise os campos informados."],
@@ -417,8 +418,17 @@ export function createAppHandler({
                 let forwardedPayload = { ...payload };
                 if (protectedActions.has(action)) {
                     const tokenHash = createHash("sha256").update(sessionToken, "utf8").digest("hex");
-                    if (action === "auth.me" || action === "auth.logout") {
+
+                    if (action === "auth.me" || action === "auth.logout" || action === "service.listMine") {
                         forwardedPayload = { tokenHash };
+                    } else if (action === "profile.update") {
+                        forwardedPayload = {
+                            nome_publico: payload.nome_publico,
+                            apresentacao: payload.apresentacao,
+                            id_cidade_principal: payload.id_cidade_principal,
+                            whatsapp: payload.whatsapp,
+                            tokenHash,
+                        };
                     } else {
                         forwardedPayload.tokenHash = tokenHash;
                     }

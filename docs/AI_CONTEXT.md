@@ -123,6 +123,17 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 - Ainda não implementados: recuperação/alteração de senha ou e-mail, edição e remoção de serviços, upload de imagens no Drive, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades.
 - A POC-04 está integrada à `dev` pela PR #14, mas sua rota independente permanece desabilitada. Os ensaios sintéticos foram concluídos e os recursos/segredos exclusivos foram limpos. Dois itens de hardening ainda impedem qualquer reativação: limite de leitura aplicado durante consumo de stream e rate limiting/limite de emissão. Não conectar a POC ao fluxo principal. Falhas reais de infraestrutura e testes de carga não foram executados. Ver `docs/POC_04_SESSOES.md`.
 
+### Trabalho em andamento — Etapa 1: autorização e integridade
+
+- Branch de trabalho: `feat/authorization-integrity`, criada a partir da `dev`.
+- O gateway encaminha somente os campos permitidos em `profile.update` e o token derivado do cookie; `service.listMine` também encaminha somente o token derivado.
+- O Apps Script usa `appRequireProfessionalSession_` para exigir o papel confiável `professional` nas operações de atualização de perfil, listagem, criação e alteração de estado de serviços. Papel diferente recebe `ROLE_FORBIDDEN`; o papel enviado pelo navegador não é considerado.
+- `tests/authorization/apps-script.test.js` executa o `apps-script/conecta-local/Code.gs` real em Node/VM com duas contas, perfis, sessões e serviços sintéticos, usando mocks de Sheets, Properties e LockService.
+- `tests/authorization/gateway.test.js` verifica sanitização dos payloads de perfil/listagem/status e bloqueio de `session.create` na allowlist do navegador.
+- O workflow `Validate Home Service` inclui `npm run test:authorization`. A execução completa #44797468279 concluiu **SUCCESS** no commit `a166540503cbebb6e5606a5753cb88bb584bb36f`; a suíte nova teve **17 testes PASS e 0 FAIL** (12 Apps Script e 5 gateway).
+- **Limite:** os testes automatizados simulam Sheets, Properties e LockService. Antes de integrar a etapa, ainda é necessário validar acesso cruzado com duas contas fictícias no Preview real de `dev`, conferir a planilha e registrar o resultado da auditoria.
+- A atualização do registro de negócio e a escrita de auditoria continuam separadas; não declarar atomicidade. Considerar essa investigação na POC-05 somente se for proporcional ao objetivo acadêmico.
+
 ## 5. Arquitetura e decisões tecnológicas
 
 ### 5.1. Frontend
@@ -311,12 +322,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 70247ff10f31391c958676b2cbb883b75d5d158f
-- **Data do commit:** 2026-11-20T15:42:22-03:00
-- **Mensagem do commit:** docs(readme): remover referencia fixa a head documental
-- **Branch desta execução:** dev
+- **Commit de referência:** a166540503cbebb6e5606a5753cb88bb584bb36f
+- **Data do commit:** 2026-11-20T15:56:22-03:00
+- **Mensagem do commit:** docs(relatorio): documentar validacao de papel
+- **Branch desta execução:** feat/authorization-integrity
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 11
+- **Scripts npm:** 12
 - **Dependências de runtime:** 4
 - **Dependências de desenvolvimento:** 11
 - **Workflows:** 2
@@ -337,6 +348,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run test:poc03 | node --test tests/poc03/apps-script.test.js |
 | npm run test:loo | node --test tests/loo/domain-entities.test.js |
 | npm run test:poc04 | node --test tests/poc04/gateway.test.js tests/poc04/apps-script.test.js |
+| npm run test:authorization | node --test tests/authorization/apps-script.test.js tests/authorization/gateway.test.js |
 
 ### Variáveis declaradas no .env.example
 
@@ -416,13 +428,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| 70247ff | 2026-11-20 | docs(readme): remover referencia fixa a head documental |
-| bbdc638 | 2026-11-20 | docs(ai-context): alinhar historico e estado das branches |
-| 69c76b1 | 2026-11-20 | docs(poc-04): identificar estado pre-merge como historico |
-| 00437cd | 2026-11-20 | docs(arquitetura): esclarecer integracao posterior de senhas |
-| 501a14b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| bb250e3 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| f4293c4 | 2026-11-20 | docs(roadmap): ajustar marcacoes para markdown |
-| 7ec7a41 | 2026-11-20 | docs(poc-03): registrar integracao posterior no prototipo |
+| a166540 | 2026-11-20 | docs(relatorio): documentar validacao de papel |
+| 1d60376 | 2026-11-20 | docs(mvp): documentar gate de papel na autorizacao |
+| 3c307d0 | 2026-11-20 | docs(roadmap): incluir gate de papel profissional |
+| 48fe723 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| f25de9b | 2026-11-20 | docs(arquitetura): documentar gate de papel profissional |
+| 6bf149f | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 8f9eddd | 2026-11-20 | test(authz): verify trusted professional role |
+| 9c707bc | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->

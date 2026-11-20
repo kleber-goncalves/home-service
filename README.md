@@ -42,6 +42,7 @@ npm run dev
 ## Validações
 
 ```bash
+npm run test:authorization
 npm run lint
 npm run check:occurrences
 npm run build

@@ -59,6 +59,9 @@ jobs:
       - name: Run POC-04 synthetic session tests
         run: npm run test:poc04
 
+      - name: Run authorization and ownership tests
+        run: npm run test:authorization
+
       - name: Run LOO domain entity tests
         run: npm run test:loo
 

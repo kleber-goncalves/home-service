@@ -50,7 +50,7 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 1 — Autorização e integridade dos dados
 
-**Próxima prioridade.**
+**Em andamento — cobertura automatizada inicial adicionada na branch `feat/authorization-integrity`.**
 
 **Por que vem primeiro:** é o aprendizado de maior valor para um sistema com contas e dados privados. Uma interface pode funcionar perfeitamente para o próprio usuário e ainda permitir acesso indevido a dados de outra conta se a validação do backend estiver incompleta.
 
@@ -62,9 +62,25 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 - Confirmar que operações recusadas não alteram dados e não registram sucesso indevido.
 - Conferir que as mudanças relevantes deixam o evento esperado na aba `AUDITORIA`.
 
-**Critério de conclusão:** as regras de identidade, propriedade, estado e permissão são aplicadas no Apps Script, e as tentativas cruzadas são recusadas sem alteração de dados.
+**Cobertura automatizada já adicionada na branch de trabalho:**
+- O teste executa o `apps-script/conecta-local/Code.gs` real em um harness Node/VM, com duas contas, duas sessões, dois perfis e dois serviços fictícios em uma implementação simulada de Sheets/Properties/LockService.
+- Verifica que cada sessão consulta somente os próprios serviços.
+- Verifica que A não consegue pausar o serviço de B: a operação recebe `SERVICE_NOT_FOUND`, o estado de B permanece inalterado e não é gravado evento de sucesso falso.
+- Verifica que campos extras como `id_usuario`, `id_profissional`, `papel` e `status` não permitem trocar a identidade, assumir perfil alheio ou elevar privilégio.
+- Verifica que a criação de serviço deriva o proprietário do perfil ligado à sessão e que estados administrativos são recusados.
+- Verifica que somente uma conta cujo papel confiável seja `professional` consegue atualizar perfil e executar operações de serviço; papel diferente é recusado com `ROLE_FORBIDDEN` sem renovar atividade nem alterar dados.
+- Verifica no gateway que os payloads de perfil/listagem/status são reduzidos aos campos esperados e que `session.create` não está na allowlist pública do navegador.
 
-**Limite:** fazer uma bateria pequena e focada no Preview com dados fictícios. Não transformar esta etapa em pentest amplo, scanner automático ou teste de carga.
+**Ainda pendente para fechar a etapa:**
+- Repetir, no Preview real de `dev`, uma tentativa cruzada com duas contas fictícias distintas e confirmar diretamente na planilha que o serviço do segundo profissional permaneceu intacto.
+- Conferir no Sheets os eventos de auditoria das operações legítimas e a ausência de evento de sucesso para a tentativa recusada.
+- Concluir e registrar o resultado da CI da PR antes de integrar.
+
+**Limites técnicos:** o harness executa o código real do Apps Script, mas simula Sheets, Locks e Properties. Não comprova comportamento de quota, falhas reais dos serviços Google ou atomicidade entre gravação de negócio e auditoria. As gravações de negócio e auditoria ainda são chamadas separadas; atomicidade/compensação fica para a etapa de consistência/POC-05, caso haja justificativa acadêmica.
+
+**Critério de conclusão:** as regras de identidade, propriedade, estado e permissão são aplicadas no Apps Script; as tentativas cruzadas são recusadas sem alterar o recurso alheio ou registrar sucesso indevido; e o cenário equivalente é conferido no Preview com dados fictícios.
+
+**Limite:** manter uma bateria pequena e focada. Não transformar esta etapa em pentest amplo, scanner automático ou teste de carga.
 
 ### Etapa 2 — Completar o ciclo de vida dos serviços
 

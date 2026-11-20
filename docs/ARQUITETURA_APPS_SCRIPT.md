@@ -485,7 +485,20 @@ Em toda operação protegida:
 6. validar novamente os campos e as transições;
 7. executar a operação e auditar o resultado.
 
-Testar acesso cruzado entre profissionais, elevação de papel, alteração de proprietário e manipulação de status.
+**Implementação observada no protótipo atual:**
+- `appRequireSession_` resolve a sessão pelo hash do token e retorna o registro de usuário confiável; operações de perfil/serviço não usam um `id_usuario` escolhido pelo navegador como identidade.
+- `appRequireProfessionalSession_` exige que o papel armazenado no registro confiável da conta seja exatamente `professional`; papel enviado pelo navegador não é consultado. O gate é usado em atualização de perfil, listagem, criação e alteração de estado de serviços. Falha retorna `ROLE_FORBIDDEN` (HTTP 403 no gateway).
+- `appUpdateProfile_` encontra o perfil por `state.user.id_usuario` e atualiza somente nome público, apresentação, cidade principal, WhatsApp e data de atualização.
+- `appListMyServices_` obtém a lista através do perfil ligado ao usuário da sessão.
+- `appCreateService_` deriva `id_profissional` do perfil ligado à sessão; não aceita o proprietário do payload como fonte de verdade.
+- `appSetServiceStatus_` localiza o serviço pelo ID solicitado e compara seu `id_profissional` ao perfil obtido da sessão; divergência retorna `SERVICE_NOT_FOUND`. Somente `published` e `paused` são aceitos nesta operação.
+- No gateway, `profile.update`, `service.listMine` e `service.setStatus` encaminham apenas campos permitidos e o hash do token derivado do cookie. A ação interna `session.create` não faz parte da allowlist do navegador.
+
+A suíte `tests/authorization/` executa o `Code.gs` real em um harness Node/VM com duas contas, dois perfis e dois serviços sintéticos. Ela cobre listagem isolada, tentativa de A alterar serviço de B, mass assignment de identidade/papel, proprietário de serviço criado, estados não permitidos, sessão inválida e sanitização do gateway. O harness usa mocks de Sheets/LockService/Properties; não é uma validação da infraestrutura Google real. A verificação manual de acesso cruzado no Preview atualizado de `dev` e a inspeção da planilha continuam necessárias.
+
+**Limite de integridade conhecido:** atualização de serviço/perfil e inclusão do evento de auditoria ainda são escritas separadas no Apps Script. Portanto, os testes desta etapa comprovam que operações recusadas não alteram o recurso alheio nem geram evento de sucesso; não comprovam atomicidade diante de uma falha entre a escrita de negócio e a escrita de auditoria. Avaliar esse cenário na POC-05 somente se o esforço for proporcional ao objetivo acadêmico.
+
+Testar também elevação de papel, alteração de proprietário e manipulação de status.
 
 ## 11. Catálogo inicial de operações da API
 
