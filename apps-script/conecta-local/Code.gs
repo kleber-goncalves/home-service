@@ -1199,7 +1199,7 @@ function appImageRequireUpload_(payload, nowMs) {
         || String(state.profileId) !== String(profile.id_profissional)) {
         throw appFault_("SERVICE_NOT_FOUND", "Serviço não encontrado.");
     }
-    if (["suspended", "removed"].indexOf(String(service.status)) !== -1) {
+    if (state.status !== "completed" && ["suspended", "removed"].indexOf(String(service.status)) !== -1) {
         throw appFault_("SERVICE_STATE_LOCKED", "Este serviço não permite alteração de imagens.");
     }
     return { state: state, service: service, profile: profile, user: session.user };
@@ -1392,7 +1392,25 @@ function appImageFinalizeUpload_(state, driveMetadata) {
             }
         }
 
-        appImageDeleteUploadState_(currentState);
+        currentState.status = "completed";
+        currentState.sessionUri = "";
+        currentState.inFlight = false;
+        currentState.inFlightAt = 0;
+        currentState.nextOffset = Number(currentState.fileSize);
+        currentState.completedImageId = imageId;
+        currentState.completedDriveFileId = String(driveFile.getId());
+        currentState.completedAt = nowIso;
+        currentState.completedImage = {
+            id: imageId,
+            order: Number(currentState.order),
+            mimeType: String(currentState.mimeType),
+            sizeBytes: Number(currentState.fileSize),
+            status: "active"
+        };
+        PropertiesService.getScriptProperties().deleteProperty(
+            appImageServiceReservationKey_(String(currentState.serviceId))
+        );
+        appImageStoreUploadState_(currentState);
         return {
             completed: true,
             image: {
@@ -1589,17 +1607,40 @@ function appImageUploadStatus_(payload, nowMs) {
     if (!appHasKeys_(payload, ["tokenHash", "uploadId"])) {
         throw appFault_("INVALID_INPUT", "Informe a sessão de envio.");
     }
-    var state = appWithLock_(function () {
-        var authorized = appImageRequireUpload_(payload, nowMs);
-        var current = authorized.state;
+    var authorized = appWithLock_(function () {
+        var result = appImageRequireUpload_(payload, nowMs);
+        var current = result.state;
+        if (current.status === "completed") return result;
         if (current.inFlight && nowMs - Number(current.inFlightAt || 0) < APP_IMAGE_IN_FLIGHT_STALE_MS) {
             throw appFault_("IMAGE_UPLOAD_BUSY", "O envio ainda está sendo processado. Consulte novamente em instantes.");
         }
         current.inFlight = true;
         current.inFlightAt = nowMs;
         appImageStoreUploadState_(current);
-        return current;
+        return result;
     });
+
+    if (authorized.state.status === "completed") {
+        var completedImage = appFind_("IMAGENS", "id_imagem", String(authorized.state.completedImageId || ""));
+        if (!completedImage) throw appFault_("IMAGE_UPLOAD_STATE_INVALID", "O recibo de conclusão não corresponde a uma imagem registrada.");
+        var imageIsPublic = String(completedImage.status) === "active"
+            && String(authorized.service.status) === "published"
+            && String(authorized.user.status) === "active";
+        return {
+            completed: true,
+            image: {
+                id: String(completedImage.id_imagem),
+                order: Number(completedImage.ordem_exibicao),
+                mimeType: String(completedImage.tipo_mime),
+                sizeBytes: Number(completedImage.tamanho_bytes),
+                status: String(completedImage.status),
+                url: imageIsPublic
+                    ? appImagePublicUrl_(String(completedImage.id_arquivo_drive))
+                    : null
+            }
+        };
+    }
+    var state = authorized.state;
 
     var result;
     try {
