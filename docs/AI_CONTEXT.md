@@ -341,9 +341,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 59906838f69cb0c5a20a0dd2f5b7b7e73f17b1f2
-- **Data do commit:** 2026-11-20T17:48:06-03:00
-- **Mensagem do commit:** docs(roadmap): ajustar ordem das proximas etapas
+- **Commit de referência:** 261f1a72aac091ff087a095424da3763f448e58d
+- **Data do commit:** 2026-11-20T17:48:35-03:00
+- **Mensagem do commit:** docs(roadmap): remover etapa duplicada na ordem
 - **Branch desta execução:** docs/record-service-lifecycle-validation
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -447,13 +447,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 261f1a7 | 2026-11-20 | docs(roadmap): remover etapa duplicada na ordem |
+| 96ea06c | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 5990683 | 2026-11-20 | docs(roadmap): ajustar ordem das proximas etapas |
 | 5574c3b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | f25c94c | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | f109ed6 | 2026-11-20 | docs(prototipo): atualizar estado do ciclo de vida |
 | ae38c65 | 2026-11-20 | docs(spec): atualizar validacao de servicos |
 | 96469b4 | 2026-11-20 | docs(roadmap): concluir etapa de ciclo de vida |
-| 069773a | 2026-11-20 | docs(ai-context): registrar ciclo de vida validado |
-| e6d231c | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
