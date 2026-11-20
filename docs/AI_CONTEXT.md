@@ -341,9 +341,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** b700d5303b0de6e46cb43180f35a2eea4048681a
-- **Data do commit:** 2026-11-20T18:06:51-03:00
-- **Mensagem do commit:** fix(ui): default to an active service city
+- **Commit de referência:** 9114eaf99d600e52913219d67af7b13560ca17a1
+- **Data do commit:** 2026-11-20T18:06:54-03:00
+- **Mensagem do commit:** fix(catalog): preserve example categories when catalog is empty
 - **Branch desta execução:** feat/service-city-coverage
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -447,6 +447,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 9114eaf | 2026-11-20 | fix(catalog): preserve example categories when catalog is empty |
 | b700d53 | 2026-11-20 | fix(ui): default to an active service city |
 | 1bc99b3 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | f7088de | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
@@ -454,6 +455,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 545e449 | 2026-11-20 | test(gateway): cover service city payloads |
 | 59b5572 | 2026-11-20 | test(authorization): cover service city coverage |
 | 751cad1 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 922bc15 | 2026-11-20 | feat(ui): style service city selector |
 
 <!-- END AUTO-GENERATED SECTION -->
