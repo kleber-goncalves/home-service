@@ -1,6 +1,6 @@
 # Etapa 4 — Imagens no Google Drive
 
-> **Status:** desenho técnico definido; implementação ainda não iniciada.
+> **Status:** implementação parcial e CI automatizada aprovada; integração com Drive real e validação manual pendentes.
 >
 > **Branch de trabalho:** `feat/drive-image-upload`.
 >
@@ -242,11 +242,12 @@ A conclusão exige testes funcionais reais no Preview e na pasta de Drive de tes
 - **Backend Apps Script:** ações de iniciar, enviar bloco, consultar status, cancelar e remover; estado/URI do Drive em Script Properties; metadados em `IMAGENS`; permissões por estado do serviço.
 - **Gateway:** rota binária separada com mesma origem, cookie HttpOnly, CSRF, HMAC e limite de stream de 1 MiB; endpoints JSON atuais preservam seus limites.
 - **Interface:** seleção de imagens de serviço, prévia local, progresso, cancelamento, remoção e exibição da primeira imagem pública na homepage.
-- **Testes automatizados:** foram adicionados casos para o harness Apps Script, gateway e cliente de upload. A CI da revisão corrente ainda precisa concluir com SUCCESS; não declarar a Etapa 4 aprovada antes desse resultado.
+- **Testes automatizados:** execução [Validate Home Service #44834406864](https://github.com/kleber-goncalves/home-service/actions/runs/44834406864) concluiu **SUCCESS** no commit `26c48caecbbd869bf9228cdd7df6bdbae78649df`. Passaram auditoria bloqueante, POC-01/02/03/04, autorização e testes Apps Script de imagens, testes do gateway e cliente de upload, LOO, registro de ocorrências, ESLint e build.
+- **Preview Vercel:** o check no commit `26c48ca` falhou com `build-rate-limit`. O deployment READY disponível (`dpl_91tVg8Bu34qKDmNkszha2Bx5L96V`) é do commit anterior `93c577e`; não contém os últimos ajustes e não deve ser usado para validar a Etapa 4.
 - **Drive real:** pasta privada, Script Property `CONECTA_LOCAL_DRIVE_FOLDER_ID`, escopos OAuth e autorização ainda não configurados.
 - **Validação manual:** ainda não executada. Nenhuma imagem foi enviada para o Drive do usuário.
 
-**Próxima ação:** concluir a CI da revisão atual, corrigir qualquer falha, então preparar a pasta privada e os escopos no projeto Apps Script existente. Somente depois o responsável sincronizará o código e publicará uma nova versão na implantação Web App existente para validar o fluxo no Preview.
+**Próxima ação:** aguardar uma nova janela de build da Vercel para gerar Preview do commit atual da branch. Enquanto isso, preparar a pasta raiz privada e revisar os escopos no projeto Apps Script existente, sem colar/publicar o código antes de o Preview atualizado estar disponível. Depois, sincronizar o código e publicar nova versão na implantação Web App existente para validar o fluxo real.
 
 Não integrar em `dev`, alterar `main`, habilitar Production ou solicitar upgrade do plano Vercel nesta etapa.
 

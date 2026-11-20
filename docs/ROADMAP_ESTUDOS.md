@@ -159,7 +159,7 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 4 — Imagens no Google Drive
 
-**Status: implementação parcial em `feat/drive-image-upload`; validação automatizada da revisão atual e integração real com o Drive ainda pendentes.**
+**Status: implementação parcial em `feat/drive-image-upload`; CI automatizada aprovada em 20/11/2026; integração real com o Drive e validação manual ainda pendentes.**
 
 O responsável escolheu prosseguir com esta etapa em 20/11/2026, mantendo o escopo acadêmico e o plano Vercel Hobby.
 
@@ -177,9 +177,9 @@ O responsável escolheu prosseguir com esta etapa em 20/11/2026, mantendo o esco
 
 **Não faz parte do primeiro ciclo:** foto de perfil, galeria avançada, painel de mídia e operação em Production.
 
-**Código já presente na branch de trabalho:** ações Apps Script para iniciar/enviar/consultar/cancelar upload e remover imagem; gateway separado para blocos binários com sessão, CSRF, mesma origem e HMAC; cliente de upload com blocos de 1 MiB e reconciliação; componente de seleção/prévia/progresso/remoção na área profissional; primeira imagem pública exibida na vitrine; testes automatizados para gateway, fluxo de navegador e harness de Apps Script. A suíte da revisão corrente ainda precisa concluir com SUCCESS antes da preparação do Apps Script real.
+**Código já presente na branch de trabalho:** ações Apps Script para iniciar/enviar/consultar/cancelar upload e remover imagem; gateway separado para blocos binários com sessão, CSRF, mesma origem e HMAC; cliente de upload com blocos de 1 MiB e reconciliação; componente de seleção/prévia/progresso/remoção na área profissional; primeira imagem pública exibida na vitrine; testes automatizados para gateway, fluxo de navegador e harness de Apps Script. A execução [Validate Home Service #44834406864](https://github.com/kleber-goncalves/home-service/actions/runs/44834406864) concluiu **SUCCESS** no commit `26c48caecbbd869bf9228cdd7df6bdbae78649df`, incluindo auditoria bloqueante, POC-01 a POC-04, autorização/imagens, LOO, validação de ocorrências, ESLint e build de produção.
 
-**Ainda pendente:** configurar pasta privada e Script Property no Apps Script, revisar escopos e autorizar Drive, sincronizar/deployar a versão no projeto Apps Script existente, validar uploads e permissões reais no Preview e resolver eventuais falhas observadas.
+**Ainda pendente:** configurar pasta privada e Script Property no Apps Script, revisar escopos e autorizar Drive, sincronizar/deployar a versão no projeto Apps Script existente, validar uploads e permissões reais no Preview e resolver eventuais falhas observadas. O check Vercel do commit `26c48ca` falhou por `build-rate-limit`; o deployment READY disponível (`dpl_91tVg8Bu34qKDmNkszha2Bx5L96V`) corresponde ao commit antigo `93c577e` e não contém todos os commits mais recentes da etapa. Não usar esse deployment como evidência de validação da Etapa 4.
 
 **Critério de conclusão:** upload, listagem, exibição, pausa/publicação e remoção validados em Preview com arquivos fictícios/licenciados, pasta Drive privada e permissões individuais conferidas no Drive real.
 
