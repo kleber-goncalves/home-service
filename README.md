@@ -24,7 +24,7 @@ O projeto é acadêmico, usa somente dados fictícios e não deve receber creden
 - **Backend de negócio:** Google Apps Script em `apps-script/conecta-local/Code.gs`.
 - **Persistência operacional atual:** Google Sheets nas abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`.
 - **Orientação a objetos:** classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`, integradas pelo PR #16.
-- **POC-04:** permanece isolada na branch `feat/poc-04-session-cookie`, PR #14 em Draft; seus ensaios sintéticos de cookie, CSRF, Origin, expiração, replay e concorrência foram registrados em `docs/POC_04_SESSOES.md`. O armazenamento temporário, o segredo Apps Script e as variáveis Vercel exclusivas da branch foram limpos; o Preview está desabilitado por ausência dessas variáveis. A POC não integra a autenticação principal.
+- **POC-04:** permanece isolada na branch `feat/poc-04-session-cookie`, PR #14 pronta para revisão e ainda não mesclada. Os ensaios sintéticos foram concluídos; a cópia atualizada de `Code.gs` apresentada pelo responsável não contém os cinco helpers temporários. A revisão estática registrou dois bloqueios para reativação: limites de corpo/resposta após leitura integral e ausência de rate limiting/limite de emissão. O armazenamento temporário, o segredo Apps Script e as variáveis Vercel exclusivas foram limpos; o Preview está READY, mas a rota permanece desabilitada. A POC não integra a autenticação principal.
 
 **Limitações conhecidas da demonstração:** recuperação e alteração de senha/e-mail, edição e remoção de serviços, upload de imagens no Google Drive, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades ainda não estão implementados. A modelagem aprovada prevê 12 abas; o backend atual utiliza operacionalmente as oito listadas acima.
 
@@ -64,7 +64,7 @@ O GitHub Actions executa essas verificações em pushes e Pull Requests direcion
 - [Relatório integrador acadêmico](docs/PROJETO_INTEGRADOR_CONECTA_LOCAL.md)
 - [Registro público de ocorrências](docs/REGISTRO_DE_OCORRENCIAS.md)
 
-A POC-04 está isolada na branch `feat/poc-04-session-cookie`, PR #14 em Draft, e ainda não integra `dev` nem o fluxo de autenticação principal.
+A POC-04 está isolada na branch `feat/poc-04-session-cookie`; a PR #14 está pronta para revisão, aberta e ainda não mesclada em `dev`. Ela não integra o fluxo de autenticação principal.
 
 ## Créditos das imagens
 
