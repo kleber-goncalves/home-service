@@ -10,7 +10,7 @@
 - Em 20/11/2026, após as integrações das PRs #16, #17 e #14, o responsável confirmou ter repetido os testes do fluxo principal no Preview atualizado de `dev` e informou que a demonstração está funcionando. O histórico anterior de validação do PR #15 permanece registrado em 16/11; a confirmação mais recente é a referência funcional para a continuidade.
 - O PR #16 integrou as classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`, com testes em `tests/loo/domain-entities.test.js` (`npm run test:loo`). O PR #17 corrigiu a composição da vitrine para manter os serviços de exemplo junto aos serviços cadastrados.
 - O PR #18 adicionou `docs/PROJETO_INTEGRADOR_CONECTA_LOCAL.md`. O PR #19 integrou `dev` em `main`.
-- O PR #19 sincronizou o código de `dev` com `main` por fast-forward, sem force push. Depois, o PR #20 foi mesclado apenas em `dev` e alterou quatro documentos; `main` permanece em `49354a46863d5a5eb36ce32e450b975d4087fe3b`, enquanto `dev` contém essas atualizações documentais e o snapshot automático. O código funcional não diverge entre as branches.
+- O PR #19 sincronizou o núcleo do protótipo de `dev` com `main` por fast-forward, sem force push. Depois, o PR #20 atualizou quatro documentos em `dev`; em 20/11, a PR #14 adicionou à `dev` a POC-04 independente e desabilitada. `main` permanece em `49354a46863d5a5eb36ce32e450b975d4087fe3b`; portanto, o núcleo funcional da demonstração permanece alinhado, enquanto os arquivos exclusivos da POC-04 e as atualizações documentais estão somente em `dev`.
 - O ambiente Preview de `dev` contém variáveis `CONECTA_LOCAL_*` com escopo Preview; os valores são secretos e não devem ser lidos, copiados para documentação ou compartilhados. A Production permanece sem variáveis de backend.
 - O gateway em `api/app.js` → `server/app-gateway.js` bloqueia as operações de negócio fora de Vercel Preview. Production permanece como vitrine pública, conforme decisão do responsável pelo projeto.
 - O Apps Script de negócio está em `apps-script/conecta-local/Code.gs`. O fluxo atual utiliza oito abas operacionais do Sheets: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`. A modelagem aprovada contempla 12 abas; as quatro restantes ainda não têm fluxo operacional implementado.
@@ -98,7 +98,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 
 ## 4. Estado atual do repositório
 
-**Estado atualizado em 20/11/2026 — `dev` está no head `d431629c12ce9dda5dc3b969c9059994e52d53a2`; `main` permanece em `49354a46863d5a5eb36ce32e450b975d4087fe3b`. A PR #14 foi integrada à `dev`; seu código de sessão sintética permanece independente e desabilitado.**
+**Estado atualizado em 20/11/2026 — a branch `dev` contém a implementação principal, a POC-04 independente/desabilitada e as atualizações documentais; `main` permanece no release público `49354a46863d5a5eb36ce32e450b975d4087fe3b`. O snapshot automatizado ao final deste arquivo registra o head corrente.**
 
 ### Implementado e integrado
 
