@@ -68,6 +68,7 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 - Verifica que A não consegue pausar o serviço de B: a operação recebe `SERVICE_NOT_FOUND`, o estado de B permanece inalterado e não é gravado evento de sucesso falso.
 - Verifica que campos extras como `id_usuario`, `id_profissional`, `papel` e `status` não permitem trocar a identidade, assumir perfil alheio ou elevar privilégio.
 - Verifica que a criação de serviço deriva o proprietário do perfil ligado à sessão e que estados administrativos são recusados.
+- Verifica que somente uma conta cujo papel confiável seja `professional` consegue atualizar perfil e executar operações de serviço; papel diferente é recusado com `ROLE_FORBIDDEN` sem renovar atividade nem alterar dados.
 - Verifica no gateway que os payloads de perfil/listagem/status são reduzidos aos campos esperados e que `session.create` não está na allowlist pública do navegador.
 
 **Ainda pendente para fechar a etapa:**
