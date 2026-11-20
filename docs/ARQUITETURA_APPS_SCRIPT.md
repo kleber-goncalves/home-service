@@ -1,16 +1,16 @@
 # Arquitetura da integração Vercel Functions + Google Apps Script — Conecta Local
 
 > **Versão:** 0.2  
-> **Data da revisão:** 2026-11-14  
-> **Status atualizado em 2026-11-20:** POC-01 (#10), POC-02 (#11), POC-03 experimental (#12), interface demonstrativa (#13) e protótipo funcional (#15–#18) estão integrados à `dev`. O fluxo principal utiliza Vercel Functions e Apps Script somente no Preview; `main`/Production permanece vitrine pública. A POC-04 continua isolada na PR #14, pronta para revisão e ainda não mesclada. Seus ensaios sintéticos e limpeza dos recursos temporários foram concluídos; a cópia atualizada de `Code.gs` apresentada pelo responsável não contém os cinco helpers. Revisão estática registrou dois bloqueios para reativação: leitura integral antes de checar limites de corpo/resposta e ausência de rate limiting/limite de emissão. O Preview está READY, mas a rota permanece desabilitada após a remoção das variáveis exclusivas e do segredo. Falhas reais de infraestrutura e testes de carga não foram executados. Nenhuma validação equivale a auditoria/certificação ou aprovação para produção.
+> **Data da atualização:** 2026-11-20  
+> **Estado atual:** o protótipo funcional (#15–#18) e a POC-04 (#14) estão integrados à branch `dev`. O responsável confirmou em 20/11/2026 que revalidou o fluxo principal no Preview atualizado e que a demonstração está funcionando. O backend principal usa Vercel Functions como gateway, Apps Script como autoridade de negócio e oito abas operacionais do Google Sheets. `main`/Production continua sendo vitrine pública, sem backend habilitado. A POC-04 foi mesclada, mas permanece independente e desabilitada; seus dois itens de hardening impedem qualquer reativação. A integração não equivale a auditoria independente, certificação ou aprovação para produção.
 > **Escopo:** integração React/Vite, Google Apps Script, Google Sheets e Google Drive para a demonstração acadêmica.  
 > **Premissa:** manter Apps Script como autoridade de domínio e sessão; Vercel Functions atua apenas como gateway HTTP. Qualquer fluxo de autenticação e sessão deverá ser aprovado em provas isoladas com dados sintéticos.
 
 ## 1. Objetivo e estado real
 
-### Protótipo funcional com persistência — branch `feat/prototipo-demo-profissional`
+### Protótipo funcional com persistência — branch `dev`
 
-A branch de entrega acrescenta a implementação inicial do fluxo profissional conectado ao Google Sheets, sem alterar `dev` ou `main`:
+O fluxo funcional foi integrado à `dev` pela PR #15 e permanece no ambiente Preview para demonstração acadêmica com dados fictícios:
 
 - `api/app.js` expõe a Function `POST /api/app`.
 - `server/app-gateway.js` aplica validação de Origin, contrato de JSON, Argon2id no runtime Node, comparação de hash com `timingSafeEqual`, cookie HttpOnly/Secure/SameSite, CSRF e HMAC server-to-server.
@@ -20,23 +20,24 @@ A branch de entrega acrescenta a implementação inicial do fluxo profissional c
 - O código de confirmação é HMAC no Apps Script e exibido na interface do protótipo. Não há envio de e-mail.
 - A sessão é criada pelo backend funcional desta branch; a POC-04 de conta sintética continua separada.
 
-**Ativação pendente:** o novo projeto Apps Script precisa ser criado/atualizado com `apps-script/conecta-local/Code.gs`, receber as Script Properties `CONECTA_LOCAL_SPREADSHEET_ID` e `CONECTA_LOCAL_HMAC_SECRET`, ser implantado como Web App e ter suas três variáveis configuradas somente na Vercel Preview. O passo a passo está em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md`. Até essa configuração, o código está versionado e o Preview publicado, mas ainda não grava efetivamente na planilha.
+**Estado de ativação:** a integração de negócio com Apps Script e Google Sheets está ativa no Preview de `dev` e foi exercitada pelo responsável no fluxo principal. As variáveis `CONECTA_LOCAL_*` permanecem restritas ao ambiente Preview; seus valores são secretos e não devem ser registrados na documentação. O procedimento original de configuração continua em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md` para referência, mas não representa uma ativação pendente.
 
 **Escopo de demonstração:** cadastro, ativação por código, login, sessão, consulta de dados e CRUD mínimo de serviços. Recuperação de senha, e-mail, upload Drive, edição completa de perfil, admin e moderação ficam fora desta rodada. Usar apenas dados fictícios; o protótipo não é declarado pronto para produção.
 
 
-Este documento registra a arquitetura aprovada para a comunicação do Conecta Local e os testes necessários antes da implementação. Ele não declara que qualquer API ou integração já exista.
+Este documento preserva decisões arquiteturais, detalhes técnicos e propostas que foram sendo implementadas ao longo das POCs. Em caso de divergência, `docs/AI_CONTEXT.md` e o código da branch `dev` representam o estado atual; trechos identificados como candidatos ou propostas devem ser lidos como histórico/planejamento, não como descrição de funcionalidades inexistentes.
 
 Estado conhecido na data desta revisão:
 
 - Frontend demonstrativo em React, JavaScript/JSX e Vite, publicado na Vercel.
 - Projeto configurado como módulo JavaScript ES (package.json usa type module).
-- A branch `dev` já contém `api/backend.js`, a página temporária `?poc=01` e a camada de serviço da POC-01, integradas pelo PR #10. O Preview confirmou a publicação da Function.
-- Arquivo Google Sheets estrutural criado e conferido pelo responsável, com 12 abas e 102 cabeçalhos.
-- A planilha ainda não é armazenamento operacional integrado.
-- A comunicação real da POC-01 foi confirmada manualmente em Preview em 2026-11-11: eco HTTP 200, erro lógico HTTP 422, resposta upstream inválida HTTP 502, JSON inválido HTTP 400 e GET HTTP 405. A evidência está registrada em `docs/POC_01_COMUNICACAO.md`.
-- Não há autenticação real, sessão, integração operacional com Sheets/Drive, upload ou painel administrativo implementados.
-- `src/pages/AuthDemoPage.jsx`, integrada à `dev` pelo PR #13, fornece apenas a interface visual em `/?auth=demo`; o CTA de profissionais abre `/?auth=demo&mode=register`. Os formulários validam localmente, não chamam a Function/Apps Script, não persistem dados e orientam o uso exclusivo de valores fictícios.
+- A branch `dev` contém a Function de negócio `api/app.js`, as regras de gateway em `server/app-gateway.js` e a integração Apps Script.
+- A planilha estrutural foi criada com 12 abas/102 cabeçalhos; oito abas são utilizadas operacionalmente pelo fluxo atual.
+- O fluxo de cadastro, confirmação demonstrativa, login, sessão, perfil, criação, pausa/publicação e consulta de serviços está implementado e conectado ao Sheets.
+- A comunicação real da POC-01 foi confirmada manualmente em Preview em 2026-11-11; a evidência está em `docs/POC_01_COMUNICACAO.md`.
+- O responsável confirmou a revalidação do fluxo principal no Preview atualizado de `dev` em 20/11/2026.
+- Upload/gerenciamento de imagens no Drive e painel administrativo ainda não estão implementados.
+- `src/pages/AuthDemoPage.jsx` e `HomePage.jsx` estão conectadas ao gateway/consulta pública; não são apenas interfaces locais.
 
 O projeto continua sendo uma demonstração acadêmica com dados sintéticos. Não inserir credenciais, cadastros ou dados pessoais reais.
 
@@ -46,7 +47,7 @@ O projeto continua sendo uma demonstração acadêmica com dados sintéticos. N�
 2. Google Apps Script continua sendo o único backend de negócio do MVP: é a autoridade para autenticação, autorização, regras, transições de estado, integridade e operações de dados.
 3. Vercel Functions será utilizada como **gateway HTTP server-side** entre o navegador e o Web App do Apps Script.
 4. A Function é um componente técnico de borda/transporte, não uma segunda camada de domínio. Ela não será responsável por regras de negócio, não acessará Sheets/Drive diretamente e não será fonte de verdade para usuários, sessões, papéis ou permissões.
-5. Google Sheets continua armazenando os registros nas 12 abas aprovadas. Google Drive continua armazenando imagens.
+5. Google Sheets armazena operacionalmente os dados nas oito abas já integradas; as quatro abas restantes da modelagem continuam planejadas. Google Drive está reservado para uma etapa futura de imagens; o fluxo de upload e permissões ainda não está implementado.
 6. O navegador chamará somente rotas de mesma origem da aplicação, como /api/backend. Não chamará o Web App Apps Script diretamente.
 7. A Vercel Function chamará o Apps Script server-to-server, acompanhará os redirecionamentos do Content Service e converterá a resposta lógica em JSON/HTTP para o frontend.
 8. Toda regra crítica e toda autorização continuarão sendo verificadas no Apps Script. A Function não poderá ser a única barreira contra chamadas diretas ao Web App.
@@ -93,7 +94,7 @@ O Apps Script Web App pode executar como o usuário que implantou o aplicativo (
 
 Para uma interface pública hospedada na Vercel, visitantes sem login Google precisam conseguir alcançar as rotas públicas. A configuração ANYONE_ANONYMOUS é uma candidata para essa necessidade; ANYONE exige que a pessoa esteja conectada a uma conta Google.
 
-**Candidata para a prova de conceito, não autorização para publicar:** Web App executando como o responsável pela implantação (USER_DEPLOYING) e acessível anonimamente (ANYONE_ANONYMOUS), limitado a uma planilha e pasta do Drive de teste, ambas com dados sintéticos.
+**Configuração usada na demonstração:** o Web App de negócio opera com a identidade do implantador e é acessado pela camada server-side da Vercel; a chamada é autenticada por HMAC e todas as operações protegidas validam sessão e autorização no Apps Script. A configuração permanece limitada à demonstração com dados fictícios e ao Preview; conferir o manifesto e as propriedades do projeto Apps Script antes de qualquer mudança de implantação.
 
 Quando executa como quem publicou, o script atua com a autoridade dessa pessoa, independentemente de quem chamou o endpoint. Isso significa que um endpoint público pode acionar operações privilegiadas. A interface, a URL difícil de adivinhar e o login do frontend não protegem a planilha. Toda operação deve validar no servidor o tipo de ação, a sessão, o papel, a propriedade e o estado dos registros.
 
@@ -129,16 +130,16 @@ A POC-02 implementa HMAC-SHA-256 com mensagem canônica versionada, timestamp em
 
 A Vercel Function pode emitir uma resposta HTTP própria para o navegador, separada do TextOutput produzido pelo Apps Script. Isso permite testar um cookie de sessão HttpOnly no domínio da aplicação Vercel sem exigir que o Apps Script configure Set-Cookie.
 
-Modelo candidato, ainda não aprovado:
+**Implementação atual — sessão principal do protótipo:** o PR #15 integrou o fluxo de sessão por cookie HttpOnly emitido pela Vercel, com validação server-side/Apps Script, CSRF, Origin, revogação e persistência em Sheets. O Apps Script permanece autoridade para sessão, estado da conta e autorização.
 
 1. O login chega à rota da Vercel.
-2. A Function encaminha a operação autenticada ao Apps Script.
-3. O Apps Script cria/registra a sessão e devolve a informação necessária somente à Function.
-4. A Function define o cookie com atributos seguros, por exemplo HttpOnly, Secure, SameSite apropriado e Path restrito.
-5. Nas próximas requisições, o navegador envia o cookie automaticamente à mesma origem; a Function repassa o token ao Apps Script por canal server-to-server.
-6. Apps Script continua sendo a autoridade que consulta SESSOES, verifica o hash do token, expiração, revogação, estado da conta e permissões.
+2. A Function valida a entrada, deriva o verificador Argon2id e encaminha somente os dados necessários ao Apps Script por chamada server-to-server autenticada.
+3. O Apps Script valida a assinatura, os dados e as regras de negócio, cria/registra a sessão e confirma o resultado.
+4. A Function define o cookie `__Host-conecta_local_session` com `HttpOnly; Secure; SameSite=Strict; Path=/`, sem `Domain`.
+5. Nas próximas requisições, o navegador envia o cookie à mesma origem; a Function encaminha a operação ao Apps Script.
+6. O Apps Script consulta `SESSOES`, valida o hash do token, expiração, revogação, estado da conta e permissões.
 
-A POC de sessão deverá avaliar CSRF, validação de Origin, SameSite, escopo do cookie em Preview/produção, logout, revogação, expiração e ausência do token em JavaScript, URL e logs. Não considerar cookie implementado só porque a Function consegue emitir Set-Cookie.
+O responsável confirmou a revalidação do fluxo principal no Preview atualizado de `dev` em 20/11/2026. A POC-04 é um experimento separado de sessão sintética; foi mesclada em `dev`, mas continua desabilitada e não faz parte desta autenticação.
 ## 5. Comunicação React/Vite ↔ Vercel Function ↔ Apps Script
 
 ### 5.1. Navegador → Vercel Function
@@ -304,7 +305,7 @@ Divisão inicial sugerida, sem abstrações desnecessárias:
 | Validation.gs | validar e normalizar entradas no backend |
 | SheetsRepository.gs | leitura/gravação controlada nas abas |
 | DriveRepository.gs | upload e gerenciamento de arquivos |
-| AuthService.gs | cadastro, login, códigos e sessões; bloqueado até PoCs |
+| AuthService.gs | cadastro, login, códigos e sessões; fluxo principal implementado em `apps-script/conecta-local/Code.gs` |
 | Authorization.gs | papel, propriedade, sessão e permissões |
 | AuditService.gs | registrar eventos e resultados sem segredos |
 
@@ -453,9 +454,9 @@ A aba `USUARIOS` já prevê `senha_hash`, `senha_salt` e `senha_algoritmo`, mas 
 
 A modelagem prevê persistir somente o hash do token na aba `SESSOES`, com 30 minutos de inatividade e duração absoluta de 8 horas. O token em claro não deve ser gravado na planilha nem em logs.
 
-**Sessão do protótipo principal:** o PR #15 integrou à demonstração funcional o fluxo de sessão por cookie HttpOnly emitido pela Vercel, validação server-side/Apps Script, CSRF, Origin, revogação e persistência em Sheets. A validação ponta a ponta foi registrada em 16/11/2026 no Preview da branch de implementação; repetir no Preview atualizado de `dev` após as integrações posteriores. Essa sessão pertence ao protótipo principal e não depende da POC-04.
+**Sessão do protótipo principal:** o PR #15 integrou à demonstração o fluxo de sessão por cookie HttpOnly emitido pela Vercel, validação server-side/Apps Script, CSRF, Origin, revogação e persistência em Sheets. Em 20/11/2026, o responsável confirmou que repetiu o percurso funcional no Preview atualizado de `dev` após as integrações posteriores. Essa sessão pertence ao protótipo principal e não depende da POC-04.
 
-**POC-04 — sessão sintética independente:** permanece na branch `feat/poc-04-session-cookie`, PR #14 pronta para revisão e ainda não mesclada, sem conexão com `AuthDemoPage.jsx` ou com o fluxo principal. Em 14 e 20/11/2026, ensaios sintéticos confirmaram cookie (`HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/`, sem `Domain`), CSRF, rejeição de Origin ausente/externa e Fetch Metadata cross-site, expiração por timestamps controlados, replay, concorrência, logout e revogação. A planilha temporária, nonces, segredo `POC04_HMAC_SECRET` e quatro variáveis Vercel exclusivas foram limpos. A cópia atualizada de `Code.gs` apresentada pelo responsável não contém os cinco helpers temporários. O Preview está READY, mas a rota permanece desabilitada.
+**POC-04 — sessão sintética independente:** foi integrada à branch `dev` pela PR #14 em 20/11/2026, sem conexão com `AuthDemoPage.jsx` ou com o fluxo principal. Os ensaios sintéticos confirmaram cookie (`HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/`, sem `Domain`), CSRF, rejeição de Origin ausente/externa e Fetch Metadata cross-site, expiração por timestamps controlados, replay, concorrência, logout e revogação. A planilha temporária, nonces, segredo `POC04_HMAC_SECRET` e quatro variáveis Vercel exclusivas foram limpos. A rota permanece desabilitada. Os dois pontos de hardening registrados no documento específico impedem qualquer reativação.
 
 A cópia atualizada de `Code.gs` apresentada pelo responsável não contém as cinco funções auxiliares de ensaio; a conferência não substitui a responsabilidade do editor em manter a versão salva. A revisão estática final registrou dois bloqueios para reativação: os limites de corpo/resposta são verificados após leitura integral e não existe rate limiting/limite de emissão. Falhas reais de armazenamento, timeout/upstream e testes de carga não foram executados. Esses itens não foram corrigidos nesta etapa; a rota deve permanecer desabilitada. Evidências e limites em [`docs/POC_04_SESSOES.md`](./POC_04_SESSOES.md).
 
@@ -546,16 +547,16 @@ Nenhuma implementação de autenticação, publicação anônima ou escrita oper
 
 ## 15. Ordem de trabalho proposta
 
-1. **POC-01 — comunicação:** concluída e integrada pelo PR #10; testes manuais registrados em `docs/POC_01_COMUNICACAO.md`.
-2. **POC-02 — assinatura do gateway:** concluída e integrada pelo PR #11; permanece restrita a ações sintéticas `poc.*`, com evidências em `docs/POC_02_ASSINATURA_GATEWAY.md`.
-3. **POC-03 — KDF, política de entrada, blocklist e throttling:** investigação concluída e integrada pelo PR #12; nenhuma solução de senha/comparador foi aprovada para autenticação. Evidências e limites em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
-4. **POC-04 — sessão sintética independente:** ensaios de cookie/CSRF/Origin, expiração controlada, replay e concorrência foram concluídos; recursos temporários e variáveis Vercel exclusivas foram limpos, e o Preview está desabilitado. A cópia atualizada de `Code.gs` apresentada pelo responsável não contém os cinco helpers. A PR #14 está pronta para revisão, mas ainda não foi mesclada. A revisão estática registrou dois bloqueios para reativação: limites de corpo/resposta após leitura integral e ausência de rate limiting/limite de emissão. Falhas reais de infraestrutura e testes de carga não foram executados. Não conectar login nem credenciais reais.
-5. **POC-05 — Sheets, locks e auditoria:** confirmar lote atômico, concorrência e falhas.
-6. **POC-06/07 — Drive e arquivos:** confirmar permissões, validações e limites.
-7. **POC-08/09 — implantação, abuso e quotas:** testar limites do ambiente de demonstração.
-8. Somente após aprovações separadas: implementar módulos progressivamente. Cadastro/login permanecem bloqueados até que armazenamento/validação de senha e sessão tenham decisões técnicas aprovadas.
+1. **POC-01 — comunicação:** concluída e integrada pelo PR #10.
+2. **POC-02 — assinatura do gateway:** concluída e integrada pelo PR #11; o protocolo também é utilizado no gateway de negócio.
+3. **POC-03 — senha e política de entrada:** estudo concluído; Argon2id e comparação Node com `timingSafeEqual` foram posteriormente integrados ao gateway do protótipo principal. A blocklist e a sonda Pwned Passwords continuam como pesquisa isolada, sem integração afirmada ao fluxo.
+4. **POC-04 — sessão sintética independente:** PR #14 integrada à `dev`; ensaios concluídos, rota desabilitada e dois bloqueios de hardening registrados para qualquer reativação. Não conectar ao login principal.
+5. **Próxima prioridade — autorização e integridade:** verificar acesso cruzado entre profissionais, manipulação de proprietário/estado e consistência de auditoria. O roteiro está em `docs/ROADMAP_ESTUDOS.md`.
+6. **Depois — ciclo de vida dos serviços:** implementar edição e remoção lógica com validações no Apps Script e registro de auditoria.
+7. **Opcional — localidades e imagens:** concluir vínculo de serviços a múltiplas cidades e/ou integração de imagens no Drive, somente se agregarem valor à demonstração e ao aprendizado.
+8. **Adiadas:** painel administrativo completo, denúncias, envio real de e-mail, recuperação de senha e infraestrutura de produção; não são pré-requisitos para o projeto acadêmico atual.
 
-Não criar endpoints administrativos, painel autenticado, upload público ou escrita operacional antes das etapas e critérios correspondentes.
+Não ampliar a arquitetura nem introduzir serviços externos antes de uma necessidade didática ou funcional demonstrável.
 
 **Trabalho visual independente das POCs:** é permitido desenvolver e revisar a experiência visual de cadastro/login em React usando estado local efêmero, desde que não envie credenciais, não persista valores, não crie uma falsa sessão e deixe explícito que o backend não está conectado. Essa permissão não libera a implementação de autenticação, verificação de e-mail, recuperação de senha ou sessão no Apps Script/Vercel.
 
