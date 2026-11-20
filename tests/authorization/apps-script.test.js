@@ -1081,7 +1081,7 @@ test("image.upload.start e image.upload.chunk gravam metadados somente após con
     const harness = createHarness();
     const { uploaded } = startPngUpload(harness);
 
-    assert.equal(uploaded.ok, true);
+    assert.equal(uploaded.ok, true, "Chunk falhou: " + JSON.stringify(uploaded));
     assert.equal(uploaded.data.completed, true);
     assert.equal(uploaded.data.image.status, "active");
     assert.equal(uploaded.data.image.order, 1);
