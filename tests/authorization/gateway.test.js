@@ -268,3 +268,64 @@ test("gateway permite service.remove e não encaminha identidade ou estado envia
         tokenHash: createHash("sha256").update(SESSION_TOKEN, "utf8").digest("hex"),
     });
 });
+
+
+test("gateway permite início de upload, mas deriva a sessão e encaminha somente metadados permitidos", async () => {
+    let forwarded;
+    const handler = createHarness(async (_url, options) => {
+        const form = new URLSearchParams(options.body);
+        forwarded = {
+            action: form.get("action"),
+            payload: JSON.parse(form.get("payload")),
+        };
+        return upstreamResponse(form);
+    });
+
+    const response = await handler(buildRequest("image.upload.start", {
+        serviceId: "service-a",
+        fileSize: 2048,
+        mimeType: "image/png",
+        tokenHash: "9".repeat(64),
+        id_usuario: "user-b",
+        id_profissional: "profile-b",
+        papel: "admin",
+        folderId: "attacker-controlled-folder",
+        sessionUri: "https://attacker.example/upload",
+    }));
+
+    assert.equal(response.status, 200);
+    assert.equal(forwarded.action, "image.upload.start");
+    assert.deepEqual(forwarded.payload, {
+        serviceId: "service-a",
+        fileSize: 2048,
+        mimeType: "image/png",
+        tokenHash: createHash("sha256").update(SESSION_TOKEN, "utf8").digest("hex"),
+    });
+});
+
+test("gateway permite remoção de imagem somente com ID e sessão derivados", async () => {
+    let forwarded;
+    const handler = createHarness(async (_url, options) => {
+        const form = new URLSearchParams(options.body);
+        forwarded = {
+            action: form.get("action"),
+            payload: JSON.parse(form.get("payload")),
+        };
+        return upstreamResponse(form);
+    });
+
+    const response = await handler(buildRequest("image.remove", {
+        imageId: "image-a",
+        tokenHash: "9".repeat(64),
+        id_usuario: "user-b",
+        ownerId: "user-b",
+        papel: "admin",
+    }));
+
+    assert.equal(response.status, 200);
+    assert.equal(forwarded.action, "image.remove");
+    assert.deepEqual(forwarded.payload, {
+        imageId: "image-a",
+        tokenHash: createHash("sha256").update(SESSION_TOKEN, "utf8").digest("hex"),
+    });
+});
