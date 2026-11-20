@@ -2,7 +2,7 @@ import { ArrowRight, MapPin, Search, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-export default function HeroSearch({ query, city, onQueryChange, onCityChange, onSubmit }) {
+export default function HeroSearch({ query, city, onQueryChange, onCityChange, onSubmit, availableCities = [] }) {
     return (
         <section className="hero-section" id="inicio" aria-labelledby="hero-title">
             <div className="hero-inner mx-auto grid w-full max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -23,7 +23,12 @@ export default function HeroSearch({ query, city, onQueryChange, onCityChange, o
                             <MapPin size={19} aria-hidden="true" />
                             <span className="search-field-copy">
                                 <span>Onde você precisa?</span>
-                                <Input type="text" name="location" placeholder="Sua cidade ou região" value={city} onChange={(event) => onCityChange(event.target.value)} aria-label="Cidade ou região" />
+                                <Input type="text" name="location" list="service-city-options" placeholder="Sua cidade ou região" value={city} onChange={(event) => onCityChange(event.target.value)} aria-label="Cidade ou região" />
+                                <datalist id="service-city-options">
+                                    {availableCities.map((item) => (
+                                        <option key={item.id} value={item.name + " - " + item.state} />
+                                    ))}
+                                </datalist>
                             </span>
                         </label>
                         <Button type="submit" size="lg" className="search-submit">Buscar <ArrowRight size={17} aria-hidden="true" /></Button>
