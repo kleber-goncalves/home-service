@@ -311,12 +311,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** f6048bc4e698d4591b2960fa3464f5ab166fd146
-- **Data do commit:** 2026-11-20T15:50:13-03:00
-- **Mensagem do commit:** test(authz): cover Apps Script ownership boundaries
+- **Commit de referência:** 2af9dd47a2470f95a6728534494f89b286773f86
+- **Data do commit:** 2026-11-20T15:50:34-03:00
+- **Mensagem do commit:** ci(authz): run authorization ownership tests
 - **Branch desta execução:** feat/authorization-integrity
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 11
+- **Scripts npm:** 12
 - **Dependências de runtime:** 4
 - **Dependências de desenvolvimento:** 11
 - **Workflows:** 2
@@ -337,6 +337,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run test:poc03 | node --test tests/poc03/apps-script.test.js |
 | npm run test:loo | node --test tests/loo/domain-entities.test.js |
 | npm run test:poc04 | node --test tests/poc04/gateway.test.js tests/poc04/apps-script.test.js |
+| npm run test:authorization | node --test tests/authorization/apps-script.test.js tests/authorization/gateway.test.js |
 
 ### Variáveis declaradas no .env.example
 
@@ -416,13 +417,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 2af9dd4 | 2026-11-20 | ci(authz): run authorization ownership tests |
+| 40c3dd1 | 2026-11-20 | test(authz): add authorization test command |
+| db694c1 | 2026-11-20 | fix(authz): allowlist profile update fields |
+| 20b3250 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| b101634 | 2026-11-20 | test(authz): cover gateway identity sanitization |
 | f6048bc | 2026-11-20 | test(authz): cover Apps Script ownership boundaries |
 | a9fd8a1 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 9843ae5 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 70247ff | 2026-11-20 | docs(readme): remover referencia fixa a head documental |
-| bbdc638 | 2026-11-20 | docs(ai-context): alinhar historico e estado das branches |
-| 69c76b1 | 2026-11-20 | docs(poc-04): identificar estado pre-merge como historico |
-| 00437cd | 2026-11-20 | docs(arquitetura): esclarecer integracao posterior de senhas |
-| 501a14b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
