@@ -28,7 +28,7 @@
 - Usar somente dados fictícios; não cadastrar credenciais ou dados pessoais reais.
 - O código de confirmação é mostrado na interface, sem envio de e-mail.
 - Não há recuperação de senha nesta rodada.
-- Upload de imagens no Drive, edição completa do perfil e painel administrativo ficam para etapas futuras. A edição/remoção de serviços da branch `feat/service-lifecycle` ainda depende de integração e validação manual no Preview antes de ser considerada disponível em `dev`.
+- Upload de imagens no Drive, edição completa do perfil e painel administrativo ficam para etapas futuras. A edição de nome/categoria/descrição e a remoção lógica de serviços foram integradas em `dev` pela PR #23 e validadas pelo responsável no Preview atualizado em 20/11/2026.
 - O protótipo é acadêmico e não foi dimensionado para produção ou escala comercial.
 - A POC-04 continua separada. A sessão da aplicação usa a implementação nova desta branch, não a conta sintética da POC-04.
 
