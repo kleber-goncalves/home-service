@@ -6,13 +6,15 @@ O projeto tem finalidade acadêmica e busca demonstrar investigação de problem
 
 ## Estado atual — 20/11/2026
 
-A branch `dev` contém a demonstração acadêmica atual do Conecta Local. O PR #15 foi integrado em 16/11/2026 e trouxe o fluxo conectado ao Google Sheets: cadastro de profissional, confirmação demonstrativa por código, login, sessão, atualização de perfil, criação de serviços, pausa/publicação e consulta pública dos serviços publicados. O percurso ponta a ponta foi validado manualmente no Preview da branch de implementação em 16/11/2026, usando exclusivamente dados fictícios.
+A branch `dev` contém a demonstração acadêmica funcional do Conecta Local. O PR #15 integrou cadastro, confirmação demonstrativa por código, login, sessão, atualização de perfil, criação de serviços, pausa/publicação e consulta pública com persistência no Google Sheets. Os PRs #16 (orientação a objetos), #17 (preservação dos serviços de exemplo) e #18 (relatório integrador) também foram integrados.
 
-Os PRs #16 (orientação a objetos), #17 (preservação dos serviços de exemplo na vitrine) e #18 (relatório integrador) também foram integrados em `dev`. O PR #19 integrou `dev` em `main`, levando o código funcional ao commit `49354a4`. Depois, a PR #20 atualizou somente documentação e foi mesclada em `dev`; assim, `main` permanece em `49354a4` e `dev` está à frente apenas por alterações documentais, sem divergência no código funcional.
+O PR #19 sincronizou o código principal de `dev` com `main`; a PR #20 atualizou documentação em `dev`. Em 20/11/2026, a PR #14 foi integrada a `dev` pelo merge commit `adb51e2f1de8b9d47fb59205938b3e33e21739a1`. Ela adiciona a POC-04 de sessão sintética como rota independente, mas **não a conecta ao login principal e permanece desabilitada**. O head atual consultado de `dev` é `d431629c12ce9dda5dc3b969c9059994e52d53a2`; `main` permanece em `49354a46863d5a5eb36ce32e450b975d4087fe3b`.
+
+**Validação funcional:** em 20/11/2026, após as integrações de #16, #17 e #14, o responsável informou ter repetido os testes do fluxo principal no Preview atualizado de `dev` e confirmou que a demonstração está funcionando. Os testes usam dados fictícios. A verificação adversarial específica de autorização entre dois profissionais continua como uma etapa técnica separada no roteiro.
 
 **Ambientes**
-- **Preview de `dev`:** ambiente destinado ao desenvolvimento e à demonstração funcional. A validação ponta a ponta deve ser repetida neste Preview após as integrações mais recentes.
-- **Production (`main`):** vitrine pública. O gateway do protótipo bloqueia operações de negócio fora de Vercel Preview; não habilitar variáveis de backend em Production nesta etapa.
+- **Preview de `dev`:** ambiente destinado ao desenvolvimento e à demonstração funcional; contém as configurações privadas do backend com escopo Preview.
+- **Production (`main`):** vitrine pública. O gateway bloqueia operações de negócio fora de Vercel Preview; não habilitar variáveis de backend em Production nesta etapa.
 
 O projeto é acadêmico, usa somente dados fictícios e não deve receber credenciais ou dados pessoais reais. Não é serviço comercial, marketplace transacional ou aplicação aprovada para produção.
 
@@ -24,7 +26,7 @@ O projeto é acadêmico, usa somente dados fictícios e não deve receber creden
 - **Backend de negócio:** Google Apps Script em `apps-script/conecta-local/Code.gs`.
 - **Persistência operacional atual:** Google Sheets nas abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`.
 - **Orientação a objetos:** classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`, integradas pelo PR #16.
-- **POC-04:** permanece isolada na branch `feat/poc-04-session-cookie`, PR #14 pronta para revisão e ainda não mesclada. Os ensaios sintéticos foram concluídos; a cópia atualizada de `Code.gs` apresentada pelo responsável não contém os cinco helpers temporários. A revisão estática registrou dois bloqueios para reativação: limites de corpo/resposta após leitura integral e ausência de rate limiting/limite de emissão. O armazenamento temporário, o segredo Apps Script e as variáveis Vercel exclusivas foram limpos; o Preview está READY, mas a rota permanece desabilitada. A POC não integra a autenticação principal.
+- **POC-04:** integrada à `dev` pela PR #14 em 20/11/2026, como experimento independente de sessão sintética. O armazenamento temporário, nonces, segredo Apps Script e variáveis Vercel exclusivas foram limpos; a rota permanece desabilitada. Dois itens de hardening continuam bloqueando qualquer reativação: leitura limitada por stream e controles de rate limiting/capacidade. A POC não integra a autenticação principal e não deve ser ativada para a demonstração atual.
 
 **Limitações conhecidas da demonstração:** recuperação e alteração de senha/e-mail, edição e remoção de serviços, upload de imagens no Google Drive, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades ainda não estão implementados. A modelagem aprovada prevê 12 abas; o backend atual utiliza operacionalmente as oito listadas acima.
 
@@ -51,6 +53,7 @@ O GitHub Actions executa essas verificações em pushes e Pull Requests direcion
 ## Documentação
 
 - [Contexto técnico para IAs e desenvolvedores](docs/AI_CONTEXT.md)
+- [Roteiro de evolução acadêmica e prioridades](docs/ROADMAP_ESTUDOS.md)
 - [Ativar o protótipo funcional com Google Sheets](docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md)
 - [Fluxo da área do profissional](docs/PROTOTIPO_DEMO_LOCAL.md)
 - [Especificação funcional do MVP (em revisão)](docs/ESPECIFICACAO_MVP.md)
@@ -64,7 +67,7 @@ O GitHub Actions executa essas verificações em pushes e Pull Requests direcion
 - [Relatório integrador acadêmico](docs/PROJETO_INTEGRADOR_CONECTA_LOCAL.md)
 - [Registro público de ocorrências](docs/REGISTRO_DE_OCORRENCIAS.md)
 
-A POC-04 está isolada na branch `feat/poc-04-session-cookie`; a PR #14 está pronta para revisão, aberta e ainda não mesclada em `dev`. Ela não integra o fluxo de autenticação principal.
+A POC-04 foi integrada à branch `dev` pela PR #14, mas permanece isolada e desabilitada. Não integra o fluxo de autenticação principal; consulte [POC-04 — Sessão sintética via cookie](docs/POC_04_SESSOES.md) para os limites e a decisão de não reativação.
 
 ## Créditos das imagens
 
