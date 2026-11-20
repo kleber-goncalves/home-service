@@ -311,9 +311,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 08a1ee7f09b6e6e06aa2be9ea71a0caf679dbb40
-- **Data do commit:** 2026-11-20T15:40:58-03:00
-- **Mensagem do commit:** docs(poc-04): registrar merge em dev e estado desabilitado
+- **Commit de referência:** f4293c45063de9a8154ddb877754c54af45b9a5a
+- **Data do commit:** 2026-11-20T15:41:04-03:00
+- **Mensagem do commit:** docs(roadmap): ajustar marcacoes para markdown
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 11
@@ -416,13 +416,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| f4293c4 | 2026-11-20 | docs(roadmap): ajustar marcacoes para markdown |
+| 7ec7a41 | 2026-11-20 | docs(poc-03): registrar integracao posterior no prototipo |
 | 08a1ee7 | 2026-11-20 | docs(poc-04): registrar merge em dev e estado desabilitado |
 | 0024b3e | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 528a637 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 4c12853 | 2026-11-20 | docs: criar roadmap de evolucao academica |
 | 322992e | 2026-11-20 | docs(poc-03): registrar integracao posterior no prototipo |
 | 1919a0d | 2026-11-20 | docs(arquitetura): sincronizar implementacao atual |
-| aedf073 | 2026-11-20 | docs(mvp): atualizar estado das validacoes |
-| 737c616 | 2026-11-20 | docs(relatorio): atualizar evidencias de validacao |
 
 <!-- END AUTO-GENERATED SECTION -->
