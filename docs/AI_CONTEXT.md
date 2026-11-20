@@ -11,6 +11,7 @@
 - O PR #16 integrou as classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`, com testes em `tests/loo/domain-entities.test.js` (`npm run test:loo`). O PR #17 corrigiu a composição da vitrine para manter os serviços de exemplo junto aos serviços cadastrados.
 - O PR #18 adicionou `docs/PROJETO_INTEGRADOR_CONECTA_LOCAL.md`. O PR #19 integrou `dev` em `main`.
 - O PR #19 sincronizou o núcleo do protótipo de `dev` com `main` por fast-forward, sem force push. Depois, o PR #20 atualizou quatro documentos em `dev`; em 20/11, a PR #14 adicionou à `dev` a POC-04 independente e desabilitada. `main` permanece em `49354a46863d5a5eb36ce32e450b975d4087fe3b`; portanto, o núcleo funcional da demonstração permanece alinhado, enquanto os arquivos exclusivos da POC-04 e as atualizações documentais estão somente em `dev`.
+- A PR #23 concluiu o ciclo de vida dos serviços em `dev` (edição e remoção lógica). Em 20/11/2026, após a sincronização do Apps Script e a publicação da implantação Web App existente, o responsável confirmou que os testes manuais passaram no Preview fixo da branch `dev`; o deployment `dpl_FT5dFsPzB6B1phwGywur4ewjRkZS` está `READY` no commit `e6d231c`. `main` permanece inalterada.
 - O ambiente Preview de `dev` contém variáveis `CONECTA_LOCAL_*` com escopo Preview; os valores são secretos e não devem ser lidos, copiados para documentação ou compartilhados. A Production permanece sem variáveis de backend.
 - O gateway em `api/app.js` → `server/app-gateway.js` bloqueia as operações de negócio fora de Vercel Preview. Production permanece como vitrine pública, conforme decisão do responsável pelo projeto.
 - O Apps Script de negócio está em `apps-script/conecta-local/Code.gs`. O fluxo atual utiliza oito abas operacionais do Sheets: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`. A modelagem aprovada contempla 12 abas; as quatro restantes ainda não têm fluxo operacional implementado.
@@ -104,7 +105,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 
 - Homepage pública demonstrativa em `src/pages/HomePage.jsx`, organizada com componentes reutilizáveis em `src/components/home/` e primitivas locais em `src/components/ui/`.
 - A homepage combina serviços reais da demonstração retornados por `public.services` com serviços/profissionais ilustrativos. Busca, categoria e cidade filtram os itens disponíveis no frontend; não há pesquisa geográfica externa ou geolocalização.
-- Cadastro, confirmação de código demonstrativo, login, sessão, atualização do perfil, criação de serviço, pausa/publicação e consulta pública de serviços implementados em `src/pages/AuthDemoPage.jsx`, `src/services/app-api.js`, `api/app.js` e `server/app-gateway.js`.
+- Cadastro, confirmação de código demonstrativo, login, sessão, atualização do perfil, criação, edição, pausa/publicação e remoção lógica de serviços, além da consulta pública, implementados em `src/pages/AuthDemoPage.jsx`, `src/services/app-api.js`, `api/app.js` e `server/app-gateway.js`.
 - Em 20/11/2026, o responsável informou que repetiu os testes do fluxo funcional no Preview atualizado de `dev`, após as integrações das PRs #16 e #17, e confirmou o funcionamento correto. O fluxo inclui catálogo, cadastro/ativação demonstrativa, persistência em Sheets, login/restauração de sessão, criação, pausa/publicação, vitrine e logout, com dados fictícios.
 - O Apps Script de negócio está em `apps-script/conecta-local/Code.gs`; utiliza operacionalmente as abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`.
 - O gateway aplica Argon2id (`hash-wasm@4.13.0`), comparação resistente a diferenças de tempo, cookie `HttpOnly; Secure; SameSite=Strict`, CSRF, HMAC servidor-servidor, validação de Origin e bloqueio fora de Preview.
@@ -120,7 +121,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 - **Production (`main`):** vitrine pública. O gateway retorna `APP_DEMO_DISABLED` fora de `preview`; não há variáveis Production do backend e não se deve habilitá-lo nesta etapa.
 - O projeto é acadêmico e utiliza somente dados fictícios. Não inserir credenciais ou dados pessoais reais.
 - A modelagem prevê 12 abas/entidades; somente as oito listadas acima são atualmente utilizadas pelo backend de negócio. `CONTROLE_AUTENTICACAO`, `SERVICO_CIDADES`, `IMAGENS` e `DENUNCIAS` ainda não têm fluxos operacionais.
-- Ainda não implementados: recuperação/alteração de senha ou e-mail, edição e remoção de serviços, upload de imagens no Drive, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades.
+- Ainda não implementados: recuperação/alteração de senha ou e-mail, upload de imagens no Drive, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades.
 - A POC-04 está integrada à `dev` pela PR #14, mas sua rota independente permanece desabilitada. Os ensaios sintéticos foram concluídos e os recursos/segredos exclusivos foram limpos. Dois itens de hardening ainda impedem qualquer reativação: limite de leitura aplicado durante consumo de stream e rate limiting/limite de emissão. Não conectar a POC ao fluxo principal. Falhas reais de infraestrutura e testes de carga não foram executados. Ver `docs/POC_04_SESSOES.md`.
 
 ### Etapa 1 — Autorização e integridade (validação técnica concluída em 20/11/2026)
@@ -136,24 +137,21 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 - **Validação manual do papel — PASS:** depois de sincronizar e publicar uma nova versão do Apps Script real, A teve seu papel fictício alterado temporariamente para `admin` e tentou pausar um serviço próprio. A API retornou HTTP 403/`ROLE_FORBIDDEN`; `ultima_atividade_em` não mudou, o serviço permaneceu `published` e a auditoria permaneceu intacta, sem sucesso indevido.
 - A tentativa anterior à sincronização do Apps Script havia retornado HTTP 200, evidenciando que o Web App publicado estava atrás do código versionado em GitHub. Após sincronizar `apps-script/conecta-local/Code.gs` e atualizar a implantação Web App existente, o mesmo cenário retornou o bloqueio esperado.
 - **Limite:** o harness automatizado simula Sheets, Properties e LockService; não demonstra quotas, indisponibilidades ou falhas reais desses serviços. A atualização do registro de negócio e a escrita de auditoria continuam separadas; não declarar atomicidade. Considerar essa investigação na POC-05 somente se for proporcional ao objetivo acadêmico.
-- **Limpeza da conta de teste:** antes de retomar o uso normal da conta A, confirmar que o papel foi restaurado para `professional`; não deixar a conta de demonstração com o papel temporário `admin`.
+- **Limpeza da conta de teste:** o responsável confirmou que o papel da conta fictícia A foi restaurado para `professional` após o teste temporário com `admin`.
 
 
-### Etapa 2 — Ciclo de vida dos serviços (em implementação na branch `feat/service-lifecycle`)
+### Etapa 2 — Ciclo de vida dos serviços (concluída em 20/11/2026)
 
-- Base da branch: `dev` no commit `b75da38569e023eb717e380c9451f540e11c9ec6`; a branch de trabalho é `feat/service-lifecycle`. Nenhuma alteração foi integrada em `dev` ou `main` nesta etapa.
-- Novas ações protegidas no Apps Script e gateway: `service.update` e `service.remove`. Ambas exigem sessão, CSRF e papel confiável `professional`.
-- `service.update` permite editar somente nome, categoria e descrição; o Apps Script deriva proprietário da sessão, confere o ID do serviço e não aceita mass assignment de proprietário, papel, status, preço ou timestamps.
-- `service.remove` faz remoção lógica: altera `SERVICOS.status` para `removed`, mantém a linha e registra `service.remove` em `AUDITORIA`.
-- Serviços `suspended` ou `removed` não podem ser editados/removidos pelo profissional; também não podem ser reativados com `service.setStatus`. Somente `published` e `paused` alternam nesses estados.
-- A edição preserva estado, proprietário, preço, `criado_em` e `publicado_em`. Categoria inativada já associada pode ser mantida, mas uma categoria inativa não pode ser escolhida para outra associação.
-- Os limites de nome e descrição foram alinhados à modelagem: nome de 5 a 100 caracteres; descrição de 10 a 1.000.
-- A interface em `src/pages/AuthDemoPage.jsx` reutiliza o formulário para criação/edição, apresenta estados `draft`, `published`, `paused`, `suspended` e `removed`, confirma antes da remoção e atualiza a tela somente após resposta de sucesso.
-- A suíte existente foi ampliada: testes Apps Script em `tests/authorization/apps-script.test.js`, gateway em `tests/authorization/gateway.test.js` e entidade em `tests/loo/domain-entities.test.js`. A execução [Validate Home Service #44810635555](https://github.com/kleber-goncalves/home-service/actions/runs/44810635555) concluiu **SUCCESS** no commit funcional `e1a1dc326d59b711dabd0eab6032f6994baa0f5f`: autorização/ownership 22/22 PASS, LOO 7/7 PASS, POC-01/02/03/04, auditoria de produção, registro de ocorrências, ESLint e build passaram.
-- O Preview da branch concluiu READY no deployment `dpl_2ZXGHjMJ3dx2urhGjf3rtXucJKsk`, mas não possui variáveis privadas `CONECTA_LOCAL_*`; portanto, comprova somente o build do frontend, não o fluxo backend.
-- A validação ponta a ponta no Preview de `dev` depende de integrar a branch, sincronizar `apps-script/conecta-local/Code.gs` com o editor Apps Script real e publicar uma nova versão da implantação Web App existente, preservando a URL/ID e as Script Properties.
-- Não implementar nesta etapa gestão administrativa, publicação completa de rascunhos, associação `SERVICO_CIDADES`, preços avançados ou imagens. A gravação de negócio e a auditoria continuam separadas; não declarar atomicidade.
-
+- A PR #23 (`feat/service-lifecycle`) foi integrada exclusivamente em `dev` em 20/11/2026 pelo merge commit `0f9e887347444deb1307e65d127d969e595c81ed`. `main` e Production não foram alteradas.
+- As ações protegidas `service.update` e `service.remove` estão integradas no gateway e em `apps-script/conecta-local/Code.gs`; ambas exigem sessão, CSRF e papel confiável `professional`.
+- `service.update` permite editar nome, categoria e descrição; o backend deriva o proprietário da sessão e rejeita mass assignment de proprietário, papel, status, preço e timestamps.
+- `service.remove` realiza remoção lógica: define `SERVICOS.status = removed`, preserva a linha e registra a ação em `AUDITORIA`.
+- Serviços `suspended` e `removed` não podem ser editados/removidos pelo profissional nem reativados por `service.setStatus`. A edição preserva status, proprietário, preço, `criado_em` e `publicado_em`; categoria inativa já associada pode ser mantida, mas não selecionada para nova associação.
+- A interface em `src/pages/AuthDemoPage.jsx` reutiliza o formulário para criação/edição, apresenta os estados do serviço e solicita confirmação antes da remoção.
+- **CI — PASS:** a execução do workflow no merge commit `0f9e887347444deb1307e65d127d969e595c81ed`, run [#44812170065](https://github.com/kleber-goncalves/home-service/actions/runs/44812170065), concluiu com sucesso. Foram aprovados POC-01 (12/12), POC-02 (20/20), POC-03 (26/26), POC-04 (33/33), autorização/ownership (22/22), LOO (7/7), auditoria de dependências de produção, registro de ocorrências, ESLint e build.
+- **Apps Script real:** após o merge, o responsável confirmou que sincronizou `apps-script/conecta-local/Code.gs` e publicou uma nova versão na implantação Web App existente, preservando a implantação e suas configurações.
+- **Preview e validação manual — PASS em 20/11/2026:** o deployment `dpl_FT5dFsPzB6B1phwGywur4ewjRkZS` ficou `READY` no commit `e6d231ce5cc978338bce23010d2003c7f551fd7c`. O alias fixo de `dev` (`https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app/`) foi conferido e aponta para esse deployment. O responsável confirmou que executou os testes manuais da etapa nesse ambiente e que todos passaram.
+- **Limites:** o harness automatizado usa mocks para Sheets/Properties/LockService; a confirmação manual é específica aos cenários executados pelo responsável. A gravação do registro de serviço e a escrita de auditoria continuam separadas; não declarar atomicidade. Manter dados fictícios e backend restrito ao Preview.
 
 ## 5. Arquitetura e decisões tecnológicas
 
