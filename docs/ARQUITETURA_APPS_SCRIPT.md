@@ -487,6 +487,7 @@ Em toda operação protegida:
 
 **Implementação observada no protótipo atual:**
 - `appRequireSession_` resolve a sessão pelo hash do token e retorna o registro de usuário confiável; operações de perfil/serviço não usam um `id_usuario` escolhido pelo navegador como identidade.
+- `appRequireProfessionalSession_` exige que o papel armazenado no registro confiável da conta seja exatamente `professional`; papel enviado pelo navegador não é consultado. O gate é usado em atualização de perfil, listagem, criação e alteração de estado de serviços. Falha retorna `ROLE_FORBIDDEN` (HTTP 403 no gateway).
 - `appUpdateProfile_` encontra o perfil por `state.user.id_usuario` e atualiza somente nome público, apresentação, cidade principal, WhatsApp e data de atualização.
 - `appListMyServices_` obtém a lista através do perfil ligado ao usuário da sessão.
 - `appCreateService_` deriva `id_profissional` do perfil ligado à sessão; não aceita o proprietário do payload como fonte de verdade.
