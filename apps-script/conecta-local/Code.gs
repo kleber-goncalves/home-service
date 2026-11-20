@@ -587,6 +587,21 @@ function appRequireSession_(tokenHash, nowMs, updateActivity) {
     return { session: session, user: user };
 }
 
+function appRequireProfessionalSession_(tokenHash, nowMs, updateActivity) {
+    var state = appRequireSession_(tokenHash, nowMs, false);
+    if (String(state.user.papel) !== "professional") {
+        throw appFault_("ROLE_FORBIDDEN", "A conta não possui permissão para esta operação.");
+    }
+
+    if (updateActivity) {
+        appUpdate_("SESSOES", state.session._row, {
+            ultima_atividade_em: new Date(nowMs).toISOString()
+        });
+    }
+
+    return state;
+}
+
 function appSessionMe_(payload, nowMs) {
     if (!appHasKeys_(payload, ["tokenHash"])) throw appFault_("SESSION_INVALID", "Entre novamente para continuar.");
     return appWithLock_(function () {
@@ -621,7 +636,7 @@ function appUpdateProfile_(payload, nowMs) {
     }
 
     return appWithLock_(function () {
-        var state = appRequireSession_(String(payload.tokenHash), nowMs, true);
+        var state = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, true);
         var profile = appGetProfile_(String(state.user.id_usuario));
         if (!profile) throw appFault_("PROFILE_UNAVAILABLE", "O perfil não está disponível.");
         var city = appFind_("CIDADES", "id_cidade", payload.id_cidade_principal);
@@ -666,7 +681,7 @@ function appGetServicesForUser_(userId) {
 function appListMyServices_(payload, nowMs) {
     if (!appHasKeys_(payload, ["tokenHash"])) throw appFault_("SESSION_INVALID", "Entre novamente para continuar.");
     return appWithLock_(function () {
-        var state = appRequireSession_(String(payload.tokenHash), nowMs, true);
+        var state = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, true);
         return { services: appGetServicesForUser_(String(state.user.id_usuario)) };
     });
 }
@@ -676,7 +691,7 @@ function appCreateService_(payload, nowMs) {
     if (!appHasKeys_(payload, required)) throw appFault_("INVALID_INPUT", "Preencha o nome, categoria e descrição do serviço.");
 
     return appWithLock_(function () {
-        var state = appRequireSession_(String(payload.tokenHash), nowMs, true);
+        var state = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, true);
         var profile = appGetProfile_(String(state.user.id_usuario));
         if (!profile) throw appFault_("PROFILE_UNAVAILABLE", "O perfil profissional não está disponível.");
 
@@ -718,7 +733,7 @@ function appSetServiceStatus_(payload, nowMs) {
     }
 
     return appWithLock_(function () {
-        var state = appRequireSession_(String(payload.tokenHash), nowMs, true);
+        var state = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, true);
         var profile = appGetProfile_(String(state.user.id_usuario));
         if (!profile) throw appFault_("PROFILE_UNAVAILABLE", "O perfil profissional não está disponível.");
 
