@@ -6,29 +6,32 @@ O projeto tem finalidade acadêmica e busca demonstrar investigação de problem
 
 ## Estado atual — 20/11/2026
 
-A branch `dev` contém a demonstração acadêmica funcional do Conecta Local. Os PRs #15 a #22 integraram cadastro, confirmação demonstrativa por código, login, sessão, atualização de perfil, criação e gestão de estado dos serviços, controles de autorização, persistência no Google Sheets, testes e documentação. A branch `feat/service-lifecycle` amplia o ciclo dos serviços com edição e remoção lógica; essa etapa permanece em validação e ainda não foi integrada.
+A branch `dev` contém a demonstração acadêmica funcional do Conecta Local. As integrações mais recentes concluíram três frentes importantes:
 
-O PR #19 sincronizou o núcleo do protótipo de `dev` com `main`; a PR #20 atualizou documentação em `dev`. Em 20/11/2026, a PR #14 foi integrada a `dev` pelo merge commit `adb51e2f1de8b9d47fb59205938b3e33e21739a1`. Ela adiciona a POC-04 de sessão sintética como rota independente, mas **não a conecta ao login principal e permanece desabilitada**. `main` permanece em `49354a46863d5a5eb36ce32e450b975d4087fe3b`; o head corrente de `dev` pode ser consultado diretamente no GitHub.
+- **PR #22 — autorização e integridade:** identidade, papel e propriedade de serviços são validados no Apps Script; testes automatizados e ensaios manuais de acesso cruzado e papel não profissional foram aprovados.
+- **PR #23 — ciclo de vida dos serviços:** edição dos próprios serviços e remoção lógica, mantendo o histórico em `SERVICOS` e registrando eventos em `AUDITORIA`. O responsável confirmou os testes manuais no Preview atualizado.
+- **PR #25 — cobertura por cidades:** um serviço pode atender vários municípios por meio da aba `SERVICO_CIDADES`. O responsável confirmou a sincronização/publicação do Apps Script e testou edição, persistência no Sheets e pesquisa pública do mesmo serviço nas duas cidades.
 
-**Validação funcional:** em 20/11/2026, após as integrações de #16, #17 e #14, o responsável informou ter repetido os testes do fluxo principal no Preview atualizado de `dev` e confirmou que a demonstração está funcionando. Os testes usam dados fictícios. A verificação adversarial específica de autorização entre dois profissionais continua como uma etapa técnica separada no roteiro.
+A **validação funcional principal da Etapa 3** foi concluída em 20/11/2026. A segunda cidade usada no ensaio foi temporária e foi removida depois dos testes; a planilha voltou a manter apenas a cidade original. Esses resultados refletem os testes relatados pelo responsável, além das evidências automatizadas disponíveis. Eles não equivalem a auditoria independente, teste de carga ou aprovação para produção.
 
-**Ambientes**
-- **Preview de `dev`:** ambiente destinado ao desenvolvimento e à demonstração funcional; contém as configurações privadas do backend com escopo Preview.
-- **Production (`main`):** vitrine pública. O gateway bloqueia operações de negócio fora de Vercel Preview; não habilitar variáveis de backend em Production nesta etapa.
+A PR #25 foi integrada exclusivamente em `dev` pelo merge commit `5003604a51def9bdf58df9845d36c2ec75a4452e`. A CI do merge [#44820409487](https://github.com/kleber-goncalves/home-service/actions/runs/44820409487) concluiu **SUCCESS**. A atualização documental de 20/11 também passou na execução [#44825394280](https://github.com/kleber-goncalves/home-service/actions/runs/44825394280). O Preview fixo de `dev` está disponível em:
+
+- **Preview:** https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app/
+- **Deployment verificado:** `dpl_HxMw5f9zyTKFYbj9We6YbguNX58v`, estado `READY`.
+
+**Production (`main`) permanece inalterada** no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`. O gateway bloqueia operações de negócio fora de Vercel Preview; não habilitar variáveis de backend em Production nesta etapa.
 
 O projeto é acadêmico, usa somente dados fictícios e não deve receber credenciais ou dados pessoais reais. Não é serviço comercial, marketplace transacional ou aplicação aprovada para produção.
 
 - **Repositório:** https://github.com/kleber-goncalves/home-service
-- **Preview de demonstração:** https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app
-- **Production (vitrine):** https://home-service-blush.vercel.app/
 - **Frontend:** React, JavaScript/JSX, Vite 8 e Tailwind CSS 4.
 - **Gateway HTTP:** Vercel Function em `api/app.js`, com regras em `server/app-gateway.js`.
 - **Backend de negócio:** Google Apps Script em `apps-script/conecta-local/Code.gs`.
-- **Persistência operacional atual:** Google Sheets nas abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`.
-- **Orientação a objetos:** classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`, integradas pelo PR #16.
-- **POC-04:** integrada à `dev` pela PR #14 em 20/11/2026, como experimento independente de sessão sintética. O armazenamento temporário, nonces, segredo Apps Script e variáveis Vercel exclusivas foram limpos; a rota permanece desabilitada. Dois itens de hardening continuam bloqueando qualquer reativação: leitura limitada por stream e controles de rate limiting/capacidade. A POC não integra a autenticação principal e não deve ser ativada para a demonstração atual.
+- **Persistência operacional atual:** Google Sheets nas abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS`, `SERVICO_CIDADES` e `AUDITORIA`.
+- **Orientação a objetos:** classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`.
+- **POC-04:** integrada à `dev` pela PR #14 como experimento independente de sessão sintética. Permanece desabilitada e não integra a autenticação principal. Os recursos temporários foram limpos; os limites de hardening e a decisão de não reativação estão documentados em `docs/POC_04_SESSOES.md`.
 
-**Limitações conhecidas da demonstração:** recuperação e alteração de senha/e-mail, upload de imagens no Google Drive, painel administrativo, denúncias/moderação, gestão administrativa de categorias/cidades e associação operacional de múltiplas cidades por serviço ainda não estão implementados. A edição e a remoção lógica dos serviços estão em desenvolvimento na branch `feat/service-lifecycle`, aguardando validação antes da integração. A modelagem aprovada prevê 12 abas; o backend atual utiliza operacionalmente as oito listadas acima.
+**Limitações conhecidas da demonstração:** envio real de e-mail, recuperação/alteração de senha e e-mail, upload de imagens no Google Drive, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades ainda não foram implementados. Pesquisa local com moradores e profissionais também continua pendente; os indicadores documentais não substituem dados primários de Capelinha.
 
 ## Executar localmente
 
