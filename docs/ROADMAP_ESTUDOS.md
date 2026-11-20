@@ -175,15 +175,19 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 5 — Pesquisa acadêmica e acabamento da apresentação
 
-**Objetivo:** fortalecer a justificativa e a qualidade da entrega acadêmica.
+**Status: instrumento exploratório preparado; coleta e análise de respostas pendentes.**
 
-Escopo:
-- Registrar uma pequena pesquisa com profissionais e moradores, se viável e autorizada, sem coletar dados pessoais desnecessários.
-- Apresentar claramente o que é dado real, dado fictício e hipótese do projeto.
+**Instrumento disponível:** `docs/ROTEIRO_PESQUISA_EXPLORATORIA.md`, com questionários separados para moradores e profissionais, consentimento, cuidados de privacidade e sugestões de análise.
+
+**Próximos passos:**
+- Confirmar com o professor/orientador se a atividade exige algum termo ou procedimento institucional antes de abordar participantes.
+- Aplicar somente após essa orientação, com participação voluntária e sem coletar nomes, e-mails, telefones, endereços ou outros dados identificáveis.
+- Buscar, se viável, 20 a 30 respostas de moradores e 10 a 15 de profissionais; a amostra é exploratória e de conveniência, não representativa do município.
+- Analisar respostas reais, calcular percentuais por pergunta e registrar também opiniões contrárias ou pouco favoráveis à proposta.
 - Revisar acessibilidade básica, responsividade, mensagens de erro, estados vazios e fluxo de demonstração.
-- Atualizar capturas, roteiro de apresentação e relatório acadêmico conforme o que está realmente implementado.
+- Atualizar capturas, roteiro de apresentação e relatório acadêmico conforme o que estiver realmente implementado e pesquisado.
 
-**Prioridade:** alta para a entrega acadêmica, sem criar novas funcionalidades de backend.
+**Prioridade:** alta para a entrega acadêmica. Não inventar participantes, respostas, percentuais ou conclusões; não implementar novas funcionalidades de backend apenas para aumentar o escopo da apresentação.
 
 ## 4. Itens que devem ficar para depois
 
