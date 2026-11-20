@@ -126,13 +126,14 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 - Valida no Apps Script IDs existentes, cidades ativas, ausência de duplicidade e pelo menos um município por serviço.
 - Preserva vínculos antigos com cidade posteriormente inativada durante a edição, sem permitir novas associações inativas.
 - Mantém fallback para serviços legados sem linhas em `SERVICO_CIDADES`, usando a cidade principal do profissional até a primeira edição do serviço.
-- Retorna a cobertura por serviço em `service.listMine` e `public.services`; a busca textual da homepage considera todos os municípios vinculados.
+- Retorna a cobertura por serviço em `service.listMine` e `public.services`; a busca textual da homepage considera todos os municípios vinculados e oferece sugestões do catálogo ativo `CIDADES` no campo de localidade.
+- Alinha os rótulos dos cartões/categorias ilustrativas à taxonomia inicial cadastrada em `CATEGORIAS`, preservando filtros coerentes enquanto não há dados persistidos.
 - Mantém serviços publicados visíveis quando sua categoria é inativada posteriormente, conforme a regra da especificação.
 - Acrescenta seleção de múltiplos municípios ao formulário de criação/edição do profissional.
 
-**Validação automatizada — PASS:**
-- Execução do workflow no push #44817408060 e no evento da PR #44817414307 no commit de código `9114eaf99d600e52913219d67af7b13560ca17a1`, ambas SUCCESS.
-- Authorization/ownership, LOO, POC-01/02/03/04, auditoria de dependências de produção, registro de ocorrências, ESLint e build passaram.
+**Validação automatizada — PASS na revisão principal (`c2d2ad1`):**
+- Push #44817708561 e evento da PR #44817721297 concluíram SUCCESS; authorization/ownership, LOO, POC-01/02/03/04, auditoria de dependências de produção, registro de ocorrências, ESLint e build passaram.
+- Duas correções adicionais na busca (sugestões de municípios ativos e alinhamento da taxonomia ilustrativa) foram adicionadas depois; aguardar a conclusão dos workflows no novo HEAD antes de declarar a revisão final aprovada.
 
 **Validação pendente antes de concluir:**
 - Integrar a PR em `dev`.
