@@ -2,10 +2,10 @@
 
 **Projeto:** Conecta Local (repositório `home-service`)  
 **Natureza:** projeto acadêmico de desenvolvimento web  
-**Versão do documento:** 1.0  
-**Data de consolidação:** 17 de novembro de 2026  
-**Base técnica analisada:** branches `dev` e `main`, commit `49354a46863d5a5eb36ce32e450b975d4087fe3b` (18/11/2026)  
-**Ambiente de demonstração:** Vercel Preview — `https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app`
+**Versão do documento:** 1.1  
+**Data de consolidação:** 20 de novembro de 2026  
+**Base técnica analisada:** branch `dev` no head documental `a17f2419a4613933b03f20b2f6e312c527a53274`; código da Etapa 3 integrado no merge commit `5003604a51def9bdf58df9845d36c2ec75a4452e`. A branch `main` permanece no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`.  
+**Ambiente de demonstração:** Vercel Preview — `https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app` (deployment verificado `dpl_HxMw5f9zyTKFYbj9We6YbguNX58v`, `READY`).
 
 > **Finalidade:** apresentar como o Conecta Local atende às oito etapas solicitadas na atividade integradora: investigação, dados, APS, LOO, PI, segurança, testes e viabilidade. O documento diferencia funcionalidades implementadas, decisões de projeto, evidências existentes e atividades ainda pendentes.
 
@@ -15,22 +15,22 @@
 
 O **Conecta Local** é uma plataforma web regional proposta para aproximar pessoas que procuram serviços locais de profissionais autônomos e pequenos empreendedores. A experiência principal é: **pesquisar → descobrir → conhecer → entrar em contato**. O sistema funciona como uma vitrine de serviços; o contato é realizado diretamente com o profissional, principalmente pelo WhatsApp divulgado no perfil.
 
-A análise do código atual da branch `dev` confirma uma homepage pública, interface de acesso/cadastro, confirmação demonstrativa, login, gerenciamento de sessão e operações básicas de serviços. Também confirma uma arquitetura com React/Vite no navegador, uma Vercel Function como gateway HTTP, Google Apps Script como autoridade de negócio e Google Sheets como armazenamento da demonstração.
+A análise da branch `dev` confirma uma homepage pública, cadastro e login demonstrativos, gerenciamento de sessão, edição e remoção lógica de serviços e associação de cada serviço a uma ou mais cidades. A arquitetura utiliza React/Vite no navegador, uma Vercel Function como gateway HTTP, Google Apps Script como autoridade de negócio e Google Sheets como armazenamento da demonstração.
 
-O projeto já possui implementação concreta de orientação a objetos, controles de segurança, testes automatizados e documentação de arquitetura e dados. Entretanto, **a necessidade específica do município ainda não foi comprovada por pesquisa de campo**. Os números públicos apresentados neste relatório dão contexto nacional e municipal, mas não substituem entrevistas ou questionários com moradores e profissionais locais.
+O projeto também possui implementação concreta de orientação a objetos, controles de segurança, testes automatizados e documentação de arquitetura e dados. Em 20/11/2026, o responsável confirmou a sincronização/publicação do Apps Script real e a validação manual da edição de serviços, da persistência em `SERVICO_CIDADES` e da pesquisa pública do mesmo serviço em duas cidades. Entretanto, **a necessidade específica do município ainda não foi comprovada por pesquisa de campo**. Os números públicos apresentados neste relatório dão contexto nacional e municipal, mas não substituem entrevistas ou questionários com moradores e profissionais locais.
 
 ### Situação das oito etapas
 
 | Etapa | Situação atual | Evidência ou pendência principal |
 |---|---|---|
-| 1. Investigação | Parcial | Problema e público definidos como hipótese; pesquisa local ainda necessária. |
-| 2. Dados | Parcial | Indicadores oficiais contextualizam o tema; faltam dados primários de Capelinha. |
-| 3. APS — Análise e Projeto de Sistemas | Desenvolvida | Requisitos, atores, regras, arquitetura e modelagem documentados. |
-| 4. LOO — Linguagem Orientada a Objetos | Implementada | Classes `Usuario`, `Profissional` e `Servico`, com herança e testes automatizados. |
-| 5. PI — Programação/Projeto de Interface | Implementada | Interface React/JSX, CSS/Tailwind e fluxos responsivos. |
-| 6. Segurança | Implementada em nível de protótipo | Hash de senha, sessão, CSRF, HMAC, validação de origem e auditoria; sem aprovação para produção. |
-| 7. Testes | Suítes automatizadas aprovadas; fluxo funcional revalidado manualmente | Em 20/11/2026, o responsável confirmou o funcionamento do fluxo principal no Preview atualizado de `dev`, após as integrações recentes. A autorização adversarial entre profissionais e a validação de abuso/carga continuam fora dessa confirmação. |
-| 8. Viabilidade | Análise preliminar | Custos de demonstração baixos; uso comercial exige plano e infraestrutura adequados. |
+| 1. Investigação | Parcial | Problema e público definidos como hipótese; pesquisa local com moradores e profissionais ainda não realizada. |
+| 2. Dados | Parcial | Indicadores públicos contextualizam o tema; faltam dados primários de Capelinha. |
+| 3. APS — Análise e Projeto de Sistemas | Desenvolvida e implementada no protótipo | Requisitos, regras, modelagem, arquitetura e fluxo de serviços documentados e exercitados. |
+| 4. LOO — Linguagem Orientada a Objetos | Implementada | Classes `Usuario`, `Profissional` e `Servico`, herança e testes automatizados. |
+| 5. PI — Programação/Projeto de Interface | Implementada | Interface React/JSX, CSS/Tailwind, homepage pública e área profissional responsiva. |
+| 6. Segurança | Implementada em nível de protótipo | Argon2id, sessão, CSRF, HMAC, replay, validação de origem, autorização e auditoria; sem aprovação para produção. |
+| 7. Testes | CI aprovada e fluxos principais confirmados manualmente | Testes automatizados passaram; o responsável confirmou validação manual de edição/remoção de serviços, autorização e cobertura por duas cidades no Preview de `dev`. Origem externa, carga e auditoria independente não foram validadas nesta rodada. |
+| 8. Viabilidade | Análise preliminar | Custos de demonstração baixos; operação comercial exigiria revisão de infraestrutura, custos, privacidade e segurança. |
 
 **Critério de leitura:** “implementado” significa que há código ou estrutura versionada. Não significa, por si só, que todos os fluxos foram novamente testados em ambiente real, que houve auditoria independente ou que o sistema esteja liberado para produção.
 
@@ -145,15 +145,16 @@ A autorização de operações protegidas deve ser validada no backend. O navega
 |---|---|---|
 | RF01 | Permitir acesso público à homepage e ao catálogo sem login. | Implementado. |
 | RF02 | Apresentar categorias e serviços públicos retornados pelo backend. | Implementado, com exemplos locais como conteúdo ilustrativo complementar. |
-| RF03 | Filtrar itens exibidos por texto, categoria e cidade informada. | Implementado no frontend; a filtragem é textual/local, não geoespacial. |
+| RF03 | Filtrar itens exibidos por texto, categoria e cidade informada. | Implementado no frontend sobre o catálogo carregado; a pesquisa considera todas as cidades vinculadas ao serviço, sem geolocalização ou distância. |
 | RF04 | Permitir cadastro de profissional com dados de demonstração. | Implementado no protótipo. |
 | RF05 | Gerar e validar um código demonstrativo de confirmação. | Implementado; código é mostrado na interface e não enviado por e-mail. |
-| RF06 | Permitir login e criação de sessão autenticada. | Implementado no código; revalidação manual no Preview após a última correção de ambiente permanece necessária. |
+| RF06 | Permitir login e criação de sessão autenticada. | Implementado e revalidado manualmente no Preview atualizado de `dev` em 20/11/2026. |
 | RF07 | Permitir consultar os dados do profissional e os seus serviços. | Implementado no fluxo autenticado. |
-| RF08 | Permitir criar serviço e alterar seu estado entre publicado e pausado. | Implementado no protótipo. |
-| RF09 | Exibir serviço publicado na vitrine pública, respeitando as condições de visibilidade do backend. | Implementado no fluxo de consulta; validar ponta a ponta no ambiente de demonstração. |
+| RF08 | Permitir criar, editar, pausar, publicar e remover logicamente os próprios serviços. | Implementado em `dev` pelas PRs #23 e #25; o responsável confirmou os testes manuais do ciclo de vida no Preview em 20/11/2026. |
+| RF09 | Exibir serviço publicado na vitrine pública, respeitando as condições de visibilidade do backend e as cidades atendidas. | Implementado e validado manualmente na homepage do Preview; o mesmo serviço foi encontrado pelas duas cidades vinculadas. |
 | RF10 | Permitir logout com revogação da sessão. | Implementado no código. |
 | RF11 | Permitir envio real de e-mail, recuperação de senha e gestão administrativa completa. | Fora do escopo atual. |
+| RF12 | Permitir associar uma ou mais cidades a cada serviço e pesquisar o serviço por qualquer cidade vinculada. | Implementado pela PR #25; persistência em `SERVICO_CIDADES` e pesquisa pública nas duas cidades confirmadas manualmente em 20/11/2026. |
 
 ### 3.5. Requisitos não funcionais
 
@@ -184,7 +185,7 @@ A modelagem lógica documenta **12 entidades e 102 campos** distribuídos em tr�
 - **Catálogo e serviços:** `SERVICOS`, `CATEGORIAS`, `CIDADES`, `SERVICO_CIDADES` e `IMAGENS`.
 - **Governança:** `DENUNCIAS` e `AUDITORIA`.
 
-A implementação atual do Apps Script utiliza diretamente as abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `SERVICOS`, `CATEGORIAS`, `CIDADES` e `AUDITORIA`. As demais entidades permanecem previstas na modelagem para evoluções futuras; não se deve dizer que todos os 12 módulos estão plenamente operacionais.
+A implementação atual do Apps Script utiliza diretamente nove abas: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `SERVICOS`, `CATEGORIAS`, `CIDADES`, `SERVICO_CIDADES` e `AUDITORIA`. As abas `CONTROLE_AUTENTICACAO`, `IMAGENS` e `DENUNCIAS` permanecem previstas na modelagem para evoluções futuras; não se deve dizer que todos os 12 módulos estão plenamente operacionais.
 
 O Google Sheets é utilizado como persistência didática e não deve ser confundido com um banco de dados relacional. Integridade referencial, unicidade, propriedade, estados e validações precisam ser aplicadas pelo Apps Script. Para uma evolução comercial ou aumento relevante de volume, deve-se reavaliar o armazenamento e considerar um banco de dados próprio.
 
@@ -307,7 +308,7 @@ O projeto utiliza React com JavaScript e JSX. O JSX permite descrever a estrutur
 
 A interface pública apresenta a proposta da plataforma, campo de busca, seleção de categorias, cards de serviços/profissionais ilustrativos, explicação de como funciona, perguntas frequentes e chamadas para ação. O fluxo de cadastro e acesso apresenta formulários com validação, etapas de confirmação e área autenticada.
 
-A busca pública consulta serviços e categorias pelo gateway e combina os serviços retornados com exemplos visuais locais. A filtragem atual por texto/categoria/cidade é realizada no frontend sobre os itens carregados. O campo de cidade não realiza geocodificação nem uma pesquisa geográfica por distância. As fotografias e os perfis de exemplo não representam profissionais cadastrados.
+A busca pública consulta serviços e categorias pelo gateway e combina os serviços retornados com exemplos visuais locais. A filtragem por texto/categoria/cidade é realizada no frontend sobre os itens carregados; para serviços cadastrados, a pesquisa considera todas as cidades associadas em `SERVICO_CIDADES`. O campo de cidade não realiza geocodificação nem uma pesquisa geográfica por distância. As fotografias e os perfis de exemplo não representam profissionais cadastrados.
 
 ### 5.3. Responsividade e usabilidade
 
@@ -319,7 +320,7 @@ A interface foi construída com classes utilitárias e regras CSS para diferente
 - A confirmação é demonstrativa e não envia mensagens de e-mail.
 - Não existe fluxo de recuperação de senha.
 - Upload de fotos para Google Drive não está implementado.
-- A pesquisa geográfica e a cobertura por distância não estão implementadas.
+- A busca por município é textual e considera os vínculos de cada serviço; geolocalização, cálculo de distância e ordenação por proximidade não estão implementados.
 - Cards e fotografias de exemplo são ilustrativos e não devem ser confundidos com prestadores reais.
 
 ## 6. Segurança — proteção dos dados
@@ -393,12 +394,12 @@ A existência de um teste automatizado no repositório não significa que toda a
 | T08 | Herança e operações LOO | Instanciar `Profissional`, verificar herança de `Usuario`, pausar e publicar um `Servico`. | Atributos e payloads corretos; estados `paused` e `published`. | Cinco casos automatizados em `tests/loo/domain-entities.test.js`. |
 | T09 | Cadastro e confirmação | Criar conta totalmente fictícia e usar o código exibido na interface. | Conta é registrada; código válido ativa o fluxo; código inválido/expirado é recusado. | Responsável confirmou a validação do fluxo no Preview atualizado de `dev` em 20/11/2026, após as integrações recentes. |
 | T10 | Login e restauração de sessão | Entrar com credencial fictícia e recarregar a página. | Sessão é reconhecida pelo backend; dados do profissional são carregados. | Responsável confirmou a validação do fluxo no Preview atualizado de `dev` em 20/11/2026, após as integrações recentes. |
-| T11 | Criação e alteração de serviço | Criar um serviço, pausar e publicar novamente. | Estado é salvo no Sheets e refletido na área do profissional. | Responsável confirmou o fluxo de criação, pausa e publicação no Preview atualizado de `dev` em 20/11/2026. Edição/remoção continuam não implementadas. |
-| T12 | Visibilidade pública e autorização | Publicar serviço e consultar homepage; tentar alterar serviço que não pertence ao usuário autenticado. | Serviço publicado elegível aparece; operação de outro proprietário é negada. | Visibilidade de serviço publicado na homepage foi validada no Preview do PR #15 em 16/11/2026. O ensaio adversarial de acesso cruzado entre profissionais ainda precisa de evidência específica. |
+| T11 | Ciclo de vida do serviço | Criar, editar, pausar, publicar e solicitar remoção lógica de serviço próprio. | Alterações são persistidas; remoção muda o estado para `removed` sem apagar o histórico. | PR #23 integrada em `dev`; o responsável confirmou os testes manuais do ciclo de vida no Preview em 20/11/2026. |
+| T12 | Visibilidade pública e cobertura por cidade | Consultar a homepage por uma cidade vinculada e repetir a busca por outra cidade do mesmo serviço. | Serviço publicado aparece nas duas pesquisas, sem login. | O responsável confirmou em 20/11/2026 que a homepage encontrou o mesmo serviço nas duas cidades após atualizar a aba `SERVICO_CIDADES`. |
 | T13 | Logout e revogação | Encerrar a sessão e tentar acessar uma operação protegida com a sessão anterior. | Sessão é revogada, cookie expirado e operação protegida recusada. | Responsável confirmou a validação do fluxo no Preview atualizado de `dev` em 20/11/2026. |
 | T14 | Origem externa | Enviar requisição com origem diferente da permitida. | Gateway responde com recusa; operação não chega ao backend de negócio. | Validação de Origin implementada no gateway. A evidência específica de rejeição manual no Preview atualizado de `dev` ainda precisa ser registrada. |
-| T15 | Acesso cruzado entre profissionais | Autenticar como profissional A e tentar consultar/alterar serviço de B usando o ID conhecido do serviço. | A recebe somente os próprios serviços; a alteração do recurso de B é recusada e o registro permanece intacto. | Coberto por teste automatizado do `Code.gs` real em harness Node/VM com dois usuários e Sheets simulado. Confirmação no Preview real ainda pendente. |
-| T16 | Mass assignment e elevação de privilégio | Enviar `id_usuario`, `id_profissional`, `papel=admin` ou estado administrativo em payload de perfil/serviço; simular conta com papel diferente de `professional`. | O backend ignora campos de identidade não permitidos, mantém o proprietário da sessão, recusa estados não previstos e bloqueia ações profissionais para papel não autorizado. | Coberto por testes automatizados de Apps Script e gateway na branch `feat/authorization-integrity`; validação manual cruzada no Preview permanece pendente. |
+| T15 | Acesso cruzado entre profissionais | Autenticar como profissional A e tentar alterar serviço de B usando o ID conhecido do serviço. | Operação é recusada e o registro de B permanece intacto, sem evento de sucesso indevido. | Teste manual confirmado pelo responsável em 20/11/2026: HTTP 404 / `SERVICE_NOT_FOUND`; serviço de B permaneceu publicado e a auditoria não registrou sucesso indevido. |
+| T16 | Papel não autorizado e mass assignment | Testar campos de identidade/papel enviados pelo cliente e executar ação profissional com conta cujo papel confiável não seja `professional`. | O navegador não altera identidade/proprietário; papel não autorizado é recusado. | Testes automatizados cobrem mass assignment; no Apps Script real, o responsável confirmou HTTP 403 / `ROLE_FORBIDDEN` ao executar ação profissional com a conta temporariamente marcada como `admin`. O papel foi restaurado para `professional`. |
 
 ### 7.2. Comandos de validação
 
@@ -409,6 +410,8 @@ npm ci
 npm run test:poc01
 npm run test:poc02
 npm run test:poc03
+npm run test:poc04
+npm run test:authorization
 npm run test:loo
 npm run check:occurrences
 npm run lint
@@ -416,7 +419,7 @@ npm run build
 npm audit --omit=dev --audit-level=high
 ```
 
-O workflow do GitHub Actions executa essas etapas de validação. A auditoria completa de dependências de desenvolvimento é informativa e não bloqueia a execução quando falha, conforme configuração do workflow; a auditoria de dependências de produção com severidade alta é bloqueante.
+O workflow `.github/workflows/validate.yml` executa POC-01/02/03/04, autorização e propriedade, LOO, verificação do registro de ocorrências, ESLint, build e auditoria bloqueante das dependências de produção. A auditoria completa de dependências de desenvolvimento é informativa e não bloqueia a execução quando falha. No merge da PR #25, o workflow [#44820409487](https://github.com/kleber-goncalves/home-service/actions/runs/44820409487) concluiu SUCCESS. A atualização documental deste relatório/README em 20/11 também passou na execução [#44825394280](https://github.com/kleber-goncalves/home-service/actions/runs/44825394280).
 
 ### 7.3. Roteiro de demonstração manual
 
@@ -429,7 +432,7 @@ O workflow do GitHub Actions executa essas etapas de validação. A auditoria co
 7. Abrir a homepage e verificar a visibilidade do serviço publicado e o canal de contato.
 8. Encerrar a sessão e verificar que o acesso protegido exige nova autenticação.
 
-**Estado de implantação em 18/11/2026:** após o merge da PR #20, a Vercel publicou um Preview da branch `dev` no commit `6c787ec` com estado `READY`. A PR #20 e os commits subsequentes deste ajuste são exclusivamente documentais; o código funcional foi originalmente sincronizado com `main` no commit `49354a4`. O estado `READY` confirma build e publicação, não a jornada ponta a ponta. O fluxo manual foi validado no Preview da branch de implementação do PR #15 em 16/11/2026, mas precisa ser repetido no Preview atualizado de `dev` após as integrações #16 e #17.
+**Estado de implantação em 20/11/2026:** a PR #25 está integrada exclusivamente em `dev` pelo merge commit `5003604a51def9bdf58df9845d36c2ec75a4452e`. A CI do merge concluiu SUCCESS. O Preview fixo da branch `dev` está READY no deployment `dpl_HxMw5f9zyTKFYbj9We6YbguNX58v`, URL de branch `https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app/`. O responsável confirmou a sincronização/publicação do Apps Script e a validação manual de edição de serviço, persistência na aba `SERVICO_CIDADES` e busca pública do mesmo serviço nas duas cidades. O segundo município foi usado temporariamente e depois removido; a planilha permaneceu apenas com a cidade original. O deployment READY confirma build/publicação; os resultados funcionais acima são registrados separadamente como testes manuais relatados pelo responsável. `main` permanece inalterada no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`.
 
 ## 8. Viabilidade — custos e benefícios
 
@@ -497,11 +500,11 @@ A evolução responsável seria validar a necessidade local, medir o uso do prot
 
 ## Conclusão geral
 
-O Conecta Local cobre de forma concreta boa parte das exigências acadêmicas: possui uma proposta de solução, requisitos e modelagem, interface web, implementação de orientação a objetos, controles de segurança e uma estrutura de testes automatizados. A arquitetura separa a experiência do usuário, o gateway e o backend de negócio e documenta os limites da persistência em planilha.
+O Conecta Local cobre de forma concreta as principais exigências técnicas da atividade acadêmica: possui problema e público definidos como hipótese, requisitos e modelagem documentados, interface web, orientação a objetos, controles de segurança, testes automatizados e integração real entre React, Vercel Functions, Apps Script e Google Sheets. As PRs #22, #23 e #25 ampliaram a autorização, o ciclo de vida dos serviços e a descoberta por múltiplas cidades na branch `dev`.
 
-As duas lacunas mais importantes para fortalecer a apresentação acadêmica são **validar o problema com moradores e profissionais de Capelinha** e **registrar a execução manual completa dos fluxos no ambiente Preview**. Os números nacionais justificam investigar o tema, mas não substituem a pesquisa local. Do mesmo modo, um deploy `READY` não substitui o teste funcional da aplicação.
+Em 20/11/2026, além da CI aprovada, o responsável confirmou testes manuais no Preview atualizado: edição e remoção lógica de serviços, verificação de propriedade/papel, persistência de cidades atendidas e descoberta do mesmo serviço em duas localidades. Isso sustenta a conclusão funcional do núcleo demonstrativo. Permanecem fora desta evidência a auditoria independente, os testes de carga, a validação manual de todas as entradas inválidas e uma pesquisa de campo com moradores e profissionais.
 
-A conclusão adequada é que o Conecta Local é um **protótipo acadêmico funcional em evolução, com evidências de implementação e testes automatizados**, e não um marketplace comercial pronto. Essa delimitação torna a apresentação tecnicamente honesta e mostra consciência sobre o que foi construído, o que foi testado e o que ainda precisa ser validado.
+A principal lacuna acadêmica agora é **validar a hipótese do problema com moradores e profissionais de Capelinha**, caso o prazo e a atividade permitam. Os indicadores oficiais contextualizam o tema, mas não substituem dados primários. A conclusão adequada é que o Conecta Local é um **protótipo acadêmico funcional validado em Preview para os fluxos descritos**, e não um marketplace comercial pronto ou aprovado para produção.
 
 ## Referências externas
 
@@ -530,4 +533,4 @@ A conclusão adequada é que o Conecta Local é um **protótipo acadêmico funci
 
 ---
 
-**Nota de atualização:** este relatório representa a leitura do código e da documentação disponível na branch `dev` no commit informado no cabeçalho. Alterações posteriores podem exigir revisão do status, dos requisitos, da arquitetura e das evidências de teste.
+**Nota de atualização:** este relatório representa a leitura do código e da documentação disponível na branch `dev` em 20/11/2026, incluindo a cobertura por múltiplas cidades integrada pela PR #25. A seção de testes diferencia evidências automatizadas de validações manuais relatadas pelo responsável. Alterações posteriores podem exigir revisão do status, dos requisitos, da arquitetura e das evidências.
