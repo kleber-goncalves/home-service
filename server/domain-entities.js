@@ -56,12 +56,14 @@ export class Servico {
         categoryId = null,
         title = null,
         description = null,
+        cityIds = [],
         status = null,
     } = {}) {
         this.serviceId = serviceId;
         this.categoryId = categoryId;
         this.title = title;
         this.description = description;
+        this.cityIds = Array.isArray(cityIds) ? cityIds.slice() : [];
         this.status = status;
     }
 
@@ -70,6 +72,7 @@ export class Servico {
             categoryId: this.categoryId,
             title: this.title,
             description: this.description,
+            cityIds: this.cityIds.slice(),
         };
     }
 
@@ -79,6 +82,7 @@ export class Servico {
             categoryId: this.categoryId,
             title: this.title,
             description: this.description,
+            cityIds: this.cityIds.slice(),
         };
     }
 
