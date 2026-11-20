@@ -1,7 +1,8 @@
 # POC-04 — sessão sintética com cookie via gateway
 
-> **Status nesta branch (atualizado em 2026-11-20):** os ensaios sintéticos de cookie, CSRF/Origin, expiração controlada, replay, concorrência e logout foram concluídos. O armazenamento temporário, nonces, segredo Apps Script e variáveis Vercel exclusivas da branch foram limpos; o Preview está READY, mas a rota permanece desabilitada. O responsável apresentou uma versão atualizada do `Code.gs` do editor Apps Script sem as cinco funções auxiliares de ensaio; as rotinas permanentes foram preservadas. A revisão estática final identificou dois requisitos de hardening antes de qualquer reativação: limites de corpo/resposta aplicados após leitura integral e ausência de rate limiting/limite de emissão. Falhas reais de infraestrutura e testes de carga não foram executados. A PR #14 está pronta para revisão, aberta e não mesclada.
-> **Branch:** `feat/poc-04-session-cookie`
+> **Status atual (atualizado em 2026-11-20):** a PR #14 foi mesclada em `dev` em 20/11/2026 (merge commit `adb51e2f1de8b9d47fb59205938b3e33e21739a1`). A POC-04 está versionada na branch de integração, mas continua como rota experimental independente e desabilitada. Os ensaios sintéticos de cookie, CSRF/Origin, expiração controlada, replay, concorrência, logout e revogação foram concluídos. O armazenamento temporário, nonces, segredo Apps Script e variáveis Vercel exclusivas foram limpos. A revisão estática identificou dois requisitos de hardening antes de qualquer reativação: limitar a leitura de corpos/respostas durante o consumo do stream e implementar rate limiting/limite de emissão. Esses itens foram aceitos como pendências deste ciclo e não impedem manter o código desabilitado em `dev`. Falhas reais de infraestrutura e testes de carga não foram executados.
+> **Branch de origem:** `feat/poc-04-session-cookie`
+> **Branch de integração:** `dev`
 > **Base inicial:** HEAD de `dev` em 2026-11-14; a branch foi reconciliada com `dev` pelo merge commit `51bf7d4b2d832ffa4927d0a8937bb303f476b89d` em 20/11/2026.
 > **Escopo:** provar emissão/recepção de cookie, encaminhamento server-side, autoridade Apps Script, expiração, CSRF/Origin e logout/revogação, exclusivamente com dados sintéticos.
 > **Fora do escopo:** cadastro, senha, login de usuários, recuperação, autorização de papéis, integração com `AuthDemoPage.jsx`, planilha estrutural e Production.
@@ -243,7 +244,7 @@ Após as atualizações documentais, a branch recebeu outro deployment Preview n
 
 O primeiro novo Preview foi criado a partir do commit Git da POC-04, sem reutilizar o snapshot de variáveis de um deployment antigo. O segundo Preview inclui somente as atualizações documentais. Como as quatro variáveis da POC-04 estão ausentes, a funcionalidade permanece desabilitada em ambos. O estado READY comprova o build/deployment, não uma nova validação funcional após a desativação. `dev`, `main` e Production não foram alteradas.
 
-#### Reconciliação da branch com `dev` — 20/11/2026
+#### Reconciliação da branch com `dev` — 20/11/2026 (registro histórico anterior ao merge da PR)
 
 A branch `feat/poc-04-session-cookie` recebeu a branch `dev` por um merge commit, preservando ambas as linhas de histórico e sem force push:
 
@@ -309,6 +310,22 @@ A POC não implementa cadastro, login de usuários, recuperação de senha, pap�
 - [x] Revisão estática final concluída e dois pontos de hardening registrados como bloqueios para reativação.
 - [x] Falhas reais de infraestrutura e testes de carga registrados explicitamente como não executados.
 - [ ] Corrigir leitura limitada por stream e implementar controles proporcionais de rate limiting/capacidade antes de qualquer reativação.
-- [ ] Merge da PR #14 em `dev`, pendente de decisão explícita do responsável e dos checks aplicáveis.
+- [x] PR #14 integrada à branch `dev` em 20/11/2026; merge commit `adb51e2f1de8b9d47fb59205938b3e33e21739a1`.
 
-A POC-04 concluiu os ensaios sintéticos previstos para cookie, Origin/CSRF, expiração, replay, concorrência e logout. O ambiente temporário foi limpo e a rota está desabilitada no Preview. A PR #14 está aberta e pronta para revisão, mas ainda não foi mesclada. Os itens de hardening acima impedem a reativação da rota; nada nesta POC representa autenticação real ou aprovação para Production.
+A POC-04 concluiu os ensaios sintéticos previstos e foi integrada à branch `dev` pela PR #14 em 20/11/2026. A integração é apenas de código e documentação: a rota permanece desabilitada, sem variáveis ou segredo `POC04_*`, e não se conecta ao login principal. Os dois itens de hardening registrados continuam impedindo qualquer reativação, uso com credenciais reais ou promoção para Production. A integração não representa autenticação real nem aprovação para produção.
+
+
+### 12.8. Integração final da PR #14 em `dev` — 20/11/2026
+
+A decisão do responsável foi integrar a POC-04 mantendo os dois itens de hardening como limitações documentadas e aceitas para o escopo acadêmico desativado.
+
+- PR: [#14 — feat: iniciar POC-04 de sessão sintética via cookie](https://github.com/kleber-goncalves/home-service/pull/14).
+- Estado: fechada e mesclada em `dev`.
+- Merge commit: `adb51e2f1de8b9d47fb59205938b3e33e21739a1`.
+- Head de `dev` confirmado após o snapshot automático: `d431629c12ce9dda5dc3b969c9059994e52d53a2`.
+- O workflow completo de validação #44792200549 concluiu **SUCCESS** antes do merge, no commit `98d83c558782227fe26bcb513639fd56fc99970b`. O commit posterior do head da PR alterou somente o snapshot gerado de `docs/AI_CONTEXT.md`; a execução associada ficou `action_required` com zero jobs e não deve ser descrita como nova validação.
+- O Preview da branch `dev` foi confirmado como READY após a integração.
+- A consulta de configuração não encontrou variáveis `POC04_*` no projeto nem no escopo Preview de `dev`; o segredo correspondente também foi removido do Apps Script.
+- `main` permaneceu no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`.
+
+**Regra vigente:** não reativar a rota, não restaurar variáveis/segredos `POC04_*`, não conectar a POC ao login principal e não usar credenciais ou dados reais. Os limites técnicos registrados na seção 12.6 continuam sendo bloqueios de qualquer reativação.
