@@ -342,9 +342,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 3da8bd19d2e07a5e5b50c414054915989496f68c
-- **Data do commit:** 2026-11-20T17:19:43-03:00
-- **Mensagem do commit:** style(services): adaptar controles de servicos e estados
+- **Commit de referência:** 7392e998f8d78b02805b63a4255cbc26a9ae3394
+- **Data do commit:** 2026-11-20T17:21:12-03:00
+- **Mensagem do commit:** docs(roadmap): registrar implementacao da etapa 2
 - **Branch desta execução:** feat/service-lifecycle
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 12
@@ -448,13 +448,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 7392e99 | 2026-11-20 | docs(roadmap): registrar implementacao da etapa 2 |
+| 58780c9 | 2026-11-20 | docs(arquitetura): documentar edicao e remocao logica |
+| 12b1cb1 | 2026-11-20 | docs(mvp): atualizar estado do ciclo de servicos |
+| c03199d | 2026-11-20 | docs(readme): registrar evolucao do ciclo de servicos |
+| 31f33db | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 616d61e | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 3da8bd1 | 2026-11-20 | style(services): adaptar controles de servicos e estados |
 | 291241b | 2026-11-20 | feat(services): adicionar edicao e remocao na area profissional |
-| d951458 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 72ed6ab | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| ff2f0f3 | 2026-11-20 | test(services): cobrir payloads de edicao e remocao da entidade |
-| fd104a1 | 2026-11-20 | test(services): verificar allowlist e sanitizacao de edicao/remocao |
-| caf1044 | 2026-11-20 | test(services): cobrir edicao e remocao logica no Apps Script |
-| c5b778a | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
