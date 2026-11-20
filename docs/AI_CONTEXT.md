@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 43d0c910f0071da3e1064e3a3fd837da750f3107
-- **Data do commit:** 2026-11-20T19:58:01-03:00
-- **Mensagem do commit:** fix: mapear erros do ciclo de vida de imagens no gateway
+- **Commit de referência:** 03ff7ce767f3f6c1ac7aea81abd3eb14d176ce31
+- **Data do commit:** 2026-11-20T19:58:04-03:00
+- **Mensagem do commit:** fix: mapear erros de upload e Drive com códigos seguros
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -473,6 +473,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 03ff7ce | 2026-11-20 | fix: mapear erros de upload e Drive com códigos seguros |
 | 43d0c91 | 2026-11-20 | fix: mapear erros do ciclo de vida de imagens no gateway |
 | d5e9546 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 0c0d0b7 | 2026-11-20 | test: garantir privacidade em remoção idempotente de imagem |
@@ -480,6 +481,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 1b1fc9d | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 7efc5b8 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | acf3bbe | 2026-11-20 | test: incluir testes do cliente de upload de imagens |
-| bdaa51f | 2026-11-20 | test: cobrir upload em blocos e reconciliação no navegador |
 
 <!-- END AUTO-GENERATED SECTION -->
