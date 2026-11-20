@@ -50,35 +50,45 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 1 — Autorização e integridade dos dados
 
-**Em andamento — cobertura automatizada inicial adicionada na branch `feat/authorization-integrity`.**
+**Em andamento — PR #22 integrada em `dev`; validação manual da propriedade concluída.** Falta somente a conferência pós-merge da proteção explícita de papel no Preview atualizado.
 
 **Por que vem primeiro:** é o aprendizado de maior valor para um sistema com contas e dados privados. Uma interface pode funcionar perfeitamente para o próprio usuário e ainda permitir acesso indevido a dados de outra conta se a validação do backend estiver incompleta.
 
 **Escopo enxuto:**
-- Usar duas contas inteiramente fictícias, profissional A e profissional B.
+- Usar contas inteiramente fictícias, profissionais A e B.
 - Confirmar que A só consulta e altera os próprios dados e serviços.
 - Verificar que trocar IDs de serviço/proprietário no payload não permite assumir propriedade.
-- Verificar que o navegador não consegue publicar, reativar, suspender ou remover um serviço ignorando as regras do Apps Script.
+- Verificar que o navegador não consegue executar operações ignorando as regras do Apps Script.
 - Confirmar que operações recusadas não alteram dados e não registram sucesso indevido.
-- Conferir que as mudanças relevantes deixam o evento esperado na aba `AUDITORIA`.
+- Conferir que as mudanças relevantes deixam os eventos esperados na aba `AUDITORIA`.
 
-**Cobertura automatizada já adicionada na branch de trabalho:**
-- O teste executa o `apps-script/conecta-local/Code.gs` real em um harness Node/VM, com duas contas, duas sessões, dois perfis e dois serviços fictícios em uma implementação simulada de Sheets/Properties/LockService.
-- Verifica que cada sessão consulta somente os próprios serviços.
-- Verifica que A não consegue pausar o serviço de B: a operação recebe `SERVICE_NOT_FOUND`, o estado de B permanece inalterado e não é gravado evento de sucesso falso.
-- Verifica que campos extras como `id_usuario`, `id_profissional`, `papel` e `status` não permitem trocar a identidade, assumir perfil alheio ou elevar privilégio.
-- Verifica que a criação de serviço deriva o proprietário do perfil ligado à sessão e que estados administrativos são recusados.
-- Verifica que somente uma conta cujo papel confiável seja `professional` consegue atualizar perfil e executar operações de serviço; papel diferente é recusado com `ROLE_FORBIDDEN` sem renovar atividade nem alterar dados.
-- Verifica no gateway que os payloads de perfil/listagem/status são reduzidos aos campos esperados e que `session.create` não está na allowlist pública do navegador.
+**Implementação integrada em `dev` pela PR #22:**
+- O gateway reduz o payload de `profile.update` aos campos editáveis permitidos e deriva o token de sessão do cookie; `service.listMine` encaminha somente esse token.
+- O Apps Script usa `appRequireProfessionalSession_` para exigir o papel confiável `professional` nas operações de perfil e serviços. O papel recebido do navegador não é autoridade; papel diferente é recusado com `ROLE_FORBIDDEN` (HTTP 403).
+- A identidade e o perfil são derivados da sessão validada; a propriedade do serviço é conferida no backend.
+- A suíte `tests/authorization/` executa o `apps-script/conecta-local/Code.gs` real em um harness Node/VM com dois profissionais, sessões, perfis e serviços fictícios, usando mocks de Sheets/Properties/LockService.
+- Os testes cobrem listagem isolada, acesso cruzado, mass assignment, derivação do proprietário na criação, estados não permitidos, sessão inválida, papel não profissional e sanitização do gateway.
+- O comando `npm run test:authorization` foi integrado ao workflow de validação.
 
-**Ainda pendente para fechar a etapa:**
-- Repetir, no Preview real de `dev`, uma tentativa cruzada com duas contas fictícias distintas e confirmar diretamente na planilha que o serviço do segundo profissional permaneceu intacto.
-- Conferir no Sheets os eventos de auditoria das operações legítimas e a ausência de evento de sucesso para a tentativa recusada.
-- Concluir e registrar o resultado da CI da PR antes de integrar.
+**Validação automatizada:**
+- **17 testes de autorização: 17 PASS, 0 FAIL** (12 Apps Script e 5 gateway).
+- A execução final `Validate Home Service #44797635404` concluiu **SUCCESS** no head da PR `54142fca94b71e72b19cee7dbaae2d6467db4dd0`; todos os passos do job passaram, incluindo auditoria bloqueante de dependências de produção, POC-01/02/03/04, autorização, LOO, registro de ocorrências, ESLint e build.
+- A PR #22 foi integrada exclusivamente em `dev` pelo merge commit `1bf55488539c5e4874573f77737827c1089504cc`, em 20/11/2026. `main` permaneceu inalterada.
 
-**Limites técnicos:** o harness executa o código real do Apps Script, mas simula Sheets, Locks e Properties. Não comprova comportamento de quota, falhas reais dos serviços Google ou atomicidade entre gravação de negócio e auditoria. As gravações de negócio e auditoria ainda são chamadas separadas; atomicidade/compensação fica para a etapa de consistência/POC-05, caso haja justificativa acadêmica.
+**Validação manual de propriedade no Preview de `dev` — 20/11/2026:**
+- O profissional B criou um serviço fictício; autenticado como A, o responsável tentou executar `service.setStatus` usando o ID do serviço de B.
+- A API respondeu HTTP **404**, com `error.code: SERVICE_NOT_FOUND`.
+- O registro de B permaneceu `published` na aba `SERVICOS`; a aba `AUDITORIA` não recebeu evento de sucesso indevido.
+- **Resultado: PASS** para isolamento de propriedade. Esse ensaio foi realizado no Preview anterior ao merge e confirma a regra de propriedade que já existia em `dev`; não equivale à validação manual da nova checagem de papel.
 
-**Critério de conclusão:** as regras de identidade, propriedade, estado e permissão são aplicadas no Apps Script; as tentativas cruzadas são recusadas sem alterar o recurso alheio ou registrar sucesso indevido; e o cenário equivalente é conferido no Preview com dados fictícios.
+**Única validação manual residual para fechar a etapa:**
+- No Preview atualizado de `dev`, validar com dados fictícios que uma sessão associada a papel confiável diferente de `professional` recebe HTTP 403/`ROLE_FORBIDDEN`.
+- Confirmar que a recusa não renova a atividade da sessão, não altera dados de serviços e não registra evento de sucesso na auditoria.
+- O Preview atualizado está **READY** no deployment `dpl_GuadbXiGjb6MtQnRNENf4S6Xp5bP`, commit `66d319bccccd879ba8b037d5433cd0c49a316465`: https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app
+
+**Limites técnicos:** o harness simula Sheets, Locks e Properties; não comprova quotas, falhas reais dos serviços Google ou atomicidade entre gravação de negócio e auditoria. As duas gravações continuam separadas. Avaliar atomicidade/compensação na POC-05 somente se houver justificativa acadêmica.
+
+**Critério de conclusão:** identidade, propriedade, estado e papel são impostos no Apps Script; tentativas indevidas são recusadas sem alterar recursos alheios nem registrar sucesso falso; e os cenários manuais relevantes são conferidos no Preview com dados fictícios.
 
 **Limite:** manter uma bateria pequena e focada. Não transformar esta etapa em pentest amplo, scanner automático ou teste de carga.
 
