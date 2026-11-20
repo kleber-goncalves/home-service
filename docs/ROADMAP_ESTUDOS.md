@@ -116,35 +116,35 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 3 — Melhorar a descoberta por cidade e categoria
 
-**Em desenvolvimento na branch `feat/service-city-coverage`; ainda não integrada em `dev`.**
+**Código integrado em `dev` pela PR #25 em 20/11/2026; validação manual real pendente.**
 
 **Objetivo:** aproximar o catálogo da proposta regional sem construir busca sofisticada.
 
-**Implementado nesta branch:**
-- Usa `CATEGORIAS` e `CIDADES` ativas como fonte dos filtros do catálogo.
+**Implementado e integrado:**
+- Usa `CATEGORIAS` e `CIDADES` do catálogo ativo como fonte dos filtros e sugestões da homepage.
 - Implementa a relação `SERVICO_CIDADES` para permitir um ou mais municípios por serviço.
 - Valida no Apps Script IDs existentes, cidades ativas, ausência de duplicidade e pelo menos um município por serviço.
 - Preserva vínculos antigos com cidade posteriormente inativada durante a edição, sem permitir novas associações inativas.
 - Mantém fallback para serviços legados sem linhas em `SERVICO_CIDADES`, usando a cidade principal do profissional até a primeira edição do serviço.
-- Retorna a cobertura por serviço em `service.listMine` e `public.services`; a busca textual da homepage considera todos os municípios vinculados e oferece sugestões do catálogo ativo `CIDADES` no campo de localidade.
-- Alinha os rótulos dos cartões/categorias ilustrativas à taxonomia inicial cadastrada em `CATEGORIAS`, preservando filtros coerentes enquanto não há dados persistidos.
+- Retorna a cobertura por serviço em `service.listMine` e `public.services`; a busca textual da homepage considera todos os municípios vinculados e oferece sugestões de cidades ativas.
+- Alinha os rótulos dos cartões/categorias ilustrativas à taxonomia inicial cadastrada em `CATEGORIAS`.
 - Mantém serviços publicados visíveis quando sua categoria é inativada posteriormente, conforme a regra da especificação.
 - Acrescenta seleção de múltiplos municípios ao formulário de criação/edição do profissional.
 
-**Validação automatizada — PASS na revisão final de código (`f4019b3`):**
-- Workflow push #44818113651 concluiu SUCCESS no commit `f4019b3f6dee5bfc103c7fb857aaf03319971529`.
-- Auditoria de dependências de produção, POC-01/02/03/04, autorização/ownership, LOO, registro de ocorrências, ESLint e build passaram.
-- Commits posteriores na branch atualizam somente a documentação e o snapshot automático do `AI_CONTEXT.md`.
+**Validação automatizada — PASS:**
+- Merge commit `5003604a51def9bdf58df9845d36c2ec75a4452e`; workflow [#44820409487](https://github.com/kleber-goncalves/home-service/actions/runs/44820409487) concluiu SUCCESS.
+- Auditoria bloqueante de dependências de produção, POC-01/02/03/04, autorização/ownership, LOO, registro de ocorrências, ESLint e build passaram.
+- Preview fixo de `dev` está READY no deployment `dpl_4n5E7JLaUQPHezVk8ymGRXZSS7Bx`.
 
-**Validação pendente antes de concluir:**
-- Integrar a PR em `dev`.
-- Sincronizar o arquivo Apps Script real e publicar nova versão na implantação Web App existente.
-- Confirmar no Preview fixo atualizado de `dev` criação e edição com duas cidades, pesquisa por qualquer cidade atendida, recusa de cidade inválida/inativa, compatibilidade dos serviços antigos e preservação da visibilidade quando uma categoria for inativada.
-- Confirmar que a Vercel aponta o alias fixo de `dev` ao novo deployment antes dos testes manuais.
+**Pendente para concluir a etapa:**
+- Sincronizar `apps-script/conecta-local/Code.gs` no projeto Google Apps Script real.
+- Salvar e publicar nova versão na implantação Web App existente, preservando URL/ID, Script Properties, permissões e identidade de execução.
+- No Preview fixo atualizado de `dev`, validar criação/edição com duas cidades, busca por cada município, recusa de cidade inválida/inativa, compatibilidade dos serviços antigos e visibilidade quando uma categoria for inativada.
+- Usar somente dados fictícios. Não configurar backend em Production.
 
-**Limites:** não criar infraestrutura de busca separada; não implementar geolocalização. Vínculos em Sheets e auditoria não são atômicos. Manter dados fictícios e backend restrito ao Preview.
+**Limites:** não criar infraestrutura de busca separada; não implementar geolocalização. Vínculos em Sheets e auditoria não são atômicos.
 
-**Critério de conclusão:** os filtros por categoria/cidade representam os dados cadastrados, cada serviço pode ter múltiplos municípios com validação no backend e os serviços antigos permanecem descobertos sem migração destrutiva.
+**Critério de conclusão:** além da CI e do Preview, a integração Apps Script/Sheets e os cenários manuais de cobertura regional devem ser confirmados.
 
 ### Etapa 4 — Imagens no Google Drive
 
@@ -199,7 +199,7 @@ Reavaliar somente quando houver exigência acadêmica explícita ou uma necessid
 
 ## 6. Ordem prática recomendada
 
-1. **Agora:** Etapa 3 — revisar a descoberta por cidade e categoria, começando por mapear o que já funciona no catálogo e implementar somente as lacunas necessárias.
+1. **Agora:** concluir a Etapa 3 — sincronizar/publicar o Apps Script real e executar os testes manuais no Preview fixo de `dev`.
 2. **Depois, conforme necessidade:** Etapa 4 — imagens no Google Drive, somente se trouxer ganho real para a apresentação.
 3. **Em paralelo à preparação da entrega:** Etapa 5 — pesquisa acadêmica e acabamento.
 

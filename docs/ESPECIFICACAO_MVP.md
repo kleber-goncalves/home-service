@@ -177,7 +177,7 @@ Um profissional poderá cadastrar vários serviços, sem limite numérico fixo n
 
 **Estado atual da demonstração em `dev`:** criação, edição, pausa, publicação e remoção lógica estão integradas ao Sheets. A PR #23 adicionou `service.update` e `service.remove`, com validação de sessão/papel/propriedade no Apps Script, preservação do registro na remoção e auditoria. Em 20/11/2026, após o responsável sincronizar e publicar a versão atualizada do Apps Script, ele confirmou que os testes manuais passaram no Preview fixo atualizado de `dev`.
 
-**Etapa 3 em desenvolvimento na branch `feat/service-city-coverage`:** implementação de múltiplos municípios por serviço via `SERVICO_CIDADES`, com validação no Apps Script, fallback para serviços antigos sem vínculos e busca pública por qualquer município associado. O código e a CI estão atualizados nessa branch, mas a integração em `dev`, a sincronização do Apps Script real e a validação manual no Preview de `dev` permanecem pendentes.
+**Etapa 3 integrada em `dev` pela PR #25 em 20/11/2026:** o código permite múltiplos municípios por serviço via `SERVICO_CIDADES`, valida cidades no Apps Script, mantém fallback para serviços antigos sem vínculos e permite busca pública por qualquer município associado. A CI do merge (#44820409487) passou e o Preview fixo de `dev` está READY. Ainda falta sincronizar/publicar o Apps Script real e executar a validação manual ponta a ponta no Preview; portanto, a etapa está implementada no repositório, mas a validação operacional ainda não foi concluída.
 
 | Campo | Regra |
 |---|---|
