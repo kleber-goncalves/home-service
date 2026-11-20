@@ -333,9 +333,11 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                 description: newService.description,
                 cityIds: newService.cityIds,
             };
-            const result = editingServiceId
-                ? await appRequest("service.update", { serviceId: editingServiceId, ...payload }, csrfToken)
-                : await appRequest("service.create", payload, csrfToken);
+            if (editingServiceId) {
+                await appRequest("service.update", { serviceId: editingServiceId, ...payload }, csrfToken);
+            } else {
+                await appRequest("service.create", payload, csrfToken);
+            }
 
             const latest = await appRequest("service.listMine", {}, csrfToken);
             setServices(latest.services || []);
@@ -364,7 +366,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         setBusy(true);
         setNotice(null);
         try {
-            const result = await appRequest("service.remove", {
+            await appRequest("service.remove", {
                 serviceId: service.id,
             }, csrfToken);
             const latest = await appRequest("service.listMine", {}, csrfToken);
@@ -387,7 +389,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         setBusy(true);
         setNotice(null);
         try {
-            const result = await appRequest("service.setStatus", {
+            await appRequest("service.setStatus", {
                 serviceId: service.id,
                 status: nextStatus,
             }, csrfToken);
