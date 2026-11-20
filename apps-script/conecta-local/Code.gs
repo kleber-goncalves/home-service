@@ -1712,10 +1712,21 @@ function appSetServiceImagesVisibility_(serviceId, publicAccess) {
     var images = appRecords_("IMAGENS").filter(function (item) {
         return String(item.id_servico) === String(serviceId) && String(item.status) === "active";
     });
+    var failedCount = 0;
     images.forEach(function (image) {
-        if (publicAccess) appImageSetFilePublic_(String(image.id_arquivo_drive));
-        else appImageSetFilePrivate_(String(image.id_arquivo_drive));
+        try {
+            if (publicAccess) appImageSetFilePublic_(String(image.id_arquivo_drive));
+            else appImageSetFilePrivate_(String(image.id_arquivo_drive));
+        } catch (error) {
+            failedCount += 1;
+        }
     });
+    if (failedCount > 0) {
+        throw appFault_(
+            "IMAGE_PERMISSION_SYNC_FAILED",
+            "Não foi possível atualizar a permissão de todas as imagens do serviço."
+        );
+    }
 }
 
 function appImagePublicUrl_(fileId) {
