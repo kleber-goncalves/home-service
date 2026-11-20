@@ -23,7 +23,7 @@ O projeto também possui implementação concreta de orientação a objetos, con
 
 | Etapa | Situação atual | Evidência ou pendência principal |
 |---|---|---|
-| 1. Investigação | Parcial | Problema e público definidos como hipótese; pesquisa local com moradores e profissionais ainda não realizada. |
+| 1. Investigação | Parcial | Hipótese e instrumento de pesquisa documentados; coleta local com moradores e profissionais ainda não realizada. |
 | 2. Dados | Parcial | Indicadores públicos contextualizam o tema; faltam dados primários de Capelinha. |
 | 3. APS — Análise e Projeto de Sistemas | Desenvolvida e implementada no protótipo | Requisitos, regras, modelagem, arquitetura e fluxo de serviços documentados e exercitados. |
 | 4. LOO — Linguagem Orientada a Objetos | Implementada | Classes `Usuario`, `Profissional` e `Servico`, herança e testes automatizados. |
@@ -65,6 +65,7 @@ Recomenda-se uma pesquisa exploratória simples, com participação voluntária 
 - **Moradores:** meta inicial de 20 a 30 respostas.
 - **Profissionais:** meta inicial de 10 a 15 respostas.
 - **Instrumento:** questionário curto, entrevista semiestruturada ou formulário presencial/digital.
+- **Roteiro pronto para aplicação:** `docs/ROTEIRO_PESQUISA_EXPLORATORIA.md`, com dois questionários curtos, aviso de participação voluntária, minimização de dados e orientações para análise. O instrumento está preparado, mas ainda não foi aplicado.
 - **Período de referência:** perguntar sobre experiências dos últimos 3 a 6 meses, para reduzir respostas vagas.
 
 Perguntas sugeridas para moradores:
@@ -530,6 +531,7 @@ A principal lacuna acadêmica agora é **validar a hipótese do problema com mor
 - `docs/POC_02_ASSINATURA_GATEWAY.md` — HMAC e proteção contra replay.
 - `docs/POC_03_ARMAZENAMENTO_SENHAS.md` — investigação e validação do armazenamento de senhas.
 - A POC-04 foi integrada à branch `dev` pela PR #14 em 20/11/2026, mas permanece independente e desabilitada; os limites e a decisão de não reativação estão registrados em `docs/POC_04_SESSOES.md`.
+- `docs/ROTEIRO_PESQUISA_EXPLORATORIA.md` — instrumento de pesquisa exploratória; coleta ainda pendente.
 - `docs/REGISTRO_DE_OCORRENCIAS.md` — histórico sanitizado de ocorrências.
 
 ---
