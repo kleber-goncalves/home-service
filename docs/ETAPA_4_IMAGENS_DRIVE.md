@@ -1,8 +1,8 @@
 # Etapa 4 — Imagens no Google Drive
 
-> **Status:** implementação concluída na branch `feat/drive-image-upload`; CI automatizada aprovada e validação manual real no Preview concluída. PR e integração em `dev` ainda pendentes.
+> **Status:** implementação integrada em `dev` pela PR #26; CI pós-merge aprovada e validação manual principal no Preview concluída.
 >
-> **Branch de trabalho:** `feat/drive-image-upload`.
+> **Branch de implementação:** `feat/drive-image-upload` (integrada em `dev` pela PR #26).
 >
 > **Escopo inicial:** imagens de serviços. Foto de perfil fica para uma segunda parte da etapa.
 >

@@ -114,7 +114,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 - A homepage combina serviços reais da demonstração retornados por `public.services` com serviços/profissionais ilustrativos. Busca, categoria e cidade filtram os itens disponíveis no frontend; não há pesquisa geográfica externa ou geolocalização.
 - Cadastro, confirmação de código demonstrativo, login, sessão, atualização do perfil, criação, edição, pausa/publicação e remoção lógica de serviços, além da consulta pública, implementados em `src/pages/AuthDemoPage.jsx`, `src/services/app-api.js`, `api/app.js` e `server/app-gateway.js`.
 - Em 20/11/2026, o responsável informou que repetiu os testes do fluxo funcional no Preview atualizado de `dev`, após as integrações das PRs #16 e #17, e confirmou o funcionamento correto. O fluxo inclui catálogo, cadastro/ativação demonstrativa, persistência em Sheets, login/restauração de sessão, criação, pausa/publicação, vitrine e logout, com dados fictícios.
-- O Apps Script de negócio está em `apps-script/conecta-local/Code.gs`; utiliza operacionalmente as abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`.
+- O Apps Script de negócio está em `apps-script/conecta-local/Code.gs`; utiliza operacionalmente as abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS`, `SERVICO_CIDADES`, `IMAGENS` e `AUDITORIA`.
 - O gateway aplica Argon2id (`hash-wasm@4.13.0`), comparação resistente a diferenças de tempo, cookie `HttpOnly; Secure; SameSite=Strict`, CSRF, HMAC servidor-servidor, validação de Origin e bloqueio fora de Preview.
 - POC-01 (#10), POC-02 (#11) e POC-03 (#12) estão integradas a `dev`; documentação específica em `docs/POC_01_COMUNICACAO.md`, `docs/POC_02_ASSINATURA_GATEWAY.md` e `docs/POC_03_ARMAZENAMENTO_SENHAS.md`.
 - PR #16 integrou LOO em JavaScript no gateway: `Usuario`, `Profissional` e `Servico`, com testes `npm run test:loo` e documentação em `docs/LOO_ORIENTACAO_OBJETOS.md`.
@@ -127,8 +127,8 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 - **Preview de `dev`:** ambiente da demonstração funcional; as variáveis `CONECTA_LOCAL_*` estão escopadas para Preview. Não registrar seus valores.
 - **Production (`main`):** vitrine pública. O gateway retorna `APP_DEMO_DISABLED` fora de `preview`; não há variáveis Production do backend e não se deve habilitá-lo nesta etapa.
 - O projeto é acadêmico e utiliza somente dados fictícios. Não inserir credenciais ou dados pessoais reais.
-- A modelagem prevê 12 abas/entidades; somente as oito listadas acima são atualmente utilizadas pelo backend de negócio. `CONTROLE_AUTENTICACAO`, `SERVICO_CIDADES`, `IMAGENS` e `DENUNCIAS` ainda não têm fluxos operacionais.
-- Ainda não implementados: recuperação/alteração de senha ou e-mail, upload de imagens no Drive, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades.
+- A modelagem prevê 12 abas/entidades; dez são utilizadas operacionalmente pelo backend de negócio. `CONTROLE_AUTENTICACAO` e `DENUNCIAS` ainda não têm fluxos operacionais.
+- Ainda não implementados: recuperação/alteração de senha ou e-mail, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades.
 - A POC-04 está integrada à `dev` pela PR #14, mas sua rota independente permanece desabilitada. Os ensaios sintéticos foram concluídos e os recursos/segredos exclusivos foram limpos. Dois itens de hardening ainda impedem qualquer reativação: limite de leitura aplicado durante consumo de stream e rate limiting/limite de emissão. Não conectar a POC ao fluxo principal. Falhas reais de infraestrutura e testes de carga não foram executados. Ver `docs/POC_04_SESSOES.md`.
 
 ### Etapa 1 — Autorização e integridade (validação técnica concluída em 20/11/2026)
@@ -160,7 +160,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 - **Preview e validação manual — PASS em 20/11/2026:** o deployment `dpl_FT5dFsPzB6B1phwGywur4ewjRkZS` ficou `READY` no commit `e6d231ce5cc978338bce23010d2003c7f551fd7c`. O alias fixo de `dev` (`https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app/`) foi conferido e aponta para esse deployment. O responsável confirmou que executou os testes manuais da etapa nesse ambiente e que todos passaram.
 - **Limites:** o harness automatizado usa mocks para Sheets/Properties/LockService; a confirmação manual é específica aos cenários executados pelo responsável. A gravação do registro de serviço e a escrita de auditoria continuam separadas; não declarar atomicidade. Manter dados fictícios e backend restrito ao Preview.
 
-### Etapa 3 — Descoberta por cidade e categoria (código integrado em `dev`; validação real pendente)
+### Etapa 3 — Descoberta por cidade e categoria (concluída em 20/11/2026)
 
 - A PR #25 (`feat/service-city-coverage`) foi integrada em `dev` em 20/11/2026 pelo merge commit `5003604a51def9bdf58df9845d36c2ec75a4452e`. Não alterou `main` ou Production.
 - O Apps Script no repositório lê e grava a relação `SERVICO_CIDADES` para associar um serviço a um ou mais municípios. A criação exige pelo menos uma cidade ativa; IDs inexistentes, duplicados e cidades inativas em novas associações são recusados.
@@ -172,7 +172,7 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 - Testes em `tests/authorization/apps-script.test.js` cobrem fallback legado, múltiplas cidades, lista vazia/duplicada/inativa, substituição de vínculos e catálogo após inativação de categoria. Gateway e entidade também validam o contrato `cityIds`.
 - **CI — PASS:** workflow no merge commit, run [#44820409487](https://github.com/kleber-goncalves/home-service/actions/runs/44820409487), concluiu SUCCESS; passaram auditoria bloqueante de dependências de produção, POC-01/02/03/04, autorização/ownership, LOO, registro de ocorrências, ESLint e build.
 - **Preview — READY:** deployment `dpl_4n5E7JLaUQPHezVk8ymGRXZSS7Bx` está pronto para o commit `5003604a51def9bdf58df9845d36c2ec75a4452e`; o alias fixo `https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app/` aponta para ele.
-- **Validação real pendente:** o merge no Git não atualizou o projeto externo do Apps Script. É necessário copiar o conteúdo atualizado de `apps-script/conecta-local/Code.gs` para o Apps Script existente, salvar e publicar nova versão na implantação Web App já existente, preservando URL/ID, Script Properties, permissões e identidade de execução. Depois, validar criação/edição multi-cidade, pesquisa por qualquer cidade atendida, cidade inválida/inativa, fallback de serviços antigos e visibilidade de serviços após inativação de categoria, sempre com dados fictícios.
+- **Validação real — PASS:** o responsável confirmou a sincronização de `apps-script/conecta-local/Code.gs` e a publicação de nova versão na implantação Web App existente. No Preview, confirmou que a edição de um serviço atualizou `SERVICO_CIDADES`, que o serviço continuou encontrável pela cidade original e que a associação temporária a uma segunda cidade permitiu encontrá-lo nas duas localidades. A cidade temporária e seus vínculos foram removidos após o ensaio; somente a cidade original permaneceu. Esses resultados são validação manual relatada pelo responsável, não auditoria independente.
 - **Limites:** operações em `SERVICOS`, `SERVICO_CIDADES` e `AUDITORIA` não são uma transação atômica. Não declarar atomicidade nem habilitar backend em Production.
 
 
@@ -194,8 +194,8 @@ Não foi escolhida uma aplicação Next.js. Não adicionar Express por padrão: 
 
 - **Google Apps Script:** backend de negócio implementado em `apps-script/conecta-local/Code.gs`, responsável por validar assinatura, sessão, conta, propriedade do serviço e operações permitidas.
 - **Vercel Functions:** gateway em `api/app.js` e `server/app-gateway.js`; o frontend chama somente a rota same-origin `POST /api/app`. O gateway executa Argon2id, gerencia o cookie HttpOnly/CSRF e assina as chamadas ao Apps Script.
-- **Google Sheets:** armazenamento operacional da demonstração nas abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`. A modelagem aprovada possui 12 abas; as quatro não listadas ainda não têm operações de negócio implementadas.
-- **Google Drive:** upload, armazenamento e gerenciamento de permissões de imagens ainda não implementados.
+- **Google Sheets:** armazenamento operacional da demonstração nas abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS`, `SERVICO_CIDADES`, `IMAGENS` e `AUDITORIA`. A modelagem aprovada possui 12 abas; `CONTROLE_AUTENTICACAO` e `DENUNCIAS` ainda não têm operações de negócio implementadas.
+- **Google Drive:** armazenamento de imagens de serviços integrado em `dev` e validado no Preview com a pasta privada e permissões individuais. Upload retomável em blocos, gerenciamento e remoção lógica são implementados pelo Apps Script e pelo gateway Vercel. Não habilitar backend em Production.
 - **POC-02:** permanece uma prova isolada para ações sintéticas `poc.*`; não confundir seu Apps Script de teste com o Apps Script funcional em `apps-script/conecta-local/Code.gs`.
 
 Fluxo de negócio implementado: React/Vite → `POST /api/app` → Vercel Function → Apps Script → Google Sheets. O Apps Script é a autoridade para validação de sessão, identidade, propriedade, transições e persistência. O navegador não chama Apps Script diretamente.
@@ -235,7 +235,7 @@ A modelagem lógica e o esquema físico estão consolidados em [`docs/MODELAGEM_
 
 Entidades/abas: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CONTROLE_AUTENTICACAO`, `SERVICOS`, `CATEGORIAS`, `CIDADES`, `SERVICO_CIDADES`, `IMAGENS`, `DENUNCIAS` e `AUDITORIA`. A estrutura prevê um único arquivo Google Sheets; linha 1 para cabeçalhos e linha 2 em diante para registros; UUIDs/textos como texto; datas como ISO 8601 UTC; números em células numéricas; células vazias para opcionais; validações do Sheets apenas auxiliares, com Apps Script como autoridade.
 
-Google Sheets não impõe automaticamente FKs, unicidade composta ou integridade relacional; esses controles pertencem ao Apps Script e exigem validação de concorrência. A planilha estrutural possui 12 abas modeladas; o backend da demonstração utiliza operacionalmente oito: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS` e `AUDITORIA`. As quatro restantes ainda não têm fluxo operacional. A persistência do fluxo principal já foi exercitada no Preview com dados fictícios.
+Google Sheets não impõe automaticamente FKs, unicidade composta ou integridade relacional; esses controles pertencem ao Apps Script e exigem validação de concorrência. A planilha estrutural possui 12 abas modeladas; o backend da demonstração utiliza operacionalmente dez: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS`, `SERVICO_CIDADES`, `IMAGENS` e `AUDITORIA`. `CONTROLE_AUTENTICACAO` e `DENUNCIAS` ainda não têm fluxo operacional. A persistência do fluxo principal e das imagens foi exercitada no Preview com dados fictícios/licenciados.
 
 ### 5.4. Autenticação, e-mail e imagens — estado atual
 
@@ -336,7 +336,7 @@ Em falhas: informar estado de carregamento/sucesso/erro; não declarar sucesso a
 - Este `AI_CONTEXT.md` descreve o estado atual e as regras de continuidade. Em uma conversa nova, leia-o por inteiro antes de qualquer alteração.
 - `POC_04_SESSOES.md` registra a implementação, os ensaios, a revisão estática e o merge da PR #14 em `dev`. A sessão sintética continua separada e desabilitada; os dois pontos de hardening bloqueiam sua reativação. A POC não implementa autenticação de usuários nem se conecta ao fluxo principal.
 - `ROADMAP_ESTUDOS.md` organiza a evolução por valor didático e relevância para a demonstração, sem ampliar o escopo para uma operação comercial.
-- `ESPECIFICACAO_MVP.md` v0.4 consolida requisitos funcionais e as Fases 3 e 4; `MODELAGEM_DADOS.md` contém a modelagem lógica e o esquema físico aprovado conceitualmente (12 entidades/102 campos e 12 abas/102 colunas). Validações técnicas e implementação continuam pendentes.
+- `ESPECIFICACAO_MVP.md` v0.4 consolida os requisitos funcionais; as Etapas 3 e 4 do roadmap estão implementadas e validadas funcionalmente em `dev`/Preview. `MODELAGEM_DADOS.md` contém a modelagem lógica e o esquema físico aprovado conceitualmente (12 entidades/102 campos e 12 abas/102 colunas); outras funcionalidades permanecem no backlog.
 - `REGISTRO_DE_OCORRENCIAS.md` preserva o histórico de bugs, erros, vulnerabilidades e incidentes. Não criar ocorrência apenas por haver pendência de projeto ou risco conhecido ainda não observado como falha.
 - Atualize o contexto narrativo no mesmo trabalho quando decisões ou comportamentos relevantes mudarem.
 - O snapshot delimitado por marcadores é automatizado; não editar manualmente.
