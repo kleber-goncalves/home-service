@@ -18,9 +18,9 @@ A branch `dev` contém a demonstração acadêmica funcional do Conecta Local. A
 A Etapa 4 (imagens de serviços) está concluída no escopo atual. O Preview fixo de `dev` é:
 
 - **Preview:** https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app/
-- **Deployment de código verificado após a PR #26:** `dpl_Bqwfwchf4vpH1LKLBFte2Y1yav9Y`, estado `READY`.
+- **Deployment de código verificado após a PR #26:** histórico de referência; consultar o deployment atual da branch `dev` antes de testes.
 
-**Etapa 5 — PR #28 em revisão:** a homepage simplificada, o catálogo `/servicos`, `/categorias` e os detalhes `/servicos/:serviceId` com galeria foram implementados em `feat/catalogo-publico-navegacao`; CI passou. O Preview da feature branch serve para conferir frontend/build, mas não acessa a planilha: as variáveis Vercel do Apps Script/Sheets estão restritas à branch `dev`. A validação integrada deve ocorrer no Preview fixo de `dev` depois do merge: https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app. [Preview isolado da feature](https://home-service-6mgrjabmj-kleber-goncalves-s-projects.vercel.app). Consulte [Plano — catálogo público, navegação e apresentação de imagens](docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md).
+**Etapa 5 — catálogo público:** a PR #28 foi integrada em `dev` em 21/11/2026; as páginas `/servicos`, `/categorias` e `/servicos/:serviceId` estão na branch integrada. Após a validação manual, foi aberta a frente corretiva `fix/homepage-images-and-sections`: entrega de imagem pela Function same-origin com leitura autenticada no Drive; exemplos fictícios sempre visíveis em seção separada; restauração de `FAQSection`, `PopularServices` e `AboutSection`. As variáveis de Sheets/Drive continuam restritas a `dev`; qualquer validação real deve ocorrer no Preview fixo https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app, após merge e sincronização/publicação da nova ação do Apps Script. Consulte [Plano — catálogo público, navegação e apresentação de imagens](docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md).
 
 **Production (`main`) permanece inalterada** no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`. O gateway bloqueia operações de negócio fora de Vercel Preview; não habilitar variáveis de backend em Production nesta etapa.
 
