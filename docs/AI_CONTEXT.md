@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 6dab42ba291008a20a490542dcaf28c6c439c7d2
-- **Data do commit:** 2026-11-20T22:28:44-03:00
-- **Mensagem do commit:** Merge pull request #26 from kleber-goncalves/feat/drive-image-upload
+- **Commit de referência:** b640b654bb1bc91125974badd37091c353d8e64c
+- **Data do commit:** 2026-11-20T22:31:27-03:00
+- **Mensagem do commit:** docs(images): fechar Etapa 4 após integração em dev
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -473,13 +473,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| b640b65 | 2026-11-20 | docs(images): fechar Etapa 4 após integração em dev |
+| e38c221 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 6dab42b | 2026-11-20 | Merge pull request #26 from kleber-goncalves/feat/drive-image-upload |
 | cb5a120 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | ce4e14c | 2026-11-20 | docs(images): registrar validação manual da integração Drive |
 | e78600e | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | d41fd53 | 2026-11-20 | test(images): cobrir URI resumable com parâmetros do Drive |
 | 3d14ece | 2026-11-20 | fix(images): aceitar parâmetros adicionais na sessão resumable do Drive |
-| cb35700 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 78962bb | 2026-11-20 | docs: registrar CI aprovada e Preview Vercel pendente |
 
 <!-- END AUTO-GENERATED SECTION -->
