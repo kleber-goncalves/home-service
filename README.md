@@ -6,20 +6,21 @@ O projeto tem finalidade acadêmica e busca demonstrar investigação de problem
 
 **Contexto acadêmico:** o Conecta Local está sendo desenvolvido no âmbito de um curso Técnico em Informática. Ele não é o Projeto Integrador do curso de Análise e Desenvolvimento de Sistemas da Uniube.
 
-## Estado atual — 20/11/2026
+## Estado atual — 21/11/2026
 
-A branch `dev` contém a demonstração acadêmica funcional do Conecta Local. As integrações mais recentes concluíram três frentes importantes:
+A branch `dev` contém a demonstração acadêmica funcional do Conecta Local. As principais frentes integradas incluem:
 
-- **PR #22 — autorização e integridade:** identidade, papel e propriedade de serviços são validados no Apps Script; testes automatizados e ensaios manuais de acesso cruzado e papel não profissional foram aprovados.
-- **PR #23 — ciclo de vida dos serviços:** edição dos próprios serviços e remoção lógica, mantendo o histórico em `SERVICOS` e registrando eventos em `AUDITORIA`. O responsável confirmou os testes manuais no Preview atualizado.
-- **PR #25 — cobertura por cidades:** um serviço pode atender vários municípios por meio da aba `SERVICO_CIDADES`. O responsável confirmou a sincronização/publicação do Apps Script e testou edição, persistência no Sheets e pesquisa pública do mesmo serviço nas duas cidades.
+- **PR #22 — autorização e integridade:** identidade, papel e propriedade de serviços são validados no Apps Script; testes automatizados e ensaios manuais foram aprovados.
+- **PR #23 — ciclo de vida dos serviços:** edição dos próprios serviços e remoção lógica, mantendo o histórico em `SERVICOS` e registrando eventos em `AUDITORIA`.
+- **PR #25 — cobertura por cidades:** um serviço pode atender vários municípios por meio da aba `SERVICO_CIDADES`; a persistência e a pesquisa pública foram validadas no Preview.
+- **PR #26 — imagens no Google Drive:** upload retomável, gerenciamento de até cinco imagens por serviço, remoção lógica e permissões por estado foram integrados em `dev` e validados no Preview com Apps Script, Sheets e Drive de teste.
 
-A **validação funcional principal da Etapa 3** foi concluída em 20/11/2026. A segunda cidade usada no ensaio foi temporária e foi removida depois dos testes; a planilha voltou a manter apenas a cidade original. Esses resultados refletem os testes relatados pelo responsável, além das evidências automatizadas disponíveis. Eles não equivalem a auditoria independente, teste de carga ou aprovação para produção.
-
-A PR #25 foi integrada exclusivamente em `dev` pelo merge commit `5003604a51def9bdf58df9845d36c2ec75a4452e`. A CI do merge [#44820409487](https://github.com/kleber-goncalves/home-service/actions/runs/44820409487) concluiu **SUCCESS**. A atualização documental de 20/11 também passou na execução [#44825394280](https://github.com/kleber-goncalves/home-service/actions/runs/44825394280). O Preview fixo de `dev` está disponível em:
+A Etapa 4 (imagens de serviços) está concluída no escopo atual. O Preview fixo de `dev` é:
 
 - **Preview:** https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app/
-- **Deployment verificado:** `dpl_HxMw5f9zyTKFYbj9We6YbguNX58v`, estado `READY`.
+- **Deployment de código verificado após a PR #26:** `dpl_Bqwfwchf4vpH1LKLBFte2Y1yav9Y`, estado `READY`.
+
+**Próxima evolução aprovada — ainda não implementada:** simplificar a homepage, criar o catálogo em `/servicos`, a página `/categorias` e detalhes em `/servicos/:serviceId` com galeria de até cinco imagens. O plano está em [Catálogo público, navegação e apresentação de imagens](docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md). O objetivo é tornar a descoberta mais clara e fazer a interface refletir a capacidade de imagens que já existe no cadastro.
 
 **Production (`main`) permanece inalterada** no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`. O gateway bloqueia operações de negócio fora de Vercel Preview; não habilitar variáveis de backend em Production nesta etapa.
 
@@ -61,6 +62,7 @@ O GitHub Actions executa essas verificações em pushes e Pull Requests direcion
 - [Contexto técnico para IAs e desenvolvedores](docs/AI_CONTEXT.md)
 - [Roteiro de evolução acadêmica e prioridades](docs/ROADMAP_ESTUDOS.md)
 - [Etapa 4 — arquitetura de imagens no Google Drive](docs/ETAPA_4_IMAGENS_DRIVE.md)
+- [Plano — catálogo público, navegação e apresentação de imagens](docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md)
 - [Questionários preliminares para moradores e profissionais](PESQUISA_COMUNIDADE.md)
 - [Guia de aplicação da pesquisa com a comunidade](docs/GUIA_APLICACAO_PESQUISA_COMUNIDADE.md)
 - [Roteiro detalhado de pesquisa exploratória](docs/ROTEIRO_PESQUISA_EXPLORATORIA.md)
