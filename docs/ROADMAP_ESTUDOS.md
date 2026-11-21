@@ -1,6 +1,6 @@
 # Roteiro de evolução acadêmica — Conecta Local
 
-> **Atualizado em:** 20/11/2026  
+> **Atualizado em:** 21/11/2026  
 > **Finalidade:** organizar as próximas etapas do projeto de estudos, priorizando aprendizado técnico e conclusão coerente da demonstração. Este roteiro não é um plano de operação comercial nem uma lista de requisitos obrigatórios para Production.
 
 ## 1. Ponto de partida
@@ -182,9 +182,30 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 **Limites e itens fora desta etapa:** foto de perfil, galeria avançada, ordenação por arrastar e soltar, compressão/otimização de imagens, painel administrativo de mídia e operação em Production. Não declarar como testes manuais realizados nesta rodada repetição individual de todos os formatos, interrupção deliberada de blocos ou falha forçada entre Drive e Sheets.
 
-**Ambiente:** a funcionalidade está em `dev` e no Preview de desenvolvimento. `main` e Production permanecem inalteradas e sem backend habilitado. A próxima etapa do roadmap é a Etapa 5; qualquer promoção futura para Production exige decisão e revisão específicas.
+**Ambiente:** a funcionalidade está em `dev` e no Preview de desenvolvimento. `main` e Production permanecem inalteradas e sem backend habilitado. A próxima etapa é a Etapa 5 — experiência pública e catálogo; qualquer promoção futura para Production exige decisão e revisão específicas.
 
-### Etapa 5 — Pesquisa acadêmica e acabamento da apresentação
+### Etapa 5 — Experiência pública e catálogo de serviços
+
+**Status: planejamento aprovado em 21/11/2026; implementação ainda não iniciada.** O escopo completo está em [`docs/ETAPA_5_CATALOGO_PUBLICO.md`](./ETAPA_5_CATALOGO_PUBLICO.md).
+
+**Objetivo:** tornar a descoberta pública mais simples e organizar a navegação por páginas, sem ampliar desnecessariamente o backend.
+
+**Entregas planejadas:**
+- Simplificar a homepage, priorizando busca, três categorias em destaque, quatro ou cinco serviços e chamadas claras para ver todas as opções.
+- Criar `/servicos` com busca textual, filtros por categoria/cidade, contador de resultados, limpeza de filtros e estados vazios/erro.
+- Criar `/categorias` para listar todas as categorias ativas.
+- Criar `/servicos/:id` com dados públicos completos e galeria de até cinco imagens.
+- Adaptar os cards para uma imagem de capa e indicador de fotos adicionais; a galeria ficará na página individual.
+- Diagnosticar a falha relatada de carregamento da primeira imagem, sem confundir esse defeito com a ausência de uma galeria.
+- Preservar os fluxos atuais de autenticação/POCs, o contrato público e as regras de elegibilidade e permissões.
+
+**Decisões de escopo:** reutilizar as consultas e os dados atuais sempre que possível; não criar banco, abas, busca externa, avaliações ou pagamentos. Distinguir exemplos fictícios de serviços publicados reais. Manter dados fictícios e backend restrito ao Preview.
+
+**Branch:** `feat/public-discovery-experience`, criada a partir de `dev`.
+
+**Critério de conclusão:** cumprir os critérios de aceitação do documento específico, validar rotas diretas e navegação no Preview, testar desktop/mobile, executar os testes automatizados pertinentes e integrar em `dev` somente após revisão. Nenhuma dessas entregas deve ser descrita como concluída antes da implementação.
+
+### Etapa 6 — Pesquisa acadêmica e acabamento da apresentação
 
 **Status: instrumento exploratório preparado; coleta e análise de respostas pendentes.**
 
@@ -225,8 +246,8 @@ Reavaliar somente quando houver exigência acadêmica explícita ou uma necessid
 
 ## 6. Ordem prática recomendada
 
-1. **Agora:** concluir a Etapa 4 em `feat/drive-image-upload`, com upload de imagens de serviços, testes automatizados e validação manual no Preview.
-2. **Depois:** retomar a pesquisa comunitária já documentada em `PESQUISA_COMUNIDADE.md` e `docs/GUIA_APLICACAO_PESQUISA_COMUNIDADE.md`, somente após orientação do professor do curso Técnico em Informática e confirmação do procedimento aplicável. O responsável decidiu deixar a coleta para depois.
+1. **Agora:** executar a Etapa 5 na branch `feat/public-discovery-experience`, começando pelo diagnóstico da imagem principal e seguindo o escopo de homepage, catálogo, categorias e detalhes.
+2. **Depois:** retomar a Etapa 6 — pesquisa comunitária já documentada em `PESQUISA_COMUNIDADE.md` e `docs/GUIA_APLICACAO_PESQUISA_COMUNIDADE.md`, somente após orientação do professor do curso Técnico em Informática e confirmação do procedimento aplicável. O responsável decidiu deixar a coleta para depois.
 3. **Na preparação da entrega:** revisar acessibilidade, responsividade, roteiro de demonstração e relatório acadêmico, registrando as limitações reais.
 
 Trabalhar uma etapa por branch/PR, sempre partindo de `dev`. Integrar somente depois das verificações pertinentes. Não alterar `main` sem uma decisão explícita de publicação.
