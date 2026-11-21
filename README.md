@@ -20,7 +20,7 @@ A Etapa 4 (imagens de serviços) está concluída no escopo atual. O Preview fix
 - **Preview:** https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app/
 - **Deployment de código verificado após a PR #26:** `dpl_Bqwfwchf4vpH1LKLBFte2Y1yav9Y`, estado `READY`.
 
-**Próxima evolução aprovada — ainda não implementada:** simplificar a homepage, criar o catálogo em `/servicos`, a página `/categorias` e detalhes em `/servicos/:serviceId` com galeria de até cinco imagens. O plano está em [Catálogo público, navegação e apresentação de imagens](docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md). O objetivo é tornar a descoberta mais clara e fazer a interface refletir a capacidade de imagens que já existe no cadastro.
+**Etapa 5 — PR #28 em revisão:** a homepage simplificada, o catálogo `/servicos`, `/categorias` e os detalhes `/servicos/:serviceId` com galeria foram implementados em `feat/catalogo-publico-navegacao`; CI passou. O Preview da feature branch serve para conferir frontend/build, mas não acessa a planilha: as variáveis Vercel do Apps Script/Sheets estão restritas à branch `dev`. A validação integrada deve ocorrer no Preview fixo de `dev` depois do merge: https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app. [Preview isolado da feature](https://home-service-6mgrjabmj-kleber-goncalves-s-projects.vercel.app). Consulte [Plano — catálogo público, navegação e apresentação de imagens](docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md).
 
 **Production (`main`) permanece inalterada** no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`. O gateway bloqueia operações de negócio fora de Vercel Preview; não habilitar variáveis de backend em Production nesta etapa.
 

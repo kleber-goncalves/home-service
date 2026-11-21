@@ -1,183 +1,78 @@
-import { useEffect, useMemo, useState } from "react";
+import { ArrowRight, BriefcaseBusiness } from "lucide-react";
+import { useState } from "react";
 import SiteHeader from "@/components/home/site-header";
 import HeroSearch from "@/components/home/hero-search";
-import {
-    AboutSection,
-    CategorySection,
-    FAQSection,
-    HowItWorks,
-    PopularServices,
-    ProfessionalSection,
-    ProfessionalsCTA,
-    SiteFooter,
-} from "@/components/home/home-sections";
+import { HowItWorks, ProfessionalsCTA } from "@/components/home/home-sections";
+import AppLink from "@/components/public/app-link";
+import ServiceCard from "@/components/public/service-card";
+import SiteFooter from "@/components/public/site-footer";
+import { Button } from "@/components/ui/button";
+import usePublicCatalog from "@/hooks/use-public-catalog";
+import { navigateTo } from "@/lib/navigation";
 import { professionals as exampleProfessionals } from "@/data/homepage";
-import { appRequest } from "@/services/app-api";
-
-function imageForCategory(category) {
-    const normalized = String(category || "").toLocaleLowerCase("pt-BR");
-    const match = exampleProfessionals.find((item) => {
-        const candidate = item.category.toLocaleLowerCase("pt-BR");
-        return normalized.includes(candidate) || candidate.includes(normalized);
-    });
-    if (match) return match.image;
-    if (/hidraul|encan/.test(normalized)) return exampleProfessionals[1].image;
-    if (/limpez|diar/.test(normalized)) return exampleProfessionals[2].image;
-    if (/limpez|diar/.test(normalized)) return exampleProfessionals[2].image;
-    if (/pint|reform/.test(normalized)) return exampleProfessionals[3].image;
-    if (/jardin|paisag/.test(normalized)) return exampleProfessionals[4].image;
-    return exampleProfessionals[0].image;
-}
-
-function mapPublicService(service) {
+function mapExampleService(item) {
     return {
-        id: service.id,
-        category: service.category,
-        title: service.title,
-        description: service.description,
-        image: Array.isArray(service.images) && service.images[0]?.url
-            ? service.images[0].url
-            : imageForCategory(service.category),
-        imageAlt: Array.isArray(service.images) && service.images[0]?.url
-            ? "Imagem do serviço " + service.title + "."
-            : "Imagem ilustrativa de " + service.category + ".",
-        city: Array.isArray(service.cities) && service.cities.length
-            ? service.cities.map((item) => item.name + " - " + item.state).join(", ")
-            : service.city,
-        cityIds: Array.isArray(service.cityIds) ? service.cityIds : [],
-        cities: Array.isArray(service.cities) ? service.cities : [],
-        professionalName: service.professional,
-        whatsapp: service.whatsapp,
-        isPersisted: true,
+        id: item.id, categoryId: "", category: item.category, title: item.title, description: item.description,
+        professionalName: "Exemplo demonstrativo", cityLabel: "Localidade ilustrativa", cities: [],
+        images: item.image ? [{ id: item.id, order: 1, url: item.image, status: "active" }] : [],
+        whatsapp: "", isPersisted: false, isDemo: true,
     };
 }
-
 export default function HomePage() {
+    const catalog = usePublicCatalog();
     const [query, setQuery] = useState("");
     const [city, setCity] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("todas");
-    const [hasSearched, setHasSearched] = useState(false);
-    const [realServices, setRealServices] = useState([]);
-    const [catalogCategories, setCatalogCategories] = useState([]);
-    const [catalogCities, setCatalogCities] = useState([]);
-
-    useEffect(() => {
-        let active = true;
-
-        async function loadPublicData() {
-            const [servicesResult, catalogResult] = await Promise.allSettled([
-                appRequest("public.services"),
-                appRequest("public.catalog"),
-            ]);
-
-            if (!active) return;
-
-            if (servicesResult.status === "fulfilled" && Array.isArray(servicesResult.value)) {
-                setRealServices(servicesResult.value.map(mapPublicService));
-            }
-            if (catalogResult.status === "fulfilled" && catalogResult.value) {
-                setCatalogCategories(Array.isArray(catalogResult.value.categories) ? catalogResult.value.categories : []);
-                setCatalogCities(Array.isArray(catalogResult.value.cities) ? catalogResult.value.cities : []);
-            }
-        }
-
-        loadPublicData();
-        return () => { active = false; };
-    }, []);
-
-    const sourceProfessionals = useMemo(
-        () => [
-            ...exampleProfessionals.map((item) => ({
-                ...item,
-                city: "Exemplo de localidade",
-                professionalName: "",
-                isPersisted: false,
-            })),
-            ...realServices,
-        ],
-        [realServices],
-    );
-
-    const visibleProfessionals = useMemo(() => {
-        const normalizedQuery = query.trim().toLocaleLowerCase("pt-BR");
-        const normalizedCity = city.trim().toLocaleLowerCase("pt-BR");
-
-        return sourceProfessionals.filter((professional) => {
-            const matchesCategory = selectedCategory === "todas" || professional.category === selectedCategory;
-            const searchText = [
-                professional.category,
-                professional.title,
-                professional.description,
-                professional.professionalName,
-                professional.city,
-            ].join(" ").toLocaleLowerCase("pt-BR");
-            const matchesQuery = !normalizedQuery || searchText.includes(normalizedQuery);
-            const matchesCity = !normalizedCity || String(professional.city || "").toLocaleLowerCase("pt-BR").includes(normalizedCity);
-            return matchesCategory && matchesQuery && matchesCity;
-        });
-    }, [sourceProfessionals, query, city, selectedCategory]);
-
-    function scrollToExamples() {
-        window.requestAnimationFrame(() => {
-            document.getElementById("profissionais")?.scrollIntoView({
-                behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
-                block: "start",
-            });
-        });
-    }
-
     function submitSearch(event) {
         event.preventDefault();
-        setHasSearched(true);
-        scrollToExamples();
+        const params = new URLSearchParams();
+        if (query.trim()) params.set("q", query.trim());
+        if (city.trim()) params.set("cidade", city.trim());
+        navigateTo(params.toString() ? `/servicos?${params.toString()}` : "/servicos");
     }
-
-    function selectCategory(category) {
-        setSelectedCategory(category);
-        setHasSearched(true);
-        scrollToExamples();
-    }
-
-    function clearFilters() {
-        setQuery("");
-        setCity("");
-        setSelectedCategory("todas");
-        setHasSearched(false);
-    }
-
-    return (
-        <>
-            <SiteHeader />
-            <main id="conteudo" tabIndex="-1">
-                <HeroSearch
-                    query={query}
-                    city={city}
-                    onQueryChange={setQuery}
-                    onCityChange={setCity}
-                    onSubmit={submitSearch}
-                    availableCities={realServices.length ? catalogCities : []}
-                />
-                <CategorySection
-                    selectedCategory={selectedCategory}
-                    onSelect={selectCategory}
-                    catalogCategories={realServices.length ? catalogCategories : []}
-                />
-                <ProfessionalSection
-                    professionals={visibleProfessionals}
-                    hasSearched={hasSearched}
-                    query={query}
-                    city={city}
-                    selectedCategory={selectedCategory}
-                    onClearFilters={clearFilters}
-                    hasRealServices={realServices.length > 0}
-                />
-                <PopularServices />
-                <AboutSection />
-                <HowItWorks />
-                <ProfessionalsCTA />
-                <FAQSection />
-            </main>
-            <SiteFooter />
-        </>
-    );
+    const featuredServices = catalog.services.slice(0, 5);
+    const exampleServices = !catalog.loading && featuredServices.length === 0 ? exampleProfessionals.slice(0, 5).map(mapExampleService) : [];
+    return <>
+        <SiteHeader active="inicio" />
+        <main id="conteudo" tabIndex="-1">
+            <HeroSearch query={query} city={city} onQueryChange={setQuery} onCityChange={setCity} onSubmit={submitSearch} availableCities={catalog.cities} />
+            <section className="public-home-section public-home-categories" id="categorias" aria-labelledby="home-categories-title">
+                <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className="public-section-heading">
+                        <div><span className="section-eyebrow">Encontre por categoria</span><h2 id="home-categories-title">Por onde você quer começar?</h2></div>
+                        <AppLink to="/categorias" className="catalog-service-link">Ver todas as categorias <ArrowRight size={16} aria-hidden="true" /></AppLink>
+                    </div>
+                    {catalog.loading ? <p className="catalog-inline-state" role="status">Carregando categorias...</p>
+                        : catalog.categories.length ? <div className="home-category-grid">
+                            {catalog.categories.slice(0, 3).map((category) => <AppLink to={`/servicos?categoria=${encodeURIComponent(category.id)}`} className="home-category-card" key={category.id}>
+                                <span className="home-category-icon"><BriefcaseBusiness size={22} aria-hidden="true" /></span><span className="home-category-name">{category.name}</span><ArrowRight size={17} aria-hidden="true" />
+                            </AppLink>)}
+                        </div> : <p className="catalog-inline-state">As categorias serão exibidas aqui quando o catálogo estiver disponível.</p>}
+                </div>
+            </section>
+            <section className="public-home-section public-home-services" id="servicos" aria-labelledby="home-services-title">
+                <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className="public-section-heading">
+                        <div><span className="section-eyebrow">{featuredServices.length ? "Serviços publicados" : "Conheça a apresentação"}</span><h2 id="home-services-title">Serviços em destaque</h2>
+                            <p>{featuredServices.length ? "Algumas opções publicadas por profissionais no catálogo." : "Veja como os serviços serão apresentados na plataforma."}</p>
+                        </div>
+                        <AppLink to="/servicos" className="catalog-service-link">Ver todos os serviços <ArrowRight size={16} aria-hidden="true" /></AppLink>
+                    </div>
+                    {catalog.loading ? <div className="catalog-state" role="status">Carregando serviços publicados...</div>
+                        : featuredServices.length ? <div className="catalog-service-grid">{featuredServices.map((service) => <ServiceCard service={service} key={service.id} />)}</div>
+                            : <>
+                                {catalog.error && <p className="catalog-inline-state catalog-inline-state--error">Não foi possível consultar os serviços publicados agora. Os cartões abaixo são apenas exemplos visuais.</p>}
+                                <p className="home-demo-disclaimer">Exemplos ilustrativos — não representam cadastros publicados nem entram na pesquisa do catálogo.</p>
+                                <div className="catalog-service-grid">{exampleServices.map((service) => <ServiceCard service={service} key={service.id} />)}</div>
+                            </>}
+                </div>
+            </section>
+            <HowItWorks />
+            <ProfessionalsCTA />
+            <section className="public-home-final-cta"><div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+                <div><strong>Está procurando um serviço?</strong><span>Explore o catálogo completo e use os filtros.</span></div>
+                <Button type="button" onClick={() => navigateTo("/servicos")}>Explorar serviços <ArrowRight size={16} aria-hidden="true" /></Button>
+            </div></section>
+        </main>
+        <SiteFooter />
+    </>;
 }

@@ -16,8 +16,8 @@
 - A PR #23 concluiu o ciclo de vida dos serviços em `dev` (edição e remoção lógica). Em 20/11/2026, após a sincronização do Apps Script e a publicação da implantação Web App existente, o responsável confirmou que os testes manuais passaram no Preview fixo da branch `dev`; o deployment `dpl_FT5dFsPzB6B1phwGywur4ewjRkZS` está `READY` no commit `e6d231c`. `main` permanece inalterada.
 - A PR #25 (`feat/service-city-coverage`) integrou a Etapa 3 exclusivamente em `dev` em 20/11/2026, pelo merge commit `5003604a51def9bdf58df9845d36c2ec75a4452e`. A CI do merge (#44820409487) concluiu SUCCESS, e o Preview fixo de `dev` ficou READY no deployment `dpl_4n5E7JLaUQPHezVk8ymGRXZSS7Bx` (commit de código do merge). A implementação usa `SERVICO_CIDADES` para associar múltiplos municípios por serviço, preserva fallback dos serviços antigos, alinha filtros de categoria e sugere cidades ativas. Em 20/11/2026, o responsável confirmou a sincronização/publicação do Apps Script real e informou que os testes manuais passaram: a edição de um serviço existente atualizou `SERVICO_CIDADES`; a homepage encontrou o serviço pela cidade original; e a associação temporária do mesmo serviço a duas cidades permitiu encontrá-lo nas duas localidades. A validação funcional principal da Etapa 3 está concluída com base nesse relato. **Limpeza concluída:** o responsável confirmou a remoção da cidade temporária e de seus vínculos em `SERVICO_CIDADES`; apenas a cidade original permanece na planilha, com os registros permanentes preservados. `main` permanece inalterada em `49354a46863d5a5eb36ce32e450b975d4087fe3b`.
 - A PR #26 (`feat/drive-image-upload`) integrou a Etapa 4 exclusivamente em `dev` em 20/11/2026 (horário local), pelo merge commit `6dab42ba291008a20a490542dcaf28c6c439c7d2`. A CI pós-merge #44850407547 concluiu SUCCESS com auditoria, POC-01/02/03/04, autorização, testes de imagens, LOO, ocorrências, ESLint e build; o workflow AI Context #44850407640 também concluiu SUCCESS. O Preview de `dev` ficou READY no deployment `dpl_Bqwfwchf4vpH1LKLBFte2Y1yav9Y`. O responsável confirmou a validação manual principal no Preview com Apps Script, Sheets e Drive reais de teste. `main` permanece inalterada em `49354a46863d5a5eb36ce32e450b975d4087fe3b`; Production continua sem backend.
-- O ambiente Preview de `dev` contém variáveis `CONECTA_LOCAL_*` com escopo Preview; os valores são secretos e não devem ser lidos, copiados para documentação ou compartilhados. A Production permanece sem variáveis de backend.
-- Em 21/11/2026, foi aprovado o próximo escopo funcional: simplificar a homepage e criar catálogo público em `/servicos`, página `/categorias` e detalhes `/servicos/:serviceId` com galeria de até cinco imagens. O plano está em `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`; a etapa está planejada, não implementada. As alterações documentais estão sendo preparadas em branch própria; nenhuma rota ou página nova foi criada nesta etapa.
+- As variáveis `CONECTA_LOCAL_APPS_SCRIPT_URL`, `CONECTA_LOCAL_ALLOWED_ORIGIN` e `CONECTA_LOCAL_HMAC_SECRET` estão configuradas no Vercel Preview com restrição explícita `gitBranch: dev`; seus valores são secretos e não devem ser lidos, copiados para documentação ou compartilhados. Deploys de outras branches, inclusive `feat/*`, não têm conexão automática com Apps Script/Sheets. O ambiente conectado à planilha é exclusivamente o Preview fixo de `dev`: https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app. Não duplicar nem ampliar o escopo dos segredos para facilitar testes de branch. Production permanece sem variáveis de backend.
+- Em 21/11/2026, foi aprovada a Etapa 5: simplificar a homepage e criar catálogo público em `/servicos`, página `/categorias` e detalhes `/servicos/:serviceId` com galeria de até cinco imagens. A implementação está na branch `feat/catalogo-publico-navegacao` e na PR #28, ainda não integrada em `dev`; CI SUCCESS. O Preview da feature branch serve para inspecionar frontend/build/rotas, mas não acessa a planilha: as variáveis sensíveis estão restritas a `gitBranch: dev`. A validação integrada deverá ocorrer exclusivamente no Preview fixo de `dev`, após a integração da PR #28. Plano: `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`.
 - O gateway em `api/app.js` → `server/app-gateway.js` bloqueia as operações de negócio fora de Vercel Preview. Production permanece como vitrine pública, conforme decisão do responsável pelo projeto.
 - O Apps Script de negócio está em `apps-script/conecta-local/Code.gs`. O fluxo operacional atual utiliza dez abas do Sheets: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS`, `SERVICO_CIDADES`, `IMAGENS` e `AUDITORIA`. A modelagem aprovada contempla 12 abas; `CONTROLE_AUTENTICACAO` e `DENUNCIAS` ainda não têm fluxo operacional implementado.
 - Argon2id (`hash-wasm@4.13.0`) e comparação de hash por `timingSafeEqual` estão integrados no gateway do protótipo. Isso atende à demonstração acadêmica, não constitui auditoria independente ou aprovação para produção.
@@ -111,10 +111,10 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 
 ### Implementado e integrado
 
-- Homepage pública demonstrativa em `src/pages/HomePage.jsx`, organizada com componentes reutilizáveis em `src/components/home/` e primitivas locais em `src/components/ui/`.
-- A homepage atual combina serviços públicos retornados por `public.services` com dados ilustrativos locais; a separação visual entre registros reais e exemplos ainda precisa ser melhorada. A pesquisa atual filtra itens carregados no frontend e conduz até a seção de profissionais; não existe ainda uma página dedicada `/servicos`, uma página `/categorias` ou uma rota pública de detalhes.
-- O backend público retorna a coleção de metadados `images` de cada serviço, mas o mapeamento de `HomePage.jsx` conserva apenas `images[0]?.url` como imagem simples; os cartões atuais apresentam uma imagem e não uma galeria. A ausência de uma galeria explica a não exibição das imagens adicionais, mas não comprova a causa de eventual falha da primeira imagem: verificar resposta de `public.services`, URL/permissão do Drive e carregamento/decodificação no navegador antes de atribuir causa.
-- A homepage também contém conteúdo estático de serviços populares; na próxima etapa, separar exemplos ilustrativos dos resultados reais e evitar que dados de demonstração sejam contados como serviços públicos cadastrados.
+- Na linha de base de `dev` anterior à Etapa 5, a homepage pública estava concentrada em `src/pages/HomePage.jsx`, misturava serviços públicos e exemplos locais e não possuía catálogo e detalhe em rotas próprias.
+- **Etapa 5 na branch `feat/catalogo-publico-navegacao` (ainda não integrada em `dev`):** implementadas as rotas `/`, `/servicos`, `/categorias` e `/servicos/:serviceId`; homepage compacta; catálogo com filtros por texto/categoria/cidade; categorias ativas; detalhe com galeria e WhatsApp; cartão reutilizável com imagem principal e indicador `+N fotos`; placeholder neutro para imagem ausente/quebrada.
+- A API Apps Script `public.services` retorna os metadados ativos em `images[]`; o mapeamento anterior descartava as imagens após a primeira e não tinha fallback `onError`. A Etapa 5 preserva a lista ordenada e apresenta fallback neutro. **A causa específica de eventual falha da primeira URL do Drive não foi reproduzida**; não alterar permissões nem afirmar defeito do Drive sem ensaio real.
+- Exemplos ilustrativos aparecem separados e rotulados na homepage quando não há serviços públicos; não entram no catálogo nem nos filtros. Os filtros usam os até 100 serviços fornecidos pelo contrato atual, sem novo endpoint ou banco.
 - Cadastro, confirmação de código demonstrativo, login, sessão, atualização do perfil, criação, edição, pausa/publicação e remoção lógica de serviços, além da consulta pública, implementados em `src/pages/AuthDemoPage.jsx`, `src/services/app-api.js`, `api/app.js` e `server/app-gateway.js`.
 - Em 20/11/2026, o responsável informou que repetiu os testes do fluxo funcional no Preview atualizado de `dev`, após as integrações das PRs #16 e #17, e confirmou o funcionamento correto. O fluxo inclui catálogo, cadastro/ativação demonstrativa, persistência em Sheets, login/restauração de sessão, criação, pausa/publicação, vitrine e logout, com dados fictícios.
 - O Apps Script de negócio está em `apps-script/conecta-local/Code.gs`; utiliza operacionalmente as abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS`, `SERVICO_CIDADES`, `IMAGENS` e `AUDITORIA`.
@@ -180,25 +180,29 @@ O levantamento funcional está consolidado em `docs/ESPECIFICACAO_MVP.md` v0.4, 
 
 
 
-### Próxima frente aprovada — catálogo público, navegação e apresentação de imagens
+### Etapa 5 — Catálogo público, navegação e apresentação de imagens
 
-**Status em 21/11/2026: planejada e documentada; ainda não implementada.** O escopo detalhado está em `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`; a Etapa 5 foi incluída no `docs/ROADMAP_ESTUDOS.md`, e a pesquisa acadêmica passou a Etapa 6.
+**Status em 21/11/2026: implementação funcional inicial concluída na branch `feat/catalogo-publico-navegacao`; ainda não integrada em `dev`.** O plano aprovado está em `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`.
 
-Objetivos e decisões:
-- Enxugar a homepage para pesquisa por serviço/cidade, três categorias em destaque, quatro ou cinco serviços, explicação breve de funcionamento, chamada para profissionais e rodapé.
-- Criar `/servicos` com catálogo público, busca textual, filtros por categoria e cidade, contador, limpar filtros e estados de carregamento/vazio/erro.
-- Criar `/categorias` com todas as categorias ativas e encaminhamento para o catálogo já filtrado.
-- Criar `/servicos/:serviceId` com descrição completa, cidades atendidas, contato WhatsApp e galeria com até cinco imagens.
-- Padronizar o cartão para exibir uma imagem principal e indicador de fotos adicionais. As outras imagens ficam na galeria da página de detalhes.
-- Preservar no frontend a lista `images[]`, `categoryId`, IDs e cidades; não descartar metadados já fornecidos pelo backend.
-- Separar serviços publicados reais dos exemplos locais; resultados e filtros do catálogo devem conter somente dados públicos elegíveis. Exemplos, quando usados para preencher uma demonstração vazia, devem ser claramente identificados e permanecer fora dos resultados reais.
-- Investigar a falha relatada de imagem em branco separadamente da ausência de galeria: verificar payload, URL e permissão do Drive, status HTTP e decodificação no navegador. Não alterar permissões ou URLs sem causa reproduzida.
-- Reutilizar `public.services`, `CATEGORIAS`, `CIDADES`, `SERVICO_CIDADES` e `IMAGENS`; os filtros serão inicialmente no cliente sobre os até 100 serviços retornados. Não criar busca externa, banco novo ou endpoint adicional sem uma necessidade comprovada.
-- Preservar os acessos demonstrativos `?auth=demo` e `?poc=01`; não tocar no fluxo de login, na área profissional nem no mecanismo de upload sem necessidade.
+**Implementado no branch de funcionalidade:**
+- Rotas públicas `/`, `/servicos`, `/categorias` e `/servicos/:serviceId`, com histórico e navegação por URL direta.
+- Compatibilidade no roteador com `?auth=demo` e `?poc=01`.
+- Homepage compacta com pesquisa, até três categorias em destaque, até cinco serviços e seções curtas de funcionamento/CTA.
+- Página de serviços com busca textual, filtro por categoria e cidade, contador, limpar filtros e filtros persistidos na URL.
+- Página de categorias ativas e detalhe do serviço com galeria de até cinco imagens, miniaturas, controle anterior/próxima, contador, cidades atendidas e contato WhatsApp.
+- Modelo público mantém `images[]` ordenada, `categoryId`, IDs e cidades. Cartão exibe imagem principal e quantidade de fotos adicionais.
+- Placeholder neutro acessível para imagem ausente ou que falha; exemplos estão separados dos serviços publicados.
+- `vercel.json` com rewrite SPA para links diretos, preservando a resolução das rotas `/api/app` e `/api/images`.
 
-**Sequência prevista:** diagnóstico de imagens → modelo frontend/cartão reutilizável → roteamento → catálogo/categorias → detalhe/galeria → simplificação da homepage → validação de responsividade, URLs diretas, imagens ausentes/quebradas e fluxos existentes.
+**Diagnóstico das imagens:** o código anterior descartava as imagens adicionais ao reduzir `images[]` a uma única URL e não tinha fallback para `onError`. Esses dois pontos foram corrigidos. A causa específica de eventual falha da primeira URL do Drive não foi reproduzida no Preview; testar com um serviço de demonstração que possua imagens reais antes de concluir essa parte.
 
-**Ambiente e Git:** trabalhar em branch de funcionalidade derivada de `dev`, validar em Preview e integrar por PR após revisão/CI. Não alterar `main` nem habilitar backend em Production. Esta frente é de apresentação e descoberta pública; não altera o esquema das planilhas por padrão.
+**Validação automatizada e Preview:**
+- Validate Home Service [#44933049890](https://github.com/kleber-goncalves/home-service/actions/runs/44933049890): SUCCESS, incluindo `npm run test:public-catalog`, ESLint e build.
+- AI Context — Synchronize [#44933049803](https://github.com/kleber-goncalves/home-service/actions/runs/44933049803): SUCCESS.
+- Preview isolado da feature branch READY: `dpl_Ceu1VZvFX81JdMQrnKBxbzwKhK9K`, https://home-service-8v1rdts20-kleber-goncalves-s-projects.vercel.app. Esse deployment não está conectado à planilha porque as variáveis de backend estão limitadas a `gitBranch: dev`.
+- Verificados HTTP 200 no shell da aplicação para homepage, serviços, categorias e detalhe; GET em `/api/app` e `/api/images` respondeu 405 como esperado, confirmando que as Functions não foram capturadas pelo rewrite.
+
+**Pendências:** a PR #28 precisa ser integrada em `dev` para que o Preview fixo da branch receba o novo código com as variáveis já restritas a `gitBranch: dev`. Depois do deployment atualizado, validar desktop/celular; testar um serviço fictício com cinco imagens; conferir imagem principal e galeria; testar filtros, links diretos e recarga; repetir `?auth=demo`, `?poc=01` e gestão/upload do profissional. Não usar o Preview da feature branch como prova de integração com Sheets. `main` e Production permanecem inalteradas.
 
 ## 5. Arquitetura e decisões tecnológicas
 
@@ -388,12 +392,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 63039aa2e07278f999101aaaaf241698af7b302e
-- **Data do commit:** 2026-11-21T14:46:49-03:00
-- **Mensagem do commit:** Merge pull request #27 from kleber-goncalves/docs/catalogo-publico-e-navegacao
-- **Branch desta execução:** dev
+- **Commit de referência:** b7c85741e5e52b4c6bed96af0fb9ef8d9a23678e
+- **Data do commit:** 2026-11-21T15:10:17-03:00
+- **Mensagem do commit:** docs: esclarecer Preview conectado à planilha apenas em dev
+- **Branch desta execução:** feat/catalogo-publico-navegacao
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 13
+- **Scripts npm:** 14
 - **Dependências de runtime:** 4
 - **Dependências de desenvolvimento:** 11
 - **Workflows:** 2
@@ -416,6 +420,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run test:poc04 | node --test tests/poc04/gateway.test.js tests/poc04/apps-script.test.js |
 | npm run test:authorization | node --test tests/authorization/apps-script.test.js tests/authorization/gateway.test.js |
 | npm run test:images | node --test tests/images/upload-gateway.test.js tests/images/image-api.test.js |
+| npm run test:public-catalog | node --test tests/public-catalog/public-catalog.test.js |
 
 ### Variáveis declaradas no .env.example
 
@@ -471,16 +476,27 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/components/home/home-sections.jsx
 - src/components/home/site-header.jsx
 - src/components/professional/service-image-manager.jsx
+- src/components/public/app-link.jsx
+- src/components/public/service-card.jsx
+- src/components/public/service-image.jsx
+- src/components/public/site-footer.jsx
 - src/components/ui/badge.jsx
 - src/components/ui/button.jsx
 - src/components/ui/card.jsx
 - src/components/ui/input.jsx
 - src/data/homepage.js
+- src/hooks/use-public-catalog.js
+- src/lib/navigation.js
+- src/lib/public-catalog.js
 - src/lib/utils.js
 - src/main.jsx
 - src/pages/AuthDemoPage.jsx
+- src/pages/CategoriesPage.jsx
 - src/pages/HomePage.jsx
+- src/pages/NotFoundPage.jsx
 - src/pages/Poc01Page.jsx
+- src/pages/ServiceDetailPage.jsx
+- src/pages/ServicesPage.jsx
 - src/services/app-api.js
 - src/services/image-api.js
 - src/services/poc-01-api.js
@@ -489,6 +505,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 - src/components/
 - src/data/
+- src/hooks/
 - src/lib/
 - src/pages/
 - src/services/
@@ -497,13 +514,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| 63039aa | 2026-11-21 | Merge pull request #27 from kleber-goncalves/docs/catalogo-publico-e-navegacao |
-| b96b2c6 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 4844ac0 | 2026-11-21 | docs: alinhar roadmap após etapa de imagens |
-| 180f314 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 109a1f9 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| d725d76 | 2026-11-21 | docs: atualizar README com próxima evolução |
-| ce34dd1 | 2026-11-21 | docs: registrar plano do catálogo público no contexto |
-| 43c27da | 2026-11-21 | docs: priorizar evolução do catálogo público |
+| b7c8574 | 2026-11-21 | docs: esclarecer Preview conectado à planilha apenas em dev |
+| 1719f3a | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
+| d237461 | 2026-11-21 | docs: registrar estado do catálogo no Preview |
+| 32a7704 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
+| e1fcd14 | 2026-11-21 | fix: ajustar filtros de cidade e lint do roteador |
+| 84d985a | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
+| 0932494 | 2026-11-21 | feat: adicionar catálogo público e galeria de serviços |
+| 6c17087 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->

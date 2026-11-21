@@ -68,6 +68,9 @@ jobs:
       - name: Run LOO domain entity tests
         run: npm run test:loo
 
+      - name: Run public catalog data tests
+        run: npm run test:public-catalog
+
       - name: Validate occurrence register
         run: npm run check:occurrences
 
