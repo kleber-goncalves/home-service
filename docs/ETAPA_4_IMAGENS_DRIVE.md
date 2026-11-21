@@ -1,6 +1,6 @@
 # Etapa 4 — Imagens no Google Drive
 
-> **Status:** implementação parcial e CI automatizada aprovada; integração com Drive real e validação manual pendentes.
+> **Status:** implementação concluída na branch `feat/drive-image-upload`; CI automatizada aprovada e validação manual real no Preview concluída. PR e integração em `dev` ainda pendentes.
 >
 > **Branch de trabalho:** `feat/drive-image-upload`.
 >
@@ -211,18 +211,20 @@ Para a homepage pública, a primeira versão usará a primeira imagem válida do
 - Recusar upload no ambiente Production.
 - Manter testes das operações existentes dentro de seus limites originais (20 KiB/16 KiB).
 
-### Manuais no Preview
+### Validação manual real — Preview + Apps Script + Sheets + Drive
 
-1. Enviar uma imagem JPEG fictícia/licenciada abaixo de 5 MB.
-2. Confirmar a criação do arquivo na pasta privada do Drive e os metadados na aba `IMAGENS`.
-3. Confirmar que um serviço publicado e uma conta ativa tornam a imagem visualizável por link.
-4. Pausar o serviço e confirmar que o link deixa de permitir acesso anônimo.
-5. Publicar novamente e confirmar a sincronização da permissão.
-6. Remover uma imagem e confirmar que sua linha passa a `removed`, o link fica privado e a posição pode ser reutilizada.
-7. Repetir com PNG e WebP.
-8. Testar arquivo acima do limite, formato inválido, conteúdo adulterado, interrupção/repetição de bloco e falha de gravação no Sheets.
+Os cenários abaixo foram executados no ambiente Preview, com confirmação operacional dos resultados nas telas da aplicação, nas abas `IMAGENS` e `AUDITORIA` e no Google Drive:
 
-A conclusão exige testes funcionais reais no Preview e na pasta de Drive de teste. Testes simulados não comprovam as permissões reais.
+- [x] Envio real de duas imagens para o mesmo serviço; os uploads concluíram e os arquivos foram criados no Drive, com metadados em `IMAGENS`.
+- [x] Remoção lógica de uma imagem; ela deixou de aparecer em **Meus serviços**, recebeu status `removed` na aba `IMAGENS` e gerou evento correspondente em `AUDITORIA`.
+- [x] Restrição do arquivo removido no Drive; o acesso geral ficou como `Restrito`.
+- [x] Limite de cinco imagens ativas por serviço; com uma imagem ativa, foi possível adicionar mais quatro. A tentativa de adicionar uma sexta imagem foi bloqueada.
+- [x] Consistência do limite e dos registros no Drive, na aba `IMAGENS` e na aba `AUDITORIA`.
+- [x] Serviço publicado: imagens ativas com acesso por link.
+- [x] Serviço pausado: imagens ativas com acesso geral `Restrito`.
+- [x] Serviço publicado novamente: acesso por link restaurado para as imagens ativas.
+
+Os testes manuais acima validam o caminho funcional principal da integração real. Não registrar como executados os cenários complementares que não foram confirmados nesta sessão, como repetição manual individual com PNG/WebP, falha forçada de gravação no Sheets ou interrupção deliberada de blocos.
 
 ## 9. Fora do primeiro ciclo
 
@@ -236,20 +238,20 @@ A conclusão exige testes funcionais reais no Preview e na pasta de Drive de tes
 
 ## 10. Estado e próxima ação
 
-**Status em 20/11/2026:** implementação parcial versionada em `feat/drive-image-upload`. Ainda não foi integrada em `dev` e não foi conectada ao Google Drive real.
+**Status em 20/11/2026:** implementação e validação manual principal concluídas na branch `feat/drive-image-upload`. A integração ainda não foi incorporada em `dev`; nenhuma alteração foi feita em `main` ou em Production.
 
-- **Arquitetura:** definida com upload retomável em blocos binários de 1 MiB pela rota dedicada `/api/images`.
-- **Backend Apps Script:** ações de iniciar, enviar bloco, consultar status, cancelar e remover; estado/URI do Drive em Script Properties; metadados em `IMAGENS`; permissões por estado do serviço.
-- **Gateway:** rota binária separada com mesma origem, cookie HttpOnly, CSRF, HMAC e limite de stream de 1 MiB; endpoints JSON atuais preservam seus limites.
+- **Arquitetura:** upload retomável em blocos binários de 1 MiB pela rota dedicada `/api/images`.
+- **Backend Apps Script:** ações de iniciar, enviar bloco, consultar status, cancelar e remover; estado da sessão do Drive em Script Properties; metadados em `IMAGENS`; permissões sincronizadas conforme o estado do serviço.
+- **Gateway:** rota binária separada com mesma origem, cookie HttpOnly, CSRF, HMAC e limite de stream de 1 MiB; endpoints JSON existentes preservam seus limites.
 - **Interface:** seleção de imagens de serviço, prévia local, progresso, cancelamento, remoção e exibição da primeira imagem pública na homepage.
-- **Testes automatizados:** execução [Validate Home Service #44834406864](https://github.com/kleber-goncalves/home-service/actions/runs/44834406864) concluiu **SUCCESS** no commit `26c48caecbbd869bf9228cdd7df6bdbae78649df`. Passaram auditoria bloqueante, POC-01/02/03/04, autorização e testes Apps Script de imagens, testes do gateway e cliente de upload, LOO, registro de ocorrências, ESLint e build.
-- **Preview Vercel:** o check no commit `26c48ca` falhou com `build-rate-limit`. O deployment READY disponível (`dpl_91tVg8Bu34qKDmNkszha2Bx5L96V`) é do commit anterior `93c577e`; não contém os últimos ajustes e não deve ser usado para validar a Etapa 4.
-- **Drive real:** pasta privada, Script Property `CONECTA_LOCAL_DRIVE_FOLDER_ID`, escopos OAuth e autorização ainda não configurados.
-- **Validação manual:** ainda não executada. Nenhuma imagem foi enviada para o Drive do usuário.
+- **Testes automatizados:** execução [Validate Home Service #44845297066](https://github.com/kleber-goncalves/home-service/actions/runs/44845297066) concluiu **SUCCESS** no commit `d41fd53801e816a8235635d125b31247748a76ad`. Passaram auditoria de dependências, POC-01/02/03/04, autorização, testes do gateway e do cliente de upload, LOO, registro de ocorrências, ESLint e build.
+- **Correção validada:** o Apps Script passou a aceitar a URI resumível oficial do Drive com parâmetros de consulta adicionais (`fields` e `session_crd`), mantendo a validação de protocolo, host, caminho e `upload_id`.
+- **Vercel Preview:** deployment READY `dpl_5J3tdXakouRAZkiQ55sG1WC7ig2s`, para o commit de código `d41fd53801e816a8235635d125b31247748a76ad`, branch `feat/drive-image-upload`. A URL de Preview utilizada nos testes é `https://home-service-git-feat-drive-7b0906-kleber-goncalves-s-projects.vercel.app`.
+- **Apps Script e Drive de teste:** pasta privada configurada; `CONECTA_LOCAL_DRIVE_FOLDER_ID` definido em Script Properties; escopos do Drive e autorização da conta executora concluídos; versão atualizada publicada na implantação Web App existente.
+- **Validação manual:** dois uploads reais, remoção lógica com auditoria, restrição de arquivo removido, limite de cinco imagens ativas e sincronização das permissões ao pausar/publicar novamente o serviço foram confirmados no Preview, Sheets e Drive.
+- **Integração Git:** a branch `feat/drive-image-upload` ainda não tem PR aberto. Na revisão feita em 20/11/2026, `dev` estava no commit `add204f70effd8ba97a1ea54eccfe66268c544f0`; a comparação indicou 94 commits à frente e nenhum commit atrás. O escopo completo deve ser revisado antes de abrir/mesclar o PR.
 
-**Próxima ação:** aguardar uma nova janela de build da Vercel para gerar Preview do commit atual da branch. Enquanto isso, preparar a pasta raiz privada e revisar os escopos no projeto Apps Script existente, sem colar/publicar o código antes de o Preview atualizado estar disponível. Depois, sincronizar o código e publicar nova versão na implantação Web App existente para validar o fluxo real.
-
-Não integrar em `dev`, alterar `main`, habilitar Production ou solicitar upgrade do plano Vercel nesta etapa.
+**Próxima ação:** revisar o histórico e o diff da branch em relação a `dev`, confirmar que todos os commits e arquivos pertencem ao escopo planejado e então abrir PR para `dev`. Aguardar a CI do PR e revisar o diff final antes do merge. Não alterar `main`, habilitar Production ou promover o Preview nesta etapa.
 
 ## 11. Referências técnicas oficiais
 
