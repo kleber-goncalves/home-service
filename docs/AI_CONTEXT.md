@@ -394,9 +394,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 1e1c3122e13b06d598cfea0082d3074aefd39306
-- **Data do commit:** 2026-11-21T15:39:56-03:00
-- **Mensagem do commit:** fix(images): remover rota dinamica nao reconhecida pela Vercel
+- **Commit de referência:** a0c95a42996eb2a6c6ad5e61af7a37b8af9bbdcb
+- **Data do commit:** 2026-11-21T15:39:58-03:00
+- **Mensagem do commit:** fix(images): usar Function estatica para entrega publica
 - **Branch desta execução:** fix/homepage-images-and-sections
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -516,6 +516,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| a0c95a4 | 2026-11-21 | fix(images): usar Function estatica para entrega publica |
 | 1e1c312 | 2026-11-21 | fix(images): remover rota dinamica nao reconhecida pela Vercel |
 | 8567a43 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 63df51c | 2026-11-21 | test(images): corrigir tamanho minimo da fixture JPEG |
@@ -523,6 +524,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | b13ddc3 | 2026-11-21 | fix(images): não expor links diretos do Drive no catálogo público |
 | 574b8db | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 3723207 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| dee2e7b | 2026-11-21 | docs(readme): atualizar estado da etapa 5 e correcoes |
 
 <!-- END AUTO-GENERATED SECTION -->
