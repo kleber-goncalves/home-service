@@ -392,9 +392,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** e1fcd1448e5cf846cd7c000900580c44005b7aa0
-- **Data do commit:** 2026-11-21T14:59:46-03:00
-- **Mensagem do commit:** fix: ajustar filtros de cidade e lint do roteador
+- **Commit de referência:** d2374612f9f277b342c45c1ffdb75bd916e9d5b8
+- **Data do commit:** 2026-11-21T15:03:12-03:00
+- **Mensagem do commit:** docs: registrar estado do catálogo no Preview
 - **Branch desta execução:** feat/catalogo-publico-navegacao
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -514,13 +514,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| d237461 | 2026-11-21 | docs: registrar estado do catálogo no Preview |
+| 32a7704 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | e1fcd14 | 2026-11-21 | fix: ajustar filtros de cidade e lint do roteador |
 | 84d985a | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 0932494 | 2026-11-21 | feat: adicionar catálogo público e galeria de serviços |
 | 6c17087 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 63039aa | 2026-11-21 | Merge pull request #27 from kleber-goncalves/docs/catalogo-publico-e-navegacao |
 | b96b2c6 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 4844ac0 | 2026-11-21 | docs: alinhar roadmap após etapa de imagens |
-| 180f314 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
