@@ -159,31 +159,30 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 4 — Imagens no Google Drive
 
-**Status: implementação parcial em `feat/drive-image-upload`; CI automatizada aprovada em 20/11/2026; integração real com o Drive e validação manual ainda pendentes.**
+**Status: concluída no escopo do MVP para imagens de serviços.** A implementação foi integrada exclusivamente em `dev` pela PR #26, merge commit `6dab42ba291008a20a490542dcaf28c6c439c7d2`. A CI pós-merge #44850407547 concluiu **SUCCESS**, e a sincronização do contexto técnico #44850407640 também passou.
 
-O responsável escolheu prosseguir com esta etapa em 20/11/2026, mantendo o escopo acadêmico e o plano Vercel Hobby.
+**Arquitetura entregue:**
+- Upload retomável em blocos binários de 1 MiB por rota Vercel dedicada, encaminhado ao Apps Script por HMAC.
+- Sessão de Drive e URI retomável mantidas no Apps Script; navegador não recebe credenciais OAuth nem URI de upload do Drive.
+- Arquivos guardados individualmente na pasta raiz privada; metadados e histórico na aba `IMAGENS`; eventos operacionais registrados em `AUDITORIA`.
+- Limite de 5 imagens ativas por serviço, JPG/JPEG/PNG/WebP, até 5.000.000 bytes por arquivo.
+- Gerenciador na área profissional com prévias locais, progresso, cancelamento, recuperação e remoção lógica.
+- Permissão por arquivo sincronizada com o estado do serviço: publicado e conta ativa permitem visualização por link; pausado, removido ou inelegível ficam restritos.
 
-**Decisão de transporte:** upload retomável do Google Drive com blocos binários de 1 MiB enviados por uma rota dedicada da Vercel e encaminhados ao Apps Script sob HMAC. O URI de sessão do Drive e o token OAuth ficam somente no Apps Script. Essa estratégia preserva o limite de 5.000.000 bytes sem depender da opção beta de 20 MiB da Vercel, que exige memória de 4 GB indisponível no plano Hobby.
+**Validação manual real — Preview + Apps Script + Sheets + Drive:**
+- [x] Dois uploads reais concluídos para o mesmo serviço.
+- [x] Remoção lógica refletida em **Meus serviços**, status `removed` em `IMAGENS`, evento em `AUDITORIA` e acesso geral `Restrito` no Drive.
+- [x] Limite de cinco imagens ativas confirmado; após uma imagem removida, quatro novas puderam ser adicionadas e a sexta imagem ativa foi bloqueada.
+- [x] Serviço publicado: imagens acessíveis por link.
+- [x] Serviço pausado: imagens restritas.
+- [x] Serviço republicado: acesso por link restaurado.
+- [x] Resultados conferidos pelo responsável na aplicação, no Google Sheets e no Google Drive.
 
-**Escopo inicial — imagens de serviços:**
-- Iniciar sessão de upload após validar sessão, proprietário, serviço, tamanho e MIME.
-- Enviar blocos sequenciais de 1 MiB; validar assinatura binária, offset, tamanho total e sequência no backend.
-- Guardar intenção e URI retomável somente em Script Properties; não gravar metadados ativos antes de o Drive confirmar a conclusão.
-- Armazenar arquivos na pasta raiz privada e metadados na aba `IMAGENS`.
-- Permitir no máximo 5 imagens ativas por serviço, nos formatos JPG/JPEG, PNG ou WebP, até 5.000.000 bytes cada.
-- Tornar público por link somente arquivo pertencente a serviço publicado e conta ativa; restringir ao pausar, remover ou tornar inelegível.
-- Implementar cancelamento, expiração, compensação de falha parcial e remoção lógica.
-- Mostrar prévia, progresso e estado de erro na interface.
+**Validação automatizada:** PR #26 com CI aprovada antes do merge e CI pós-merge #44850407547 **SUCCESS**, incluindo auditoria bloqueante de dependências, POC-01/02/03/04, autorização/propriedade, testes do gateway e cliente de upload, LOO, registro de ocorrências, ESLint e build de produção.
 
-**Não faz parte do primeiro ciclo:** foto de perfil, galeria avançada, painel de mídia e operação em Production.
+**Limites e itens fora desta etapa:** foto de perfil, galeria avançada, ordenação por arrastar e soltar, compressão/otimização de imagens, painel administrativo de mídia e operação em Production. Não declarar como testes manuais realizados nesta rodada repetição individual de todos os formatos, interrupção deliberada de blocos ou falha forçada entre Drive e Sheets.
 
-**Código já presente na branch de trabalho:** ações Apps Script para iniciar/enviar/consultar/cancelar upload e remover imagem; gateway separado para blocos binários com sessão, CSRF, mesma origem e HMAC; cliente de upload com blocos de 1 MiB e reconciliação; componente de seleção/prévia/progresso/remoção na área profissional; primeira imagem pública exibida na vitrine; testes automatizados para gateway, fluxo de navegador e harness de Apps Script. A execução [Validate Home Service #44834406864](https://github.com/kleber-goncalves/home-service/actions/runs/44834406864) concluiu **SUCCESS** no commit `26c48caecbbd869bf9228cdd7df6bdbae78649df`, incluindo auditoria bloqueante, POC-01 a POC-04, autorização/imagens, LOO, validação de ocorrências, ESLint e build de produção.
-
-**Ainda pendente:** configurar pasta privada e Script Property no Apps Script, revisar escopos e autorizar Drive, sincronizar/deployar a versão no projeto Apps Script existente, validar uploads e permissões reais no Preview e resolver eventuais falhas observadas. O check Vercel do commit `26c48ca` falhou por `build-rate-limit`; o deployment READY disponível (`dpl_91tVg8Bu34qKDmNkszha2Bx5L96V`) corresponde ao commit antigo `93c577e` e não contém todos os commits mais recentes da etapa. Não usar esse deployment como evidência de validação da Etapa 4.
-
-**Critério de conclusão:** upload, listagem, exibição, pausa/publicação e remoção validados em Preview com arquivos fictícios/licenciados, pasta Drive privada e permissões individuais conferidas no Drive real.
-
-**Dependências manuais:** inspecionar o manifesto `appsscript.json` existente, acrescentar os escopos necessários sem substituir configurações atuais, criar pasta raiz privada, adicionar Script Property com seu ID e autorizar o Drive na conta que executa o Web App. Não criar outro projeto/implantação Apps Script nem alterar segredo HMAC ou variáveis Production.
+**Ambiente:** a funcionalidade está em `dev` e no Preview de desenvolvimento. `main` e Production permanecem inalteradas e sem backend habilitado. A próxima etapa do roadmap é a Etapa 5; qualquer promoção futura para Production exige decisão e revisão específicas.
 
 ### Etapa 5 — Pesquisa acadêmica e acabamento da apresentação
 
