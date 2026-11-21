@@ -388,9 +388,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** f72fc3679d69019f620ddb820cc290eaa7da2d72
-- **Data do commit:** 2026-11-21T14:42:16-03:00
-- **Mensagem do commit:** docs: planejar catálogo público e navegação
+- **Commit de referência:** 43c27da30840727b66b4a3170aca006c86ea8019
+- **Data do commit:** 2026-11-21T14:43:11-03:00
+- **Mensagem do commit:** docs: priorizar evolução do catálogo público
 - **Branch desta execução:** docs/catalogo-publico-e-navegacao
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -497,13 +497,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 43c27da | 2026-11-21 | docs: priorizar evolução do catálogo público |
+| 446d019 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | f72fc36 | 2026-11-21 | docs: planejar catálogo público e navegação |
 | 23ee009 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 790617b | 2026-11-20 | docs(context): corrigir estados das Etapas 3 e 4 |
 | c98c55e | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 0dd27f0 | 2026-11-20 | docs(context): registrar Etapa 4 integrada e validada |
 | 1ddd202 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 9f34327 | 2026-11-20 | docs(readme): atualizar estado da integração de imagens |
-| c88d4af | 2026-11-20 | docs(roadmap): marcar Etapa 4 como concluída |
 
 <!-- END AUTO-GENERATED SECTION -->
