@@ -398,9 +398,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** f916efb9d9337ec00366b559c0ed6618adef3230
-- **Data do commit:** 2026-11-21T17:02:57-03:00
-- **Mensagem do commit:** feat: compartilhar sessão e navegação da conta
+- **Commit de referência:** c63486772711c03fe5ab0e1c7c8efb5acd95a8eb
+- **Data do commit:** 2026-11-21T17:04:06-03:00
+- **Mensagem do commit:** fix: ajustar o menu da conta em telas estreitas
 - **Branch desta execução:** feat/autenticacao-compartilhada-navegacao
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -524,13 +524,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| c634867 | 2026-11-21 | fix: ajustar o menu da conta em telas estreitas |
+| d911464 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | f916efb | 2026-11-21 | feat: compartilhar sessão e navegação da conta |
 | bec90b6 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | e9b36e0 | 2026-11-21 | refactor: remover serviços de exemplo da página inicial |
 | 198eaa6 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 0e103ea | 2026-11-21 | docs: registrar validação integrada do gateway de imagens |
 | cf0e932 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 77e88be | 2026-11-21 | fix: corrigir imagens públicas e restaurar seções da homepage (#29) |
-| 308ef43 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
