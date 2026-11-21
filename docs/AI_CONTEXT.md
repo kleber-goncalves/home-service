@@ -394,9 +394,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 7f7d0080c4a795b9db2f24fd162a66e64f192de4
-- **Data do commit:** 2026-11-21T15:36:50-03:00
-- **Mensagem do commit:** docs(plan): registrar correcoes pos-pr28
+- **Commit de referência:** dee2e7bfab9408f9be3f0ee753ce78be0bcc25d0
+- **Data do commit:** 2026-11-21T15:36:53-03:00
+- **Mensagem do commit:** docs(readme): atualizar estado da etapa 5 e correcoes
 - **Branch desta execução:** fix/homepage-images-and-sections
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -516,6 +516,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| dee2e7b | 2026-11-21 | docs(readme): atualizar estado da etapa 5 e correcoes |
 | 7f7d008 | 2026-11-21 | docs(plan): registrar correcoes pos-pr28 |
 | 9d0034f | 2026-11-21 | docs(context): atualizar estado das correcoes de catalogo e imagens |
 | 8a7e488 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
@@ -523,6 +524,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 0fc8f57 | 2026-11-21 | test(catalog): validar URLs internas de imagens |
 | 4453686 | 2026-11-21 | test(images): cobrir entrega autenticada de imagens |
 | 068e576 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 845db7f | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
