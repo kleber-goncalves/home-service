@@ -238,20 +238,24 @@ Os testes manuais acima validam o caminho funcional principal da integração re
 
 ## 10. Estado e próxima ação
 
-**Status em 20/11/2026:** implementação e validação manual principal concluídas na branch `feat/drive-image-upload`. A integração ainda não foi incorporada em `dev`; nenhuma alteração foi feita em `main` ou em Production.
+**Status em 20/11/2026:** Etapa 4 implementada, validada funcionalmente no ambiente Preview e integrada exclusivamente em `dev` pela PR #26. A PR foi mesclada em 20/11/2026 (horário local), pelo merge commit `6dab42ba291008a20a490542dcaf28c6c439c7d2`. A CI pós-merge [Validate Home Service #44850407547](https://github.com/kleber-goncalves/home-service/actions/runs/44850407547) concluiu **SUCCESS** sobre esse commit. O workflow [AI Context — Synchronize #44850407640](https://github.com/kleber-goncalves/home-service/actions/runs/44850407640) também concluiu **SUCCESS**. Nenhuma alteração foi feita em `main` ou em Production.
 
 - **Arquitetura:** upload retomável em blocos binários de 1 MiB pela rota dedicada `/api/images`.
-- **Backend Apps Script:** ações de iniciar, enviar bloco, consultar status, cancelar e remover; estado da sessão do Drive em Script Properties; metadados em `IMAGENS`; permissões sincronizadas conforme o estado do serviço.
-- **Gateway:** rota binária separada com mesma origem, cookie HttpOnly, CSRF, HMAC e limite de stream de 1 MiB; endpoints JSON existentes preservam seus limites.
-- **Interface:** seleção de imagens de serviço, prévia local, progresso, cancelamento, remoção e exibição da primeira imagem pública na homepage.
-- **Testes automatizados:** execução [Validate Home Service #44845297066](https://github.com/kleber-goncalves/home-service/actions/runs/44845297066) concluiu **SUCCESS** no commit `d41fd53801e816a8235635d125b31247748a76ad`. Passaram auditoria de dependências, POC-01/02/03/04, autorização, testes do gateway e do cliente de upload, LOO, registro de ocorrências, ESLint e build.
-- **Correção validada:** o Apps Script passou a aceitar a URI resumível oficial do Drive com parâmetros de consulta adicionais (`fields` e `session_crd`), mantendo a validação de protocolo, host, caminho e `upload_id`.
-- **Vercel Preview:** deployment READY `dpl_5J3tdXakouRAZkiQ55sG1WC7ig2s`, para o commit de código `d41fd53801e816a8235635d125b31247748a76ad`, branch `feat/drive-image-upload`. A URL de Preview utilizada nos testes é `https://home-service-git-feat-drive-7b0906-kleber-goncalves-s-projects.vercel.app`.
-- **Apps Script e Drive de teste:** pasta privada configurada; `CONECTA_LOCAL_DRIVE_FOLDER_ID` definido em Script Properties; escopos do Drive e autorização da conta executora concluídos; versão atualizada publicada na implantação Web App existente.
-- **Validação manual:** dois uploads reais, remoção lógica com auditoria, restrição de arquivo removido, limite de cinco imagens ativas e sincronização das permissões ao pausar/publicar novamente o serviço foram confirmados no Preview, Sheets e Drive.
-- **Integração Git:** a branch `feat/drive-image-upload` ainda não tem PR aberto. Na revisão feita em 20/11/2026, `dev` estava no commit `add204f70effd8ba97a1ea54eccfe66268c544f0`; a comparação indicou 94 commits à frente e nenhum commit atrás. O escopo completo deve ser revisado antes de abrir/mesclar o PR.
+- **Backend Apps Script:** ações de iniciar, enviar, consultar status, cancelar e remover; URI da sessão de Drive guardada em Script Properties; metadados em `IMAGENS`; permissões individuais sincronizadas conforme o estado do serviço.
+- **Gateway:** rota binária separada com mesma origem, cookie de sessão HttpOnly, CSRF, HMAC servidor-servidor e limite de stream de 1 MiB; endpoints JSON existentes preservam seus limites.
+- **Interface:** seleção de imagens de serviços, prévias locais, progresso, cancelamento, recuperação e remoção; primeira imagem ativa/publicável usada na vitrine.
+- **Limites funcionais:** até 5 imagens ativas por serviço; JPG/JPEG, PNG ou WebP; no máximo 5.000.000 bytes por arquivo; somente o proprietário do serviço gerencia as imagens.
+- **Correção importante:** a validação da URI de upload retomável do Drive aceita parâmetros de consulta adicionais retornados pelo Google (por exemplo, `fields` e `session_crd`), sem abrir mão da validação de HTTPS, host, caminho e `upload_id`.
+- **CI pós-merge:** #44850407547 — **SUCCESS**. Foram aprovados auditoria de dependências, POC-01/02/03/04, autorização/propriedade, testes do gateway e cliente de imagens, LOO, validação do registro de ocorrências, ESLint e build.
+- **Preview de `dev`:** deployment READY `dpl_Bqwfwchf4vpH1LKLBFte2Y1yav9Y`, commit `6dab42ba291008a20a490542dcaf28c6c439c7d2`; URL da branch: https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app.
+- **Apps Script e Drive de teste:** pasta raiz privada configurada; Script Property `CONECTA_LOCAL_DRIVE_FOLDER_ID` definida; escopos Drive e autorização concluídos; código sincronizado e nova versão publicada na implantação Web App existente.
+- **Validação manual confirmada pelo responsável no Preview:** dois uploads reais no mesmo serviço; remoção lógica de uma imagem com status `removed` em `IMAGENS`, evento em `AUDITORIA` e arquivo com acesso geral `Restrito`; limite de cinco imagens ativas e bloqueio da sexta; serviço publicado com acesso por link, pausado com imagens restritas e republicado com acesso por link restaurado. O responsável também confirmou a persistência dos resultados no Google Drive e nas abas correspondentes do Sheets.
+- **Limites da validação manual:** não registrar como executados nesta rodada testes manuais individuais de todos os formatos, interrupção deliberada de blocos ou falha forçada entre Drive e Sheets. Os testes automatizados aplicáveis permanecem na suíte; esses cenários adicionais não foram reportados como ensaios manuais concluídos.
 
-**Próxima ação:** revisar o histórico e o diff da branch em relação a `dev`, confirmar que todos os commits e arquivos pertencem ao escopo planejado e então abrir PR para `dev`. Aguardar a CI do PR e revisar o diff final antes do merge. Não alterar `main`, habilitar Production ou promover o Preview nesta etapa.
+**Estado final:** a Etapa 4 está concluída para o escopo de imagens de serviços no Preview de desenvolvimento. A funcionalidade permanece fora de Production por decisão do projeto. Foto de perfil, galeria avançada, ordenação por arrastar e soltar, compressão/otimização, painel administrativo de mídia e uso de dados reais continuam fora deste primeiro ciclo.
+
+**Próxima etapa do roadmap:** seguir para a Etapa 5 — pesquisa acadêmica e acabamento da apresentação, respeitando a revisão do professor/orientador antes da coleta com participantes. Não promover o Preview nem configurar backend em Production sem decisão explícita e revisão específica de segurança.
+
 
 ## 11. Referências técnicas oficiais
 
