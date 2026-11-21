@@ -6,13 +6,14 @@ O projeto tem finalidade acadêmica e busca demonstrar investigação de problem
 
 **Contexto acadêmico:** o Conecta Local está sendo desenvolvido no âmbito de um curso Técnico em Informática. Ele não é o Projeto Integrador do curso de Análise e Desenvolvimento de Sistemas da Uniube.
 
-## Estado atual — 20/11/2026
+## Estado atual — 21/11/2026
 
-A branch `dev` contém a demonstração acadêmica funcional do Conecta Local. As integrações mais recentes concluíram três frentes importantes:
+A branch `dev` contém a demonstração acadêmica funcional do Conecta Local. As integrações mais recentes concluíram quatro frentes importantes:
 
 - **PR #22 — autorização e integridade:** identidade, papel e propriedade de serviços são validados no Apps Script; testes automatizados e ensaios manuais de acesso cruzado e papel não profissional foram aprovados.
 - **PR #23 — ciclo de vida dos serviços:** edição dos próprios serviços e remoção lógica, mantendo o histórico em `SERVICOS` e registrando eventos em `AUDITORIA`. O responsável confirmou os testes manuais no Preview atualizado.
 - **PR #25 — cobertura por cidades:** um serviço pode atender vários municípios por meio da aba `SERVICO_CIDADES`. O responsável confirmou a sincronização/publicação do Apps Script e testou edição, persistência no Sheets e pesquisa pública do mesmo serviço nas duas cidades.
+- **PR #26 — imagens no Drive:** upload retomável, gerenciamento de até cinco imagens por serviço, metadados em `IMAGENS` e permissões sincronizadas com o estado do serviço. A CI pós-merge e a validação manual principal no Preview foram concluídas.
 
 A **validação funcional principal da Etapa 3** foi concluída em 20/11/2026. A segunda cidade usada no ensaio foi temporária e foi removida depois dos testes; a planilha voltou a manter apenas a cidade original. Esses resultados refletem os testes relatados pelo responsável, além das evidências automatizadas disponíveis. Eles não equivalem a auditoria independente, teste de carga ou aprovação para produção.
 
@@ -33,7 +34,7 @@ O projeto é acadêmico, usa somente dados fictícios e não deve receber creden
 - **Orientação a objetos:** classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`.
 - **POC-04:** integrada à `dev` pela PR #14 como experimento independente de sessão sintética. Permanece desabilitada e não integra a autenticação principal. Os recursos temporários foram limpos; os limites de hardening e a decisão de não reativação estão documentados em `docs/POC_04_SESSOES.md`.
 
-**Limitações conhecidas da demonstração:** envio real de e-mail, recuperação/alteração de senha e e-mail, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades ainda não foram implementados. O gerenciamento de imagens de serviços está integrado à `dev` e foi validado no Preview com Apps Script, Google Sheets e Drive de teste; permanece fora de `main`/Production, que continuam sem backend habilitado. Pesquisa local com moradores e profissionais também continua pendente; os indicadores documentais não substituem dados primários de Capelinha.
+**Limitações conhecidas da demonstração:** envio real de e-mail, recuperação/alteração de senha e e-mail, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades ainda não foram implementados. O gerenciamento de imagens de serviços está integrado à `dev` e foi validado no Preview com Apps Script, Google Sheets e Drive de teste; permanece fora de `main`/Production, que continuam sem backend habilitado. A nova experiência pública (homepage resumida, catálogo com filtros, todas as categorias e detalhes com galeria) foi aprovada como próxima etapa, mas ainda não está implementada; o plano está em `docs/ETAPA_5_CATALOGO_PUBLICO.md` e a branch de trabalho é `feat/public-discovery-experience`. Pesquisa local com moradores e profissionais também continua pendente; os indicadores documentais não substituem dados primários de Capelinha.
 
 ## Executar localmente
 
@@ -61,6 +62,7 @@ O GitHub Actions executa essas verificações em pushes e Pull Requests direcion
 - [Contexto técnico para IAs e desenvolvedores](docs/AI_CONTEXT.md)
 - [Roteiro de evolução acadêmica e prioridades](docs/ROADMAP_ESTUDOS.md)
 - [Etapa 4 — arquitetura de imagens no Google Drive](docs/ETAPA_4_IMAGENS_DRIVE.md)
+- [Etapa 5 — experiência pública e catálogo de serviços](docs/ETAPA_5_CATALOGO_PUBLICO.md)
 - [Questionários preliminares para moradores e profissionais](PESQUISA_COMUNIDADE.md)
 - [Guia de aplicação da pesquisa com a comunidade](docs/GUIA_APLICACAO_PESQUISA_COMUNIDADE.md)
 - [Roteiro detalhado de pesquisa exploratória](docs/ROTEIRO_PESQUISA_EXPLORATORIA.md)
