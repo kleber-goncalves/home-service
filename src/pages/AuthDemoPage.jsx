@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { appRequest } from "@/services/app-api";
 import ServiceImageManager from "@/components/professional/service-image-manager";
+import { useAuth } from "@/hooks/use-auth";
 
 const EMPTY_REGISTER = {
     fullName: "",
@@ -56,6 +57,15 @@ function formatStatus(status) {
 }
 
 export default function AuthDemoPage({ initialMode = "login" }) {
+    const {
+        user: currentUser,
+        csrfToken,
+        services,
+        setServices,
+        establishSession,
+        logout: logoutSession,
+        isLoading: authLoading,
+    } = useAuth();
     const [mode, setMode] = useState(initialMode === "register" ? "register" : "login");
     const [catalog, setCatalog] = useState({ categories: [], cities: [] });
     const [registerForm, setRegisterForm] = useState(EMPTY_REGISTER);
@@ -63,9 +73,6 @@ export default function AuthDemoPage({ initialMode = "login" }) {
     const [verificationCode, setVerificationCode] = useState("");
     const [verificationCodeInput, setVerificationCodeInput] = useState("");
     const [pendingEmail, setPendingEmail] = useState("");
-    const [csrfToken, setCsrfToken] = useState("");
-    const [currentUser, setCurrentUser] = useState(null);
-    const [services, setServices] = useState([]);
     const [newService, setNewService] = useState(EMPTY_SERVICE);
     const [showServiceForm, setShowServiceForm] = useState(false);
     const [editingServiceId, setEditingServiceId] = useState(null);
@@ -118,17 +125,6 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                         tone: "warning",
                     });
                 }
-            }
-
-            try {
-                const session = await appRequest("auth.me");
-                if (active && session?.authenticated) {
-                    setCurrentUser(session.user);
-                    setServices(session.services || []);
-                    setCsrfToken(session.csrfToken || "");
-                }
-            } catch {
-                // Visitante sem sessão: permanece na tela de acesso.
             } finally {
                 if (active) setPageLoading(false);
             }
@@ -243,9 +239,11 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                 password: loginForm.password,
             });
             const mine = await appRequest("service.listMine", {}, result.csrfToken || "");
-            setCsrfToken(result.csrfToken || "");
-            setServices(mine.services || []);
-            setCurrentUser(result.user);
+            establishSession({
+                user: result.user,
+                csrfToken: result.csrfToken || "",
+                services: mine.services || [],
+            });
             setLoginForm((current) => ({ ...current, password: "" }));
         } catch (error) {
             setNotice({ title: "Não foi possível entrar", message: error.message, tone: "warning" });
@@ -405,10 +403,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
     async function logout() {
         setBusy(true);
         try {
-            await appRequest("auth.logout", {}, csrfToken);
-            setCurrentUser(null);
-            setServices([]);
-            setCsrfToken("");
+            await logoutSession();
             setMode("login");
             setLoginForm({ email: "", password: "" });
             setNotice({ title: "Sessão encerrada", message: "A sessão foi revogada no armazenamento.", tone: "info" });
@@ -419,7 +414,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         }
     }
 
-    if (pageLoading) {
+    if (pageLoading || authLoading) {
         return (
             <main className="auth-demo-page">
                 <div className="auth-demo-shell">
