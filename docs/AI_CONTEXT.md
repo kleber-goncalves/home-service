@@ -398,10 +398,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 2df072c202ec2cff33c3235b0f0d37075dfd9353
-- **Data do commit:** 2026-11-21T17:05:22-03:00
-- **Mensagem do commit:** a11y: adicionar navegação por teclado ao menu da conta
-- **Branch desta execução:** feat/autenticacao-compartilhada-navegacao
+- **Commit de referência:** 4696a5039243c7baf300e835973417af6003723c
+- **Data do commit:** 2026-11-21T17:25:46-03:00
+- **Mensagem do commit:** Merge pull request #30 from kleber-goncalves/feat/autenticacao-compartilhada-navegacao
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -524,13 +524,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 4696a50 | 2026-11-21 | Merge pull request #30 from kleber-goncalves/feat/autenticacao-compartilhada-navegacao |
+| 8558a8e | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 2df072c | 2026-11-21 | a11y: adicionar navegação por teclado ao menu da conta |
 | f48202d | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | c634867 | 2026-11-21 | fix: ajustar o menu da conta em telas estreitas |
 | d911464 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | f916efb | 2026-11-21 | feat: compartilhar sessão e navegação da conta |
 | bec90b6 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| e9b36e0 | 2026-11-21 | refactor: remover serviços de exemplo da página inicial |
-| 198eaa6 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
