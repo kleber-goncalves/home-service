@@ -1031,7 +1031,15 @@ function appGetPublicServices_() {
                 cities: cities,
                 city: appServiceCityLabel_(cities),
                 whatsapp: String(profile.whatsapp || ""),
-                images: appGetServiceImages_(String(service.id_servico), true)
+                images: appGetServiceImages_(String(service.id_servico), true).map(function (image) {
+                    return {
+                        id: image.id,
+                        order: image.order,
+                        mimeType: image.mimeType,
+                        sizeBytes: image.sizeBytes,
+                        status: image.status
+                    };
+                })
             };
         });
 }
