@@ -30,18 +30,50 @@ export default function SiteHeader({ active = "" }) {
             }
         }
 
-        function closeOnEscape(event) {
+        function handleMenuKeyboard(event) {
+            if (!accountMenuRef.current?.contains(event.target)) return;
+
             if (event.key === "Escape") {
                 setAccountMenuOpen(false);
                 accountTriggerRef.current?.focus();
+                return;
+            }
+
+            const menuItems = Array.from(
+                accountMenuRef.current.querySelectorAll('[role="menuitem"]:not(:disabled)')
+            );
+            if (!menuItems.length) return;
+
+            const activeIndex = menuItems.indexOf(document.activeElement);
+            let nextIndex = null;
+
+            if (event.key === "ArrowDown") {
+                nextIndex = activeIndex < 0 ? 0 : (activeIndex + 1) % menuItems.length;
+            } else if (event.key === "ArrowUp") {
+                nextIndex = activeIndex < 0
+                    ? menuItems.length - 1
+                    : (activeIndex - 1 + menuItems.length) % menuItems.length;
+            } else if (event.key === "Home") {
+                nextIndex = 0;
+            } else if (event.key === "End") {
+                nextIndex = menuItems.length - 1;
+            } else if (event.key === "Tab") {
+                const leavingMenuForward = !event.shiftKey && activeIndex === menuItems.length - 1;
+                const leavingMenuBackward = event.shiftKey && (activeIndex === 0 || event.target === accountTriggerRef.current);
+                if (leavingMenuForward || leavingMenuBackward) setAccountMenuOpen(false);
+            }
+
+            if (nextIndex !== null) {
+                event.preventDefault();
+                menuItems[nextIndex].focus();
             }
         }
 
         document.addEventListener("pointerdown", closeOnOutsidePointer);
-        document.addEventListener("keydown", closeOnEscape);
+        document.addEventListener("keydown", handleMenuKeyboard);
         return () => {
             document.removeEventListener("pointerdown", closeOnOutsidePointer);
-            document.removeEventListener("keydown", closeOnEscape);
+            document.removeEventListener("keydown", handleMenuKeyboard);
         };
     }, [accountMenuOpen]);
 
