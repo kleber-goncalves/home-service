@@ -392,9 +392,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** d5cfa672af05395ee8541becba43830433e93147
-- **Data do commit:** 2026-11-21T15:33:55-03:00
-- **Mensagem do commit:** feat(images): validar acesso publico antes da entrega do Drive
+- **Commit de referência:** c7199171b6e18ad93d16f1b90fba0380c131201c
+- **Data do commit:** 2026-11-21T15:34:37-03:00
+- **Mensagem do commit:** docs(home): atualizar perguntas frequentes ao estado atual
 - **Branch desta execução:** fix/homepage-images-and-sections
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -419,7 +419,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run test:loo | node --test tests/loo/domain-entities.test.js |
 | npm run test:poc04 | node --test tests/poc04/gateway.test.js tests/poc04/apps-script.test.js |
 | npm run test:authorization | node --test tests/authorization/apps-script.test.js tests/authorization/gateway.test.js |
-| npm run test:images | node --test tests/images/upload-gateway.test.js tests/images/image-api.test.js |
+| npm run test:images | node --test tests/images/upload-gateway.test.js tests/images/image-api.test.js tests/images/public-image-gateway.test.js |
 | npm run test:public-catalog | node --test tests/public-catalog/public-catalog.test.js |
 
 ### Variáveis declaradas no .env.example
@@ -514,13 +514,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| c719917 | 2026-11-21 | docs(home): atualizar perguntas frequentes ao estado atual |
+| c8a829b | 2026-11-21 | fix(home): ajustar ancoras e textos das secoes restauradas |
+| 60c2523 | 2026-11-21 | feat(home): separar servicos reais e exemplos e restaurar secoes |
+| 8c2501e | 2026-11-21 | feat(images): usar rota propria para imagens do catalogo |
+| 36c0d83 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | d5cfa67 | 2026-11-21 | feat(images): validar acesso publico antes da entrega do Drive |
 | e0877cb | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 0763414 | 2026-11-21 | feat(images): publicar rota GET de imagens |
-| 8501fb6 | 2026-11-21 | feat(images): criar entrega autenticada de imagens publicas |
-| ea9557d | 2026-11-21 | refactor(gateway): exportar cliente interno do Apps Script |
-| 4a7f9ea | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 22ba720 | 2026-11-21 | Merge pull request #28 from kleber-goncalves/feat/catalogo-publico-navegacao |
-| fb8c61f | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
