@@ -388,10 +388,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 4844ac0a405f342a11bf83d71b98d19bee3e3e82
-- **Data do commit:** 2026-11-21T14:43:33-03:00
-- **Mensagem do commit:** docs: alinhar roadmap após etapa de imagens
-- **Branch desta execução:** docs/catalogo-publico-e-navegacao
+- **Commit de referência:** 63039aa2e07278f999101aaaaf241698af7b302e
+- **Data do commit:** 2026-11-21T14:46:49-03:00
+- **Mensagem do commit:** Merge pull request #27 from kleber-goncalves/docs/catalogo-publico-e-navegacao
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
 - **Dependências de runtime:** 4
@@ -497,13 +497,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 63039aa | 2026-11-21 | Merge pull request #27 from kleber-goncalves/docs/catalogo-publico-e-navegacao |
+| b96b2c6 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 4844ac0 | 2026-11-21 | docs: alinhar roadmap após etapa de imagens |
 | 180f314 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 109a1f9 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | d725d76 | 2026-11-21 | docs: atualizar README com próxima evolução |
 | ce34dd1 | 2026-11-21 | docs: registrar plano do catálogo público no contexto |
 | 43c27da | 2026-11-21 | docs: priorizar evolução do catálogo público |
-| 446d019 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| f72fc36 | 2026-11-21 | docs: planejar catálogo público e navegação |
 
 <!-- END AUTO-GENERATED SECTION -->
