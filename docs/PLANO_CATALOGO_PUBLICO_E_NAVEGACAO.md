@@ -273,8 +273,8 @@ Após a integração da PR #28 em `dev` e o teste do responsável, três ajustes
 
 ### 11.1. Entrega segura das imagens
 
-- O frontend passa a gerar a URL same-origin `/api/public-images/<imageId>` em `src/lib/public-catalog.js`; deixa de depender da URL direta `drive.google.com/uc?export=view`.
-- A Function `api/public-images/[imageId].js` usa `server/public-image-gateway.js`.
+- O frontend passa a gerar a URL same-origin `/api/public-images?id=<imageId>` em `src/lib/public-catalog.js`; deixa de depender da URL direta `drive.google.com/uc?export=view`.
+- A Function `api/public-images.js` (ID na query string) usa `server/public-image-gateway.js`.
 - O gateway chama a ação interna HMAC `public.image.resolve`, aguarda confirmação de elegibilidade e recebe o token OAuth somente no servidor.
 - O Apps Script verifica que a imagem está ativa, pertence a um serviço publicado, o usuário está ativo e o MIME/tamanho do arquivo Drive correspondem aos metadados de `IMAGENS`.
 - O gateway baixa `files.get?alt=media` com o token OAuth e transmite o stream binário ao navegador; não devolve o token ou o identificador do arquivo Drive ao cliente. Respostas não são armazenadas em cache.
