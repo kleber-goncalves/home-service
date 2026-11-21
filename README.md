@@ -29,11 +29,11 @@ O projeto é acadêmico, usa somente dados fictícios e não deve receber creden
 - **Frontend:** React, JavaScript/JSX, Vite 8 e Tailwind CSS 4.
 - **Gateway HTTP:** Vercel Function em `api/app.js`, com regras em `server/app-gateway.js`.
 - **Backend de negócio:** Google Apps Script em `apps-script/conecta-local/Code.gs`.
-- **Persistência operacional atual:** Google Sheets nas abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS`, `SERVICO_CIDADES` e `AUDITORIA`.
+- **Persistência operacional atual:** Google Sheets nas abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS`, `SERVICO_CIDADES`, `IMAGENS` e `AUDITORIA`.
 - **Orientação a objetos:** classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`.
 - **POC-04:** integrada à `dev` pela PR #14 como experimento independente de sessão sintética. Permanece desabilitada e não integra a autenticação principal. Os recursos temporários foram limpos; os limites de hardening e a decisão de não reativação estão documentados em `docs/POC_04_SESSOES.md`.
 
-**Limitações conhecidas da demonstração:** envio real de e-mail, recuperação/alteração de senha e e-mail, integração real com Google Drive ainda pendente (a implementação de imagens está isolada em `feat/drive-image-upload` e tem CI automatizada aprovada, mas não está integrada à `dev` nem validada com Drive real), painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades ainda não foram implementados. Pesquisa local com moradores e profissionais também continua pendente; os indicadores documentais não substituem dados primários de Capelinha.
+**Limitações conhecidas da demonstração:** envio real de e-mail, recuperação/alteração de senha e e-mail, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades ainda não foram implementados. O gerenciamento de imagens de serviços está integrado à `dev` e foi validado no Preview com Apps Script, Google Sheets e Drive de teste; permanece fora de `main`/Production, que continuam sem backend habilitado. Pesquisa local com moradores e profissionais também continua pendente; os indicadores documentais não substituem dados primários de Capelinha.
 
 ## Executar localmente
 
