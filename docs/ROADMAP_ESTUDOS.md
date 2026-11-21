@@ -186,7 +186,7 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 5 — Catálogo público, navegação e apresentação das imagens
 
-**Status: implementação funcional inicial concluída na branch `feat/catalogo-publico-navegacao`; validação manual pendente antes da integração em `dev`.** O plano detalhado está em `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`.
+**Status: implementação funcional inicial concluída na branch `feat/catalogo-publico-navegacao`; PR #28 aberta para `dev` e CI aprovada. A validação integrada com Sheets deve ocorrer no Preview fixo de `dev` após a integração.** O plano detalhado está em `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`.
 
 **Objetivo:** simplificar a homepage e oferecer caminhos claros para descobrir serviços, consultar categorias e visualizar todas as imagens de cada serviço.
 
@@ -204,10 +204,11 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 **Validação automatizada e de infraestrutura — PASS:**
 - GitHub Actions [#44933049890](https://github.com/kleber-goncalves/home-service/actions/runs/44933049890): auditoria bloqueante de dependências, POC-01/02/03/04, autorização/ownership, gateway de imagens, LOO, testes do catálogo, registro de ocorrências, ESLint e build concluídos com **SUCCESS**.
 - GitHub Actions AI Context [#44933049803](https://github.com/kleber-goncalves/home-service/actions/runs/44933049803): **SUCCESS**.
-- Preview Vercel: deployment `dpl_Ceu1VZvFX81JdMQrnKBxbzwKhK9K`, **READY**, URL https://home-service-8v1rdts20-kleber-goncalves-s-projects.vercel.app.
-- Verificações HTTP no Preview: `/`, `/servicos`, `/categorias` e `/servicos/example-id` retornaram 200 com o shell da aplicação; `/api/app` e `/api/images` retornaram 405 em GET, confirmando que as rotas de API continuam chegando às Functions e não ao fallback HTML.
+- Preview isolado da feature branch: deployment `dpl_Ceu1VZvFX81JdMQrnKBxbzwKhK9K`, **READY**, URL https://home-service-8v1rdts20-kleber-goncalves-s-projects.vercel.app. Serve para inspecionar frontend/build/rotas; não tem acesso à planilha porque as variáveis do backend no Vercel estão restritas a `gitBranch: dev`.
+- Verificações HTTP nesse Preview: `/`, `/servicos`, `/categorias` e `/servicos/example-id` retornaram 200 com o shell da aplicação; `/api/app` e `/api/images` retornaram 405 em GET. Isso confirma resolução de rotas, não conexão funcional com Apps Script/Sheets.
+- Preview funcional conectado à planilha: https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app. Ele só exibirá o código desta etapa após merge da PR #28 em `dev` e novo deployment.
 
-**Validação manual ainda pendente:** conferir visualmente o Preview em desktop e celular; usar serviço publicado de teste com cinco imagens; confirmar apresentação da primeira imagem e galeria completa; testar filtros e recarga/links diretos; e repetir os fluxos `?auth=demo`, `?poc=01`, cadastro/gestão do profissional e upload. A etapa não deve ser integrada em `dev` até essa revisão manual e a CI da PR.
+**Validação integrada manual ainda pendente:** como as variáveis do Apps Script/Sheets estão limitadas a `gitBranch: dev`, a PR #28 precisa ser integrada em `dev` para que o novo código seja implantado no Preview fixo conectado à planilha. Após o deployment atualizado, validar em desktop/celular; testar serviço fictício com cinco imagens; conferir imagem principal/galeria; testar filtros, URLs e recarga; repetir `?auth=demo`, `?poc=01`, cadastro/gestão e upload. O Preview da feature branch não deve ser usado como prova de integração com Sheets. `main` e Production não devem ser alteradas.
 
 **Escopo aprovado:**
 - Reduzir a homepage a uma apresentação objetiva: pesquisa por serviço/cidade, três categorias em destaque, quatro ou cinco serviços, explicação curta de como funciona, chamada para profissionais e rodapé.

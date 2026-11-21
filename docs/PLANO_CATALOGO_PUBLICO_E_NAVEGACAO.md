@@ -1,10 +1,11 @@
 # Plano — catálogo público, navegação e apresentação de imagens
 
 > **Atualizado em:** 21/11/2026  
-> **Status:** implementação funcional inicial concluída em branch de funcionalidade; validação manual pendente antes da integração.  
+> **Status:** implementação funcional inicial concluída; PR #28 aberta contra `dev`, CI SUCCESS. Validação integrada com Sheets pendente.  
 > **Branch:** `feat/catalogo-publico-navegacao` (derivada de `dev`).  
-> **Preview:** https://home-service-8v1rdts20-kleber-goncalves-s-projects.vercel.app — deployment READY.  
-> **Segurança:** dados fictícios; `dev`, `main` e Production não receberam merge desta implementação.
+> **Preview isolado da feature:** https://home-service-6mgrjabmj-kleber-goncalves-s-projects.vercel.app — frontend/build, sem conexão com a planilha.  
+> **Preview integrado da planilha:** https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app — utilizar após merge da PR #28 e deployment atualizado de `dev`.  
+> **Segurança:** dados fictícios; não duplicar nem ampliar escopo de segredos Vercel. Production permanece fora deste trabalho.
 
 ## 1. Objetivo
 
@@ -12,7 +13,7 @@ Evoluir a vitrine pública do Conecta Local para que a pessoa consiga entender a
 
 O foco desta frente é a experiência pública: organização da homepage, catálogo, categorias, cartões e detalhes dos serviços. O cadastro/autenticação do profissional, o upload no Drive e as regras de segurança existentes devem ser preservados.
 
-Este documento registra o escopo e o estado de implementação. As páginas e rotas descritas já existem no branch `feat/catalogo-publico-navegacao`, mas **ainda não foram integradas em `dev`** e aguardam a validação manual do Preview.
+Este documento registra o escopo e o estado de implementação. As páginas e rotas já existem no branch `feat/catalogo-publico-navegacao`, mas ainda não foram integradas em `dev`. Como as variáveis de backend do Vercel estão restritas a `gitBranch: dev`, o Preview desta feature branch não acessa a planilha. A validação integrada com Apps Script/Sheets deve ocorrer no Preview fixo de `dev` após o merge da PR #28.
 
 ## 2. Diagnóstico do comportamento atual
 
@@ -213,10 +214,10 @@ Não alterar o esquema do Google Sheets nem a estrutura da aba `IMAGENS` apenas 
 
 **Validação automatizada — concluída:** GitHub Actions [#44933049890](https://github.com/kleber-goncalves/home-service/actions/runs/44933049890) SUCCESS, incluindo auditoria, POC-01/02/03/04, autorização/ownership, testes de imagem, LOO, testes do catálogo, registro de ocorrências, ESLint e build. A sincronização de contexto [#44933049803](https://github.com/kleber-goncalves/home-service/actions/runs/44933049803) também passou.
 
-**Preview READY:** [abrir aplicação](https://home-service-8v1rdts20-kleber-goncalves-s-projects.vercel.app). As rotas `/`, `/servicos`, `/categorias` e `/servicos/example-id` responderam HTTP 200; GET em `/api/app` e `/api/images` respondeu 405, mantendo os endpoints POST-only.
+**Preview isolado da feature READY:** [abrir aplicação](https://home-service-6mgrjabmj-kleber-goncalves-s-projects.vercel.app). As rotas `/`, `/servicos`, `/categorias` e `/servicos/example-id` responderam HTTP 200; GET em `/api/app` e `/api/images` respondeu 405. Esses testes verificam shell/rotas e preservação das Functions, não integração com Sheets porque as variáveis de backend não estão disponíveis nesta branch.
 
-**Checklist manual para concluir antes do merge em `dev`:**
-1. Abrir o Preview em desktop e celular e revisar alinhamento, texto, menus e responsividade.
+**Checklist de validação integrada após o merge em `dev`:** a integração é necessária para executar o código novo no único Preview que possui as variáveis de ambiente do Apps Script/Sheets, restritas à branch `dev`.
+1. Após o merge e o novo deployment, abrir o Preview fixo `https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app` em desktop e celular; revisar alinhamento, texto, menus e responsividade.
 2. Localizar um serviço de teste publicado com cinco imagens ativas e confirmar que o cartão mostra a primeira imagem e o indicador `+4 fotos`.
 3. Abrir os detalhes desse serviço; selecionar todas as miniaturas, usar anterior/próxima e conferir o contador e a descrição/cidades.
 4. Testar pesquisa textual, categoria, cidade no formato `Cidade - UF`, limpar filtros e recarregar a URL com filtros ativos.
@@ -225,7 +226,7 @@ Não alterar o esquema do Google Sheets nem a estrutura da aba `IMAGENS` apenas 
 7. Na área do profissional, confirmar listagem/edição/pausa/publicação de serviços e gerenciamento/upload de imagens.
 8. Observar se a primeira imagem real carrega. Se não carregar, anotar URL/serviço, status no Network e mensagem do Console; placeholder é fallback visual, não prova que a origem do problema foi resolvida.
 
-Até a validação manual e revisão da PR, a funcionalidade permanece apenas no branch de trabalho; `dev`, `main` e Production não receberam merge.
+A PR #28 aguarda integração em `dev`. Após o merge, a validação integrada será feita exclusivamente no Preview fixo de `dev`. Manter `main` e Production inalteradas e não copiar segredos para a feature branch.
 
 Trabalhar em `feat/catalogo-publico-navegacao`, derivada de `dev`. Não implementar diretamente em `dev`.
 
