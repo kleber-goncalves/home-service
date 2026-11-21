@@ -1,10 +1,9 @@
 # Plano — catálogo público, navegação e apresentação de imagens
 
 > **Atualizado em:** 21/11/2026  
-> **Status:** implementação funcional inicial concluída; PR #28 aberta contra `dev`, CI SUCCESS. Validação integrada com Sheets pendente.  
-> **Branch:** `feat/catalogo-publico-navegacao` (derivada de `dev`).  
-> **Preview isolado da feature:** https://home-service-6mgrjabmj-kleber-goncalves-s-projects.vercel.app — frontend/build, sem conexão com a planilha.  
-> **Preview integrado da planilha:** https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app — utilizar após merge da PR #28 e deployment atualizado de `dev`.  
+> **Status:** PR #28 integrada em `dev`; correções pós-validação em andamento na branch `fix/homepage-images-and-sections`. Validação automatizada e publicação do Apps Script ainda pendentes nesta correção.  
+> **Branch atual:** `fix/homepage-images-and-sections` (derivada de `dev`).  
+> **Preview integrado da planilha:** https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app — somente após merge/deployment em `dev` e sincronização da nova ação Apps Script.  
 > **Segurança:** dados fictícios; não duplicar nem ampliar escopo de segredos Vercel. Production permanece fora deste trabalho.
 
 ## 1. Objetivo
@@ -226,9 +225,9 @@ Não alterar o esquema do Google Sheets nem a estrutura da aba `IMAGENS` apenas 
 7. Na área do profissional, confirmar listagem/edição/pausa/publicação de serviços e gerenciamento/upload de imagens.
 8. Observar se a primeira imagem real carrega. Se não carregar, anotar URL/serviço, status no Network e mensagem do Console; placeholder é fallback visual, não prova que a origem do problema foi resolvida.
 
-A PR #28 aguarda integração em `dev`. Após o merge, a validação integrada será feita exclusivamente no Preview fixo de `dev`. Manter `main` e Production inalteradas e não copiar segredos para a feature branch.
+Histórico: a PR #28 foi integrada em `dev` no merge commit `22ba720c6fdd22f3bef4cc5b29963279c5119ff9`. As correções desta rodada estão isoladas em `fix/homepage-images-and-sections`. O Preview fixo de `dev` continua sendo o único ambiente conectado a Sheets/Drive; não ampliar o escopo das variáveis para branches de feature. Manter `main` e Production inalteradas.
 
-Trabalhar em `feat/catalogo-publico-navegacao`, derivada de `dev`. Não implementar diretamente em `dev`.
+Trabalhar em `fix/homepage-images-and-sections`, derivada de `dev`. Não implementar diretamente em `dev`.
 
 ## 8. Critérios de aceitação
 
@@ -241,8 +240,8 @@ Trabalhar em `feat/catalogo-publico-navegacao`, derivada de `dev`. Não implemen
 - [ ] Cada cartão mostra a imagem principal e informa quando existem outras fotos.
 - [ ] A página de detalhes apresenta todas as imagens ativas (até cinco) com navegação acessível.
 - [ ] Uma imagem ausente ou quebrada apresenta placeholder neutro, sem imagem de outro serviço.
-- [ ] O problema da primeira imagem foi diagnosticado e a correção, se necessária, foi reproduzida e validada.
-- [ ] Serviços ilustrativos estão claramente separados e não entram nos resultados reais nem nos totais.
+- [ ] A entrega de imagem usa rota same-origin autenticada no backend; validar com Apps Script atualizado e arquivos reais no Preview de `dev`.
+- [x] Serviços ilustrativos aparecem em seção própria da homepage, mesmo quando existem serviços publicados, e não entram nos resultados reais nem nos totais.
 - [ ] Os fluxos `?auth=demo` e `?poc=01` continuam funcionando.
 - [ ] Cadastro, edição, pausa/publicação, remoção e upload de imagens continuam funcionando.
 - [ ] Lint, testes pertinentes e build passam; as validações manuais do Preview são registradas separadamente.
@@ -267,3 +266,40 @@ Trabalhar em `feat/catalogo-publico-navegacao`, derivada de `dev`. Não implemen
 - `apps-script/conecta-local/Code.gs`
 - `docs/ETAPA_4_IMAGENS_DRIVE.md`
 - `docs/ROADMAP_ESTUDOS.md`
+
+## 11. Correções pós-integração da PR #28 — 21/11/2026
+
+Após a integração da PR #28 em `dev` e o teste do responsável, três ajustes foram solicitados: imagens reais ainda não apareciam; os serviços fictícios deveriam continuar visíveis junto dos cadastros reais; e as seções `FAQSection`, `PopularServices` e `AboutSection` deveriam permanecer na homepage.
+
+### 11.1. Entrega segura das imagens
+
+- O frontend passa a gerar a URL same-origin `/api/public-images?id=<imageId>` em `src/lib/public-catalog.js`; deixa de depender da URL direta `drive.google.com/uc?export=view`.
+- A Function `api/public-images.js` (ID na query string) usa `server/public-image-gateway.js`.
+- O gateway chama a ação interna HMAC `public.image.resolve`, aguarda confirmação de elegibilidade e recebe o token OAuth somente no servidor.
+- O Apps Script verifica que a imagem está ativa, pertence a um serviço publicado, o usuário está ativo e o MIME/tamanho do arquivo Drive correspondem aos metadados de `IMAGENS`.
+- O gateway baixa `files.get?alt=media` com o token OAuth e transmite o stream binário ao navegador; não devolve o token ou o identificador do arquivo Drive ao cliente. Respostas não são armazenadas em cache.
+- A rota só funciona em Preview e recusa requisições cross-site. A elegibilidade é revalidada a cada pedido de imagem, inclusive após pausa ou remoção lógica.
+- A ação `public.image.resolve` foi adicionada a `APP_ALLOWED_ACTIONS` e `appDispatch_` em `apps-script/conecta-local/Code.gs`.
+- **Dependência operacional:** após o merge desta correção em `dev`, sincronizar o `Code.gs` atualizado com o projeto Apps Script e publicar uma nova versão do Web App. O código no GitHub não atualiza automaticamente a implantação remota.
+- **Validação pendente:** os testes automatizados simulam a resposta de Drive/Apps Script; a entrega com OAuth real, arquivo real e permissões reais ainda precisa ser confirmada no Preview fixo de `dev`.
+
+### 11.2. Serviços reais e exemplos
+
+- A homepage mostra até cinco serviços publicados na seção `Serviços em destaque`.
+- Os cinco cartões fictícios de `src/data/homepage.js` aparecem sempre em seção separada `Conheça outros exemplos de serviços`, inclusive quando existem cadastros reais.
+- Os exemplos estão marcados como fictícios/ilustrativos e não entram na página `/servicos`, na busca, nos filtros ou na contagem de cadastros reais.
+- Os exemplos não têm contato WhatsApp nem página individual de serviço publicada.
+
+### 11.3. Seções institucionais restauradas
+
+- `PopularServices`, `AboutSection` e `FAQSection` voltaram a ser renderizadas em `HomePage.jsx`.
+- O id de `PopularServices` foi alterado para `servicos-populares` para não duplicar o id da seção de serviços cadastrados.
+- O FAQ foi atualizado para não afirmar incorretamente que busca pública, detalhes e contato ainda não existem; também explica que os cartões de exemplo não representam profissionais reais e que a aplicação permanece demonstrativa.
+
+### 11.4. Testes adicionados
+
+- `tests/images/public-image-gateway.test.js`: valida resolução HMAC, token exclusivamente server-side, transmissão do conteúdo, bloqueio cross-site, rejeição de imagem não elegível, MIME e tamanho.
+- `tests/public-catalog/public-catalog.test.js`: valida conversão para URL interna e rejeição de imagem removida/ID inválido.
+- `npm run test:images` inclui a nova suíte.
+- A CI ainda deve confirmar testes, ESLint, verificação de ocorrências e build antes de abrir/considerar a PR pronta.
+

@@ -2,6 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { filterPublicServices, mapPublicService } from "../../src/lib/public-catalog.js";
 
+const imageIds = {
+    first: "00000000-0000-4000-8000-000000000001",
+    second: "00000000-0000-4000-8000-000000000002",
+    third: "00000000-0000-4000-8000-000000000003",
+    removed: "00000000-0000-4000-8000-000000000004",
+    invalid: "not-a-valid-image-id",
+};
 const driveImage = (id, order, status = "active") => ({
     id,
     order,
@@ -21,7 +28,7 @@ test("preserva as imagens públicas ativas e ordena pela posição de exibição
         professional: "Profissional de teste",
         cityIds: ["city-1"],
         cities: [{ id: "city-1", name: "Capelinha", state: "MG" }],
-        images: [driveImage("image-3", 3), driveImage("image-1", 1), driveImage("image-2", 2)],
+        images: [driveImage(imageIds.third, 3), driveImage(imageIds.first, 1), driveImage(imageIds.second, 2)],
     });
 
     assert.equal(service.categoryId, "category-1");
@@ -31,18 +38,19 @@ test("preserva as imagens públicas ativas e ordena pela posição de exibição
     assert.equal(service.isPersisted, true);
 });
 
-test("ignora imagens removidas e URLs fora do contrato público do Drive", () => {
+test("ignora imagens removidas ou com identificador inválido e usa a rota interna de entrega", () => {
     const service = mapPublicService({
         id: "service-2",
         images: [
-            driveImage("active-image", 1),
-            driveImage("removed-image", 2, "removed"),
-            { ...driveImage("unsafe-image", 3), url: "https://example.com/image.jpg" },
+            driveImage(imageIds.first, 1),
+            driveImage(imageIds.removed, 2, "removed"),
+            driveImage(imageIds.invalid, 3),
         ],
     });
 
     assert.equal(service.images.length, 1);
-    assert.equal(service.images[0].id, "active-image");
+    assert.equal(service.images[0].id, imageIds.first);
+    assert.equal(service.images[0].url, "/api/public-images?id=" + imageIds.first);
 });
 
 test("filtra por categoria, cidade e texto usando todos os municípios atendidos", () => {

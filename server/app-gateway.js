@@ -564,7 +564,7 @@ export function createAppHandler({
     };
 }
 
-async function callAppsScript({
+export async function callAppsScript({
     action,
     requestId,
     payload,

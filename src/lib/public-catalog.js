@@ -7,25 +7,23 @@ function normalizeSearch(value) {
         .trim();
 }
 
-function isPublicDriveImageUrl(value) {
-    if (typeof value !== "string" || !value.trim()) return false;
-    try {
-        const url = new URL(value);
-        return url.protocol === "https:" && url.hostname === "drive.google.com" && url.pathname === "/uc"
-            && url.searchParams.get("export") === "view" && Boolean(url.searchParams.get("id"));
-    } catch {
-        return false;
-    }
-}
+const IMAGE_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 function mapPublicImage(image) {
-    if (!image || image.status !== "active" || !isPublicDriveImageUrl(image.url)) return null;
+    const id = String(image?.id || "");
+    const mimeType = String(image?.mimeType || "").toLowerCase();
+    const sizeBytes = Number(image?.sizeBytes);
+    if (!image || image.status !== "active" || !IMAGE_ID_PATTERN.test(id)
+        || !IMAGE_TYPES.has(mimeType)
+        || !Number.isSafeInteger(sizeBytes) || sizeBytes < 12 || sizeBytes > 5_000_000) return null;
+
     return {
-        id: String(image.id || ""),
+        id,
         order: Number(image.order || 0),
-        mimeType: String(image.mimeType || ""),
-        sizeBytes: Number(image.sizeBytes || 0),
-        url: image.url,
+        mimeType,
+        sizeBytes,
+        url: "/api/public-images?id=" + encodeURIComponent(id),
     };
 }
 
