@@ -388,12 +388,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 63039aa2e07278f999101aaaaf241698af7b302e
-- **Data do commit:** 2026-11-21T14:46:49-03:00
-- **Mensagem do commit:** Merge pull request #27 from kleber-goncalves/docs/catalogo-publico-e-navegacao
-- **Branch desta execução:** dev
+- **Commit de referência:** 0932494ed5eabefe7fa7af40e9490ee3e3894960
+- **Data do commit:** 2026-11-21T14:57:57-03:00
+- **Mensagem do commit:** feat: adicionar catálogo público e galeria de serviços
+- **Branch desta execução:** feat/catalogo-publico-navegacao
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 13
+- **Scripts npm:** 14
 - **Dependências de runtime:** 4
 - **Dependências de desenvolvimento:** 11
 - **Workflows:** 2
@@ -416,6 +416,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run test:poc04 | node --test tests/poc04/gateway.test.js tests/poc04/apps-script.test.js |
 | npm run test:authorization | node --test tests/authorization/apps-script.test.js tests/authorization/gateway.test.js |
 | npm run test:images | node --test tests/images/upload-gateway.test.js tests/images/image-api.test.js |
+| npm run test:public-catalog | node --test tests/public-catalog/public-catalog.test.js |
 
 ### Variáveis declaradas no .env.example
 
@@ -471,16 +472,27 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/components/home/home-sections.jsx
 - src/components/home/site-header.jsx
 - src/components/professional/service-image-manager.jsx
+- src/components/public/app-link.jsx
+- src/components/public/service-card.jsx
+- src/components/public/service-image.jsx
+- src/components/public/site-footer.jsx
 - src/components/ui/badge.jsx
 - src/components/ui/button.jsx
 - src/components/ui/card.jsx
 - src/components/ui/input.jsx
 - src/data/homepage.js
+- src/hooks/use-public-catalog.js
+- src/lib/navigation.js
+- src/lib/public-catalog.js
 - src/lib/utils.js
 - src/main.jsx
 - src/pages/AuthDemoPage.jsx
+- src/pages/CategoriesPage.jsx
 - src/pages/HomePage.jsx
+- src/pages/NotFoundPage.jsx
 - src/pages/Poc01Page.jsx
+- src/pages/ServiceDetailPage.jsx
+- src/pages/ServicesPage.jsx
 - src/services/app-api.js
 - src/services/image-api.js
 - src/services/poc-01-api.js
@@ -489,6 +501,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 - src/components/
 - src/data/
+- src/hooks/
 - src/lib/
 - src/pages/
 - src/services/
@@ -497,13 +510,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 0932494 | 2026-11-21 | feat: adicionar catálogo público e galeria de serviços |
+| 6c17087 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 63039aa | 2026-11-21 | Merge pull request #27 from kleber-goncalves/docs/catalogo-publico-e-navegacao |
 | b96b2c6 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 4844ac0 | 2026-11-21 | docs: alinhar roadmap após etapa de imagens |
 | 180f314 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 109a1f9 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | d725d76 | 2026-11-21 | docs: atualizar README com próxima evolução |
-| ce34dd1 | 2026-11-21 | docs: registrar plano do catálogo público no contexto |
-| 43c27da | 2026-11-21 | docs: priorizar evolução do catálogo público |
 
 <!-- END AUTO-GENERATED SECTION -->
