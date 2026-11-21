@@ -2,7 +2,7 @@
 
 > Documento de continuidade do projeto. Leia antes de sugerir ou realizar alterações. Reúne propósito, decisões, arquitetura planejada, estado implementado, regras de manutenção e limitações. A seção de snapshot ao final é atualizada pelo GitHub Actions.
 
-## Atualização vigente — 2026-11-20
+## Atualização vigente — 2026-11-21
 
 - Em 20/11/2026, o responsável esclareceu o contexto acadêmico: o Conecta Local está sendo desenvolvido em um curso Técnico em Informática, e não como Projeto Integrador do curso de ADS da Uniube. Não associar o projeto à Uniube.
 
@@ -16,6 +16,7 @@
 - A PR #23 concluiu o ciclo de vida dos serviços em `dev` (edição e remoção lógica). Em 20/11/2026, após a sincronização do Apps Script e a publicação da implantação Web App existente, o responsável confirmou que os testes manuais passaram no Preview fixo da branch `dev`; o deployment `dpl_FT5dFsPzB6B1phwGywur4ewjRkZS` está `READY` no commit `e6d231c`. `main` permanece inalterada.
 - A PR #25 (`feat/service-city-coverage`) integrou a Etapa 3 exclusivamente em `dev` em 20/11/2026, pelo merge commit `5003604a51def9bdf58df9845d36c2ec75a4452e`. A CI do merge (#44820409487) concluiu SUCCESS, e o Preview fixo de `dev` ficou READY no deployment `dpl_4n5E7JLaUQPHezVk8ymGRXZSS7Bx` (commit de código do merge). A implementação usa `SERVICO_CIDADES` para associar múltiplos municípios por serviço, preserva fallback dos serviços antigos, alinha filtros de categoria e sugere cidades ativas. Em 20/11/2026, o responsável confirmou a sincronização/publicação do Apps Script real e informou que os testes manuais passaram: a edição de um serviço existente atualizou `SERVICO_CIDADES`; a homepage encontrou o serviço pela cidade original; e a associação temporária do mesmo serviço a duas cidades permitiu encontrá-lo nas duas localidades. A validação funcional principal da Etapa 3 está concluída com base nesse relato. **Limpeza concluída:** o responsável confirmou a remoção da cidade temporária e de seus vínculos em `SERVICO_CIDADES`; apenas a cidade original permanece na planilha, com os registros permanentes preservados. `main` permanece inalterada em `49354a46863d5a5eb36ce32e450b975d4087fe3b`.
 - A PR #26 (`feat/drive-image-upload`) integrou a Etapa 4 exclusivamente em `dev` em 20/11/2026 (horário local), pelo merge commit `6dab42ba291008a20a490542dcaf28c6c439c7d2`. A CI pós-merge #44850407547 concluiu SUCCESS com auditoria, POC-01/02/03/04, autorização, testes de imagens, LOO, ocorrências, ESLint e build; o workflow AI Context #44850407640 também concluiu SUCCESS. O Preview de `dev` ficou READY no deployment `dpl_Bqwfwchf4vpH1LKLBFte2Y1yav9Y`. O responsável confirmou a validação manual principal no Preview com Apps Script, Sheets e Drive reais de teste. `main` permanece inalterada em `49354a46863d5a5eb36ce32e450b975d4087fe3b`; Production continua sem backend.
+- Em 21/11/2026, foi aprovado o planejamento da Etapa 5 — experiência pública e catálogo: homepage mais objetiva, catálogo `/servicos` com busca/filtros, página `/categorias` e detalhes `/servicos/:id` com galeria de até cinco imagens. O plano está em `docs/ETAPA_5_CATALOGO_PUBLICO.md`; a branch `feat/public-discovery-experience` foi criada a partir de `dev`. **Planejado, ainda não implementado.** `main` e Production permanecem fora do escopo.
 - O ambiente Preview de `dev` contém variáveis `CONECTA_LOCAL_*` com escopo Preview; os valores são secretos e não devem ser lidos, copiados para documentação ou compartilhados. A Production permanece sem variáveis de backend.
 - O gateway em `api/app.js` → `server/app-gateway.js` bloqueia as operações de negócio fora de Vercel Preview. Production permanece como vitrine pública, conforme decisão do responsável pelo projeto.
 - O Apps Script de negócio está em `apps-script/conecta-local/Code.gs`. O fluxo operacional atual utiliza dez abas do Sheets: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS`, `SERVICO_CIDADES`, `IMAGENS` e `AUDITORIA`. A modelagem aprovada contempla 12 abas; `CONTROLE_AUTENTICACAO` e `DENUNCIAS` ainda não têm fluxo operacional implementado.
@@ -25,6 +26,21 @@
 - Usar somente dados fictícios. Não configurar backend em Production nesta etapa.
 
 - A Etapa 4 (imagens no Google Drive) foi concluída no escopo do MVP e integrada exclusivamente em `dev` pela PR #26, merge commit `6dab42ba291008a20a490542dcaf28c6c439c7d2`. A CI pós-merge [Validate Home Service #44850407547](https://github.com/kleber-goncalves/home-service/actions/runs/44850407547) concluiu SUCCESS; a sincronização automática de contexto [#44850407640](https://github.com/kleber-goncalves/home-service/actions/runs/44850407640) também passou. O deployment Preview de `dev` `dpl_Bqwfwchf4vpH1LKLBFte2Y1yav9Y` ficou READY no commit de merge, em https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app. A integração usa upload retomável em blocos de 1 MiB pela rota Vercel `/api/images`, HMAC servidor-servidor e Apps Script; a URI de sessão do Drive permanece no Apps Script. O fluxo operacional grava metadados em `IMAGENS`, eventos em `AUDITORIA` e aplica permissões por arquivo: serviço publicado/conta ativa permite acesso por link; serviço pausado, removido ou inelegível restringe os arquivos. Limite: até 5 imagens ativas por serviço, JPG/JPEG/PNG/WebP, 5.000.000 bytes cada. O responsável confirmou no Preview dois uploads reais, remoção lógica com auditoria e acesso restrito no Drive, bloqueio da sexta imagem ativa e sincronização de permissões ao pausar e republicar. A validação manual principal está concluída; não foram reportados como ensaiados manualmente nesta rodada os testes individuais de todos os formatos, interrupção deliberada de blocos ou falha forçada entre Drive e Sheets. `main` e Production permanecem inalteradas e sem backend habilitado. O plano Vercel é Hobby; não fazer upgrade nem alterar billing para habilitar o beta de corpo 20 MiB. Preservar os limites dos endpoints JSON atuais e não promover o Preview para Production sem decisão e revisão específicas.
+
+## Próxima frente aprovada — Etapa 5: experiência pública e catálogo
+
+**Status em 21/11/2026: planejamento aprovado; implementação ainda não iniciada.** A branch de trabalho é `feat/public-discovery-experience`, criada a partir de `dev`. O documento de escopo e critérios de aceitação é `docs/ETAPA_5_CATALOGO_PUBLICO.md`.
+
+- Simplificar a homepage para uma busca principal, três categorias em destaque, quatro/cinco serviços e seções institucionais curtas.
+- Criar `/servicos` para explorar o catálogo, com busca textual e filtros combináveis por categoria/cidade, contador, limpar filtros e estados de erro/vazio.
+- Criar `/categorias` para listar categorias ativas; as três da homepage terão link para a listagem completa.
+- Criar `/servicos/:id` com detalhes e galeria de até cinco imagens, cidades atendidas, dados públicos do profissional e contato via WhatsApp.
+- Cards mostrarão uma única capa e um indicador de fotos adicionais; a galeria completa ficará na página de detalhes.
+- Diagnosticar separadamente a falha relatada de carregamento da primeira imagem. A interface atual consome somente a primeira imagem da coleção; isso explica a ausência de galeria, mas não determina a causa de uma capa em branco.
+- Preservar o catálogo público do backend, a elegibilidade dos serviços, os parâmetros `?auth=demo` e `?poc=01`, e as regras de segurança da Etapa 4.
+- Manter dados fictícios, Preview-only e `main`/Production inalterados. Não criar novas abas ou serviços de busca antes de provar necessidade.
+
+**Não afirmar que as novas rotas, páginas, filtros ou galeria estão implementados até que o código e as validações correspondentes existam.**
 
 ## 1. Instruções para a IA que assumir o projeto
 
@@ -251,7 +267,7 @@ O fluxo principal está implementado em `src/pages/AuthDemoPage.jsx`, `src/servi
 **Limitações funcionais ainda abertas**
 - A confirmação de cadastro é demonstrativa: o código é exibido na interface, sem envio real de e-mail.
 - Recuperação de senha, alteração de senha, alteração de e-mail com confirmação e envio real de e-mail não estão implementados.
-- Edição/remoção de serviços, imagens no Drive e painel administrativo/moderação não estão implementados.
+- Edição/remoção de serviços e gerenciamento de imagens de serviços estão implementados na branch `dev`; a experiência pública completa, galeria em detalhes, painel administrativo e moderação ainda não estão implementados. A Etapa 5 de experiência pública está planejada em `docs/ETAPA_5_CATALOGO_PUBLICO.md`.
 - Não há auditoria independente, certificação, teste de carga ou autorização para uso em produção.
 
 **POC-04 — sessão sintética independente**
