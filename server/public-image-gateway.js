@@ -50,11 +50,11 @@ function isAllowedDriveResponseUrl(value) {
     }
 }
 
-function validImageIdFromPath(pathname) {
-    const match = pathname.match(/^\/api\/public-images\/([^/]+)\/?$/);
-    if (!match) return null;
-    let imageId;
-    try { imageId = decodeURIComponent(match[1]); } catch { return null; }
+function validImageIdFromRequest(request) {
+    let imageIds;
+    try { imageIds = new URL(request.url).searchParams.getAll("id"); } catch { return null; }
+    if (imageIds.length !== 1) return null;
+    const imageId = imageIds[0];
     return IMAGE_ID_PATTERN.test(imageId) ? imageId : null;
 }
 
@@ -97,7 +97,7 @@ export function createPublicImageHandler({
             return responseError(403, "ORIGIN_REJECTED", "A origem desta requisição não está autorizada.");
         }
 
-        const imageId = validImageIdFromPath(new URL(request.url).pathname);
+        const imageId = validImageIdFromRequest(request);
         if (!imageId) {
             return responseError(404, "IMAGE_NOT_FOUND", "Imagem não encontrada.");
         }
