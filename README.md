@@ -20,7 +20,7 @@ A Etapa 4 (imagens de serviços) está concluída no escopo atual. O Preview fix
 - **Preview:** https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app/
 - **Deployment de código verificado após a PR #26:** `dpl_Bqwfwchf4vpH1LKLBFte2Y1yav9Y`, estado `READY`.
 
-**Próxima evolução aprovada — ainda não implementada:** simplificar a homepage, criar o catálogo em `/servicos`, a página `/categorias` e detalhes em `/servicos/:serviceId` com galeria de até cinco imagens. O plano está em [Catálogo público, navegação e apresentação de imagens](docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md). O objetivo é tornar a descoberta mais clara e fazer a interface refletir a capacidade de imagens que já existe no cadastro.
+**Etapa 5 — em validação no branch `feat/catalogo-publico-navegacao`:** a primeira implementação da homepage simplificada, catálogo em `/servicos`, página `/categorias` e detalhes em `/servicos/:serviceId` com galeria de até cinco imagens já está no Preview. A CI passou (incluindo testes do catálogo, ESLint e build). A implementação ainda não foi integrada em `dev`; falta a conferência visual/manual com um serviço de teste que possua as cinco imagens. [Abrir Preview](https://home-service-8v1rdts20-kleber-goncalves-s-projects.vercel.app). Consulte [Plano — catálogo público, navegação e apresentação de imagens](docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md) para o escopo e a lista de validação.
 
 **Production (`main`) permanece inalterada** no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`. O gateway bloqueia operações de negócio fora de Vercel Preview; não habilitar variáveis de backend em Production nesta etapa.
 

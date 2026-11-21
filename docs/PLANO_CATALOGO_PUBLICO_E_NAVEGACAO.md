@@ -1,9 +1,10 @@
 # Plano — catálogo público, navegação e apresentação de imagens
 
 > **Atualizado em:** 21/11/2026  
-> **Status:** escopo funcional aprovado para desenvolvimento; ainda não implementado.  
-> **Branch documental:** `docs/catalogo-publico-e-navegacao` (derivada de `dev`).  
-> **Ambiente-alvo:** Preview de `dev`, com dados fictícios. `main` e Production permanecem fora deste trabalho.
+> **Status:** implementação funcional inicial concluída em branch de funcionalidade; validação manual pendente antes da integração.  
+> **Branch:** `feat/catalogo-publico-navegacao` (derivada de `dev`).  
+> **Preview:** https://home-service-8v1rdts20-kleber-goncalves-s-projects.vercel.app — deployment READY.  
+> **Segurança:** dados fictícios; `dev`, `main` e Production não receberam merge desta implementação.
 
 ## 1. Objetivo
 
@@ -11,7 +12,7 @@ Evoluir a vitrine pública do Conecta Local para que a pessoa consiga entender a
 
 O foco desta frente é a experiência pública: organização da homepage, catálogo, categorias, cartões e detalhes dos serviços. O cadastro/autenticação do profissional, o upload no Drive e as regras de segurança existentes devem ser preservados.
 
-Este documento registra o que foi aprovado para implementação. **Não significa que as páginas, rotas ou componentes descritos já existam.**
+Este documento registra o escopo e o estado de implementação. As páginas e rotas descritas já existem no branch `feat/catalogo-publico-navegacao`, mas **ainda não foram integradas em `dev`** e aguardam a validação manual do Preview.
 
 ## 2. Diagnóstico do comportamento atual
 
@@ -38,6 +39,13 @@ A primeira etapa de implementação deverá verificar separadamente:
 5. Se o problema ocorre com todas as imagens, apenas com a primeira, ou somente em determinados serviços/navegadores.
 
 Não alterar permissões do Drive, não tornar a pasta pública e não introduzir URLs alternativas sem identificar a causa. Se a URL falhar, o cartão deverá apresentar um placeholder neutro e uma mensagem visual consistente, nunca uma fotografia de outra categoria apresentada como se fosse daquele profissional.
+
+### 2.2. Estado da implementação inicial
+
+- O backend Apps Script já retorna todas as imagens ativas em `images[]`, ordenadas por `ordem_exibicao`; o fluxo de upload limita a cinco imagens por serviço.
+- O código frontend anterior reduzia a coleção a `images[0]?.url` e o cartão não tinha fallback `onError`. Assim, as imagens adicionais eram descartadas e uma falha da primeira imagem deixava o elemento quebrado.
+- A nova camada de catálogo preserva `images[]`, valida o contrato da URL pública do Drive e ordena as imagens; o cartão mostra uma imagem principal e `+N fotos`; a página de detalhes apresenta a galeria e controles. Imagem ausente/quebrada recebe placeholder neutro.
+- **Limite do diagnóstico:** não foi reproduzida ainda no Preview a razão específica pela qual uma primeira URL real poderia falhar (resposta HTTP, redirecionamento, permissão efetiva ou decodificação). A correção visual impede imagem quebrada na interface, mas não substitui a validação manual com um serviço real que possua cinco imagens.
 
 ## 3. Estrutura pública planejada
 
@@ -182,7 +190,7 @@ Não alterar o esquema do Google Sheets nem a estrutura da aba `IMAGENS` apenas 
 - Evitar carregar todas as imagens de todos os serviços na grade: o catálogo usa apenas a imagem principal; a galeria carrega/mostra as demais no detalhe.
 - Manter mensagens explícitas para carregamento, ausência de resultados, falha de API e falha de imagem.
 
-## 7. Ordem de implementação
+## 7. Ordem de implementação e estado atual
 
 1. **Diagnosticar a primeira imagem:** conferir resposta pública, URL do Drive, permissões, resposta HTTP e decodificação no navegador. Corrigir somente a causa reproduzível.
 2. **Preparar o modelo de apresentação:** preservar `images[]`, `categoryId`, IDs e cidades no mapeamento frontend; criar o cartão reutilizável com fallback neutro.
@@ -192,7 +200,34 @@ Não alterar o esquema do Google Sheets nem a estrutura da aba `IMAGENS` apenas 
 6. **Enxugar a homepage:** três categorias, quatro ou cinco serviços em destaque, pesquisa e links para as páginas completas.
 7. **Validar navegação e apresentação:** telas pequenas/grandes, URLs diretas, voltar/avançar, dados vazios, imagens ausentes/quebradas e preservação dos fluxos existentes.
 
-Trabalhar em uma branch de funcionalidade derivada de `dev`; este branch atual contém somente as atualizações documentais. Não implementar diretamente em `dev`.
+### 7.1. Implementação e validação no branch
+
+**Implementado em `feat/catalogo-publico-navegacao`:**
+- Homepage enxuta com pesquisa, três categorias e até cinco serviços em destaque.
+- Catálogo `/servicos` com busca textual, filtros de categoria/cidade, contador, limpar filtros e estado vazio/erro/loading.
+- Página `/categorias` com as categorias ativas.
+- Detalhe `/servicos/:serviceId` com galeria de até cinco imagens, miniaturas, setas, contador, cidades atendidas e WhatsApp.
+- Modelo de apresentação que preserva `images[]`, `categoryId` e vínculos de cidades; cartão com imagem principal e indicador de fotos adicionais.
+- Placeholder neutro para imagens ausentes ou que não carregam; exemplos ilustrativos identificados e separados dos resultados reais.
+- Rewrite SPA em `vercel.json` para URLs diretas; as rotas `/api/app` e `/api/images` permanecem funcionais.
+
+**Validação automatizada — concluída:** GitHub Actions [#44933049890](https://github.com/kleber-goncalves/home-service/actions/runs/44933049890) SUCCESS, incluindo auditoria, POC-01/02/03/04, autorização/ownership, testes de imagem, LOO, testes do catálogo, registro de ocorrências, ESLint e build. A sincronização de contexto [#44933049803](https://github.com/kleber-goncalves/home-service/actions/runs/44933049803) também passou.
+
+**Preview READY:** [abrir aplicação](https://home-service-8v1rdts20-kleber-goncalves-s-projects.vercel.app). As rotas `/`, `/servicos`, `/categorias` e `/servicos/example-id` responderam HTTP 200; GET em `/api/app` e `/api/images` respondeu 405, mantendo os endpoints POST-only.
+
+**Checklist manual para concluir antes do merge em `dev`:**
+1. Abrir o Preview em desktop e celular e revisar alinhamento, texto, menus e responsividade.
+2. Localizar um serviço de teste publicado com cinco imagens ativas e confirmar que o cartão mostra a primeira imagem e o indicador `+4 fotos`.
+3. Abrir os detalhes desse serviço; selecionar todas as miniaturas, usar anterior/próxima e conferir o contador e a descrição/cidades.
+4. Testar pesquisa textual, categoria, cidade no formato `Cidade - UF`, limpar filtros e recarregar a URL com filtros ativos.
+5. Abrir diretamente uma URL `/servicos/:serviceId` e usar voltar/avançar do navegador.
+6. Abrir `/?auth=demo` e `/?poc=01`; confirmar que continuam levando às telas demonstrativas correspondentes.
+7. Na área do profissional, confirmar listagem/edição/pausa/publicação de serviços e gerenciamento/upload de imagens.
+8. Observar se a primeira imagem real carrega. Se não carregar, anotar URL/serviço, status no Network e mensagem do Console; placeholder é fallback visual, não prova que a origem do problema foi resolvida.
+
+Até a validação manual e revisão da PR, a funcionalidade permanece apenas no branch de trabalho; `dev`, `main` e Production não receberam merge.
+
+Trabalhar em `feat/catalogo-publico-navegacao`, derivada de `dev`. Não implementar diretamente em `dev`.
 
 ## 8. Critérios de aceitação
 

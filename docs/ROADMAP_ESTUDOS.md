@@ -186,9 +186,28 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 5 — Catálogo público, navegação e apresentação das imagens
 
-**Status: escopo aprovado em 21/11/2026; implementação pendente.** O plano detalhado está em `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`.
+**Status: implementação funcional inicial concluída na branch `feat/catalogo-publico-navegacao`; validação manual pendente antes da integração em `dev`.** O plano detalhado está em `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`.
 
 **Objetivo:** simplificar a homepage e oferecer caminhos claros para descobrir serviços, consultar categorias e visualizar todas as imagens de cada serviço.
+
+**Implementação atual — 21/11/2026:**
+- Foram criadas as rotas públicas `/`, `/servicos`, `/categorias` e `/servicos/:serviceId`, com suporte a URL direta e histórico do navegador. Os acessos `?auth=demo` e `?poc=01` foram preservados.
+- A homepage foi simplificada para pesquisa, três categorias, até cinco serviços em destaque, apresentação curta do fluxo e CTA para profissionais.
+- O catálogo `/servicos` usa os dados públicos existentes e filtros locais por texto, categoria e cidade; os filtros ficam refletidos na URL. A normalização considera acentos e pontuação em valores como “Cidade - UF”.
+- `/categorias` apresenta todas as categorias ativas e encaminha para a pesquisa filtrada.
+- A página de detalhes apresenta descrição, cidades atendidas, profissional, contato WhatsApp e galeria das imagens ativas, com miniaturas, navegação e contador.
+- O mapeamento frontend preserva a coleção `images[]` ordenada e `categoryId`; o cartão mostra a imagem principal e `+N fotos`.
+- Foi adicionado placeholder neutro para imagem ausente ou que falha no carregamento. O código anterior descartava as imagens adicionais e não tinha fallback visual; isso foi corrigido. **Ainda não foi reproduzida no Preview a causa específica de eventual falha na primeira URL do Drive**; a confirmação com um serviço real que possui cinco imagens continua pendente.
+- Os exemplos ilustrativos da homepage ficam identificados e não entram no catálogo, nos filtros nem na contagem de serviços publicados.
+- Foi adicionado fallback de rotas SPA em `vercel.json` para links diretos; as rotas de API continuam resolvendo para suas Functions.
+
+**Validação automatizada e de infraestrutura — PASS:**
+- GitHub Actions [#44933049890](https://github.com/kleber-goncalves/home-service/actions/runs/44933049890): auditoria bloqueante de dependências, POC-01/02/03/04, autorização/ownership, gateway de imagens, LOO, testes do catálogo, registro de ocorrências, ESLint e build concluídos com **SUCCESS**.
+- GitHub Actions AI Context [#44933049803](https://github.com/kleber-goncalves/home-service/actions/runs/44933049803): **SUCCESS**.
+- Preview Vercel: deployment `dpl_Ceu1VZvFX81JdMQrnKBxbzwKhK9K`, **READY**, URL https://home-service-8v1rdts20-kleber-goncalves-s-projects.vercel.app.
+- Verificações HTTP no Preview: `/`, `/servicos`, `/categorias` e `/servicos/example-id` retornaram 200 com o shell da aplicação; `/api/app` e `/api/images` retornaram 405 em GET, confirmando que as rotas de API continuam chegando às Functions e não ao fallback HTML.
+
+**Validação manual ainda pendente:** conferir visualmente o Preview em desktop e celular; usar serviço publicado de teste com cinco imagens; confirmar apresentação da primeira imagem e galeria completa; testar filtros e recarga/links diretos; e repetir os fluxos `?auth=demo`, `?poc=01`, cadastro/gestão do profissional e upload. A etapa não deve ser integrada em `dev` até essa revisão manual e a CI da PR.
 
 **Escopo aprovado:**
 - Reduzir a homepage a uma apresentação objetiva: pesquisa por serviço/cidade, três categorias em destaque, quatro ou cinco serviços, explicação curta de como funciona, chamada para profissionais e rodapé.
