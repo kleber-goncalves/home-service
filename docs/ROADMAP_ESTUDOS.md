@@ -1,6 +1,6 @@
 # Roteiro de evolução acadêmica — Conecta Local
 
-> **Atualizado em:** 20/11/2026  
+> **Atualizado em:** 21/11/2026  
 > **Finalidade:** organizar as próximas etapas do projeto de estudos, priorizando aprendizado técnico e conclusão coerente da demonstração. Este roteiro não é um plano de operação comercial nem uma lista de requisitos obrigatórios para Production.
 
 ## 1. Ponto de partida
@@ -184,7 +184,42 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 **Ambiente:** a funcionalidade está em `dev` e no Preview de desenvolvimento. `main` e Production permanecem inalteradas e sem backend habilitado. A próxima etapa do roadmap é a Etapa 5; qualquer promoção futura para Production exige decisão e revisão específicas.
 
-### Etapa 5 — Pesquisa acadêmica e acabamento da apresentação
+### Etapa 5 — Catálogo público, navegação e apresentação das imagens
+
+**Status: escopo aprovado em 21/11/2026; implementação pendente.** O plano detalhado está em `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`.
+
+**Objetivo:** simplificar a homepage e oferecer caminhos claros para descobrir serviços, consultar categorias e visualizar todas as imagens de cada serviço.
+
+**Escopo aprovado:**
+- Reduzir a homepage a uma apresentação objetiva: pesquisa por serviço/cidade, três categorias em destaque, quatro ou cinco serviços, explicação curta de como funciona, chamada para profissionais e rodapé.
+- Criar `/servicos` com catálogo público, pesquisa textual, filtros por categoria e cidade, contador, limpar filtros e estados de carregamento/vazio/erro.
+- Criar `/categorias` com todas as categorias ativas; cada categoria abre `/servicos` já filtrada.
+- Criar `/servicos/:serviceId` com dados públicos, cobertura por cidades, galeria das até cinco imagens ativas e contato por WhatsApp.
+- Consolidar um cartão reutilizável que exibe uma imagem principal e informa `+N fotos`; as demais imagens serão apresentadas na galeria de detalhes.
+- Preservar `images[]`, `categoryId`, IDs e cidades no mapeamento frontend. O cartão não deve descartar quatro imagens que o backend já retorna.
+- Separar serviços cadastrados de exemplos ilustrativos. A página de catálogo e os filtros devem conter somente serviços públicos elegíveis; exemplos locais, quando necessários para a demonstração, terão identificação explícita e não entrarão nos resultados reais.
+- Diagnosticar separadamente eventual falha no carregamento da primeira imagem: resposta de `public.services`, URL/permissão do Drive, resposta HTTP e decodificação no navegador. A inexistência de galeria não será tratada como causa comprovada de imagem em branco.
+
+**Estratégia proporcional ao MVP:**
+- Reutilizar `public.services`, `CATEGORIAS`, `CIDADES`, `SERVICO_CIDADES` e `IMAGENS`; filtros inicialmente no cliente sobre os até 100 serviços retornados.
+- Não criar mecanismo externo de busca, novo banco, geolocalização ou paginação backend sem uma limitação comprovada.
+- Adotar rotas públicas com URL direta e histórico do navegador, preservando `?auth=demo` e `?poc=01`.
+- Usar placeholder neutro para imagem ausente/quebrada; não substituir silenciosamente por foto de outro serviço/categoria.
+- Não inventar avaliações, estrelas, reputação, preço ou disponibilidade. Somente apresentar dados disponíveis e confirmados no contrato público.
+
+**Ordem de trabalho:**
+1. Diagnosticar e corrigir, se reproduzível, a falha da primeira imagem.
+2. Preservar a lista de imagens e demais IDs no frontend; consolidar cartão reutilizável.
+3. Implementar navegação e páginas de serviços/categorias.
+4. Implementar detalhe do serviço e galeria.
+5. Simplificar a homepage e conectar os atalhos às páginas completas.
+6. Validar URLs diretas, voltar/avançar, responsividade, estados vazios, imagens quebradas e preservação dos fluxos de autenticação e área profissional.
+
+**Critérios de conclusão:** critérios detalhados no plano específico; incluem catálogo real pesquisável/filtrável, três categorias e quatro/cinco serviços na homepage, galeria com até cinco imagens, diferenciação dos exemplos, compatibilidade dos acessos demonstrativos e testes/build aprovados.
+
+**Limites:** implementação exclusivamente em branch derivada de `dev` e validação no Preview. Não alterar `main`, não habilitar backend em Production e não modificar o esquema do Sheets sem necessidade demonstrada.
+
+### Etapa 6 — Pesquisa acadêmica e acabamento da apresentação
 
 **Status: instrumento exploratório preparado; coleta e análise de respostas pendentes.**
 
@@ -198,7 +233,7 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 - Revisar acessibilidade básica, responsividade, mensagens de erro, estados vazios e fluxo de demonstração.
 - Atualizar capturas, roteiro de apresentação e relatório acadêmico conforme o que estiver realmente implementado e pesquisado.
 
-**Prioridade:** alta para a entrega acadêmica. Não inventar participantes, respostas, percentuais ou conclusões; não implementar novas funcionalidades de backend apenas para aumentar o escopo da apresentação.
+**Prioridade:** importante para a entrega acadêmica, depois da melhoria do catálogo público. Não inventar participantes, respostas, percentuais ou conclusões.
 
 ## 4. Itens que devem ficar para depois
 
@@ -225,9 +260,9 @@ Reavaliar somente quando houver exigência acadêmica explícita ou uma necessid
 
 ## 6. Ordem prática recomendada
 
-1. **Agora:** concluir a Etapa 4 em `feat/drive-image-upload`, com upload de imagens de serviços, testes automatizados e validação manual no Preview.
-2. **Depois:** retomar a pesquisa comunitária já documentada em `PESQUISA_COMUNIDADE.md` e `docs/GUIA_APLICACAO_PESQUISA_COMUNIDADE.md`, somente após orientação do professor do curso Técnico em Informática e confirmação do procedimento aplicável. O responsável decidiu deixar a coleta para depois.
-3. **Na preparação da entrega:** revisar acessibilidade, responsividade, roteiro de demonstração e relatório acadêmico, registrando as limitações reais.
+1. **Agora:** iniciar a Etapa 5 — catálogo público, navegação e apresentação das imagens — em uma branch de funcionalidade derivada de `dev`, seguindo `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`.
+2. **Depois:** retomar a Etapa 6 — pesquisa comunitária — somente após orientação do professor do curso Técnico em Informática e confirmação do procedimento aplicável. A coleta permanece pendente.
+3. **Na preparação da entrega:** revisar acessibilidade, responsividade, roteiro de demonstração e relatório acadêmico, registrando apenas funcionalidades e resultados efetivamente concluídos.
 
 Trabalhar uma etapa por branch/PR, sempre partindo de `dev`. Integrar somente depois das verificações pertinentes. Não alterar `main` sem uma decisão explícita de publicação.
 
