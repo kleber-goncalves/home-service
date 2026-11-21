@@ -364,9 +364,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** d41fd53801e816a8235635d125b31247748a76ad
-- **Data do commit:** 2026-11-20T21:39:40-03:00
-- **Mensagem do commit:** test(images): cobrir URI resumable com parâmetros do Drive
+- **Commit de referência:** ce4e14c7a9a009a767d61dee811c8aa494ec2403
+- **Data do commit:** 2026-11-20T22:25:08-03:00
+- **Mensagem do commit:** docs(images): registrar validação manual da integração Drive
 - **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -473,13 +473,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| ce4e14c | 2026-11-20 | docs(images): registrar validação manual da integração Drive |
+| e78600e | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | d41fd53 | 2026-11-20 | test(images): cobrir URI resumable com parâmetros do Drive |
 | 3d14ece | 2026-11-20 | fix(images): aceitar parâmetros adicionais na sessão resumable do Drive |
 | cb35700 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 78962bb | 2026-11-20 | docs: registrar CI aprovada e Preview Vercel pendente |
 | 0490ab7 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
 | 26c48ca | 2026-11-20 | fix: autenticar proprietário antes de consultar configuração do Drive |
-| e4f7711 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 2011e8f | 2026-11-20 | test: cobrir resposta 308 sem Range no upload retomável |
 
 <!-- END AUTO-GENERATED SECTION -->
