@@ -52,9 +52,28 @@ export const popularServices = [
 ];
 
 export const frequentlyAskedQuestions = [
-    { question: "O Conecta Local já está recebendo pedidos?", answer: "Ainda não. Esta página apresenta a proposta e a experiência visual do produto. O cadastro de profissionais, a busca conectada a dados reais e o contato pela plataforma serão desenvolvidos em etapas posteriores." },
-    { question: "Como vou encontrar um profissional?", answer: "A proposta é pesquisar pelo serviço e pela região, conhecer as informações públicas do perfil e entrar em contato diretamente com o profissional. Nesta demonstração, a busca filtra apenas exemplos locais." },
-    { question: "Preciso criar uma conta para pesquisar?", answer: "A experiência pública planejada permitirá pesquisar e conhecer serviços sem criar uma conta. A autenticação será necessária para profissionais que forem cadastrar e administrar seus próprios serviços." },
-    { question: "Sou profissional. Como posso participar?", answer: "O cadastro e o painel do profissional ainda não estão disponíveis. A página apresenta a proposta de divulgação; o fluxo para criar um perfil será implementado em uma próxima etapa." },
-    { question: "O Conecta Local terá pagamentos ou agendamentos?", answer: "O escopo inicial é uma vitrine regional para descobrir serviços e falar diretamente com quem os oferece. Pagamentos e agendamentos dentro da plataforma não fazem parte da primeira versão planejada." },
+    {
+        question: "O que é o Conecta Local?",
+        answer: "É um projeto acadêmico em versão demonstrativa que organiza a apresentação de serviços por categoria e região, aproximando pessoas que procuram um serviço de profissionais que o oferecem."
+    },
+    {
+        question: "Preciso criar uma conta para pesquisar serviços?",
+        answer: "Não. A consulta ao catálogo público, às categorias e aos detalhes dos serviços publicados pode ser feita sem criar uma conta."
+    },
+    {
+        question: "Como entro em contato com um profissional?",
+        answer: "Abra os detalhes de um serviço publicado. Quando o profissional disponibilizar um WhatsApp público, a página apresenta a opção de contato direto. Os cartões fictícios não possuem contato real."
+    },
+    {
+        question: "Os serviços de exemplo são profissionais reais?",
+        answer: "Não. Os cartões identificados como exemplos ilustrativos são fictícios e usam imagens de referência para demonstrar a interface. Eles não representam cadastros, disponibilidade, preços ou recomendações."
+    },
+    {
+        question: "Como um profissional pode cadastrar e administrar serviços?",
+        answer: "O projeto possui uma área demonstrativa para cadastro e gerenciamento de serviços. Os fluxos ainda fazem parte da validação acadêmica e não devem ser considerados uma plataforma comercial aberta ao público."
+    },
+    {
+        question: "O Conecta Local realiza pagamentos ou agendamentos?",
+        answer: "Não. O escopo atual é apresentar serviços e permitir contato direto pelo canal público informado pelo profissional. Pagamentos e agendamentos dentro da plataforma não estão implementados."
+    },
 ];
