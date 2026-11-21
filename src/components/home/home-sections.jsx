@@ -215,7 +215,7 @@ export function HowItWorks() {
                         </article>
                     ))}
                 </div>
-                <p className="steps-note">Este fluxo representa a experiência planejada. A busca e o contato ainda não estão integrados a cadastros reais.</p>
+                <p className="steps-note">A vitrine apresenta os serviços publicados e permite conhecer os dados públicos antes de entrar em contato com o profissional.</p>
             </div>
         </section>
     );
