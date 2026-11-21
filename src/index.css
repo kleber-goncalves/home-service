@@ -259,17 +259,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
     .popular-layout { grid-template-columns: 1fr 1fr; }
     .popular-image, .popular-image img { min-height: 220px; }
 }
-@media (max-width: 380px) {
-    .nav-shell { gap: 8px; padding-right: 12px; padding-left: 12px; }
-    .brand { gap: 7px; }
-    .brand-mark { width: 34px; height: 34px; }
-    .brand-name { font-size: .98rem; }
-    .account-menu-trigger { gap: 5px; padding: 4px 6px; }
-    .account-avatar { width: 28px; height: 28px; }
-    .account-menu-name { max-width: 56px; font-size: .72rem; }
-    .account-menu-trigger > svg:last-child { width: 14px; }
-    .mobile-menu-toggle { width: 38px; height: 38px; }
-}
+
 @media (max-width: 860px) {
     .nav-shell { min-height: 70px; gap: 12px; }
     .desktop-nav, .nav-cta { display: none; }
@@ -1000,4 +990,16 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
 }
 @media (prefers-reduced-motion: reduce) {
     .home-category-card, .catalog-service-card, .catalog-service-image { transition: none; }
+}
+
+@media (max-width: 380px) {
+    .nav-shell { gap: 8px; padding-right: 12px; padding-left: 12px; }
+    .brand { gap: 7px; }
+    .brand-mark { width: 34px; height: 34px; }
+    .brand-name { font-size: .98rem; }
+    .account-menu-trigger { gap: 5px; padding: 4px 6px; }
+    .account-avatar { width: 28px; height: 28px; }
+    .account-menu-name { max-width: 56px; font-size: .72rem; }
+    .account-menu-trigger > svg:last-child { width: 14px; }
+    .mobile-menu-toggle { width: 38px; height: 38px; }
 }

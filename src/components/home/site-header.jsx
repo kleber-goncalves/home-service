@@ -85,7 +85,7 @@ export default function SiteHeader({ active = "" }) {
                     </nav>
 
                     {isLoading ? (
-                        <span className="account-session-placeholder" aria-label="Verificando sessão" />
+                        <span className="account-session-placeholder" role="status" aria-label="Verificando sessão" />
                     ) : user ? (
                         <div className="account-menu" ref={accountMenuRef}>
                             <button
