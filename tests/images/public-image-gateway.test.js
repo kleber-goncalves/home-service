@@ -10,7 +10,7 @@ const SECRET = "d".repeat(64);
 const IMAGE_ID = "00000000-0000-4000-8000-000000000001";
 const DRIVE_FILE_ID = "drive-file-id-123456";
 const ACCESS_TOKEN = "test-oauth-token-that-must-not-reach-the-browser";
-const JPEG_BYTES = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00]);
+const JPEG_BYTES = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0x02]);
 
 function buildRequest(options = {}) {
     const headers = new Headers({
