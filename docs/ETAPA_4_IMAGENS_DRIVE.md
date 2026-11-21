@@ -230,7 +230,7 @@ Os testes manuais acima validam o caminho funcional principal da integração re
 
 - Foto de perfil profissional.
 - Edição de ordem por arrastar e soltar.
-- Galeria completa na página de detalhes.
+- Galeria completa na página de detalhes não fez parte da entrega inicial de upload; está planejada para a Etapa 5, documentada em `docs/ETAPA_5_CATALOGO_PUBLICO.md`.
 - Conversão, compressão e otimização de imagens no servidor.
 - Painel administrativo de mídia.
 - Imagens anexadas a denúncias.
@@ -254,7 +254,7 @@ Os testes manuais acima validam o caminho funcional principal da integração re
 
 **Estado final:** a Etapa 4 está concluída para o escopo de imagens de serviços no Preview de desenvolvimento. A funcionalidade permanece fora de Production por decisão do projeto. Foto de perfil, galeria avançada, ordenação por arrastar e soltar, compressão/otimização, painel administrativo de mídia e uso de dados reais continuam fora deste primeiro ciclo.
 
-**Próxima etapa do roadmap:** seguir para a Etapa 5 — pesquisa acadêmica e acabamento da apresentação, respeitando a revisão do professor/orientador antes da coleta com participantes. Não promover o Preview nem configurar backend em Production sem decisão explícita e revisão específica de segurança.
+**Próxima etapa do roadmap:** executar a Etapa 5 — experiência pública e catálogo de serviços, conforme `docs/ETAPA_5_CATALOGO_PUBLICO.md`. A pesquisa acadêmica e o acabamento da apresentação foram reordenados para a Etapa 6; a coleta continua condicionada à revisão do professor/orientador. Não promover o Preview nem configurar backend em Production sem decisão explícita e revisão específica de segurança.
 
 
 ## 11. Referências técnicas oficiais
