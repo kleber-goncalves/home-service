@@ -35,6 +35,7 @@ var APP_PASSWORD_ALGORITHM = "argon2id$v=19$m=19456,t=2,p=1";
 var APP_ALLOWED_ACTIONS = [
     "public.catalog",
     "public.services",
+    "public.image.resolve",
     "auth.register",
     "auth.verify",
     "auth.lookup",
@@ -180,6 +181,7 @@ function doPost(event) {
 function appDispatch_(action, payload, nowMs, secret) {
     if (action === "public.catalog") return appGetCatalog_();
     if (action === "public.services") return appGetPublicServices_();
+    if (action === "public.image.resolve") return appResolvePublicImage_(payload);
     if (action === "auth.register") return appRegister_(payload, nowMs, secret);
     if (action === "auth.verify") return appVerifyEmail_(payload, nowMs, secret);
     if (action === "auth.lookup") return appLookupCredentials_(payload);
@@ -1805,6 +1807,80 @@ function appGetServiceImages_(serviceId, publicAccess) {
                 url: publicAccess ? appImagePublicUrl_(String(item.id_arquivo_drive)) : null
             };
         });
+}
+
+
+// Esta ação só é chamada pelo gateway Vercel assinado por HMAC.
+// O token OAuth do Apps Script nunca é enviado ao navegador.
+function appResolvePublicImage_(payload) {
+    if (!appHasKeys_(payload, ["imageId"])) {
+        throw appFault_("INVALID_INPUT", "Informe a imagem solicitada.");
+    }
+
+    var imageId = String(payload.imageId || "");
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(imageId)) {
+        throw appFault_("IMAGE_NOT_FOUND", "Imagem não encontrada.");
+    }
+
+    var image = appFind_("IMAGENS", "id_imagem", imageId);
+    if (!image || String(image.status) !== "active") {
+        throw appFault_("IMAGE_NOT_FOUND", "Imagem não encontrada ou indisponível.");
+    }
+
+    var service = appFind_("SERVICOS", "id_servico", String(image.id_servico || ""));
+    var profile = service
+        ? appFind_("PROFISSIONAIS", "id_profissional", String(service.id_profissional || ""))
+        : null;
+    var user = profile
+        ? appFind_("USUARIOS", "id_usuario", String(profile.id_usuario || ""))
+        : null;
+    var category = service
+        ? appFind_("CATEGORIAS", "id_categoria", String(service.id_categoria || ""))
+        : null;
+
+    if (!service || String(service.status) !== "published" || !profile || !user
+        || String(user.status) !== "active" || !category) {
+        throw appFault_("IMAGE_NOT_FOUND", "Imagem não encontrada ou indisponível.");
+    }
+
+    var fileId = String(image.id_arquivo_drive || "");
+    if (!/^[A-Za-z0-9_-]{10,200}$/.test(fileId)) {
+        throw appFault_("IMAGE_NOT_FOUND", "Imagem não encontrada ou indisponível.");
+    }
+
+    var file;
+    try {
+        file = DriveApp.getFileById(fileId);
+        if (file.isTrashed()) throw new Error("Arquivo removido.");
+    } catch (error) {
+        throw appFault_("IMAGE_NOT_FOUND", "Imagem não encontrada ou indisponível.");
+    }
+
+    var mimeType = String(file.getMimeType() || "").toLowerCase();
+    var sizeBytes = Number(file.getSize());
+    if (!appImageMimeAllowed_(mimeType)
+        || mimeType !== String(image.tipo_mime || "").toLowerCase()
+        || !Number.isSafeInteger(sizeBytes) || sizeBytes < 12 || sizeBytes > APP_IMAGE_MAX_BYTES
+        || sizeBytes !== Number(image.tamanho_bytes)) {
+        throw appFault_("IMAGE_NOT_FOUND", "Imagem não encontrada ou indisponível.");
+    }
+
+    var accessToken;
+    try {
+        accessToken = ScriptApp.getOAuthToken();
+    } catch (error) {
+        throw appFault_("DRIVE_AUTH_UNAVAILABLE", "A autorização de leitura do Google Drive não está disponível.");
+    }
+    if (typeof accessToken !== "string" || accessToken.length < 32) {
+        throw appFault_("DRIVE_AUTH_UNAVAILABLE", "A autorização de leitura do Google Drive não está disponível.");
+    }
+
+    return {
+        fileId: fileId,
+        mimeType: mimeType,
+        sizeBytes: sizeBytes,
+        accessToken: accessToken
+    };
 }
 
 function appImageRemove_(payload, nowMs) {
