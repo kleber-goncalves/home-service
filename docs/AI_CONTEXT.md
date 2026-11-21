@@ -392,9 +392,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** ea9557d31daa9c586ed0ff999bf5d47f6ab42d66
-- **Data do commit:** 2026-11-21T15:33:35-03:00
-- **Mensagem do commit:** refactor(gateway): exportar cliente interno do Apps Script
+- **Commit de referência:** d5cfa672af05395ee8541becba43830433e93147
+- **Data do commit:** 2026-11-21T15:33:55-03:00
+- **Mensagem do commit:** feat(images): validar acesso publico antes da entrega do Drive
 - **Branch desta execução:** fix/homepage-images-and-sections
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -514,13 +514,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| d5cfa67 | 2026-11-21 | feat(images): validar acesso publico antes da entrega do Drive |
+| e0877cb | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
+| 0763414 | 2026-11-21 | feat(images): publicar rota GET de imagens |
+| 8501fb6 | 2026-11-21 | feat(images): criar entrega autenticada de imagens publicas |
 | ea9557d | 2026-11-21 | refactor(gateway): exportar cliente interno do Apps Script |
 | 4a7f9ea | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 22ba720 | 2026-11-21 | Merge pull request #28 from kleber-goncalves/feat/catalogo-publico-navegacao |
 | fb8c61f | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| b7c8574 | 2026-11-21 | docs: esclarecer Preview conectado à planilha apenas em dev |
-| 1719f3a | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| d237461 | 2026-11-21 | docs: registrar estado do catálogo no Preview |
-| 32a7704 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
