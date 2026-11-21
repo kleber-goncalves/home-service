@@ -398,10 +398,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** e9b36e0e2a6176b5779b00599b842943911b0027
-- **Data do commit:** 2026-11-21T16:36:34-03:00
-- **Mensagem do commit:** refactor: remover serviços de exemplo da página inicial
-- **Branch desta execução:** dev
+- **Commit de referência:** f916efb9d9337ec00366b559c0ed6618adef3230
+- **Data do commit:** 2026-11-21T17:02:57-03:00
+- **Mensagem do commit:** feat: compartilhar sessão e navegação da conta
+- **Branch desta execução:** feat/autenticacao-compartilhada-navegacao
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -490,7 +490,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/components/ui/button.jsx
 - src/components/ui/card.jsx
 - src/components/ui/input.jsx
+- src/contexts/auth-context.js
+- src/contexts/auth-provider.jsx
 - src/data/homepage.js
+- src/hooks/use-auth.js
 - src/hooks/use-public-catalog.js
 - src/lib/navigation.js
 - src/lib/public-catalog.js
@@ -510,6 +513,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 ### Diretórios principais de src/
 
 - src/components/
+- src/contexts/
 - src/data/
 - src/hooks/
 - src/lib/
@@ -520,13 +524,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| f916efb | 2026-11-21 | feat: compartilhar sessão e navegação da conta |
+| bec90b6 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | e9b36e0 | 2026-11-21 | refactor: remover serviços de exemplo da página inicial |
 | 198eaa6 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 0e103ea | 2026-11-21 | docs: registrar validação integrada do gateway de imagens |
 | cf0e932 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 77e88be | 2026-11-21 | fix: corrigir imagens públicas e restaurar seções da homepage (#29) |
 | 308ef43 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 57d2d95 | 2026-11-21 | docs(context): alinhar rota same-origin de imagens |
-| dece7d8 | 2026-11-21 | docs(plan): alinhar documentacao ao endpoint estatico |
 
 <!-- END AUTO-GENERATED SECTION -->
