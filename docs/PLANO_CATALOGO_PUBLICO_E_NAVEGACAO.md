@@ -1,9 +1,9 @@
 # Plano — catálogo público, navegação e apresentação de imagens
 
 > **Atualizado em:** 21/11/2026  
-> **Status:** PR #28 integrada em `dev`; correções pós-validação em andamento na branch `fix/homepage-images-and-sections`. Validação automatizada e publicação do Apps Script ainda pendentes nesta correção.  
-> **Branch atual:** `fix/homepage-images-and-sections` (derivada de `dev`).  
-> **Preview integrado da planilha:** https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app — somente após merge/deployment em `dev` e sincronização da nova ação Apps Script.  
+> **Status:** PR #28 e PR #29 integradas em `dev`; Apps Script sincronizado/atualizado e validação manual integrada do gateway de imagens aprovada no Preview em 21/11/2026.
+> **Branch de referência:** `dev` (documentação consolidada após a PR #29).
+> **Preview integrado da planilha:** https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app — deployment verificado `dpl_3me1dDL9tjaeQveKPFx8YXYfrDm3` (`READY`, commit `cf0e932`).
 > **Segurança:** dados fictícios; não duplicar nem ampliar escopo de segredos Vercel. Production permanece fora deste trabalho.
 
 ## 1. Objetivo
@@ -12,7 +12,7 @@ Evoluir a vitrine pública do Conecta Local para que a pessoa consiga entender a
 
 O foco desta frente é a experiência pública: organização da homepage, catálogo, categorias, cartões e detalhes dos serviços. O cadastro/autenticação do profissional, o upload no Drive e as regras de segurança existentes devem ser preservados.
 
-Este documento registra o escopo e o estado de implementação. As páginas e rotas já existem no branch `feat/catalogo-publico-navegacao`, mas ainda não foram integradas em `dev`. Como as variáveis de backend do Vercel estão restritas a `gitBranch: dev`, o Preview desta feature branch não acessa a planilha. A validação integrada com Apps Script/Sheets deve ocorrer no Preview fixo de `dev` após o merge da PR #28.
+Este documento registra o escopo e o estado de implementação. As rotas públicas foram integradas em `dev` pela PR #28 e corrigidas pela PR #29. A validação integrada com Apps Script/Sheets/Drive foi executada no Preview fixo da branch `dev`; os Preview de outras branches não recebem as variáveis restritas a `gitBranch: dev`.
 
 ## 2. Diagnóstico do comportamento atual
 
@@ -45,7 +45,7 @@ Não alterar permissões do Drive, não tornar a pasta pública e não introduzi
 - O backend Apps Script já retorna todas as imagens ativas em `images[]`, ordenadas por `ordem_exibicao`; o fluxo de upload limita a cinco imagens por serviço.
 - O código frontend anterior reduzia a coleção a `images[0]?.url` e o cartão não tinha fallback `onError`. Assim, as imagens adicionais eram descartadas e uma falha da primeira imagem deixava o elemento quebrado.
 - A nova camada de catálogo preserva `images[]`, valida o contrato da URL pública do Drive e ordena as imagens; o cartão mostra uma imagem principal e `+N fotos`; a página de detalhes apresenta a galeria e controles. Imagem ausente/quebrada recebe placeholder neutro.
-- **Limite do diagnóstico:** não foi reproduzida ainda no Preview a razão específica pela qual uma primeira URL real poderia falhar (resposta HTTP, redirecionamento, permissão efetiva ou decodificação). A correção visual impede imagem quebrada na interface, mas não substitui a validação manual com um serviço real que possua cinco imagens.
+- **Resultado do diagnóstico:** a rota pública direta do Drive foi substituída por um gateway same-origin Vercel + Apps Script HMAC. A entrega real foi validada com arquivos do Drive no Preview fixo de `dev`: HTTP 200 para imagens elegíveis, HTTP 404 para imagens bloqueadas/removidas e recuperação após republicação. O gateway não expõe token OAuth ao navegador.
 
 ## 3. Estrutura pública planejada
 
@@ -73,7 +73,7 @@ Ordem proposta:
 5. **Como funciona:** versão curta em três passos, sem repetir explicações longas.
 6. **Chamada para profissionais e rodapé:** manter somente o conteúdo que ajude a entender a proposta ou acessar a área correspondente.
 
-Seções redundantes ou estáticas — como listas de serviços populares que não filtram o catálogo e blocos extensos que repetem a mesma explicação — deverão ser removidas ou condensadas após revisar seus conteúdos e links. Não eliminar conteúdo útil sem verificar se ele cumpre uma função de navegação ou apresentação.
+Seções estáticas ou institucionais podem ser mantidas quando acrescentam orientação e contexto (incluindo `PopularServices`, `AboutSection` e `FAQSection`, restauradas pela PR #29); devem permanecer distintas do catálogo e não aparentar ser resultados de busca.
 
 A homepage é uma amostra, não o catálogo completo. O limite de quatro ou cinco serviços será apenas de apresentação; não deve limitar a quantidade de registros cadastrados ou retornados no catálogo.
 
@@ -161,7 +161,7 @@ Serviços cadastrados e exemplos estáticos não podem ser misturados sem identi
 
 - A página `/servicos` mostrará somente serviços públicos elegíveis retornados pelo backend.
 - Os destaques da homepage priorizarão serviços publicados reais do catálogo.
-- Quando não houver quantidade suficiente de serviços cadastrados para demonstrar a interface, os exemplos locais poderão aparecer em uma área separada e identificada como **Exemplos ilustrativos** ou **Demonstração**.
+- A homepage mantém os exemplos locais sempre em uma área separada, identificada como **Exemplos ilustrativos**, inclusive quando há serviços publicados reais.
 - Exemplos ilustrativos nunca contarão como resultados da pesquisa, filtros ou quantidade total de serviços cadastrados.
 - Não associar imagens de banco a profissionais fictícios como se fossem fotografias enviadas por eles.
 
@@ -172,7 +172,7 @@ O primeiro ciclo deverá aproveitar a estrutura já existente:
 - `public.services` como fonte dos serviços públicos.
 - `CATEGORIAS` e `CIDADES` como fonte dos filtros.
 - `SERVICO_CIDADES` para cobertura de municípios.
-- `IMAGENS` e URLs públicas elegíveis do Drive para imagens.
+- `IMAGENS` e o gateway same-origin `/api/public-images?id=<imageId>` para entregar conteúdo do Drive após validação server-side de elegibilidade.
 
 O frontend precisa preservar os metadados de `images` como uma lista, em vez de reduzir o conteúdo à primeira URL. Também deverá preservar `categoryId`, IDs do serviço e listas de cidades ao mapear a resposta da API.
 
@@ -240,12 +240,12 @@ Trabalhar em `fix/homepage-images-and-sections`, derivada de `dev`. Não impleme
 - [ ] Cada cartão mostra a imagem principal e informa quando existem outras fotos.
 - [ ] A página de detalhes apresenta todas as imagens ativas (até cinco) com navegação acessível.
 - [ ] Uma imagem ausente ou quebrada apresenta placeholder neutro, sem imagem de outro serviço.
-- [ ] A entrega de imagem usa rota same-origin autenticada no backend; validar com Apps Script atualizado e arquivos reais no Preview de `dev`.
+- [x] A entrega de imagem usa rota same-origin autenticada no backend; a integração real foi testada no Preview de `dev`, incluindo pausa, republicação e remoção.
 - [x] Serviços ilustrativos aparecem em seção própria da homepage, mesmo quando existem serviços publicados, e não entram nos resultados reais nem nos totais.
 - [ ] Os fluxos `?auth=demo` e `?poc=01` continuam funcionando.
 - [ ] Cadastro, edição, pausa/publicação, remoção e upload de imagens continuam funcionando.
 - [ ] Lint, testes pertinentes e build passam; as validações manuais do Preview são registradas separadamente.
-- [ ] Nenhuma alteração é promovida a `main`/Production neste ciclo.
+- [x] Nenhuma alteração foi promovida a `main`/Production neste ciclo; `main` permanece em `49354a46863d5a5eb36ce32e450b975d4087fe3b`.
 
 ## 9. Fora do escopo
 
@@ -280,8 +280,8 @@ Após a integração da PR #28 em `dev` e o teste do responsável, três ajustes
 - O gateway baixa `files.get?alt=media` com o token OAuth e transmite o stream binário ao navegador; não devolve o token ou o identificador do arquivo Drive ao cliente. Respostas não são armazenadas em cache.
 - A rota só funciona em Preview e recusa requisições cross-site. A elegibilidade é revalidada a cada pedido de imagem, inclusive após pausa ou remoção lógica.
 - A ação `public.image.resolve` foi adicionada a `APP_ALLOWED_ACTIONS` e `appDispatch_` em `apps-script/conecta-local/Code.gs`.
-- **Dependência operacional:** após o merge desta correção em `dev`, sincronizar o `Code.gs` atualizado com o projeto Apps Script e publicar uma nova versão do Web App. O código no GitHub não atualiza automaticamente a implantação remota.
-- **Validação pendente:** os testes automatizados simulam a resposta de Drive/Apps Script; a entrega com OAuth real, arquivo real e permissões reais ainda precisa ser confirmada no Preview fixo de `dev`.
+- **Sincronização operacional concluída:** após o merge da PR #29 em `dev`, o responsável sincronizou o `Code.gs` atualizado com o projeto Apps Script existente e atualizou a implantação Web App usada pelo Preview. O código no GitHub não atualiza automaticamente a implantação remota.
+- **Validação manual integrada — PASS:** a entrega com OAuth real server-side, arquivo real do Drive, Apps Script e dados de `IMAGENS` foi confirmada pelo responsável no Preview fixo de `dev`; ver a seção 11.5 para os resultados detalhados.
 
 ### 11.2. Serviços reais e exemplos
 
@@ -301,5 +301,19 @@ Após a integração da PR #28 em `dev` e o teste do responsável, três ajustes
 - `tests/images/public-image-gateway.test.js`: valida resolução HMAC, token exclusivamente server-side, transmissão do conteúdo, bloqueio cross-site, rejeição de imagem não elegível, MIME e tamanho.
 - `tests/public-catalog/public-catalog.test.js`: valida conversão para URL interna e rejeição de imagem removida/ID inválido.
 - `npm run test:images` inclui a nova suíte.
-- A CI ainda deve confirmar testes, ESLint, verificação de ocorrências e build antes de abrir/considerar a PR pronta.
+- **CI pós-merge — PASS:** Validate Home Service [#44937440114](https://github.com/kleber-goncalves/home-service/actions/runs/44937440114) e AI Context — Synchronize [#44937440122](https://github.com/kleber-goncalves/home-service/actions/runs/44937440122) concluíram SUCCESS após a integração da PR #29.
 
+### 11.5. Validação manual integrada no Preview de `dev` — PASS (21/11/2026)
+
+Ambiente: Preview fixo da branch `dev`, deployment `dpl_3me1dDL9tjaeQveKPFx8YXYfrDm3` (`READY`, commit `cf0e932b854a48e67c0d69e84136bbae1e40f189`), com integração real ao Apps Script, Google Sheets e Google Drive de teste. O responsável confirmou a atualização do `Code.gs` e da implantação Web App existente.
+
+| Cenário executado | Resultado observado | Estado |
+|---|---|---|
+| Catálogo `public.services` | Cinco imagens retornadas para `Aparar grama`: 3 JPEG e 2 PNG | PASS |
+| Entrega das cinco imagens elegíveis | HTTP 200, Content-Type de imagem e corpo não vazio para 5/5 | PASS |
+| Serviço pausado | HTTP 404 para 5/5 imagens | PASS |
+| Serviço republicado | HTTP 200, MIME correto e bytes recebidos para 5/5 | PASS |
+| Uma imagem removida pela interface | ID antigo retorna HTTP 404 e a imagem não aparece mais no catálogo público | PASS |
+| Demais imagens após a remoção | As outras 4 imagens continuam entregues com HTTP 200 | PASS |
+
+Os testes exercitaram o gateway com IDs reais de metadados do catálogo e conteúdo real do Drive; o teste de remoção confirmou a revogação no servidor, não apenas o desaparecimento visual da miniatura. A validação foi executada pelo responsável e documentada como teste funcional manual. Não equivale a auditoria de segurança independente, teste de carga, ensaio de falhas distribuídas ou autorização para uso em produção.
