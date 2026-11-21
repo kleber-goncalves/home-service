@@ -392,9 +392,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** c7199171b6e18ad93d16f1b90fba0380c131201c
-- **Data do commit:** 2026-11-21T15:34:37-03:00
-- **Mensagem do commit:** docs(home): atualizar perguntas frequentes ao estado atual
+- **Commit de referência:** 5cd5df6ec85c84acdc15e8b90cb962b417978eee
+- **Data do commit:** 2026-11-21T15:34:40-03:00
+- **Mensagem do commit:** test(images): incluir testes da entrega publica
 - **Branch desta execução:** fix/homepage-images-and-sections
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -514,6 +514,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 5cd5df6 | 2026-11-21 | test(images): incluir testes da entrega publica |
 | c719917 | 2026-11-21 | docs(home): atualizar perguntas frequentes ao estado atual |
 | c8a829b | 2026-11-21 | fix(home): ajustar ancoras e textos das secoes restauradas |
 | 60c2523 | 2026-11-21 | feat(home): separar servicos reais e exemplos e restaurar secoes |
@@ -521,6 +522,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 36c0d83 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | d5cfa67 | 2026-11-21 | feat(images): validar acesso publico antes da entrega do Drive |
 | e0877cb | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 0763414 | 2026-11-21 | feat(images): publicar rota GET de imagens |
 
 <!-- END AUTO-GENERATED SECTION -->
