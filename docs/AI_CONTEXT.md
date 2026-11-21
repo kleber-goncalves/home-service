@@ -365,9 +365,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 9f3432703d442ab3c95344219c1e5d57a6566d5b
-- **Data do commit:** 2026-11-20T22:31:33-03:00
-- **Mensagem do commit:** docs(readme): atualizar estado da integração de imagens
+- **Commit de referência:** 790617bddf05288fe1c896fa1d0ddee8ac1e1324
+- **Data do commit:** 2026-11-20T22:33:30-03:00
+- **Mensagem do commit:** docs(context): corrigir estados das Etapas 3 e 4
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -474,13 +474,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 790617b | 2026-11-20 | docs(context): corrigir estados das Etapas 3 e 4 |
+| c98c55e | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
+| 0dd27f0 | 2026-11-20 | docs(context): registrar Etapa 4 integrada e validada |
+| 1ddd202 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 9f34327 | 2026-11-20 | docs(readme): atualizar estado da integração de imagens |
 | c88d4af | 2026-11-20 | docs(roadmap): marcar Etapa 4 como concluída |
 | b640b65 | 2026-11-20 | docs(images): fechar Etapa 4 após integração em dev |
 | e38c221 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 6dab42b | 2026-11-20 | Merge pull request #26 from kleber-goncalves/feat/drive-image-upload |
-| cb5a120 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| ce4e14c | 2026-11-20 | docs(images): registrar validação manual da integração Drive |
-| e78600e | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
