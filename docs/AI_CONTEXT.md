@@ -392,9 +392,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 445368650d21e38dc666f4b91f34f86b04e0e410
-- **Data do commit:** 2026-11-21T15:35:07-03:00
-- **Mensagem do commit:** test(images): cobrir entrega autenticada de imagens
+- **Commit de referência:** 0fc8f57dc0b18a2f37f1a0c810538e9d0668ccb8
+- **Data do commit:** 2026-11-21T15:35:09-03:00
+- **Mensagem do commit:** test(catalog): validar URLs internas de imagens
 - **Branch desta execução:** fix/homepage-images-and-sections
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -514,6 +514,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 0fc8f57 | 2026-11-21 | test(catalog): validar URLs internas de imagens |
 | 4453686 | 2026-11-21 | test(images): cobrir entrega autenticada de imagens |
 | 068e576 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 845db7f | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
@@ -521,6 +522,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | c719917 | 2026-11-21 | docs(home): atualizar perguntas frequentes ao estado atual |
 | c8a829b | 2026-11-21 | fix(home): ajustar ancoras e textos das secoes restauradas |
 | 60c2523 | 2026-11-21 | feat(home): separar servicos reais e exemplos e restaurar secoes |
-| 8c2501e | 2026-11-21 | feat(images): usar rota propria para imagens do catalogo |
 
 <!-- END AUTO-GENERATED SECTION -->
