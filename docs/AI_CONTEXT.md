@@ -381,9 +381,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 96bbdbe04c130056c9624efce4c276f8d0d12f5f
-- **Data do commit:** 2026-11-21T14:20:01-03:00
-- **Mensagem do commit:** docs: planejar experiência pública e catálogo de serviços
+- **Commit de referência:** 508dc0b9f1d9b9b83ed7686c7ead3ef885e5426c
+- **Data do commit:** 2026-11-21T14:20:40-03:00
+- **Mensagem do commit:** docs: priorizar experiência pública e catálogo no roadmap
 - **Branch desta execução:** feat/public-discovery-experience
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 13
@@ -490,13 +490,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 508dc0b | 2026-11-21 | docs: priorizar experiência pública e catálogo no roadmap |
+| 7746d5e | 2026-11-21 | docs: registrar escopo aprovado da experiência pública no contexto técnico |
+| 271f73c | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 96bbdbe | 2026-11-21 | docs: planejar experiência pública e catálogo de serviços |
 | 23ee009 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 790617b | 2026-11-20 | docs(context): corrigir estados das Etapas 3 e 4 |
 | c98c55e | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 0dd27f0 | 2026-11-20 | docs(context): registrar Etapa 4 integrada e validada |
-| 1ddd202 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 9f34327 | 2026-11-20 | docs(readme): atualizar estado da integração de imagens |
-| c88d4af | 2026-11-20 | docs(roadmap): marcar Etapa 4 como concluída |
 
 <!-- END AUTO-GENERATED SECTION -->
