@@ -394,10 +394,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** dece7d8e9d62cc0b0005e347ab5dd7162916f6c8
-- **Data do commit:** 2026-11-21T15:42:32-03:00
-- **Mensagem do commit:** docs(plan): alinhar documentacao ao endpoint estatico
-- **Branch desta execução:** fix/homepage-images-and-sections
+- **Commit de referência:** 77e88be6d9d20151a178f7fe31ea76509299becb
+- **Data do commit:** 2026-11-21T15:47:30-03:00
+- **Mensagem do commit:** fix: corrigir imagens públicas e restaurar seções da homepage (#29)
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -516,13 +516,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 77e88be | 2026-11-21 | fix: corrigir imagens públicas e restaurar seções da homepage (#29) |
+| 308ef43 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
+| 57d2d95 | 2026-11-21 | docs(context): alinhar rota same-origin de imagens |
 | dece7d8 | 2026-11-21 | docs(plan): alinhar documentacao ao endpoint estatico |
 | 6d913d6 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 5517251 | 2026-11-21 | test(catalog): alinhar expectativa da rota estatica de imagem |
 | bf633eb | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 444480c | 2026-11-21 | docs(context): documentar rota estatica de imagens |
-| a993de8 | 2026-11-21 | docs(plan): documentar rota estatica de imagens |
-| 1495c6e | 2026-11-21 | test(images): refletir endpoint estatico com id por query |
-| 36b6aaf | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
