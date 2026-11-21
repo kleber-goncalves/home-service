@@ -7,25 +7,42 @@ import Poc01Page from "@/pages/Poc01Page";
 import ServiceDetailPage from "@/pages/ServiceDetailPage";
 import ServicesPage from "@/pages/ServicesPage";
 import { getCurrentRoute } from "@/lib/navigation";
+
+function decodeRouteSegment(segment) {
+    try {
+        return decodeURIComponent(segment);
+    } catch {
+        return null;
+    }
+}
+
 export default function App() {
     const [route, setRoute] = useState(getCurrentRoute);
+
     useEffect(() => {
-        function handlePopState() { setRoute(getCurrentRoute()); }
+        function handlePopState() {
+            setRoute(getCurrentRoute());
+        }
         window.addEventListener("popstate", handlePopState);
         return () => window.removeEventListener("popstate", handlePopState);
     }, []);
+
     const currentUrl = new URL(route, window.location.origin);
     const params = currentUrl.searchParams;
     const pathname = currentUrl.pathname.replace(/\/+$/, "") || "/";
+
     if (params.get("poc") === "01") return <Poc01Page />;
     if (params.get("auth") === "demo") return <AuthDemoPage initialMode={params.get("mode")} />;
     if (pathname === "/") return <HomePage />;
     if (pathname === "/servicos") return <ServicesPage key={route} />;
     if (pathname === "/categorias") return <CategoriesPage />;
+
     const serviceMatch = pathname.match(/^\/servicos\/([^/]+)$/);
     if (serviceMatch) {
-        try { return <ServiceDetailPage key={serviceMatch[1]} serviceId={decodeURIComponent(serviceMatch[1])} />; }
-        catch { return <NotFoundPage />; }
+        const serviceId = decodeRouteSegment(serviceMatch[1]);
+        if (!serviceId) return <NotFoundPage />;
+        return <ServiceDetailPage key={serviceId} serviceId={serviceId} />;
     }
+
     return <NotFoundPage />;
 }
