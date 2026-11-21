@@ -23,7 +23,7 @@ function mapPublicImage(image) {
         order: Number(image.order || 0),
         mimeType,
         sizeBytes,
-        url: "/api/public-images/" + encodeURIComponent(id),
+        url: "/api/public-images?id=" + encodeURIComponent(id),
     };
 }
 
