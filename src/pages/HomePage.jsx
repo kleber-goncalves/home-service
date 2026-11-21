@@ -15,31 +15,12 @@ import SiteFooter from "@/components/public/site-footer";
 import { Button } from "@/components/ui/button";
 import usePublicCatalog from "@/hooks/use-public-catalog";
 import { navigateTo } from "@/lib/navigation";
-import { professionals as exampleProfessionals } from "@/data/homepage";
-
-function mapExampleService(item) {
-    return {
-        id: item.id,
-        categoryId: "",
-        category: item.category,
-        title: item.title,
-        description: item.description,
-        professionalName: "Exemplo demonstrativo",
-        cityLabel: "Localidade ilustrativa",
-        cities: [],
-        images: item.image ? [{ id: item.id, order: 1, url: item.image, status: "active" }] : [],
-        whatsapp: "",
-        isPersisted: false,
-        isDemo: true,
-    };
-}
 
 export default function HomePage() {
     const catalog = usePublicCatalog();
     const [query, setQuery] = useState("");
     const [city, setCity] = useState("");
     const featuredServices = catalog.services.slice(0, 5);
-    const exampleServices = exampleProfessionals.slice(0, 5).map(mapExampleService);
 
     function submitSearch(event) {
         event.preventDefault();
@@ -125,26 +106,7 @@ export default function HomePage() {
                 </div>
             </section>
 
-            <section className="public-home-section public-home-services public-home-examples" id="exemplos" aria-labelledby="home-examples-title">
-                <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="public-section-heading">
-                        <div>
-                            <span className="section-eyebrow">Demonstração visual</span>
-                            <h2 id="home-examples-title">Conheça outros exemplos de serviços</h2>
-                            <p>Modelos ilustrativos para mostrar como os serviços podem ser apresentados na plataforma.</p>
-                        </div>
-                        <AppLink to="/servicos" className="catalog-service-link">
-                            Explorar catálogo <ArrowRight size={16} aria-hidden="true" />
-                        </AppLink>
-                    </div>
-                    <p className="home-demo-disclaimer">
-                        Estes cartões são fictícios, usam imagens ilustrativas e não representam profissionais disponíveis ou cadastros publicados.
-                    </p>
-                    <div className="catalog-service-grid">
-                        {exampleServices.map((service) => <ServiceCard service={service} key={service.id} />)}
-                    </div>
-                </div>
-            </section>
+           
 
             <PopularServices />
             <AboutSection />
