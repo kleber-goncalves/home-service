@@ -394,9 +394,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 5517251d7144542d2fae84b77707801c5099a20f
-- **Data do commit:** 2026-11-21T15:41:03-03:00
-- **Mensagem do commit:** test(catalog): alinhar expectativa da rota estatica de imagem
+- **Commit de referência:** dece7d8e9d62cc0b0005e347ab5dd7162916f6c8
+- **Data do commit:** 2026-11-21T15:42:32-03:00
+- **Mensagem do commit:** docs(plan): alinhar documentacao ao endpoint estatico
 - **Branch desta execução:** fix/homepage-images-and-sections
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -516,13 +516,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| dece7d8 | 2026-11-21 | docs(plan): alinhar documentacao ao endpoint estatico |
+| 6d913d6 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 5517251 | 2026-11-21 | test(catalog): alinhar expectativa da rota estatica de imagem |
 | bf633eb | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 444480c | 2026-11-21 | docs(context): documentar rota estatica de imagens |
 | a993de8 | 2026-11-21 | docs(plan): documentar rota estatica de imagens |
 | 1495c6e | 2026-11-21 | test(images): refletir endpoint estatico com id por query |
 | 36b6aaf | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 5318751 | 2026-11-21 | fix(catalog): apontar para Function estatica de imagens |
-| fcd2ffc | 2026-11-21 | fix(images): validar id na query da Function estatica |
 
 <!-- END AUTO-GENERATED SECTION -->
