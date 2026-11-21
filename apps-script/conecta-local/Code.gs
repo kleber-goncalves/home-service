@@ -1151,6 +1151,45 @@ function appImageResponseHeader_(response, name) {
     return "";
 }
 
+function appImageDriveSessionUriIsValid_(value) {
+    if (typeof value !== "string" || value.length > 2048) return false;
+
+    // O Google pode devolver parâmetros adicionais, como "fields" e "session_crd".
+    // A URL permanece restrita ao endpoint HTTPS oficial de upload do Drive.
+    var match = /^https:\/\/www\.googleapis\.com\/upload\/drive\/v3\/files\?([^#]+)$/i.exec(value);
+    if (!match) return false;
+
+    var parts = match[1].split("&");
+    var uploadTypeCount = 0;
+    var uploadIdCount = 0;
+
+    for (var i = 0; i < parts.length; i += 1) {
+        if (!parts[i]) return false;
+        var separator = parts[i].indexOf("=");
+        if (separator <= 0) return false;
+
+        var key;
+        var parameterValue;
+        try {
+            key = decodeURIComponent(parts[i].substring(0, separator).replace(/\+/g, "%20"));
+            parameterValue = decodeURIComponent(parts[i].substring(separator + 1).replace(/\+/g, "%20"));
+        } catch (error) {
+            return false;
+        }
+
+        if (key === "uploadType") {
+            uploadTypeCount += 1;
+            if (parameterValue !== "resumable") return false;
+        } else if (key === "upload_id") {
+            uploadIdCount += 1;
+            if (!/^[A-Za-z0-9_-]{1,512}$/.test(parameterValue)) return false;
+        }
+    }
+
+    // Exige exatamente um tipo de upload e um identificador de sessão.
+    return uploadTypeCount === 1 && uploadIdCount === 1;
+}
+
 function appImageDriveStartSession_(state, folderId) {
     var token = ScriptApp.getOAuthToken();
     if (typeof token !== "string" || !token) {
@@ -1181,7 +1220,7 @@ function appImageDriveStartSession_(state, folderId) {
     }
     var code = response.getResponseCode();
     var sessionUri = appImageResponseHeader_(response, "Location");
-    if ((code !== 200 && code !== 201) || !/^https:\/\/www\.googleapis\.com\/upload\/drive\/v3\/files\?uploadType=resumable&upload_id=[A-Za-z0-9_-]+$/.test(sessionUri)) {
+    if ((code !== 200 && code !== 201) || !appImageDriveSessionUriIsValid_(sessionUri)) {
         throw appFault_("DRIVE_UPLOAD_START_FAILED", "O Google Drive não confirmou a criação da sessão de envio.");
     }
     return sessionUri;
