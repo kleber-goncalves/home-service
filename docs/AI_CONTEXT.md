@@ -394,9 +394,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** b13ddc3f1d4d63980ba976ae7d97a1ca07ac99e6
-- **Data do commit:** 2026-11-21T15:37:17-03:00
-- **Mensagem do commit:** fix(images): não expor links diretos do Drive no catálogo público
+- **Commit de referência:** 63df51c2bfe7494de80d2ee9b8b2eb5eba96bc4b
+- **Data do commit:** 2026-11-21T15:38:24-03:00
+- **Mensagem do commit:** test(images): corrigir tamanho minimo da fixture JPEG
 - **Branch desta execução:** fix/homepage-images-and-sections
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -516,13 +516,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 63df51c | 2026-11-21 | test(images): corrigir tamanho minimo da fixture JPEG |
+| 4770db2 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | b13ddc3 | 2026-11-21 | fix(images): não expor links diretos do Drive no catálogo público |
 | 574b8db | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | 3723207 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | dee2e7b | 2026-11-21 | docs(readme): atualizar estado da etapa 5 e correcoes |
 | 7f7d008 | 2026-11-21 | docs(plan): registrar correcoes pos-pr28 |
 | 9d0034f | 2026-11-21 | docs(context): atualizar estado das correcoes de catalogo e imagens |
-| 8a7e488 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 048c453 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
