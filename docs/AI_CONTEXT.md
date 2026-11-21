@@ -394,9 +394,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** a0c95a42996eb2a6c6ad5e61af7a37b8af9bbdcb
-- **Data do commit:** 2026-11-21T15:39:58-03:00
-- **Mensagem do commit:** fix(images): usar Function estatica para entrega publica
+- **Commit de referência:** 1495c6eb702184f200ca8af9041be77d2801fd8e
+- **Data do commit:** 2026-11-21T15:40:20-03:00
+- **Mensagem do commit:** test(images): refletir endpoint estatico com id por query
 - **Branch desta execução:** fix/homepage-images-and-sections
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -516,13 +516,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 1495c6e | 2026-11-21 | test(images): refletir endpoint estatico com id por query |
+| 36b6aaf | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
+| 5318751 | 2026-11-21 | fix(catalog): apontar para Function estatica de imagens |
+| fcd2ffc | 2026-11-21 | fix(images): validar id na query da Function estatica |
+| e78146b | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 | a0c95a4 | 2026-11-21 | fix(images): usar Function estatica para entrega publica |
 | 1e1c312 | 2026-11-21 | fix(images): remover rota dinamica nao reconhecida pela Vercel |
 | 8567a43 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 63df51c | 2026-11-21 | test(images): corrigir tamanho minimo da fixture JPEG |
-| 4770db2 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| b13ddc3 | 2026-11-21 | fix(images): não expor links diretos do Drive no catálogo público |
-| 574b8db | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 3723207 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
