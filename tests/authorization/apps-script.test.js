@@ -420,7 +420,9 @@ function createHarness(options = {}) {
             driveCalls.push({ url, options: requestOptions });
             if (String(url).indexOf("uploadType=resumable") !== -1 && String(requestOptions.method).toLowerCase() === "post") {
                 const sessionId = "synthetic-upload-" + driveSessionCounter++;
-                const sessionUri = "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&upload_id=" + sessionId;
+                const sessionUri = typeof options.driveSessionUri === "function"
+                    ? options.driveSessionUri(sessionId)
+                    : options.driveSessionUri || "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id%2Cname%2CmimeType%2Csize%2Cparents&upload_id=" + sessionId + "&session_crd=synthetic-session-credential";
                 const metadata = JSON.parse(String(requestOptions.payload));
                 driveSessions.set(sessionUri, {
                     sessionUri,
@@ -1089,6 +1091,42 @@ function startPngUpload(harness, tokenHash = TOKEN_HASH_A, serviceId = SERVICE_A
     });
     return { bytes, started, uploaded };
 }
+
+test("image.upload.start aceita URI oficial com fields e session_crd retornados pelo Drive", () => {
+    const harness = createHarness();
+    const result = harness.call("image.upload.start", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        fileSize: 24,
+        mimeType: "image/png",
+    });
+
+    assert.equal(result.ok, true, "A URI oficial com parâmetros adicionais deve ser aceita: " + JSON.stringify(result));
+    assert.equal(harness.driveSessions.size, 1);
+    const session = Array.from(harness.driveSessions.values())[0];
+    assert.match(session.sessionUri, /^https:\/\/www\.googleapis\.com\/upload\/drive\/v3\/files\?/);
+    assert.match(session.sessionUri, /[?&]fields=/);
+    assert.match(session.sessionUri, /[?&]upload_id=/);
+    assert.match(session.sessionUri, /[?&]session_crd=/);
+    assert.equal(harness.records("IMAGENS").length, 0);
+});
+
+test("image.upload.start rejeita URI de sessão fora do endpoint oficial do Google", () => {
+    const harness = createHarness({
+        driveSessionUri: (sessionId) =>
+            "https://attacker.example/upload/drive/v3/files?uploadType=resumable&upload_id=" + sessionId,
+    });
+    const result = harness.call("image.upload.start", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        fileSize: 24,
+        mimeType: "image/png",
+    });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.error.code, "DRIVE_UPLOAD_START_FAILED");
+    assert.equal(harness.records("IMAGENS").length, 0);
+});
 
 test("image.upload.start e image.upload.chunk gravam metadados somente após confirmação do Drive", () => {
     const harness = createHarness();
