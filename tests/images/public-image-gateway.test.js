@@ -19,7 +19,7 @@ function buildRequest(options = {}) {
         ...(options.referer ? { Referer: options.referer } : {}),
     });
     return new Request(
-        ORIGIN + "/api/public-images/" + (options.imageId ?? IMAGE_ID),
+        ORIGIN + "/api/public-images?id=" + encodeURIComponent(options.imageId ?? IMAGE_ID),
         { method: options.method ?? "GET", headers },
     );
 }
