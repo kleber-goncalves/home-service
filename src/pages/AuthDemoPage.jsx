@@ -6,6 +6,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { appRequest } from "@/services/app-api";
+import ServiceImageManager from "@/components/professional/service-image-manager";
 
 const EMPTY_REGISTER = {
     fullName: "",
@@ -332,15 +333,14 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                 description: newService.description,
                 cityIds: newService.cityIds,
             };
-            const result = editingServiceId
-                ? await appRequest("service.update", { serviceId: editingServiceId, ...payload }, csrfToken)
-                : await appRequest("service.create", payload, csrfToken);
-
             if (editingServiceId) {
-                setServices((current) => current.map((item) => item.id === editingServiceId ? result.service : item));
+                await appRequest("service.update", { serviceId: editingServiceId, ...payload }, csrfToken);
             } else {
-                setServices((current) => [result.service, ...current]);
+                await appRequest("service.create", payload, csrfToken);
             }
+
+            const latest = await appRequest("service.listMine", {}, csrfToken);
+            setServices(latest.services || []);
 
             cancelServiceForm();
             setNotice(editingServiceId
@@ -366,10 +366,11 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         setBusy(true);
         setNotice(null);
         try {
-            const result = await appRequest("service.remove", {
+            await appRequest("service.remove", {
                 serviceId: service.id,
             }, csrfToken);
-            setServices((current) => current.map((item) => item.id === service.id ? result.service : item));
+            const latest = await appRequest("service.listMine", {}, csrfToken);
+            setServices(latest.services || []);
             setNotice({
                 title: "Serviço removido",
                 message: "O serviço foi retirado da vitrine. Seu registro e histórico foram preservados.",
@@ -388,11 +389,12 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         setBusy(true);
         setNotice(null);
         try {
-            const result = await appRequest("service.setStatus", {
+            await appRequest("service.setStatus", {
                 serviceId: service.id,
                 status: nextStatus,
             }, csrfToken);
-            setServices((current) => current.map((item) => item.id === service.id ? result.service : item));
+            const latest = await appRequest("service.listMine", {}, csrfToken);
+            setServices(latest.services || []);
         } catch (error) {
             setNotice({ title: "Não foi possível atualizar", message: error.message, tone: "warning" });
         } finally {
@@ -582,6 +584,13 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                                             <span className="demo-service-category">{service.category}</span>
                                             <p>{service.description}</p>
                                             {service.city && <span className="demo-service-city-summary">Atende: {service.city}</span>}
+                                            {canEdit && (
+                                                <ServiceImageManager
+                                                    service={service}
+                                                    csrfToken={csrfToken}
+                                                    onServicesChange={setServices}
+                                                />
+                                            )}
                                         </div>
                                         <div className="demo-service-actions">
                                             {canEdit && (

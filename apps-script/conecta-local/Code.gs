@@ -18,6 +18,14 @@ var APP_NONCE_RETENTION_MS = 10 * 60 * 1000 + 30 * 1000;
 var APP_MAX_ACTIVE_NONCES = 2500;
 var APP_LOCK_TIMEOUT_MS = 8000;
 var APP_MAX_PAYLOAD_BYTES = 16 * 1024;
+var APP_IMAGE_MAX_PAYLOAD_BYTES = 2 * 1024 * 1024;
+var APP_IMAGE_UPLOAD_STATE_PREFIX = "CONECTA_LOCAL_IMAGE_UPLOAD_V1_";
+var APP_IMAGE_UPLOAD_SERVICE_PREFIX = "CONECTA_LOCAL_IMAGE_SERVICE_UPLOAD_V1_";
+var APP_IMAGE_DRIVE_FOLDER_PROPERTY = "CONECTA_LOCAL_DRIVE_FOLDER_ID";
+var APP_IMAGE_MAX_BYTES = 5000000;
+var APP_IMAGE_CHUNK_BYTES = 1024 * 1024;
+var APP_IMAGE_UPLOAD_TTL_MS = 24 * 60 * 60 * 1000;
+var APP_IMAGE_IN_FLIGHT_STALE_MS = 90 * 1000;
 var APP_SESSION_IDLE_MS = 30 * 60 * 1000;
 var APP_SESSION_ABSOLUTE_MS = 8 * 60 * 60 * 1000;
 var APP_VERIFICATION_TTL_MS = 10 * 60 * 1000;
@@ -38,7 +46,12 @@ var APP_ALLOWED_ACTIONS = [
     "service.create",
     "service.update",
     "service.remove",
-    "service.setStatus"
+    "service.setStatus",
+    "image.upload.start",
+    "image.upload.chunk",
+    "image.upload.status",
+    "image.upload.cancel",
+    "image.remove"
 ];
 
 var APP_SEED_CATEGORIES = [
@@ -96,7 +109,8 @@ function doPost(event) {
         return appJson_(appError_(action, requestId, "AUTH_CONFIG_ERROR", "A configuração interna não está disponível."));
     }
 
-    if (Utilities.newBlob(payloadText).getBytes().length > APP_MAX_PAYLOAD_BYTES) {
+    var payloadLimit = action === "image.upload.chunk" ? APP_IMAGE_MAX_PAYLOAD_BYTES : APP_MAX_PAYLOAD_BYTES;
+    if (Utilities.newBlob(payloadText).getBytes().length > payloadLimit) {
         return appJson_(appError_(action, requestId, "INVALID_PAYLOAD", "O conteúdo enviado excede o limite."));
     }
 
@@ -178,6 +192,11 @@ function appDispatch_(action, payload, nowMs, secret) {
     if (action === "service.update") return appUpdateService_(payload, nowMs);
     if (action === "service.remove") return appRemoveService_(payload, nowMs);
     if (action === "service.setStatus") return appSetServiceStatus_(payload, nowMs);
+    if (action === "image.upload.start") return appImageUploadStart_(payload, nowMs);
+    if (action === "image.upload.chunk") return appImageUploadChunk_(payload, nowMs);
+    if (action === "image.upload.status") return appImageUploadStatus_(payload, nowMs);
+    if (action === "image.upload.cancel") return appImageUploadCancel_(payload, nowMs);
+    if (action === "image.remove") return appImageRemove_(payload, nowMs);
     throw appFault_("ACTION_NOT_ALLOWED", "A operação não está liberada.");
 }
 
@@ -782,7 +801,8 @@ function appGetServicesForUser_(userId) {
                 price: item.valor_preco === "" ? null : Number(item.valor_preco),
                 cityIds: cityIds,
                 cities: cities,
-                city: appServiceCityLabel_(cities)
+                city: appServiceCityLabel_(cities),
+                images: appGetServiceImages_(String(item.id_servico), String(item.status) === "published")
             };
         });
 }
@@ -892,6 +912,7 @@ function appRemoveService_(payload, nowMs) {
             throw appFault_("SERVICE_STATE_LOCKED", "Este serviço não pode ser removido pelo profissional.");
         }
 
+        appSetServiceImagesVisibility_(String(service.id_servico), false);
         var nowIso = new Date(nowMs).toISOString();
         appUpdate_("SERVICOS", service._row, {
             status: "removed",
@@ -938,11 +959,30 @@ function appSetServiceStatus_(payload, nowMs) {
         }
 
         var nowIso = new Date(nowMs).toISOString();
-        appUpdate_("SERVICOS", service._row, {
-            status: nextStatus,
-            atualizado_em: nowIso,
-            publicado_em: nextStatus === "published" ? (service.publicado_em || nowIso) : service.publicado_em
-        });
+        if (nextStatus === "paused") {
+            appSetServiceImagesVisibility_(String(service.id_servico), false);
+            appUpdate_("SERVICOS", service._row, {
+                status: nextStatus,
+                atualizado_em: nowIso,
+                publicado_em: service.publicado_em
+            });
+        } else {
+            appUpdate_("SERVICOS", service._row, {
+                status: nextStatus,
+                atualizado_em: nowIso,
+                publicado_em: service.publicado_em || nowIso
+            });
+            try {
+                appSetServiceImagesVisibility_(String(service.id_servico), true);
+            } catch (visibilityError) {
+                try { appSetServiceImagesVisibility_(String(service.id_servico), false); } catch (ignored) {}
+                appUpdate_("SERVICOS", service._row, {
+                    status: "paused",
+                    atualizado_em: new Date().toISOString()
+                });
+                throw appFault_("IMAGE_PERMISSION_SYNC_FAILED", "Não foi possível liberar todas as imagens. O serviço voltou para pausa.");
+            }
+        }
         appAudit_(String(state.user.id_usuario), "user", "service.status", "SERVICOS", String(service.id_servico), "success", "Estado do serviço atualizado.");
         return {
             updated: true,
@@ -988,9 +1028,813 @@ function appGetPublicServices_() {
                 cityIds: cityIds,
                 cities: cities,
                 city: appServiceCityLabel_(cities),
-                whatsapp: String(profile.whatsapp || "")
+                whatsapp: String(profile.whatsapp || ""),
+                images: appGetServiceImages_(String(service.id_servico), true)
             };
         });
+}
+
+
+/* ------------------------ Imagens no Google Drive ------------------------ */
+
+function appImageSheet_() {
+    var sheet = appSheet_("IMAGENS");
+    var required = [
+        "id_imagem", "id_profissional", "id_servico", "id_arquivo_drive",
+        "tipo_mime", "tamanho_bytes", "ordem_exibicao", "status",
+        "criado_em", "atualizado_em"
+    ];
+    var headers = appHeaders_(sheet);
+    if (required.some(function (header) { return headers.indexOf(header) === -1; })) {
+        throw appFault_("STORE_SCHEMA_INVALID", "A aba IMAGENS não corresponde ao esquema esperado.");
+    }
+    return sheet;
+}
+
+function appImageUploadKey_(uploadId) {
+    return APP_IMAGE_UPLOAD_STATE_PREFIX + String(uploadId);
+}
+
+function appImageServiceReservationKey_(serviceId) {
+    return APP_IMAGE_UPLOAD_SERVICE_PREFIX + String(serviceId);
+}
+
+function appImageReadUploadState_(uploadId) {
+    if (typeof uploadId !== "string" || !/^[0-9a-f-]{36}$/i.test(uploadId)) {
+        throw appFault_("IMAGE_UPLOAD_NOT_FOUND", "A sessão de envio não foi encontrada.");
+    }
+    var raw = PropertiesService.getScriptProperties().getProperty(appImageUploadKey_(uploadId));
+    if (typeof raw !== "string" || !raw) {
+        throw appFault_("IMAGE_UPLOAD_NOT_FOUND", "A sessão de envio não foi encontrada ou expirou.");
+    }
+    var state;
+    try { state = JSON.parse(raw); } catch (error) {
+        throw appFault_("IMAGE_UPLOAD_STATE_INVALID", "O estado do envio não pode ser recuperado.");
+    }
+    if (!appIsPlainObject_(state) || String(state.uploadId) !== uploadId) {
+        throw appFault_("IMAGE_UPLOAD_STATE_INVALID", "O estado do envio não pode ser recuperado.");
+    }
+    if (!Number.isFinite(Number(state.expiresAt)) || Number(state.expiresAt) <= Date.now()) {
+        appImageDeleteUploadState_(state);
+        throw appFault_("IMAGE_UPLOAD_EXPIRED", "A sessão de envio expirou. Inicie um novo envio.");
+    }
+    return state;
+}
+
+function appImageStoreUploadState_(state) {
+    PropertiesService.getScriptProperties().setProperty(
+        appImageUploadKey_(String(state.uploadId)),
+        JSON.stringify(state)
+    );
+}
+
+function appImageDeleteUploadState_(state) {
+    var properties = PropertiesService.getScriptProperties();
+    if (!state || !state.uploadId) return;
+    properties.deleteProperty(appImageUploadKey_(String(state.uploadId)));
+    properties.deleteProperty(appImageServiceReservationKey_(String(state.serviceId)));
+}
+
+function appImageMimeAllowed_(mimeType) {
+    return ["image/jpeg", "image/png", "image/webp"].indexOf(String(mimeType)) !== -1;
+}
+
+function appImageExtension_(mimeType) {
+    if (mimeType === "image/jpeg") return "jpg";
+    if (mimeType === "image/png") return "png";
+    if (mimeType === "image/webp") return "webp";
+    throw appFault_("IMAGE_MIME_INVALID", "Formato de imagem não permitido.");
+}
+
+function appImageByte_(value) {
+    return (Number(value) + 256) % 256;
+}
+
+function appImageSignatureMatches_(bytes, mimeType) {
+    if (!Array.isArray(bytes) || bytes.length < 12) return false;
+    var first = bytes.slice(0, 12).map(appImageByte_);
+    if (mimeType === "image/jpeg") return first[0] === 255 && first[1] === 216 && first[2] === 255;
+    if (mimeType === "image/png") {
+        return first[0] === 137 && first[1] === 80 && first[2] === 78 && first[3] === 71
+            && first[4] === 13 && first[5] === 10 && first[6] === 26 && first[7] === 10;
+    }
+    if (mimeType === "image/webp") {
+        return first[0] === 82 && first[1] === 73 && first[2] === 70 && first[3] === 70
+            && first[8] === 87 && first[9] === 69 && first[10] === 66 && first[11] === 80;
+    }
+    return false;
+}
+
+function appImagePrivateFolderId_() {
+    var folderId = PropertiesService.getScriptProperties().getProperty(APP_IMAGE_DRIVE_FOLDER_PROPERTY);
+    if (typeof folderId !== "string" || !/^[A-Za-z0-9_-]{20,}$/.test(folderId)) {
+        throw appFault_("DRIVE_FOLDER_NOT_CONFIGURED", "A pasta privada de imagens ainda não foi configurada no Apps Script.");
+    }
+    try {
+        var folder = DriveApp.getFolderById(folderId);
+        if (!folder || String(folder.getId()) !== folderId || folder.getSharingAccess() !== DriveApp.Access.PRIVATE) {
+            throw new Error("Folder is not private.");
+        }
+    } catch (error) {
+        throw appFault_("DRIVE_FOLDER_NOT_PRIVATE", "A pasta raiz de imagens não está disponível ou não é privada.");
+    }
+    return folderId;
+}
+
+function appImageResponseHeader_(response, name) {
+    var headers = response.getAllHeaders ? response.getAllHeaders() : {};
+    var expected = String(name).toLowerCase();
+    var keys = Object.keys(headers || {});
+    for (var i = 0; i < keys.length; i += 1) {
+        if (String(keys[i]).toLowerCase() === expected) return String(headers[keys[i]]);
+    }
+    return "";
+}
+
+function appImageDriveSessionUriIsValid_(value) {
+    if (typeof value !== "string" || value.length > 2048) return false;
+
+    // O Google pode devolver parâmetros adicionais, como "fields" e "session_crd".
+    // A URL permanece restrita ao endpoint HTTPS oficial de upload do Drive.
+    var match = /^https:\/\/www\.googleapis\.com\/upload\/drive\/v3\/files\?([^#]+)$/i.exec(value);
+    if (!match) return false;
+
+    var parts = match[1].split("&");
+    var uploadTypeCount = 0;
+    var uploadIdCount = 0;
+
+    for (var i = 0; i < parts.length; i += 1) {
+        if (!parts[i]) return false;
+        var separator = parts[i].indexOf("=");
+        if (separator <= 0) return false;
+
+        var key;
+        var parameterValue;
+        try {
+            key = decodeURIComponent(parts[i].substring(0, separator).replace(/\+/g, "%20"));
+            parameterValue = decodeURIComponent(parts[i].substring(separator + 1).replace(/\+/g, "%20"));
+        } catch (error) {
+            return false;
+        }
+
+        if (key === "uploadType") {
+            uploadTypeCount += 1;
+            if (parameterValue !== "resumable") return false;
+        } else if (key === "upload_id") {
+            uploadIdCount += 1;
+            if (!/^[A-Za-z0-9_-]{1,512}$/.test(parameterValue)) return false;
+        }
+    }
+
+    // Exige exatamente um tipo de upload e um identificador de sessão.
+    return uploadTypeCount === 1 && uploadIdCount === 1;
+}
+
+function appImageDriveStartSession_(state, folderId) {
+    var token = ScriptApp.getOAuthToken();
+    if (typeof token !== "string" || !token) {
+        throw appFault_("DRIVE_AUTH_UNAVAILABLE", "A autorização do Google Drive não está disponível.");
+    }
+    var fileName = "conecta-service-" + String(state.serviceId) + "-" + String(state.uploadId) + "." + appImageExtension_(state.mimeType);
+    var url = "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id%2Cname%2CmimeType%2Csize%2Cparents";
+    var response;
+    try {
+        response = UrlFetchApp.fetch(url, {
+            method: "post",
+            contentType: "application/json; charset=UTF-8",
+            headers: {
+                Authorization: "Bearer " + token,
+                "X-Upload-Content-Type": String(state.mimeType),
+                "X-Upload-Content-Length": String(state.fileSize)
+            },
+            payload: JSON.stringify({
+                name: fileName,
+                mimeType: String(state.mimeType),
+                parents: [String(folderId)]
+            }),
+            muteHttpExceptions: true,
+            followRedirects: false
+        });
+    } catch (error) {
+        throw appFault_("DRIVE_UPLOAD_START_FAILED", "Não foi possível iniciar a sessão de envio no Google Drive.");
+    }
+    var code = response.getResponseCode();
+    var sessionUri = appImageResponseHeader_(response, "Location");
+    if ((code !== 200 && code !== 201) || !appImageDriveSessionUriIsValid_(sessionUri)) {
+        throw appFault_("DRIVE_UPLOAD_START_FAILED", "O Google Drive não confirmou a criação da sessão de envio.");
+    }
+    return sessionUri;
+}
+
+function appImageRequireUpload_(payload, nowMs) {
+    var state = appImageReadUploadState_(String(payload.uploadId || ""));
+    var session = appRequireProfessionalSession_(String(payload.tokenHash || ""), nowMs, true);
+    if (String(state.userId) !== String(session.user.id_usuario)) {
+        throw appFault_("IMAGE_UPLOAD_NOT_FOUND", "A sessão de envio não foi encontrada.");
+    }
+    var profile = appGetProfile_(String(session.user.id_usuario));
+    var service = profile ? appFind_("SERVICOS", "id_servico", String(state.serviceId)) : null;
+    if (!profile || !service || String(service.id_profissional) !== String(profile.id_profissional)
+        || String(state.profileId) !== String(profile.id_profissional)) {
+        throw appFault_("SERVICE_NOT_FOUND", "Serviço não encontrado.");
+    }
+    if (state.status !== "completed" && ["suspended", "removed"].indexOf(String(service.status)) !== -1) {
+        throw appFault_("SERVICE_STATE_LOCKED", "Este serviço não permite alteração de imagens.");
+    }
+    return { state: state, service: service, profile: profile, user: session.user };
+}
+
+function appImageGetDriveOffset_(state) {
+    var token = ScriptApp.getOAuthToken();
+    var response;
+    try {
+        response = UrlFetchApp.fetch(String(state.sessionUri), {
+            method: "put",
+            contentType: String(state.mimeType),
+            headers: {
+                Authorization: "Bearer " + token,
+                "Content-Range": "bytes */" + String(state.fileSize)
+            },
+            payload: "",
+            muteHttpExceptions: true,
+            followRedirects: false
+        });
+    } catch (error) {
+        throw appFault_("DRIVE_STATUS_UNAVAILABLE", "Não foi possível consultar o progresso confirmado pelo Google Drive.");
+    }
+    var code = response.getResponseCode();
+    if (code === 308) {
+        var range = appImageResponseHeader_(response, "Range");
+        if (!range) return { completed: false, nextOffset: 0 };
+        var match = range.match(/^bytes=0-(\d+)$/);
+        if (!match) throw appFault_("DRIVE_STATUS_INVALID", "O Google Drive retornou um progresso inválido.");
+        return { completed: false, nextOffset: Number(match[1]) + 1 };
+    }
+    if (code === 200 || code === 201) {
+        var file = appImageParseDriveFile_(response);
+        return { completed: true, file: file, nextOffset: Number(state.fileSize) };
+    }
+    if (code === 404 || code === 410) {
+        throw appFault_("IMAGE_UPLOAD_EXPIRED", "A sessão de envio do Google Drive expirou.");
+    }
+    throw appFault_("DRIVE_STATUS_UNAVAILABLE", "O Google Drive não confirmou o estado do envio.");
+}
+
+function appImageParseDriveFile_(response) {
+    var file;
+    try { file = JSON.parse(response.getContentText()); } catch (error) {
+        throw appFault_("DRIVE_FILE_METADATA_INVALID", "O Google Drive concluiu o envio sem retornar metadados válidos.");
+    }
+    if (!appIsPlainObject_(file) || typeof file.id !== "string" || !file.id
+        || Number(file.size) <= 0 || !Array.isArray(file.parents)) {
+        throw appFault_("DRIVE_FILE_METADATA_INVALID", "Os metadados do arquivo no Google Drive são inválidos.");
+    }
+    return file;
+}
+
+function appImageDrivePutChunk_(state, bytes, startOffset) {
+    var endOffset = startOffset + bytes.length - 1;
+    var token = ScriptApp.getOAuthToken();
+    var response;
+    try {
+        response = UrlFetchApp.fetch(String(state.sessionUri), {
+            method: "put",
+            contentType: String(state.mimeType),
+            headers: {
+                Authorization: "Bearer " + token,
+                "Content-Range": "bytes " + startOffset + "-" + endOffset + "/" + String(state.fileSize)
+            },
+            payload: bytes,
+            muteHttpExceptions: true,
+            followRedirects: false
+        });
+    } catch (error) {
+        throw appFault_("DRIVE_CHUNK_TRANSPORT_FAILED", "A conexão com o Google Drive foi interrompida. Consulte o progresso antes de reenviar.");
+    }
+    var code = response.getResponseCode();
+    if (code === 308) {
+        var range = appImageResponseHeader_(response, "Range");
+        if (!range) {
+            throw appFault_("DRIVE_CHUNK_OFFSET_UNKNOWN", "O Google Drive não confirmou o intervalo recebido.");
+        }
+        var match = range.match(/^bytes=0-(\d+)$/);
+        if (!match) throw appFault_("DRIVE_CHUNK_OFFSET_UNKNOWN", "O Google Drive não confirmou o intervalo recebido.");
+        return { completed: false, nextOffset: Number(match[1]) + 1 };
+    }
+    if (code === 200 || code === 201) {
+        return { completed: true, file: appImageParseDriveFile_(response), nextOffset: Number(state.fileSize) };
+    }
+    if (code === 404 || code === 410) {
+        throw appFault_("IMAGE_UPLOAD_EXPIRED", "A sessão de envio do Google Drive expirou.");
+    }
+    throw appFault_("DRIVE_CHUNK_REJECTED", "O Google Drive recusou o bloco enviado.");
+}
+
+function appImageFinalizeUpload_(state, driveMetadata) {
+    var folderId = String(state.folderId);
+    if (!appIsPlainObject_(driveMetadata)
+        || typeof driveMetadata.id !== "string"
+        || !driveMetadata.id
+        || String(driveMetadata.mimeType) !== String(state.mimeType)
+        || Number(driveMetadata.size) !== Number(state.fileSize)
+        || !Array.isArray(driveMetadata.parents)
+        || driveMetadata.parents.indexOf(folderId) === -1) {
+        try {
+            if (driveMetadata && driveMetadata.id) {
+                var invalidDriveFile = DriveApp.getFileById(String(driveMetadata.id));
+                invalidDriveFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
+                invalidDriveFile.setTrashed(true);
+            }
+        } catch (ignored) {}
+        appImageDeleteUploadState_(state);
+        throw appFault_("DRIVE_FILE_VALIDATION_FAILED", "O arquivo concluído no Google Drive não corresponde ao envio.");
+    }
+
+    return appWithLock_(function () {
+        var currentState = appImageReadUploadState_(String(state.uploadId));
+        if (String(currentState.userId) !== String(state.userId) || String(currentState.serviceId) !== String(state.serviceId)) {
+            throw appFault_("IMAGE_UPLOAD_NOT_FOUND", "A sessão de envio não foi encontrada.");
+        }
+        var service = appFind_("SERVICOS", "id_servico", String(currentState.serviceId));
+        var profile = service ? appFind_("PROFISSIONAIS", "id_profissional", String(service.id_profissional)) : null;
+        var user = profile ? appFind_("USUARIOS", "id_usuario", String(profile.id_usuario)) : null;
+        if (!service || !profile || !user || String(user.id_usuario) !== String(currentState.userId)
+            || String(profile.id_profissional) !== String(currentState.profileId)
+            || ["suspended", "removed"].indexOf(String(service.status)) !== -1
+            || String(user.status) !== "active") {
+            throw appFault_("SERVICE_NOT_FOUND", "Serviço não encontrado ou não disponível para receber imagens.");
+        }
+
+        var rows = appRecords_("IMAGENS").filter(function (item) {
+            return String(item.id_servico) === String(service.id_servico) && String(item.status) === "active";
+        });
+        if (rows.length >= 5 || rows.some(function (item) { return Number(item.ordem_exibicao) === Number(currentState.order); })) {
+            throw appFault_("IMAGE_LIMIT_REACHED", "O serviço já atingiu o limite de imagens ativas.");
+        }
+
+        var driveFile;
+        try {
+            driveFile = DriveApp.getFileById(String(driveMetadata.id));
+            driveFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
+        } catch (error) {
+            appImageDeleteUploadState_(currentState);
+            throw appFault_("IMAGE_PERMISSION_SYNC_FAILED", "Não foi possível manter privada a imagem concluída no Google Drive.");
+        }
+
+        var nowIso = new Date().toISOString();
+        var imageId = Utilities.getUuid();
+        var imageRow;
+        try {
+            imageRow = appAppend_("IMAGENS", {
+                id_imagem: imageId,
+                id_profissional: "",
+                id_servico: String(service.id_servico),
+                id_arquivo_drive: String(driveFile.getId()),
+                tipo_mime: String(currentState.mimeType),
+                tamanho_bytes: Number(currentState.fileSize),
+                ordem_exibicao: Number(currentState.order),
+                status: "active",
+                criado_em: nowIso,
+                atualizado_em: nowIso
+            });
+            appAudit_(String(user.id_usuario), "user", "image.upload", "IMAGENS", imageId, "success", "Imagem de serviço enviada ao Drive.");
+        } catch (error) {
+            if (imageRow) {
+                try {
+                    appUpdate_("IMAGENS", imageRow, {
+                        status: "removed",
+                        atualizado_em: new Date().toISOString()
+                    });
+                } catch (ignored) {}
+            }
+            try {
+                driveFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
+                driveFile.setTrashed(true);
+            } catch (ignored) {}
+            appImageDeleteUploadState_(currentState);
+            throw appFault_("IMAGE_METADATA_SAVE_FAILED", "O arquivo foi recebido, mas não foi possível registrar seus metadados. O arquivo foi restringido.");
+        }
+
+        if (String(service.status) === "published") {
+            try {
+                driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+            } catch (error) {
+                try {
+                    driveFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
+                    driveFile.setTrashed(true);
+                } catch (ignored) {}
+                try {
+                    appUpdate_("IMAGENS", imageRow, {
+                        status: "removed",
+                        atualizado_em: new Date().toISOString()
+                    });
+                } catch (ignored) {}
+                appImageDeleteUploadState_(currentState);
+                throw appFault_("IMAGE_PERMISSION_SYNC_FAILED", "Não foi possível liberar a imagem. O arquivo foi restringido e o vínculo foi removido.");
+            }
+        }
+
+        currentState.status = "completed";
+        currentState.sessionUri = "";
+        currentState.inFlight = false;
+        currentState.inFlightAt = 0;
+        currentState.nextOffset = Number(currentState.fileSize);
+        currentState.completedImageId = imageId;
+        currentState.completedDriveFileId = String(driveFile.getId());
+        currentState.completedAt = nowIso;
+        currentState.completedImage = {
+            id: imageId,
+            order: Number(currentState.order),
+            mimeType: String(currentState.mimeType),
+            sizeBytes: Number(currentState.fileSize),
+            status: "active"
+        };
+        PropertiesService.getScriptProperties().deleteProperty(
+            appImageServiceReservationKey_(String(currentState.serviceId))
+        );
+        appImageStoreUploadState_(currentState);
+        return {
+            completed: true,
+            image: {
+                id: imageId,
+                order: Number(currentState.order),
+                mimeType: String(currentState.mimeType),
+                sizeBytes: Number(currentState.fileSize),
+                status: "active",
+                url: String(service.status) === "published"
+                    ? appImagePublicUrl_(String(driveFile.getId()))
+                    : null
+            }
+        };
+    });
+}
+
+function appImageUploadStart_(payload, nowMs) {
+    if (!appHasKeys_(payload, ["tokenHash", "serviceId", "fileSize", "mimeType"])) {
+        throw appFault_("INVALID_INPUT", "Os dados para iniciar o envio estão incompletos.");
+    }
+    var fileSize = Number(payload.fileSize);
+    var mimeType = String(payload.mimeType || "");
+    if (!Number.isSafeInteger(fileSize) || fileSize < 12 || fileSize > APP_IMAGE_MAX_BYTES) {
+        throw appFault_("IMAGE_SIZE_INVALID", "Cada imagem deve ter entre 12 bytes e 5.000.000 bytes.");
+    }
+    if (!appImageMimeAllowed_(mimeType)) throw appFault_("IMAGE_MIME_INVALID", "Use uma imagem JPG, PNG ou WebP.");
+
+    var preflightSession = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, false);
+    var preflightProfile = appGetProfile_(String(preflightSession.user.id_usuario));
+    var preflightService = preflightProfile
+        ? appFind_("SERVICOS", "id_servico", String(payload.serviceId))
+        : null;
+    if (!preflightProfile || !preflightService
+        || String(preflightService.id_profissional) !== String(preflightProfile.id_profissional)) {
+        throw appFault_("SERVICE_NOT_FOUND", "Serviço não encontrado.");
+    }
+    if (["suspended", "removed"].indexOf(String(preflightService.status)) !== -1) {
+        throw appFault_("SERVICE_STATE_LOCKED", "Este serviço não permite imagens.");
+    }
+
+    appImageSheet_();
+    var folderId = appImagePrivateFolderId_();
+
+    var state = appWithLock_(function () {
+        var session = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, true);
+        var profile = appGetProfile_(String(session.user.id_usuario));
+        var service = profile ? appFind_("SERVICOS", "id_servico", String(payload.serviceId)) : null;
+        if (!profile || !service || String(service.id_profissional) !== String(profile.id_profissional)) {
+            throw appFault_("SERVICE_NOT_FOUND", "Serviço não encontrado.");
+        }
+        if (["suspended", "removed"].indexOf(String(service.status)) !== -1) {
+            throw appFault_("SERVICE_STATE_LOCKED", "Este serviço não permite imagens.");
+        }
+
+        var properties = PropertiesService.getScriptProperties();
+        var reservationKey = appImageServiceReservationKey_(String(service.id_servico));
+        var existingUploadId = properties.getProperty(reservationKey);
+        if (existingUploadId) {
+            var existingRaw = properties.getProperty(appImageUploadKey_(String(existingUploadId)));
+            var existing = null;
+            try { existing = existingRaw ? JSON.parse(existingRaw) : null; } catch (ignored) {}
+            if (existing && Number(existing.expiresAt) > nowMs) {
+                throw appFault_("IMAGE_UPLOAD_IN_PROGRESS", "Já existe um envio em andamento para este serviço.");
+            }
+            if (existingUploadId) properties.deleteProperty(appImageUploadKey_(String(existingUploadId)));
+            properties.deleteProperty(reservationKey);
+        }
+
+        var activeRows = appRecords_("IMAGENS").filter(function (item) {
+            return String(item.id_servico) === String(service.id_servico) && String(item.status) === "active";
+        });
+        if (activeRows.length >= 5) throw appFault_("IMAGE_LIMIT_REACHED", "O serviço já possui cinco imagens ativas.");
+        var used = {};
+        activeRows.forEach(function (item) { used[String(item.ordem_exibicao)] = true; });
+        var order = 0;
+        for (var candidate = 1; candidate <= 5; candidate += 1) {
+            if (!used[String(candidate)]) { order = candidate; break; }
+        }
+        if (!order) throw appFault_("IMAGE_LIMIT_REACHED", "Não há posição disponível para outra imagem.");
+
+        var uploadId = Utilities.getUuid();
+        var createdAt = new Date(nowMs).toISOString();
+        var nextState = {
+            uploadId: uploadId,
+            userId: String(session.user.id_usuario),
+            profileId: String(profile.id_profissional),
+            serviceId: String(service.id_servico),
+            folderId: String(folderId),
+            mimeType: mimeType,
+            fileSize: fileSize,
+            order: order,
+            sessionUri: "",
+            nextOffset: 0,
+            signatureValidated: false,
+            inFlight: false,
+            inFlightAt: 0,
+            status: "creating",
+            createdAt: createdAt,
+            expiresAt: nowMs + APP_IMAGE_UPLOAD_TTL_MS
+        };
+        appImageStoreUploadState_(nextState);
+        properties.setProperty(reservationKey, uploadId);
+        return nextState;
+    });
+
+    try {
+        state.sessionUri = appImageDriveStartSession_(state, folderId);
+        state.status = "uploading";
+        appWithLock_(function () {
+            appImageStoreUploadState_(state);
+        });
+        return {
+            uploadId: String(state.uploadId),
+            order: Number(state.order),
+            chunkSize: APP_IMAGE_CHUNK_BYTES,
+            nextOffset: 0,
+            expiresAt: Number(state.expiresAt)
+        };
+    } catch (error) {
+        try { appImageDeleteUploadState_(state); } catch (ignored) {}
+        throw error;
+    }
+}
+
+function appImageUploadChunk_(payload, nowMs) {
+    if (!appHasKeys_(payload, ["tokenHash", "uploadId", "startOffset", "totalSize", "chunkBase64"])) {
+        throw appFault_("INVALID_INPUT", "O bloco de imagem está incompleto.");
+    }
+    var startOffset = Number(payload.startOffset);
+    var totalSize = Number(payload.totalSize);
+    var base64 = String(payload.chunkBase64 || "");
+    if (!Number.isSafeInteger(startOffset) || !Number.isSafeInteger(totalSize)
+        || startOffset < 0 || totalSize < 12 || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(base64)) {
+        throw appFault_("IMAGE_CHUNK_INVALID", "O bloco de imagem é inválido.");
+    }
+    var bytes;
+    try { bytes = Utilities.base64Decode(base64); } catch (error) {
+        throw appFault_("IMAGE_CHUNK_INVALID", "O bloco de imagem não contém Base64 válido.");
+    }
+    if (!Array.isArray(bytes) || bytes.length < 1 || bytes.length > APP_IMAGE_CHUNK_BYTES) {
+        throw appFault_("IMAGE_CHUNK_INVALID", "O tamanho do bloco de imagem é inválido.");
+    }
+
+    var state = appWithLock_(function () {
+        var authorized = appImageRequireUpload_(payload, nowMs);
+        var current = authorized.state;
+        if (Number(current.fileSize) !== totalSize || Number(current.nextOffset) !== startOffset) {
+            throw appFault_("IMAGE_UPLOAD_OFFSET_MISMATCH", "O bloco não corresponde à próxima posição confirmada. Consulte o progresso do envio.");
+        }
+        if (current.status !== "uploading" || !current.sessionUri) {
+            throw appFault_("IMAGE_UPLOAD_STATE_INVALID", "A sessão de envio não está pronta para receber blocos.");
+        }
+        var expectedLength = Math.min(APP_IMAGE_CHUNK_BYTES, totalSize - startOffset);
+        if (bytes.length !== expectedLength) {
+            throw appFault_("IMAGE_CHUNK_INVALID", "O bloco deve ter 1 MiB, exceto o último bloco do arquivo.");
+        }
+        if (startOffset === 0 && !current.signatureValidated) {
+            if (!appImageSignatureMatches_(bytes, String(current.mimeType))) {
+                throw appFault_("IMAGE_CONTENT_INVALID", "O conteúdo do arquivo não corresponde ao formato declarado.");
+            }
+            current.signatureValidated = true;
+        }
+        if (current.inFlight && nowMs - Number(current.inFlightAt || 0) < APP_IMAGE_IN_FLIGHT_STALE_MS) {
+            throw appFault_("IMAGE_UPLOAD_BUSY", "Já existe um bloco sendo processado para este envio.");
+        }
+        current.inFlight = true;
+        current.inFlightAt = nowMs;
+        appImageStoreUploadState_(current);
+        return current;
+    });
+
+    var driveResult;
+    try {
+        driveResult = appImageDrivePutChunk_(state, bytes, startOffset);
+    } catch (error) {
+        try {
+            appWithLock_(function () {
+                var latest = appImageReadUploadState_(String(state.uploadId));
+                latest.inFlight = false;
+                latest.inFlightAt = 0;
+                appImageStoreUploadState_(latest);
+            });
+        } catch (ignored) {}
+        throw error;
+    }
+
+    if (driveResult.completed) {
+        return appImageFinalizeUpload_(state, driveResult.file);
+    }
+
+    appWithLock_(function () {
+        var latest = appImageReadUploadState_(String(state.uploadId));
+        latest.nextOffset = Number(driveResult.nextOffset);
+        latest.inFlight = false;
+        latest.inFlightAt = 0;
+        latest.lastActivityAt = nowMs;
+        appImageStoreUploadState_(latest);
+    });
+    return {
+        completed: false,
+        uploadId: String(state.uploadId),
+        nextOffset: Number(driveResult.nextOffset),
+        totalSize: Number(state.fileSize)
+    };
+}
+
+function appImageUploadStatus_(payload, nowMs) {
+    if (!appHasKeys_(payload, ["tokenHash", "uploadId"])) {
+        throw appFault_("INVALID_INPUT", "Informe a sessão de envio.");
+    }
+    var authorized = appWithLock_(function () {
+        var result = appImageRequireUpload_(payload, nowMs);
+        var current = result.state;
+        if (current.status === "completed") return result;
+        if (current.inFlight && nowMs - Number(current.inFlightAt || 0) < APP_IMAGE_IN_FLIGHT_STALE_MS) {
+            throw appFault_("IMAGE_UPLOAD_BUSY", "O envio ainda está sendo processado. Consulte novamente em instantes.");
+        }
+        current.inFlight = true;
+        current.inFlightAt = nowMs;
+        appImageStoreUploadState_(current);
+        return result;
+    });
+
+    if (authorized.state.status === "completed") {
+        var completedImage = appFind_("IMAGENS", "id_imagem", String(authorized.state.completedImageId || ""));
+        if (!completedImage) throw appFault_("IMAGE_UPLOAD_STATE_INVALID", "O recibo de conclusão não corresponde a uma imagem registrada.");
+        var imageIsPublic = String(completedImage.status) === "active"
+            && String(authorized.service.status) === "published"
+            && String(authorized.user.status) === "active";
+        return {
+            completed: true,
+            image: {
+                id: String(completedImage.id_imagem),
+                order: Number(completedImage.ordem_exibicao),
+                mimeType: String(completedImage.tipo_mime),
+                sizeBytes: Number(completedImage.tamanho_bytes),
+                status: String(completedImage.status),
+                url: imageIsPublic
+                    ? appImagePublicUrl_(String(completedImage.id_arquivo_drive))
+                    : null
+            }
+        };
+    }
+    var state = authorized.state;
+
+    var result;
+    try {
+        result = appImageGetDriveOffset_(state);
+    } catch (error) {
+        try {
+            appWithLock_(function () {
+                var latest = appImageReadUploadState_(String(state.uploadId));
+                latest.inFlight = false;
+                latest.inFlightAt = 0;
+                appImageStoreUploadState_(latest);
+            });
+        } catch (ignored) {}
+        throw error;
+    }
+
+    if (result.completed) return appImageFinalizeUpload_(state, result.file);
+
+    appWithLock_(function () {
+        var latest = appImageReadUploadState_(String(state.uploadId));
+        latest.nextOffset = Number(result.nextOffset);
+        latest.inFlight = false;
+        latest.inFlightAt = 0;
+        latest.lastActivityAt = nowMs;
+        appImageStoreUploadState_(latest);
+    });
+    return {
+        completed: false,
+        uploadId: String(state.uploadId),
+        nextOffset: Number(result.nextOffset),
+        totalSize: Number(state.fileSize)
+    };
+}
+
+function appImageUploadCancel_(payload, nowMs) {
+    if (!appHasKeys_(payload, ["tokenHash", "uploadId"])) {
+        throw appFault_("INVALID_INPUT", "Informe a sessão de envio.");
+    }
+    return appWithLock_(function () {
+        var authorized = appImageRequireUpload_(payload, nowMs);
+        if (authorized.state.status === "completed") {
+            return { cancelled: false, completed: true };
+        }
+        if (authorized.state.inFlight && nowMs - Number(authorized.state.inFlightAt || 0) < APP_IMAGE_IN_FLIGHT_STALE_MS) {
+            throw appFault_("IMAGE_UPLOAD_BUSY", "Aguarde o bloco em andamento antes de cancelar.");
+        }
+        appImageDeleteUploadState_(authorized.state);
+        return { cancelled: true };
+    });
+}
+
+function appImageSetFilePrivate_(fileId) {
+    try {
+        DriveApp.getFileById(String(fileId)).setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
+    } catch (error) {
+        throw appFault_("IMAGE_PERMISSION_SYNC_FAILED", "Não foi possível restringir o acesso da imagem no Google Drive.");
+    }
+}
+
+function appImageSetFilePublic_(fileId) {
+    try {
+        DriveApp.getFileById(String(fileId)).setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (error) {
+        throw appFault_("IMAGE_PERMISSION_SYNC_FAILED", "Não foi possível liberar a visualização da imagem no Google Drive.");
+    }
+}
+
+function appSetServiceImagesVisibility_(serviceId, publicAccess) {
+    var images = appRecords_("IMAGENS").filter(function (item) {
+        return String(item.id_servico) === String(serviceId) && String(item.status) === "active";
+    });
+    var failedCount = 0;
+    images.forEach(function (image) {
+        try {
+            if (publicAccess) appImageSetFilePublic_(String(image.id_arquivo_drive));
+            else appImageSetFilePrivate_(String(image.id_arquivo_drive));
+        } catch (error) {
+            failedCount += 1;
+        }
+    });
+    if (failedCount > 0) {
+        throw appFault_(
+            "IMAGE_PERMISSION_SYNC_FAILED",
+            "Não foi possível atualizar a permissão de todas as imagens do serviço."
+        );
+    }
+}
+
+function appImagePublicUrl_(fileId) {
+    return "https://drive.google.com/uc?export=view&id=" + encodeURIComponent(String(fileId));
+}
+
+function appGetServiceImages_(serviceId, publicAccess) {
+    return appRecords_("IMAGENS")
+        .filter(function (item) {
+            return String(item.id_servico) === String(serviceId) && String(item.status) === "active";
+        })
+        .sort(function (left, right) { return Number(left.ordem_exibicao) - Number(right.ordem_exibicao); })
+        .map(function (item) {
+            return {
+                id: String(item.id_imagem),
+                order: Number(item.ordem_exibicao),
+                mimeType: String(item.tipo_mime),
+                sizeBytes: Number(item.tamanho_bytes),
+                status: String(item.status),
+                url: publicAccess ? appImagePublicUrl_(String(item.id_arquivo_drive)) : null
+            };
+        });
+}
+
+function appImageRemove_(payload, nowMs) {
+    if (!appHasKeys_(payload, ["tokenHash", "imageId"])) {
+        throw appFault_("INVALID_INPUT", "Informe a imagem que deseja remover.");
+    }
+    return appWithLock_(function () {
+        var session = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, true);
+        var profile = appGetProfile_(String(session.user.id_usuario));
+        if (!profile) throw appFault_("PROFILE_UNAVAILABLE", "O perfil não está disponível.");
+        var image = appFind_("IMAGENS", "id_imagem", String(payload.imageId));
+        if (!image || String(image.id_profissional || "") !== ""
+            || String(image.id_servico || "") === "") {
+            throw appFault_("IMAGE_NOT_FOUND", "Imagem não encontrada.");
+        }
+        var service = appFind_("SERVICOS", "id_servico", String(image.id_servico));
+        if (!service || String(service.id_profissional) !== String(profile.id_profissional)) {
+            throw appFault_("IMAGE_NOT_FOUND", "Imagem não encontrada.");
+        }
+        appImageSetFilePrivate_(String(image.id_arquivo_drive));
+        if (String(image.status) === "removed") {
+            return { removed: true, imageId: String(image.id_imagem), alreadyRemoved: true };
+        }
+        appUpdate_("IMAGENS", image._row, {
+            status: "removed",
+            atualizado_em: new Date(nowMs).toISOString()
+        });
+        appAudit_(String(session.user.id_usuario), "user", "image.remove", "IMAGENS", String(image.id_imagem), "success", "Imagem removida logicamente e acesso restringido.");
+        return { removed: true, imageId: String(image.id_imagem) };
+    });
 }
 
 /* ---------------------------- Auditoria --------------------------------- */

@@ -23,6 +23,8 @@
 - A pesquisa comunitária do Conecta Local está em preparação. Os questionários preliminares para moradores e profissionais estão em `PESQUISA_COMUNIDADE.md`; as orientações de aplicação e análise estão em `docs/GUIA_APLICACAO_PESQUISA_COMUNIDADE.md`; o roteiro detalhado existente permanece em `docs/ROTEIRO_PESQUISA_EXPLORATORIA.md`. Em 20/11/2026, os instrumentos ainda aguardam revisão do professor/orientador; coleta e análise não foram iniciadas/confirmadas. Não fabricar resultados nem iniciar a aplicação antes de confirmar os procedimentos acadêmicos e de participação voluntária.
 - Usar somente dados fictícios. Não configurar backend em Production nesta etapa.
 
+- A Etapa 4 (imagens no Google Drive) está em implementação parcial na branch `feat/drive-image-upload`, criada a partir de `dev`. O desenho e o estado atualizado estão em `docs/ETAPA_4_IMAGENS_DRIVE.md` e `docs/ROADMAP_ESTUDOS.md`. Há código na branch para upload retomável de 1 MiB no Apps Script, gateway binário dedicado na Vercel, cliente/gerenciador de imagens para serviços e exibição da primeira imagem pública na homepage; os testes automatizados de Apps Script, gateway e cliente passaram. A execução [Validate Home Service #44834406864](https://github.com/kleber-goncalves/home-service/actions/runs/44834406864) concluiu SUCCESS no commit `26c48caecbbd869bf9228cdd7df6bdbae78649df`, incluindo auditoria, POC-01 a POC-04, autorização/imagens, LOO, ocorrências, ESLint e build. **O código não está integrado em dev e não foi conectado ao Drive real.** O check Vercel desse commit falhou com `build-rate-limit`; o Preview READY disponível é do commit anterior `93c577e` e não contém os últimos ajustes. Pasta privada, Script Property `CONECTA_LOCAL_DRIVE_FOLDER_ID`, escopos OAuth, autorização, sincronização manual e implantação na Web App existente ainda estão pendentes. Limite: até 5 imagens de serviço, JPG/JPEG/PNG/WebP, 5.000.000 bytes cada. O plano Vercel é Hobby; não fazer upgrade nem alterar billing para habilitar o beta de corpo 20 MiB. Preservar os limites dos endpoints JSON atuais, manter backend somente em Preview e não modificar `dev`/`main` até concluir testes e aprovar a PR.
+
 ## 1. Instruções para a IA que assumir o projeto
 
 1. Leia este documento por inteiro antes de propor mudanças, especialmente em uma conversa nova.
@@ -362,12 +364,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** ea65aa10947751dc7eceb893a2778a8608c17ac2
-- **Data do commit:** 2026-11-20T19:23:52-03:00
-- **Mensagem do commit:** docs: corrigir contexto acadêmico e indexar pesquisa comunitária
-- **Branch desta execução:** dev
+- **Commit de referência:** ce4e14c7a9a009a767d61dee811c8aa494ec2403
+- **Data do commit:** 2026-11-20T22:25:08-03:00
+- **Mensagem do commit:** docs(images): registrar validação manual da integração Drive
+- **Branch desta execução:** feat/drive-image-upload
 - **Projeto declarado:** home-service@0.0.0
-- **Scripts npm:** 12
+- **Scripts npm:** 13
 - **Dependências de runtime:** 4
 - **Dependências de desenvolvimento:** 11
 - **Workflows:** 2
@@ -389,6 +391,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run test:loo | node --test tests/loo/domain-entities.test.js |
 | npm run test:poc04 | node --test tests/poc04/gateway.test.js tests/poc04/apps-script.test.js |
 | npm run test:authorization | node --test tests/authorization/apps-script.test.js tests/authorization/gateway.test.js |
+| npm run test:images | node --test tests/images/upload-gateway.test.js tests/images/image-api.test.js |
 
 ### Variáveis declaradas no .env.example
 
@@ -443,6 +446,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/components/home/hero-search.jsx
 - src/components/home/home-sections.jsx
 - src/components/home/site-header.jsx
+- src/components/professional/service-image-manager.jsx
 - src/components/ui/badge.jsx
 - src/components/ui/button.jsx
 - src/components/ui/card.jsx
@@ -454,6 +458,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/pages/HomePage.jsx
 - src/pages/Poc01Page.jsx
 - src/services/app-api.js
+- src/services/image-api.js
 - src/services/poc-01-api.js
 
 ### Diretórios principais de src/
@@ -468,13 +473,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| ea65aa1 | 2026-11-20 | docs: corrigir contexto acadêmico e indexar pesquisa comunitária |
-| 68d81aa | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 4010c83 | 2026-11-20 | docs: adicionar guia de aplicação da pesquisa comunitária |
-| c500597 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 93407e7 | 2026-11-20 | docs: adicionar questionários preliminares da pesquisa comunitária |
-| 1dcaaff | 2026-11-20 | docs(ai-context): confirmar limpeza e estado da etapa 5 |
-| 103219b | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
-| 404d5ed | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| ce4e14c | 2026-11-20 | docs(images): registrar validação manual da integração Drive |
+| e78600e | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
+| d41fd53 | 2026-11-20 | test(images): cobrir URI resumable com parâmetros do Drive |
+| 3d14ece | 2026-11-20 | fix(images): aceitar parâmetros adicionais na sessão resumable do Drive |
+| cb35700 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 78962bb | 2026-11-20 | docs: registrar CI aprovada e Preview Vercel pendente |
+| 0490ab7 | 2026-11-20 | docs(ai-context): atualizar snapshot automaticamente |
+| 26c48ca | 2026-11-20 | fix: autenticar proprietário antes de consultar configuração do Drive |
 
 <!-- END AUTO-GENERATED SECTION -->

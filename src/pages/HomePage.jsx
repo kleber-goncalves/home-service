@@ -35,8 +35,12 @@ function mapPublicService(service) {
         category: service.category,
         title: service.title,
         description: service.description,
-        image: imageForCategory(service.category),
-        imageAlt: "Imagem ilustrativa de " + service.category + ".",
+        image: Array.isArray(service.images) && service.images[0]?.url
+            ? service.images[0].url
+            : imageForCategory(service.category),
+        imageAlt: Array.isArray(service.images) && service.images[0]?.url
+            ? "Imagem do serviço " + service.title + "."
+            : "Imagem ilustrativa de " + service.category + ".",
         city: Array.isArray(service.cities) && service.cities.length
             ? service.cities.map((item) => item.name + " - " + item.state).join(", ")
             : service.city,

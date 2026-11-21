@@ -33,7 +33,7 @@ O projeto é acadêmico, usa somente dados fictícios e não deve receber creden
 - **Orientação a objetos:** classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`.
 - **POC-04:** integrada à `dev` pela PR #14 como experimento independente de sessão sintética. Permanece desabilitada e não integra a autenticação principal. Os recursos temporários foram limpos; os limites de hardening e a decisão de não reativação estão documentados em `docs/POC_04_SESSOES.md`.
 
-**Limitações conhecidas da demonstração:** envio real de e-mail, recuperação/alteração de senha e e-mail, upload de imagens no Google Drive, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades ainda não foram implementados. Pesquisa local com moradores e profissionais também continua pendente; os indicadores documentais não substituem dados primários de Capelinha.
+**Limitações conhecidas da demonstração:** envio real de e-mail, recuperação/alteração de senha e e-mail, integração real com Google Drive ainda pendente (a implementação de imagens está isolada em `feat/drive-image-upload` e tem CI automatizada aprovada, mas não está integrada à `dev` nem validada com Drive real), painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades ainda não foram implementados. Pesquisa local com moradores e profissionais também continua pendente; os indicadores documentais não substituem dados primários de Capelinha.
 
 ## Executar localmente
 
@@ -60,6 +60,7 @@ O GitHub Actions executa essas verificações em pushes e Pull Requests direcion
 
 - [Contexto técnico para IAs e desenvolvedores](docs/AI_CONTEXT.md)
 - [Roteiro de evolução acadêmica e prioridades](docs/ROADMAP_ESTUDOS.md)
+- [Etapa 4 — arquitetura de imagens no Google Drive](docs/ETAPA_4_IMAGENS_DRIVE.md)
 - [Questionários preliminares para moradores e profissionais](PESQUISA_COMUNIDADE.md)
 - [Guia de aplicação da pesquisa com a comunidade](docs/GUIA_APLICACAO_PESQUISA_COMUNIDADE.md)
 - [Roteiro detalhado de pesquisa exploratória](docs/ROTEIRO_PESQUISA_EXPLORATORIA.md)

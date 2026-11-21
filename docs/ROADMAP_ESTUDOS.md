@@ -159,19 +159,31 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 ### Etapa 4 — Imagens no Google Drive
 
-**Objetivo:** permitir que o profissional associe imagens ao perfil ou aos serviços.
+**Status: implementação parcial em `feat/drive-image-upload`; CI automatizada aprovada em 20/11/2026; integração real com o Drive e validação manual ainda pendentes.**
 
-**Escopo mínimo:**
-- Upload de JPG, PNG ou WebP com limite definido na especificação.
-- Validar tamanho, tipo real do conteúdo e propriedade no backend.
-- Guardar metadados e ID do arquivo no Sheets; manter a pasta raiz privada.
-- Tornar público somente o arquivo elegível a um serviço publicado e conta ativa.
-- Revogar acesso público ao pausar/remover/suspender, verificando o resultado.
-- Tratar falhas parciais entre Sheets e Drive; nunca exibir sucesso antes de confirmar as etapas.
+O responsável escolheu prosseguir com esta etapa em 20/11/2026, mantendo o escopo acadêmico e o plano Vercel Hobby.
 
-**Critério de conclusão:** upload, exibição, pausa e remoção funcionam com dados fictícios e as permissões do Drive seguem os estados do serviço.
+**Decisão de transporte:** upload retomável do Google Drive com blocos binários de 1 MiB enviados por uma rota dedicada da Vercel e encaminhados ao Apps Script sob HMAC. O URI de sessão do Drive e o token OAuth ficam somente no Apps Script. Essa estratégia preserva o limite de 5.000.000 bytes sem depender da opção beta de 20 MiB da Vercel, que exige memória de 4 GB indisponível no plano Hobby.
 
-**Prioridade:** média/baixa. Tem grande valor visual, mas é mais complexa por envolver um segundo serviço externo e permissões. Fazer somente quando o fluxo de serviços estiver estável e houver tempo.
+**Escopo inicial — imagens de serviços:**
+- Iniciar sessão de upload após validar sessão, proprietário, serviço, tamanho e MIME.
+- Enviar blocos sequenciais de 1 MiB; validar assinatura binária, offset, tamanho total e sequência no backend.
+- Guardar intenção e URI retomável somente em Script Properties; não gravar metadados ativos antes de o Drive confirmar a conclusão.
+- Armazenar arquivos na pasta raiz privada e metadados na aba `IMAGENS`.
+- Permitir no máximo 5 imagens ativas por serviço, nos formatos JPG/JPEG, PNG ou WebP, até 5.000.000 bytes cada.
+- Tornar público por link somente arquivo pertencente a serviço publicado e conta ativa; restringir ao pausar, remover ou tornar inelegível.
+- Implementar cancelamento, expiração, compensação de falha parcial e remoção lógica.
+- Mostrar prévia, progresso e estado de erro na interface.
+
+**Não faz parte do primeiro ciclo:** foto de perfil, galeria avançada, painel de mídia e operação em Production.
+
+**Código já presente na branch de trabalho:** ações Apps Script para iniciar/enviar/consultar/cancelar upload e remover imagem; gateway separado para blocos binários com sessão, CSRF, mesma origem e HMAC; cliente de upload com blocos de 1 MiB e reconciliação; componente de seleção/prévia/progresso/remoção na área profissional; primeira imagem pública exibida na vitrine; testes automatizados para gateway, fluxo de navegador e harness de Apps Script. A execução [Validate Home Service #44834406864](https://github.com/kleber-goncalves/home-service/actions/runs/44834406864) concluiu **SUCCESS** no commit `26c48caecbbd869bf9228cdd7df6bdbae78649df`, incluindo auditoria bloqueante, POC-01 a POC-04, autorização/imagens, LOO, validação de ocorrências, ESLint e build de produção.
+
+**Ainda pendente:** configurar pasta privada e Script Property no Apps Script, revisar escopos e autorizar Drive, sincronizar/deployar a versão no projeto Apps Script existente, validar uploads e permissões reais no Preview e resolver eventuais falhas observadas. O check Vercel do commit `26c48ca` falhou por `build-rate-limit`; o deployment READY disponível (`dpl_91tVg8Bu34qKDmNkszha2Bx5L96V`) corresponde ao commit antigo `93c577e` e não contém todos os commits mais recentes da etapa. Não usar esse deployment como evidência de validação da Etapa 4.
+
+**Critério de conclusão:** upload, listagem, exibição, pausa/publicação e remoção validados em Preview com arquivos fictícios/licenciados, pasta Drive privada e permissões individuais conferidas no Drive real.
+
+**Dependências manuais:** inspecionar o manifesto `appsscript.json` existente, acrescentar os escopos necessários sem substituir configurações atuais, criar pasta raiz privada, adicionar Script Property com seu ID e autorizar o Drive na conta que executa o Web App. Não criar outro projeto/implantação Apps Script nem alterar segredo HMAC ou variáveis Production.
 
 ### Etapa 5 — Pesquisa acadêmica e acabamento da apresentação
 
@@ -214,9 +226,9 @@ Reavaliar somente quando houver exigência acadêmica explícita ou uma necessid
 
 ## 6. Ordem prática recomendada
 
-1. **Agora:** aplicar a pesquisa exploratória com base em `docs/ROTEIRO_PESQUISA_EXPLORATORIA.md`, somente após confirmar com o professor/orientador o procedimento adequado e mantendo a coleta sem dados identificáveis.
-2. **Depois da coleta:** analisar respostas reais e atualizar o relatório e a apresentação, incluindo limitações da amostra.
-3. **Somente se houver ganho claro para a demonstração:** reavaliar a Etapa 4 (imagens no Google Drive), sem comprometer o prazo acadêmico.
+1. **Agora:** concluir a Etapa 4 em `feat/drive-image-upload`, com upload de imagens de serviços, testes automatizados e validação manual no Preview.
+2. **Depois:** retomar a pesquisa comunitária já documentada em `PESQUISA_COMUNIDADE.md` e `docs/GUIA_APLICACAO_PESQUISA_COMUNIDADE.md`, somente após orientação do professor do curso Técnico em Informática e confirmação do procedimento aplicável. O responsável decidiu deixar a coleta para depois.
+3. **Na preparação da entrega:** revisar acessibilidade, responsividade, roteiro de demonstração e relatório acadêmico, registrando as limitações reais.
 
 Trabalhar uma etapa por branch/PR, sempre partindo de `dev`. Integrar somente depois das verificações pertinentes. Não alterar `main` sem uma decisão explícita de publicação.
 
