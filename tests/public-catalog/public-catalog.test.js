@@ -50,7 +50,7 @@ test("ignora imagens removidas ou com identificador inválido e usa a rota inter
 
     assert.equal(service.images.length, 1);
     assert.equal(service.images[0].id, imageIds.first);
-    assert.equal(service.images[0].url, "/api/public-images/" + imageIds.first);
+    assert.equal(service.images[0].url, "/api/public-images?id=" + imageIds.first);
 });
 
 test("filtra por categoria, cidade e texto usando todos os municípios atendidos", () => {
