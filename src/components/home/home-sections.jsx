@@ -136,7 +136,7 @@ export function ProfessionalSection({
 
 export function PopularServices() {
     return (
-        <section className="popular-section section-space" id="servicos">
+        <section className="popular-section section-space" id="servicos-populares">
             <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="popular-layout">
                     <div className="popular-intro">
@@ -229,7 +229,7 @@ export function ProfessionalsCTA() {
                     <div className="professionals-cta-copy">
                         <span className="cta-eyebrow"><BriefcaseBusiness size={16} />Para quem oferece serviços</span>
                         <h2>Seu trabalho merece ser encontrado.</h2>
-                        <p>O Conecta Local quer criar um espaço para profissionais apresentarem seus serviços e se aproximarem de novos clientes.</p>
+                        <p>O Conecta Local oferece uma vitrine demonstrativa para organizar serviços por categoria e região e aproximar moradores e profissionais.</p>
                         <a className="cta-button" href="/?auth=demo&mode=register">Abrir cadastro demonstrativo <ArrowRight size={17} /></a>
                         <span className="cta-note"><CheckCircle2 size={15} />Interface de cadastro em demonstração; sem envio de dados</span>
                     </div>
@@ -248,7 +248,7 @@ export function FAQSection() {
         <section className="faq-section section-space" id="perguntas">
             <div className="mx-auto grid w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="faq-intro">
-                    <SectionHeading eyebrow="Dúvidas comuns" title="Perguntas frequentes" description="Entenda o que já está disponível e o que ainda faz parte das próximas etapas." />
+                    <SectionHeading eyebrow="Dúvidas comuns" title="Perguntas frequentes" description="Veja como consultar serviços, conhecer os exemplos e entender os limites desta demonstração." />
                     <p className="faq-contact">Não encontrou sua dúvida? Acompanhe a evolução do projeto pelo repositório.</p>
                     <a className="text-link" href="https://github.com/kleber-goncalves/home-service" target="_blank" rel="noreferrer">Acessar o projeto <ChevronDown size={15} /></a>
                 </div>
