@@ -514,7 +514,7 @@ function createHarness(options = {}) {
     };
 
     context.UrlFetchApp = fakeUrlFetch;
-    context.ScriptApp = { getOAuthToken: () => "synthetic-drive-oauth-token" };
+    context.ScriptApp = { getOAuthToken: () => "synthetic-drive-oauth-token-for-test-validation" };
     context.DriveApp = driveApp;
 
     runInNewContext(SOURCE, context, { filename: "conecta-local/Code.gs" });
