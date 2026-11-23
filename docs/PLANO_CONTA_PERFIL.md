@@ -48,7 +48,7 @@ Regras implementadas:
 
 ### Etapa 3 — Foto de perfil
 
-**Status: em implementação na branch `feat/foto-perfil-profissional`.**
+**Status: integrada em `dev` pela PR #33, merge commit `782d8ede22ffcf8f1b3193c70e956715ca701af0`. CI pós-merge #45255089911 concluída com SUCCESS. A validação manual com o Preview conectado ao Apps Script/Sheets/Drive ainda está pendente da sincronização e publicação do `Code.gs` atualizado.**
 
 Escopo implementado na branch:
 
