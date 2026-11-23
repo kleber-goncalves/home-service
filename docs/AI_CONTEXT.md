@@ -401,9 +401,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** cc8d95d9a4b96579651d4d06be1bf79805207535
-- **Data do commit:** 2026-11-23T16:10:47-03:00
-- **Mensagem do commit:** docs(profile): documentar evolução da conta e perfil
+- **Commit de referência:** 52e485841ae558cb984ed25beda0b16c010cdcb0
+- **Data do commit:** 2026-11-23T16:12:50-03:00
+- **Mensagem do commit:** fix(profile): inicializar formulário ao iniciar edição
 - **Branch desta execução:** feat/edicao-perfil-usuario
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -527,13 +527,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 52e4858 | 2026-11-23 | fix(profile): inicializar formulário ao iniciar edição |
+| b85a92e | 2026-11-23 | docs(context): atualizar estado da autenticação e perfil |
+| 633126d | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | cc8d95d | 2026-11-23 | docs(profile): documentar evolução da conta e perfil |
 | 97467e1 | 2026-11-23 | style(profile): estilizar formulário de edição do perfil |
 | 7a69de5 | 2026-11-23 | test(profile): restringir campos enviados ao gateway |
 | 7151880 | 2026-11-23 | test(profile): validar atualização do nome completo |
 | 4a6ae4a | 2026-11-23 | feat(profile): validar e salvar nome completo |
-| b0997d3 | 2026-11-23 | feat(profile): encaminhar nome completo na allowlist |
-| a684a58 | 2026-11-23 | feat(profile): adicionar edição dos dados do perfil |
-| 9136929 | 2026-11-23 | feat(auth): permitir atualização segura do usuário na sessão |
 
 <!-- END AUTO-GENERATED SECTION -->
