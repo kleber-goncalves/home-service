@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { appRequest } from "@/services/app-api";
 import ServiceImageManager from "@/components/professional/service-image-manager";
+import ProfilePhotoManager from "@/components/professional/profile-photo-manager";
 import { useAuth } from "@/hooks/use-auth";
 
 const EMPTY_REGISTER = {
@@ -291,6 +292,10 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         setNotice(null);
     }
 
+    function updateProfilePhoto(photo) {
+        updateUser({ ...currentUser, ...photo });
+    }
+
     async function saveProfile(event) {
         event.preventDefault();
         setBusy(true);
@@ -525,7 +530,10 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                             <h1>Olá, {currentUser.publicName}!</h1>
                             <p>Gerencie seu perfil e os serviços cadastrados no Conecta Local.</p>
                         </div>
-                        <div className="demo-profile-avatar" aria-hidden="true"><UserRound size={30} /></div>
+                        <div className="demo-profile-avatar" aria-hidden="true">
+                            <UserRound size={30} />
+                            {currentUser.photoUrl && <img src={currentUser.photoUrl} alt="" />}
+                        </div>
                     </div>
 
                     {notice && (
@@ -577,6 +585,12 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                                 )}
                             </div>
                         </div>
+
+                        <ProfilePhotoManager
+                            user={currentUser}
+                            csrfToken={csrfToken}
+                            onPhotoChange={updateProfilePhoto}
+                        />
 
                         {isEditingProfile ? (
                             <form className="demo-new-service-form demo-profile-form" onSubmit={saveProfile}>
