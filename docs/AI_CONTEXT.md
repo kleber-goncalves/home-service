@@ -401,9 +401,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 28479b065d038622139ea252b84ab641b43bc46e
-- **Data do commit:** 2026-11-23T16:56:24-03:00
-- **Mensagem do commit:** feat(profile-photo): criar gerenciador de foto de perfil
+- **Commit de referência:** bc33f6a5b10d4e25c88bcfd8b4f38926f5c68641
+- **Data do commit:** 2026-11-23T16:57:01-03:00
+- **Mensagem do commit:** feat(profile-photo): integrar foto na área de conta
 - **Branch desta execução:** feat/foto-perfil-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -528,13 +528,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| bc33f6a | 2026-11-23 | feat(profile-photo): integrar foto na área de conta |
+| 35f27f1 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | 28479b0 | 2026-11-23 | feat(profile-photo): criar gerenciador de foto de perfil |
 | 08bed7e | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | 34e2df4 | 2026-11-23 | fix(profile-photo): manter foto privada e retornar id no perfil |
 | 11804da | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | ae34aea | 2026-11-23 | refactor(images): compartilhar cliente de upload retomável |
 | aa49acd | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
-| a6fb5af | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
-| 9420e80 | 2026-11-23 | feat(profile-photo): mapear falhas específicas do perfil |
 
 <!-- END AUTO-GENERATED SECTION -->
