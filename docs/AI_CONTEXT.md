@@ -403,10 +403,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** e00d2d566a3584424ab65cf648e241dbf2fb3c21
-- **Data do commit:** 2026-11-23T17:01:15-03:00
-- **Mensagem do commit:** test(profile-photo): usar token OAuth sintético válido
-- **Branch desta execução:** feat/foto-perfil-profissional
+- **Commit de referência:** 782d8ede22ffcf8f1b3193c70e956715ca701af0
+- **Data do commit:** 2026-11-23T17:01:57-03:00
+- **Mensagem do commit:** Merge pull request #33 from kleber-goncalves/feat/foto-perfil-profissional
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -530,13 +530,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 782d8ed | 2026-11-23 | Merge pull request #33 from kleber-goncalves/feat/foto-perfil-profissional |
+| cef494f | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | e00d2d5 | 2026-11-23 | test(profile-photo): usar token OAuth sintético válido |
 | a10487f | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | 41212c7 | 2026-11-23 | fix(profile-photo): limpar arquivo se finalização falhar |
 | 9ffdfc8 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | d6e7f81 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | dc71985 | 2026-11-23 | docs(context): registrar andamento da foto de perfil |
-| 8601404 | 2026-11-23 | docs(images): separar escopo de fotos de perfil |
-| b48e5fe | 2026-11-23 | docs(profile): atualizar etapas da conta e foto |
 
 <!-- END AUTO-GENERATED SECTION -->
