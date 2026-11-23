@@ -132,7 +132,10 @@ export default function SiteHeader({ active = "" }) {
                                     setAccountMenuOpen((current) => !current);
                                 }}
                             >
-                                <span className="account-avatar" aria-hidden="true"><UserRound size={18} /></span>
+                                <span className="account-avatar" aria-hidden="true">
+                                    <UserRound size={18} />
+                                    {user.photoUrl && <img className="account-avatar-image" src={user.photoUrl} alt="" />}
+                                </span>
                                 <span className="account-menu-name">{user.publicName || user.fullName || "Minha conta"}</span>
                                 <ChevronDown className={accountMenuOpen ? "is-rotated" : ""} size={16} aria-hidden="true" />
                             </button>

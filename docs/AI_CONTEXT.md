@@ -9,7 +9,9 @@
 > Esta seção registra o estado mais recente conhecido. Consulte os SHAs e os arquivos do branch efetivamente em análise antes de realizar mudanças.
 
 - Em 21/11/2026, a PR #30 integrou em `dev` a sessão compartilhada pelo `AuthProvider`, o estado global de autenticação e o menu da conta com `Minha conta` e `Sair` (merge commit `4696a5039243c7baf300e835973417af6003723c`). Em 23/11/2026, a PR #31 separou os acessos de visitante em `Entrar` e `Criar conta`, com destinos diretos para login/cadastro no desktop e menu móvel (merge commit `3a99eb1650d118ce8ccb20fc3de7b179125e86b7`). O responsável confirmou a validação visual desses dois acessos no Preview de `dev`.
-- A evolução do perfil está documentada em `docs/PLANO_CONTA_PERFIL.md`. A branch `feat/edicao-perfil-usuario` foi criada a partir do HEAD de `dev` em 23/11/2026 (`3304773295e6f1f6e96350ac52b6c09482e64de7`) e contém a implementação em andamento da Etapa 2: formulário para nome completo, nome público, telefone/WhatsApp, apresentação e cidade principal; a allowlist do gateway e o Apps Script foram ampliados para aceitar somente esses campos, com identidade derivada da sessão e auditoria. A alteração de e-mail permanece fora desta etapa, pois exige reautenticação e confirmação do novo endereço; foto de perfil é etapa posterior.
+- A Etapa 2 — edição dos dados do perfil — foi integrada em `dev` pela PR #32, merge commit `db31cee401cb47369811a9ca2326a2268e27e51a`. Permite editar nome completo, nome público, WhatsApp, apresentação e cidade principal, com allowlist no gateway, validação/autorização no Apps Script, atualização do AuthProvider e auditoria. Em 23/11/2026, o responsável confirmou que testou e que a edição funcionou no Preview após sincronizar/publicar o Apps Script.
+- A Etapa 3 — foto de perfil — está em implementação na branch `feat/foto-perfil-profissional`, criada a partir do HEAD de `dev` `184a295f2db2ab701d50e2d6f319c4469f01c78b`. Reutiliza o upload retomável por blocos, mas reserva a imagem pelo profissional e grava `IMAGENS` com `id_profissional` preenchido e `id_servico` vazio. O arquivo fica privado no Drive; a entrega usa `/api/public-images?id=<imageId>` e valida conta ativa/registro ativo no Apps Script. A branch inclui fluxo de upload, substituição, remoção, estado global e avatar no cabeçalho; testes automatizados novos ainda aguardam execução da CI e validação manual no Preview.
+- A alteração de e-mail continua planejada em etapa separada, pois exige reautenticação, unicidade e confirmação do novo endereço; não alterar `USUARIOS.email` como campo comum de perfil.
 - O ambiente conectado ao Apps Script/Sheets permanece restrito ao Preview fixo da branch `dev`. A branch `feat/*` não recebe as variáveis secretas de Preview. Como o código da pasta `apps-script/conecta-local/Code.gs` não se sincroniza automaticamente com a implantação Web App do Google, após a integração da etapa será necessário sincronizar o arquivo e publicar nova versão do Apps Script antes dos testes manuais no Preview de `dev`. Não duplicar nem ampliar escopo dos segredos para testar branches de feature.
 - O PR #15 (`feat/prototipo-demo-profissional` → `dev`) foi integrado em 16/11/2026. O protótipo funcional com cadastro, confirmação demonstrativa, login, sessão, perfil, criação/pausa/publicação de serviços e persistência no Google Sheets está na branch `dev`.
 - Em 20/11/2026, após as integrações das PRs #16, #17 e #14, o responsável confirmou ter repetido os testes do fluxo principal no Preview atualizado de `dev` e informou que a demonstração está funcionando. O histórico anterior de validação do PR #15 permanece registrado em 16/11; a confirmação mais recente é a referência funcional para a continuidade.
@@ -401,10 +403,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** db31cee401cb47369811a9ca2326a2268e27e51a
-- **Data do commit:** 2026-11-23T16:14:50-03:00
-- **Mensagem do commit:** Merge pull request #32 from kleber-goncalves/feat/edicao-perfil-usuario
-- **Branch desta execução:** dev
+- **Commit de referência:** e00d2d566a3584424ab65cf648e241dbf2fb3c21
+- **Data do commit:** 2026-11-23T17:01:15-03:00
+- **Mensagem do commit:** test(profile-photo): usar token OAuth sintético válido
+- **Branch desta execução:** feat/foto-perfil-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -484,6 +486,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/components/home/hero-search.jsx
 - src/components/home/home-sections.jsx
 - src/components/home/site-header.jsx
+- src/components/professional/profile-photo-manager.jsx
 - src/components/professional/service-image-manager.jsx
 - src/components/public/app-link.jsx
 - src/components/public/service-card.jsx
@@ -527,13 +530,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| db31cee | 2026-11-23 | Merge pull request #32 from kleber-goncalves/feat/edicao-perfil-usuario |
-| 0fab99b | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
-| 52e4858 | 2026-11-23 | fix(profile): inicializar formulário ao iniciar edição |
-| b85a92e | 2026-11-23 | docs(context): atualizar estado da autenticação e perfil |
-| 633126d | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
-| cc8d95d | 2026-11-23 | docs(profile): documentar evolução da conta e perfil |
-| 97467e1 | 2026-11-23 | style(profile): estilizar formulário de edição do perfil |
-| 7a69de5 | 2026-11-23 | test(profile): restringir campos enviados ao gateway |
+| e00d2d5 | 2026-11-23 | test(profile-photo): usar token OAuth sintético válido |
+| a10487f | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
+| 41212c7 | 2026-11-23 | fix(profile-photo): limpar arquivo se finalização falhar |
+| 9ffdfc8 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
+| d6e7f81 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
+| dc71985 | 2026-11-23 | docs(context): registrar andamento da foto de perfil |
+| 8601404 | 2026-11-23 | docs(images): separar escopo de fotos de perfil |
+| b48e5fe | 2026-11-23 | docs(profile): atualizar etapas da conta e foto |
 
 <!-- END AUTO-GENERATED SECTION -->

@@ -21,6 +21,7 @@ var APP_MAX_PAYLOAD_BYTES = 16 * 1024;
 var APP_IMAGE_MAX_PAYLOAD_BYTES = 2 * 1024 * 1024;
 var APP_IMAGE_UPLOAD_STATE_PREFIX = "CONECTA_LOCAL_IMAGE_UPLOAD_V1_";
 var APP_IMAGE_UPLOAD_SERVICE_PREFIX = "CONECTA_LOCAL_IMAGE_SERVICE_UPLOAD_V1_";
+var APP_IMAGE_UPLOAD_PROFILE_PREFIX = "CONECTA_LOCAL_IMAGE_PROFILE_UPLOAD_V1_";
 var APP_IMAGE_DRIVE_FOLDER_PROPERTY = "CONECTA_LOCAL_DRIVE_FOLDER_ID";
 var APP_IMAGE_MAX_BYTES = 5000000;
 var APP_IMAGE_CHUNK_BYTES = 1024 * 1024;
@@ -52,7 +53,11 @@ var APP_ALLOWED_ACTIONS = [
     "image.upload.chunk",
     "image.upload.status",
     "image.upload.cancel",
-    "image.remove"
+    "image.remove",
+    "profile.photo.upload.start",
+    "profile.photo.upload.status",
+    "profile.photo.upload.cancel",
+    "profile.photo.remove"
 ];
 
 var APP_SEED_CATEGORIES = [
@@ -199,6 +204,10 @@ function appDispatch_(action, payload, nowMs, secret) {
     if (action === "image.upload.status") return appImageUploadStatus_(payload, nowMs);
     if (action === "image.upload.cancel") return appImageUploadCancel_(payload, nowMs);
     if (action === "image.remove") return appImageRemove_(payload, nowMs);
+    if (action === "profile.photo.upload.start") return appProfilePhotoUploadStart_(payload, nowMs);
+    if (action === "profile.photo.upload.status") return appImageUploadStatus_(payload, nowMs);
+    if (action === "profile.photo.upload.cancel") return appImageUploadCancel_(payload, nowMs);
+    if (action === "profile.photo.remove") return appProfilePhotoRemove_(payload, nowMs);
     throw appFault_("ACTION_NOT_ALLOWED", "A operação não está liberada.");
 }
 
@@ -282,6 +291,9 @@ function appFindByEmail_(email) {
 }
 
 function appSafeUser_(user, profile) {
+    var profilePhoto = profile && String(user.status) === "active"
+        ? appGetProfilePhoto_(String(profile.id_profissional))
+        : null;
     return {
         idUsuario: String(user.id_usuario),
         idProfissional: profile ? String(profile.id_profissional) : null,
@@ -293,12 +305,27 @@ function appSafeUser_(user, profile) {
         presentation: profile ? String(profile.apresentacao) : "",
         cityId: profile ? String(profile.id_cidade_principal) : "",
         neighborhoods: profile ? String(profile.bairros_regioes_atendidos || "") : "",
-        whatsapp: profile ? String(profile.whatsapp || "") : ""
+        whatsapp: profile ? String(profile.whatsapp || "") : "",
+        photoId: profilePhoto ? String(profilePhoto.id_imagem) : "",
+        photoUrl: profilePhoto ? appImageProxyUrl_(String(profilePhoto.id_imagem)) : ""
     };
 }
 
 function appGetProfile_(userId) {
     return appFind_("PROFISSIONAIS", "id_usuario", userId);
+}
+
+function appGetProfilePhoto_(profileId) {
+    var rows = appRecords_("IMAGENS").filter(function (item) {
+        return String(item.id_profissional || "") === String(profileId)
+            && String(item.id_servico || "") === ""
+            && String(item.status) === "active";
+    });
+    return rows.length === 1 ? rows[0] : null;
+}
+
+function appImageProxyUrl_(imageId) {
+    return "/api/public-images?id=" + encodeURIComponent(String(imageId));
 }
 
 function appBuildServiceCityIndex_() {
@@ -1070,6 +1097,10 @@ function appImageServiceReservationKey_(serviceId) {
     return APP_IMAGE_UPLOAD_SERVICE_PREFIX + String(serviceId);
 }
 
+function appImageProfileReservationKey_(profileId) {
+    return APP_IMAGE_UPLOAD_PROFILE_PREFIX + String(profileId);
+}
+
 function appImageReadUploadState_(uploadId) {
     if (typeof uploadId !== "string" || !/^[0-9a-f-]{36}$/i.test(uploadId)) {
         throw appFault_("IMAGE_UPLOAD_NOT_FOUND", "A sessão de envio não foi encontrada.");
@@ -1103,7 +1134,11 @@ function appImageDeleteUploadState_(state) {
     var properties = PropertiesService.getScriptProperties();
     if (!state || !state.uploadId) return;
     properties.deleteProperty(appImageUploadKey_(String(state.uploadId)));
-    properties.deleteProperty(appImageServiceReservationKey_(String(state.serviceId)));
+    if (String(state.kind || "service") === "profile") {
+        properties.deleteProperty(appImageProfileReservationKey_(String(state.profileId)));
+    } else {
+        properties.deleteProperty(appImageServiceReservationKey_(String(state.serviceId)));
+    }
 }
 
 function appImageMimeAllowed_(mimeType) {
@@ -1206,7 +1241,9 @@ function appImageDriveStartSession_(state, folderId) {
     if (typeof token !== "string" || !token) {
         throw appFault_("DRIVE_AUTH_UNAVAILABLE", "A autorização do Google Drive não está disponível.");
     }
-    var fileName = "conecta-service-" + String(state.serviceId) + "-" + String(state.uploadId) + "." + appImageExtension_(state.mimeType);
+    var filePrefix = String(state.kind || "service") === "profile" ? "conecta-profile-" : "conecta-service-";
+    var resourceId = String(state.kind || "service") === "profile" ? String(state.profileId) : String(state.serviceId);
+    var fileName = filePrefix + resourceId + "-" + String(state.uploadId) + "." + appImageExtension_(state.mimeType);
     var url = "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&fields=id%2Cname%2CmimeType%2Csize%2Cparents";
     var response;
     try {
@@ -1244,9 +1281,18 @@ function appImageRequireUpload_(payload, nowMs) {
         throw appFault_("IMAGE_UPLOAD_NOT_FOUND", "A sessão de envio não foi encontrada.");
     }
     var profile = appGetProfile_(String(session.user.id_usuario));
-    var service = profile ? appFind_("SERVICOS", "id_servico", String(state.serviceId)) : null;
-    if (!profile || !service || String(service.id_profissional) !== String(profile.id_profissional)
-        || String(state.profileId) !== String(profile.id_profissional)) {
+    if (!profile || String(state.profileId) !== String(profile.id_profissional)) {
+        throw appFault_(String(state.kind || "service") === "profile" ? "PROFILE_PHOTO_NOT_FOUND" : "SERVICE_NOT_FOUND",
+            String(state.kind || "service") === "profile" ? "Foto de perfil não encontrada." : "Serviço não encontrado.");
+    }
+    if (String(state.kind || "service") === "profile") {
+        if (String(state.serviceId || "") !== "" || Number(state.order) !== 1) {
+            throw appFault_("IMAGE_UPLOAD_STATE_INVALID", "O estado do envio de foto de perfil é inválido.");
+        }
+        return { state: state, service: null, profile: profile, user: session.user };
+    }
+    var service = appFind_("SERVICOS", "id_servico", String(state.serviceId));
+    if (!service || String(service.id_profissional) !== String(profile.id_profissional)) {
         throw appFault_("SERVICE_NOT_FOUND", "Serviço não encontrado.");
     }
     if (state.status !== "completed" && ["suspended", "removed"].indexOf(String(service.status)) !== -1) {
@@ -1359,6 +1405,10 @@ function appImageFinalizeUpload_(state, driveMetadata) {
         } catch (ignored) {}
         appImageDeleteUploadState_(state);
         throw appFault_("DRIVE_FILE_VALIDATION_FAILED", "O arquivo concluído no Google Drive não corresponde ao envio.");
+    }
+
+    if (String(state.kind || "service") === "profile") {
+        return appImageFinalizeProfilePhotoUpload_(state, driveMetadata);
     }
 
     return appWithLock_(function () {
@@ -1478,6 +1528,226 @@ function appImageFinalizeUpload_(state, driveMetadata) {
             }
         };
     });
+}
+
+
+function appImageFinalizeProfilePhotoUpload_(state, driveMetadata) {
+    return appWithLock_(function () {
+        var currentState = appImageReadUploadState_(String(state.uploadId));
+        var profile = appFind_("PROFISSIONAIS", "id_profissional", String(currentState.profileId));
+        var user = profile ? appFind_("USUARIOS", "id_usuario", String(profile.id_usuario)) : null;
+        if (String(currentState.kind || "") !== "profile"
+            || !profile
+            || !user
+            || String(currentState.userId) !== String(user.id_usuario)
+            || String(profile.id_profissional) !== String(currentState.profileId)
+            || String(user.status) !== "active") {
+            try {
+                var rejectedFile = DriveApp.getFileById(String(driveMetadata.id));
+                rejectedFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
+                rejectedFile.setTrashed(true);
+            } catch (ignored) {}
+            appImageDeleteUploadState_(currentState);
+            throw appFault_("PROFILE_PHOTO_NOT_FOUND", "A sessão de foto de perfil não está disponível.");
+        }
+
+        var imageRows = appRecords_("IMAGENS");
+        var activeRows = imageRows.filter(function (item) {
+            return String(item.id_profissional || "") === String(profile.id_profissional)
+                && String(item.id_servico || "") === ""
+                && String(item.status) === "active";
+        });
+        var driveFile;
+        try {
+            driveFile = DriveApp.getFileById(String(driveMetadata.id));
+            driveFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
+            if (driveFile.isTrashed && driveFile.isTrashed()) throw new Error("Arquivo removido.");
+        } catch (error) {
+            try {
+                var rejectedDriveFile = DriveApp.getFileById(String(driveMetadata.id));
+                rejectedDriveFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
+                rejectedDriveFile.setTrashed(true);
+            } catch (ignored) {}
+            appImageDeleteUploadState_(currentState);
+            throw appFault_("IMAGE_PERMISSION_SYNC_FAILED", "Não foi possível manter privada a nova foto no Google Drive.");
+        }
+        if (activeRows.length > 1) {
+            try { driveFile.setTrashed(true); } catch (ignored) {}
+            appImageDeleteUploadState_(currentState);
+            throw appFault_("PROFILE_PHOTO_CONFLICT", "Há mais de uma foto de perfil ativa. Regularize os registros antes de substituir.");
+        }
+
+        var previous = activeRows[0] || null;
+        var nowIso = new Date().toISOString();
+        var imageId = Utilities.getUuid();
+        var imageRow = 0;
+        var previousRestricted = false;
+        try {
+            // A foto permanece privada no Drive; a leitura pública passa pelo gateway,
+            // que revalida a conta ativa e nunca expõe o token OAuth ao navegador.
+            if (previous) {
+                appImageSetFilePrivate_(String(previous.id_arquivo_drive));
+                previousRestricted = true;
+                appUpdate_("IMAGENS", previous._row, {
+                    status: "removed",
+                    atualizado_em: nowIso
+                });
+            }
+
+            imageRow = appAppend_("IMAGENS", {
+                id_imagem: imageId,
+                id_profissional: String(profile.id_profissional),
+                id_servico: "",
+                id_arquivo_drive: String(driveFile.getId()),
+                tipo_mime: String(currentState.mimeType),
+                tamanho_bytes: Number(currentState.fileSize),
+                ordem_exibicao: 1,
+                status: "active",
+                criado_em: nowIso,
+                atualizado_em: nowIso
+            });
+
+            appAudit_(
+                String(user.id_usuario),
+                "user",
+                previous ? "profile.photo.replace" : "profile.photo.upload",
+                "IMAGENS",
+                imageId,
+                "success",
+                previous ? "Foto de perfil substituída; arquivo anterior restringido." : "Foto de perfil enviada ao Drive."
+            );
+        } catch (error) {
+            if (imageRow) {
+                try {
+                    appUpdate_("IMAGENS", imageRow, {
+                        status: "removed",
+                        atualizado_em: new Date().toISOString()
+                    });
+                } catch (ignored) {}
+            }
+            try {
+                appImageSetFilePrivate_(String(driveFile.getId()));
+                driveFile.setTrashed(true);
+            } catch (ignored) {}
+            if (previous && previousRestricted) {
+                try {
+                    appImageSetFilePrivate_(String(previous.id_arquivo_drive));
+                    appUpdate_("IMAGENS", previous._row, {
+                        status: "active",
+                        atualizado_em: new Date().toISOString()
+                    });
+                } catch (ignored) {}
+            }
+            appImageDeleteUploadState_(currentState);
+            throw appFault_("IMAGE_METADATA_SAVE_FAILED", "Não foi possível registrar a nova foto de perfil. A foto anterior foi preservada quando possível.");
+        }
+
+        currentState.status = "completed";
+        currentState.sessionUri = "";
+        currentState.inFlight = false;
+        currentState.inFlightAt = 0;
+        currentState.nextOffset = Number(currentState.fileSize);
+        currentState.completedImageId = imageId;
+        currentState.completedDriveFileId = String(driveFile.getId());
+        currentState.completedAt = nowIso;
+        currentState.completedImage = {
+            id: imageId,
+            order: 1,
+            mimeType: String(currentState.mimeType),
+            sizeBytes: Number(currentState.fileSize),
+            status: "active",
+            url: appImageProxyUrl_(imageId)
+        };
+        PropertiesService.getScriptProperties().deleteProperty(
+            appImageProfileReservationKey_(String(profile.id_profissional))
+        );
+        appImageStoreUploadState_(currentState);
+
+        return {
+            completed: true,
+            image: currentState.completedImage
+        };
+    });
+}
+
+function appProfilePhotoUploadStart_(payload, nowMs) {
+    if (!appHasKeys_(payload, ["tokenHash", "fileSize", "mimeType"])) {
+        throw appFault_("INVALID_INPUT", "Os dados para iniciar a foto de perfil estão incompletos.");
+    }
+    var fileSize = Number(payload.fileSize);
+    var mimeType = String(payload.mimeType || "");
+    if (!Number.isSafeInteger(fileSize) || fileSize < 12 || fileSize > APP_IMAGE_MAX_BYTES) {
+        throw appFault_("IMAGE_SIZE_INVALID", "A foto deve ter entre 12 bytes e 5.000.000 bytes.");
+    }
+    if (!appImageMimeAllowed_(mimeType)) throw appFault_("IMAGE_MIME_INVALID", "Use uma foto JPG, PNG ou WebP.");
+
+    var preflightSession = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, false);
+    var preflightProfile = appGetProfile_(String(preflightSession.user.id_usuario));
+    if (!preflightProfile) throw appFault_("PROFILE_UNAVAILABLE", "O perfil profissional não está disponível.");
+
+    appImageSheet_();
+    var folderId = appImagePrivateFolderId_();
+    var state = appWithLock_(function () {
+        var session = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, true);
+        var profile = appGetProfile_(String(session.user.id_usuario));
+        if (!profile || String(session.user.status) !== "active") {
+            throw appFault_("PROFILE_UNAVAILABLE", "O perfil profissional não está disponível.");
+        }
+        var properties = PropertiesService.getScriptProperties();
+        var reservationKey = appImageProfileReservationKey_(String(profile.id_profissional));
+        var existingUploadId = properties.getProperty(reservationKey);
+        if (existingUploadId) {
+            var existingRaw = properties.getProperty(appImageUploadKey_(String(existingUploadId)));
+            var existing = null;
+            try { existing = existingRaw ? JSON.parse(existingRaw) : null; } catch (ignored) {}
+            if (existing && Number(existing.expiresAt) > nowMs) {
+                throw appFault_("IMAGE_UPLOAD_IN_PROGRESS", "Já existe um envio de foto de perfil em andamento.");
+            }
+            properties.deleteProperty(appImageUploadKey_(String(existingUploadId)));
+            properties.deleteProperty(reservationKey);
+        }
+
+        var uploadId = Utilities.getUuid();
+        var createdAt = new Date(nowMs).toISOString();
+        var nextState = {
+            kind: "profile",
+            uploadId: uploadId,
+            userId: String(session.user.id_usuario),
+            profileId: String(profile.id_profissional),
+            serviceId: "",
+            folderId: String(folderId),
+            mimeType: mimeType,
+            fileSize: fileSize,
+            order: 1,
+            sessionUri: "",
+            nextOffset: 0,
+            signatureValidated: false,
+            inFlight: false,
+            inFlightAt: 0,
+            status: "creating",
+            createdAt: createdAt,
+            expiresAt: nowMs + APP_IMAGE_UPLOAD_TTL_MS
+        };
+        appImageStoreUploadState_(nextState);
+        properties.setProperty(reservationKey, uploadId);
+        return nextState;
+    });
+
+    try {
+        state.sessionUri = appImageDriveStartSession_(state, folderId);
+        state.status = "uploading";
+        appWithLock_(function () { appImageStoreUploadState_(state); });
+        return {
+            uploadId: String(state.uploadId),
+            order: 1,
+            chunkSize: APP_IMAGE_CHUNK_BYTES,
+            nextOffset: 0,
+            expiresAt: Number(state.expiresAt)
+        };
+    } catch (error) {
+        try { appImageDeleteUploadState_(state); } catch (ignored) {}
+        throw error;
+    }
 }
 
 function appImageUploadStart_(payload, nowMs) {
@@ -1691,8 +1961,10 @@ function appImageUploadStatus_(payload, nowMs) {
         var completedImage = appFind_("IMAGENS", "id_imagem", String(authorized.state.completedImageId || ""));
         if (!completedImage) throw appFault_("IMAGE_UPLOAD_STATE_INVALID", "O recibo de conclusão não corresponde a uma imagem registrada.");
         var imageIsPublic = String(completedImage.status) === "active"
-            && String(authorized.service.status) === "published"
             && String(authorized.user.status) === "active";
+        if (String(authorized.state.kind || "service") !== "profile") {
+            imageIsPublic = imageIsPublic && authorized.service && String(authorized.service.status) === "published";
+        }
         return {
             completed: true,
             image: {
@@ -1702,7 +1974,9 @@ function appImageUploadStatus_(payload, nowMs) {
                 sizeBytes: Number(completedImage.tamanho_bytes),
                 status: String(completedImage.status),
                 url: imageIsPublic
-                    ? appImagePublicUrl_(String(completedImage.id_arquivo_drive))
+                    ? (String(authorized.state.kind || "service") === "profile"
+                        ? appImageProxyUrl_(String(completedImage.id_imagem))
+                        : appImagePublicUrl_(String(completedImage.id_arquivo_drive)))
                     : null
             }
         };
@@ -1836,20 +2110,39 @@ function appResolvePublicImage_(payload) {
         throw appFault_("IMAGE_NOT_FOUND", "Imagem não encontrada ou indisponível.");
     }
 
-    var service = appFind_("SERVICOS", "id_servico", String(image.id_servico || ""));
-    var profile = service
-        ? appFind_("PROFISSIONAIS", "id_profissional", String(service.id_profissional || ""))
-        : null;
-    var user = profile
-        ? appFind_("USUARIOS", "id_usuario", String(profile.id_usuario || ""))
-        : null;
-    var category = service
-        ? appFind_("CATEGORIAS", "id_categoria", String(service.id_categoria || ""))
-        : null;
-
-    if (!service || String(service.status) !== "published" || !profile || !user
-        || String(user.status) !== "active" || !category) {
+    var serviceId = String(image.id_servico || "");
+    var profileId = String(image.id_profissional || "");
+    if ((serviceId === "" && profileId === "") || (serviceId !== "" && profileId !== "")) {
         throw appFault_("IMAGE_NOT_FOUND", "Imagem não encontrada ou indisponível.");
+    }
+
+    var profile;
+    var user;
+    if (profileId !== "") {
+        profile = appFind_("PROFISSIONAIS", "id_profissional", profileId);
+        user = profile ? appFind_("USUARIOS", "id_usuario", String(profile.id_usuario || "")) : null;
+        var activeProfilePhoto = profile ? appGetProfilePhoto_(profileId) : null;
+        if (!profile || !user || String(user.status) !== "active"
+            || !activeProfilePhoto
+            || String(activeProfilePhoto.id_imagem) !== imageId
+            || Number(image.ordem_exibicao) !== 1) {
+            throw appFault_("IMAGE_NOT_FOUND", "Imagem não encontrada ou indisponível.");
+        }
+    } else {
+        var service = appFind_("SERVICOS", "id_servico", serviceId);
+        profile = service
+            ? appFind_("PROFISSIONAIS", "id_profissional", String(service.id_profissional || ""))
+            : null;
+        user = profile
+            ? appFind_("USUARIOS", "id_usuario", String(profile.id_usuario || ""))
+            : null;
+        var category = service
+            ? appFind_("CATEGORIAS", "id_categoria", String(service.id_categoria || ""))
+            : null;
+        if (!service || String(service.status) !== "published" || !profile || !user
+            || String(user.status) !== "active" || !category) {
+            throw appFault_("IMAGE_NOT_FOUND", "Imagem não encontrada ou indisponível.");
+        }
     }
 
     var fileId = String(image.id_arquivo_drive || "");
@@ -1890,6 +2183,34 @@ function appResolvePublicImage_(payload) {
         sizeBytes: sizeBytes,
         accessToken: accessToken
     };
+}
+
+
+function appProfilePhotoRemove_(payload, nowMs) {
+    if (!appHasKeys_(payload, ["tokenHash", "imageId"])) {
+        throw appFault_("INVALID_INPUT", "Informe a foto de perfil que deseja remover.");
+    }
+    return appWithLock_(function () {
+        var session = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, true);
+        var profile = appGetProfile_(String(session.user.id_usuario));
+        if (!profile) throw appFault_("PROFILE_UNAVAILABLE", "O perfil profissional não está disponível.");
+        var image = appFind_("IMAGENS", "id_imagem", String(payload.imageId));
+        if (!image
+            || String(image.id_profissional || "") !== String(profile.id_profissional)
+            || String(image.id_servico || "") !== "") {
+            throw appFault_("PROFILE_PHOTO_NOT_FOUND", "Foto de perfil não encontrada.");
+        }
+        appImageSetFilePrivate_(String(image.id_arquivo_drive));
+        if (String(image.status) === "removed") {
+            return { removed: true, imageId: String(image.id_imagem), alreadyRemoved: true };
+        }
+        appUpdate_("IMAGENS", image._row, {
+            status: "removed",
+            atualizado_em: new Date(nowMs).toISOString()
+        });
+        appAudit_(String(session.user.id_usuario), "user", "profile.photo.remove", "IMAGENS", String(image.id_imagem), "success", "Foto de perfil removida e acesso restringido.");
+        return { removed: true, imageId: String(image.id_imagem) };
+    });
 }
 
 function appImageRemove_(payload, nowMs) {

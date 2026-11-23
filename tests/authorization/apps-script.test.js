@@ -485,6 +485,7 @@ function createHarness(options = {}) {
                     this.sharingHistory.push({ access, permission });
                 },
                 setTrashed(value) { this.trashed = Boolean(value); },
+                isTrashed() { return this.trashed; },
                 getId() { return this.id; },
                 getSize() { return this.size; },
                 getMimeType() { return this.mimeType; },
@@ -513,7 +514,7 @@ function createHarness(options = {}) {
     };
 
     context.UrlFetchApp = fakeUrlFetch;
-    context.ScriptApp = { getOAuthToken: () => "synthetic-drive-oauth-token" };
+    context.ScriptApp = { getOAuthToken: () => "synthetic-drive-oauth-token-for-test-validation" };
     context.DriveApp = driveApp;
 
     runInNewContext(SOURCE, context, { filename: "conecta-local/Code.gs" });
@@ -1096,6 +1097,24 @@ function startPngUpload(harness, tokenHash = TOKEN_HASH_A, serviceId = SERVICE_A
     return { bytes, started, uploaded };
 }
 
+function startPngProfilePhotoUpload(harness, tokenHash = TOKEN_HASH_A) {
+    const bytes = createPngBytes();
+    const started = harness.call("profile.photo.upload.start", {
+        tokenHash,
+        fileSize: bytes.length,
+        mimeType: "image/png",
+    });
+    assert.equal(started.ok, true, "Início do upload da foto falhou: " + JSON.stringify(started));
+    const uploaded = harness.call("image.upload.chunk", {
+        tokenHash,
+        uploadId: started.data.uploadId,
+        startOffset: 0,
+        totalSize: bytes.length,
+        chunkBase64: bytes.toString("base64"),
+    });
+    return { bytes, started, uploaded };
+}
+
 test("image.upload.start aceita URI oficial com fields e session_crd retornados pelo Drive", () => {
     const harness = createHarness();
     const result = harness.call("image.upload.start", {
@@ -1408,4 +1427,187 @@ test("image.upload.chunk trata 308 sem Range como offset não confirmado", () =>
     assert.equal(result.ok, false);
     assert.equal(result.error.code, "DRIVE_CHUNK_OFFSET_UNKNOWN");
     assert.equal(harness.records("IMAGENS").length, 0);
+});
+
+
+test("foto de perfil é salva como imagem exclusiva do profissional e retorna na sessão", () => {
+    const harness = createHarness();
+    const { uploaded } = startPngProfilePhotoUpload(harness);
+
+    assert.equal(uploaded.ok, true, "Upload da foto falhou: " + JSON.stringify(uploaded));
+    assert.equal(uploaded.data.completed, true);
+    assert.equal(uploaded.data.image.order, 1);
+    assert.equal(uploaded.data.image.mimeType, "image/png");
+    assert.equal(uploaded.data.image.sizeBytes, 24);
+    assert.match(uploaded.data.image.url, /^\/api\/public-images\?id=/);
+
+    const rows = harness.records("IMAGENS");
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].id_profissional, PROFILE_A);
+    assert.equal(rows[0].id_servico, "");
+    assert.equal(rows[0].ordem_exibicao, 1);
+    assert.equal(rows[0].status, "active");
+    assert.equal(harness.driveFiles.get("synthetic-drive-file-1").sharing, "PRIVATE");
+
+    const me = harness.call("session.me", { tokenHash: TOKEN_HASH_A });
+    assert.equal(me.ok, true);
+    assert.equal(me.data.user.photoId, rows[0].id_imagem);
+    assert.equal(me.data.user.photoUrl, "/api/public-images?id=" + rows[0].id_imagem);
+
+    const audit = harness.records("AUDITORIA").find((event) => event.acao === "profile.photo.upload");
+    assert.ok(audit);
+    assert.equal(audit.id_usuario_ator, USER_A);
+    assert.equal(audit.id_registro_afetado, rows[0].id_imagem);
+    assert.equal(audit.resultado, "success");
+});
+
+test("substituição da foto de perfil restringe o arquivo anterior e mantém uma única foto ativa", () => {
+    const harness = createHarness();
+    const first = startPngProfilePhotoUpload(harness);
+    assert.equal(first.uploaded.ok, true);
+    const firstImageId = first.uploaded.data.image.id;
+    const firstFile = harness.driveFiles.get("synthetic-drive-file-1");
+
+    const second = startPngProfilePhotoUpload(harness);
+    assert.equal(second.uploaded.ok, true);
+    const secondImageId = second.uploaded.data.image.id;
+
+    const rows = harness.records("IMAGENS");
+    assert.equal(rows.length, 2);
+    assert.equal(rows.find((row) => row.id_imagem === firstImageId).status, "removed");
+    assert.equal(rows.find((row) => row.id_imagem === secondImageId).status, "active");
+    assert.equal(rows.filter((row) => row.id_profissional === PROFILE_A && row.id_servico === "" && row.status === "active").length, 1);
+    assert.equal(firstFile.sharing, "PRIVATE");
+    assert.equal(harness.driveFiles.get("synthetic-drive-file-2").sharing, "PRIVATE");
+
+    const me = harness.call("session.me", { tokenHash: TOKEN_HASH_A });
+    assert.equal(me.data.user.photoId, secondImageId);
+    assert.equal(me.data.user.photoUrl, "/api/public-images?id=" + secondImageId);
+
+    const audit = harness.records("AUDITORIA").filter((event) =>
+        event.acao === "profile.photo.upload" || event.acao === "profile.photo.replace",
+    );
+    assert.deepEqual(audit.map((event) => event.acao), ["profile.photo.upload", "profile.photo.replace"]);
+});
+
+test("upload de foto de perfil não pode ser concluído com a sessão de outro profissional", () => {
+    const harness = createHarness();
+    const bytes = createPngBytes();
+    const started = harness.call("profile.photo.upload.start", {
+        tokenHash: TOKEN_HASH_A,
+        fileSize: bytes.length,
+        mimeType: "image/png",
+    });
+    assert.equal(started.ok, true);
+
+    const foreignChunk = harness.call("image.upload.chunk", {
+        tokenHash: TOKEN_HASH_B,
+        uploadId: started.data.uploadId,
+        startOffset: 0,
+        totalSize: bytes.length,
+        chunkBase64: bytes.toString("base64"),
+    });
+
+    assert.equal(foreignChunk.ok, false);
+    assert.equal(foreignChunk.error.code, "IMAGE_UPLOAD_NOT_FOUND");
+    assert.equal(harness.records("IMAGENS").length, 0);
+
+    const cancelled = harness.call("profile.photo.upload.cancel", {
+        tokenHash: TOKEN_HASH_A,
+        uploadId: started.data.uploadId,
+    });
+    assert.equal(cancelled.ok, true);
+    assert.equal(cancelled.data.cancelled, true);
+});
+
+test("profile.photo.upload.cancel libera a reserva do profissional sem gravar metadados", () => {
+    const harness = createHarness();
+    const bytes = createPngBytes();
+    const started = harness.call("profile.photo.upload.start", {
+        tokenHash: TOKEN_HASH_A,
+        fileSize: bytes.length,
+        mimeType: "image/png",
+    });
+    assert.equal(started.ok, true);
+
+    const reservationKey = "CONECTA_LOCAL_IMAGE_PROFILE_UPLOAD_V1_" + PROFILE_A;
+    assert.equal(harness.properties.has(reservationKey), true);
+
+    const cancelled = harness.call("profile.photo.upload.cancel", {
+        tokenHash: TOKEN_HASH_A,
+        uploadId: started.data.uploadId,
+    });
+    assert.equal(cancelled.ok, true);
+    assert.equal(cancelled.data.cancelled, true);
+    assert.equal(harness.properties.has(reservationKey), false);
+    assert.equal(harness.records("IMAGENS").length, 0);
+});
+
+test("profile.photo.upload.status recupera recibo sem reenviar blocos ao Drive", () => {
+    const harness = createHarness();
+    const { started, uploaded } = startPngProfilePhotoUpload(harness);
+    assert.equal(uploaded.ok, true);
+    const drivePutCount = harness.driveCalls.filter((call) => String(call.options.method).toLowerCase() === "put").length;
+
+    const status = harness.call("profile.photo.upload.status", {
+        tokenHash: TOKEN_HASH_A,
+        uploadId: started.data.uploadId,
+    });
+
+    assert.equal(status.ok, true);
+    assert.equal(status.data.completed, true);
+    assert.equal(status.data.image.id, uploaded.data.image.id);
+    assert.equal(status.data.image.url, "/api/public-images?id=" + uploaded.data.image.id);
+    assert.equal(
+        harness.driveCalls.filter((call) => String(call.options.method).toLowerCase() === "put").length,
+        drivePutCount,
+    );
+});
+
+test("profile.photo.remove restringe o arquivo e atualiza a sessão sem a foto", () => {
+    const harness = createHarness();
+    const { uploaded } = startPngProfilePhotoUpload(harness);
+    assert.equal(uploaded.ok, true);
+    const imageId = uploaded.data.image.id;
+    const file = harness.driveFiles.get("synthetic-drive-file-1");
+
+    const removed = harness.call("profile.photo.remove", {
+        tokenHash: TOKEN_HASH_A,
+        imageId,
+        id_profissional: PROFILE_B,
+    });
+
+    assert.equal(removed.ok, true);
+    assert.equal(removed.data.removed, true);
+    assert.equal(file.sharing, "PRIVATE");
+    assert.equal(harness.records("IMAGENS")[0].status, "removed");
+
+    const me = harness.call("session.me", { tokenHash: TOKEN_HASH_A });
+    assert.equal(me.ok, true);
+    assert.equal(me.data.user.photoId, "");
+    assert.equal(me.data.user.photoUrl, "");
+
+    const audit = harness.records("AUDITORIA").find((event) => event.acao === "profile.photo.remove");
+    assert.ok(audit);
+    assert.equal(audit.id_usuario_ator, USER_A);
+    assert.equal(audit.id_registro_afetado, imageId);
+});
+
+test("public.image.resolve permite foto ativa somente do profissional com conta ativa", () => {
+    const harness = createHarness();
+    const { uploaded } = startPngProfilePhotoUpload(harness);
+    assert.equal(uploaded.ok, true);
+    const imageId = uploaded.data.image.id;
+
+    const resolved = harness.call("public.image.resolve", { imageId });
+    assert.equal(resolved.ok, true);
+    assert.equal(resolved.data.fileId, "synthetic-drive-file-1");
+    assert.equal(resolved.data.mimeType, "image/png");
+    assert.equal(harness.driveFiles.get("synthetic-drive-file-1").sharing, "PRIVATE");
+
+    const removed = harness.call("profile.photo.remove", { tokenHash: TOKEN_HASH_A, imageId });
+    assert.equal(removed.ok, true);
+    const hidden = harness.call("public.image.resolve", { imageId });
+    assert.equal(hidden.ok, false);
+    assert.equal(hidden.error.code, "IMAGE_NOT_FOUND");
 });

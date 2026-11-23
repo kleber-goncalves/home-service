@@ -42,6 +42,10 @@ const BROWSER_ACTIONS = new Set([
     "image.upload.status",
     "image.upload.cancel",
     "image.remove",
+    "profile.photo.upload.start",
+    "profile.photo.upload.status",
+    "profile.photo.upload.cancel",
+    "profile.photo.remove",
 ]);
 
 const RESPONSE_HEADERS = {
@@ -261,7 +265,9 @@ function mapAppsScriptError(output) {
         IMAGE_MIME_INVALID: [415, "Use uma imagem JPG, PNG ou WebP."],
         IMAGE_CONTENT_INVALID: [415, "O conteúdo do arquivo não corresponde ao formato informado."],
         IMAGE_CHUNK_INVALID: [400, "O bloco da imagem é inválido."],
-        IMAGE_UPLOAD_IN_PROGRESS: [409, "Já existe um envio em andamento para este serviço."],
+        IMAGE_UPLOAD_IN_PROGRESS: [409, "Já existe um envio em andamento para este recurso."],
+        PROFILE_PHOTO_NOT_FOUND: [404, "Foto de perfil não encontrada."],
+        PROFILE_PHOTO_CONFLICT: [409, "Há mais de uma foto de perfil ativa; regularize os registros antes de substituir."],
         IMAGE_UPLOAD_EXPIRED: [409, "A sessão de envio expirou. Inicie novamente."],
         IMAGE_LIMIT_REACHED: [409, "O serviço já atingiu o limite de cinco imagens."],
         IMAGE_PERMISSION_SYNC_FAILED: [502, "Não foi possível atualizar a permissão da imagem."],
@@ -352,7 +358,7 @@ export function createAppHandler({
         }
 
         const sessionToken = parseSessionCookie(request.headers.get("cookie"));
-        const protectedActions = new Set(["auth.me", "auth.logout", "profile.update", "service.listMine", "service.create", "service.update", "service.remove", "service.setStatus", "image.upload.start", "image.upload.status", "image.upload.cancel", "image.remove"]);
+        const protectedActions = new Set(["auth.me", "auth.logout", "profile.update", "service.listMine", "service.create", "service.update", "service.remove", "service.setStatus", "image.upload.start", "image.upload.status", "image.upload.cancel", "image.remove", "profile.photo.upload.start", "profile.photo.upload.status", "profile.photo.upload.cancel", "profile.photo.remove"]);
         if (protectedActions.has(action) && !sessionToken) {
             return fail(requestId, "SESSION_INVALID", "Entre novamente para continuar.", 401, clearSessionCookie());
         }
@@ -469,9 +475,21 @@ export function createAppHandler({
                             mimeType: payload.mimeType,
                             tokenHash,
                         };
-                    } else if (action === "image.upload.status" || action === "image.upload.cancel") {
+                    } else if (action === "profile.photo.upload.start") {
+                        forwardedPayload = {
+                            fileSize: payload.fileSize,
+                            mimeType: payload.mimeType,
+                            tokenHash,
+                        };
+                    } else if (action === "image.upload.status" || action === "image.upload.cancel"
+                        || action === "profile.photo.upload.status" || action === "profile.photo.upload.cancel") {
                         forwardedPayload = {
                             uploadId: payload.uploadId,
+                            tokenHash,
+                        };
+                    } else if (action === "profile.photo.remove") {
+                        forwardedPayload = {
+                            imageId: payload.imageId,
                             tokenHash,
                         };
                     } else if (action === "image.remove") {

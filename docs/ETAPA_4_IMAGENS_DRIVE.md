@@ -4,7 +4,7 @@
 >
 > **Branch de implementação:** `feat/drive-image-upload` (integrada em `dev` pela PR #26).
 >
-> **Escopo inicial:** imagens de serviços. Foto de perfil fica para uma segunda parte da etapa.
+> **Escopo desta etapa:** imagens de serviços. A foto de perfil é implementada separadamente no plano `docs/PLANO_CONTA_PERFIL.md`, reutilizando o transporte retomável, mas com propriedade e regras próprias.
 >
 > **Ambiente:** Vercel Preview + Apps Script + Google Sheets e Drive de teste; somente dados e imagens sintéticas/licenciadas.
 
@@ -226,9 +226,9 @@ Os cenários abaixo foram executados no ambiente Preview, com confirmação oper
 
 Os testes manuais acima validam o caminho funcional principal da integração real. Não registrar como executados os cenários complementares que não foram confirmados nesta sessão, como repetição manual individual com PNG/WebP, falha forçada de gravação no Sheets ou interrupção deliberada de blocos.
 
-## 9. Fora do primeiro ciclo
+## 9. Fora do primeiro ciclo de imagens de serviço
 
-- Foto de perfil profissional.
+- Foto de perfil profissional (tratada no plano separado `docs/PLANO_CONTA_PERFIL.md`).
 - Edição de ordem por arrastar e soltar.
 - Galeria completa na página de detalhes.
 - Conversão, compressão e otimização de imagens no servidor.

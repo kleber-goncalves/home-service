@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { uploadServiceImage } from "../../src/services/image-api.js";
+import { uploadProfilePhoto, uploadServiceImage } from "../../src/services/image-api.js";
 
 const CHUNK_BYTES = 1024 * 1024;
 
@@ -139,4 +139,83 @@ test("uploadServiceImage cancela uma intenção não iniciada quando o usuário 
     });
 
     assert.deepEqual(actions, ["image.upload.start", "image.upload.status", "image.upload.cancel"]);
+});
+
+
+test("uploadProfilePhoto usa ações próprias de perfil e o mesmo transporte em blocos", async () => {
+    const actions = [];
+    const photo = {
+        id: "synthetic-profile-photo-1",
+        order: 1,
+        status: "active",
+        url: "/api/public-images?id=synthetic-profile-photo-1",
+    };
+
+    await withFetchMock(async (url, options) => {
+        if (url === "/api/app") {
+            const body = JSON.parse(options.body);
+            actions.push(body.action);
+            if (body.action === "profile.photo.upload.start") {
+                assert.equal(body.payload.fileSize, 24);
+                assert.equal(body.payload.mimeType, "image/jpeg");
+                return jsonResponse({ uploadId: "00000000-0000-4000-8000-000000000010", nextOffset: 0 });
+            }
+            assert.fail("Não era esperada uma consulta adicional: " + body.action);
+        }
+
+        assert.equal(url, "/api/images");
+        assert.equal(options.method, "POST");
+        assert.equal(options.credentials, "same-origin");
+        assert.equal(options.headers["Content-Type"], "application/octet-stream");
+        assert.equal(options.headers["X-Image-Upload-Id"], "00000000-0000-4000-8000-000000000010");
+        assert.equal(options.body.size, 24);
+        return jsonResponse({ completed: true, image: photo });
+    }, async () => {
+        const result = await uploadProfilePhoto({
+            file: createFile(24),
+            csrfToken: "d".repeat(64),
+        });
+        assert.equal(result.id, photo.id);
+        assert.equal(result.url, photo.url);
+    });
+
+    assert.deepEqual(actions, ["profile.photo.upload.start"]);
+});
+
+test("uploadProfilePhoto reconcilia e cancela usando as ações de perfil", async () => {
+    const actions = [];
+    const controller = new AbortController();
+
+    await withFetchMock(async (url, options) => {
+        assert.equal(url, "/api/app");
+        const body = JSON.parse(options.body);
+        actions.push(body.action);
+
+        if (body.action === "profile.photo.upload.start") {
+            return jsonResponse({ uploadId: "00000000-0000-4000-8000-000000000011", nextOffset: 0 });
+        }
+        if (body.action === "profile.photo.upload.status") {
+            return jsonResponse({ completed: false, nextOffset: 0, totalSize: 1024 });
+        }
+        if (body.action === "profile.photo.upload.cancel") {
+            return jsonResponse({ cancelled: true });
+        }
+        assert.fail("Ação inesperada: " + body.action);
+    }, async () => {
+        await assert.rejects(
+            uploadProfilePhoto({
+                file: createFile(1024),
+                csrfToken: "e".repeat(64),
+                signal: controller.signal,
+                onUploadStarted: () => controller.abort(),
+            }),
+            (error) => error.name === "AbortError",
+        );
+    });
+
+    assert.deepEqual(actions, [
+        "profile.photo.upload.start",
+        "profile.photo.upload.status",
+        "profile.photo.upload.cancel",
+    ]);
 });
