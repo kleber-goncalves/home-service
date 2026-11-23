@@ -401,9 +401,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 34e2df4c932ca79e48ba7cfc3762e5fdde33a41a
-- **Data do commit:** 2026-11-23T16:56:06-03:00
-- **Mensagem do commit:** fix(profile-photo): manter foto privada e retornar id no perfil
+- **Commit de referência:** 28479b065d038622139ea252b84ab641b43bc46e
+- **Data do commit:** 2026-11-23T16:56:24-03:00
+- **Mensagem do commit:** feat(profile-photo): criar gerenciador de foto de perfil
 - **Branch desta execução:** feat/foto-perfil-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -484,6 +484,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/components/home/hero-search.jsx
 - src/components/home/home-sections.jsx
 - src/components/home/site-header.jsx
+- src/components/professional/profile-photo-manager.jsx
 - src/components/professional/service-image-manager.jsx
 - src/components/public/app-link.jsx
 - src/components/public/service-card.jsx
@@ -527,13 +528,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 28479b0 | 2026-11-23 | feat(profile-photo): criar gerenciador de foto de perfil |
+| 08bed7e | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | 34e2df4 | 2026-11-23 | fix(profile-photo): manter foto privada e retornar id no perfil |
 | 11804da | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | ae34aea | 2026-11-23 | refactor(images): compartilhar cliente de upload retomável |
 | aa49acd | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | a6fb5af | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | 9420e80 | 2026-11-23 | feat(profile-photo): mapear falhas específicas do perfil |
-| 16d6873 | 2026-11-23 | feat(profile-photo): incluir operações de foto no gateway |
-| 8c97f5c | 2026-11-23 | feat(profile-photo): adicionar upload seguro de foto de perfil |
 
 <!-- END AUTO-GENERATED SECTION -->
