@@ -1542,6 +1542,12 @@ function appImageFinalizeProfilePhotoUpload_(state, driveMetadata) {
             || String(currentState.userId) !== String(user.id_usuario)
             || String(profile.id_profissional) !== String(currentState.profileId)
             || String(user.status) !== "active") {
+            try {
+                var rejectedFile = DriveApp.getFileById(String(driveMetadata.id));
+                rejectedFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
+                rejectedFile.setTrashed(true);
+            } catch (ignored) {}
+            appImageDeleteUploadState_(currentState);
             throw appFault_("PROFILE_PHOTO_NOT_FOUND", "A sessão de foto de perfil não está disponível.");
         }
 
@@ -1557,6 +1563,11 @@ function appImageFinalizeProfilePhotoUpload_(state, driveMetadata) {
             driveFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
             if (driveFile.isTrashed && driveFile.isTrashed()) throw new Error("Arquivo removido.");
         } catch (error) {
+            try {
+                var rejectedDriveFile = DriveApp.getFileById(String(driveMetadata.id));
+                rejectedDriveFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
+                rejectedDriveFile.setTrashed(true);
+            } catch (ignored) {}
             appImageDeleteUploadState_(currentState);
             throw appFault_("IMAGE_PERMISSION_SYNC_FAILED", "Não foi possível manter privada a nova foto no Google Drive.");
         }
