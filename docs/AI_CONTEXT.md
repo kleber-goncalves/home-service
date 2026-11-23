@@ -401,9 +401,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 8c97f5ca85bb9089c9ebfbb8904212f65aaf2fb6
-- **Data do commit:** 2026-11-23T16:54:27-03:00
-- **Mensagem do commit:** feat(profile-photo): adicionar upload seguro de foto de perfil
+- **Commit de referência:** 9420e802ba853309483a2327bf28d178b89f9272
+- **Data do commit:** 2026-11-23T16:54:32-03:00
+- **Mensagem do commit:** feat(profile-photo): mapear falhas específicas do perfil
 - **Branch desta execução:** feat/foto-perfil-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -527,13 +527,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 9420e80 | 2026-11-23 | feat(profile-photo): mapear falhas específicas do perfil |
+| 16d6873 | 2026-11-23 | feat(profile-photo): incluir operações de foto no gateway |
 | 8c97f5c | 2026-11-23 | feat(profile-photo): adicionar upload seguro de foto de perfil |
 | b4f8e85 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | 5658262 | 2026-11-23 | feat(profile-photo): adicionar fluxo de upload e resolução da foto |
 | 184a295 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | db31cee | 2026-11-23 | Merge pull request #32 from kleber-goncalves/feat/edicao-perfil-usuario |
 | 0fab99b | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
-| 52e4858 | 2026-11-23 | fix(profile): inicializar formulário ao iniciar edição |
-| b85a92e | 2026-11-23 | docs(context): atualizar estado da autenticação e perfil |
 
 <!-- END AUTO-GENERATED SECTION -->
