@@ -403,9 +403,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** b48e5fe593de0abcab78162dd1ecc335000c9cbe
-- **Data do commit:** 2026-11-23T16:59:30-03:00
-- **Mensagem do commit:** docs(profile): atualizar etapas da conta e foto
+- **Commit de referência:** 86014048b7f2678af82e26e8542b8aefd8e5a71b
+- **Data do commit:** 2026-11-23T16:59:33-03:00
+- **Mensagem do commit:** docs(images): separar escopo de fotos de perfil
 - **Branch desta execução:** feat/foto-perfil-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -530,6 +530,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 8601404 | 2026-11-23 | docs(images): separar escopo de fotos de perfil |
 | b48e5fe | 2026-11-23 | docs(profile): atualizar etapas da conta e foto |
 | 000e6d9 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | f19cd68 | 2026-11-23 | test(profile-photo): validar cliente de upload e cancelamento |
@@ -537,6 +538,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | a906e4b | 2026-11-23 | test(profile-photo): validar allowlist das ações no gateway |
 | e453440 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | cc37b00 | 2026-11-23 | test(profile-photo): cobrir upload, substituição, remoção e acesso |
-| 233ce87 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
