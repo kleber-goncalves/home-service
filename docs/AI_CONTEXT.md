@@ -398,10 +398,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 3a99eb1650d118ce8ccb20fc3de7b179125e86b7
-- **Data do commit:** 2026-11-23T16:03:24-03:00
-- **Mensagem do commit:** Merge pull request #31 from kleber-goncalves/fix/header-login-signup-actions
-- **Branch desta execução:** dev
+- **Commit de referência:** cc8d95d9a4b96579651d4d06be1bf79805207535
+- **Data do commit:** 2026-11-23T16:10:47-03:00
+- **Mensagem do commit:** docs(profile): documentar evolução da conta e perfil
+- **Branch desta execução:** feat/edicao-perfil-usuario
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -524,13 +524,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| 3a99eb1 | 2026-11-23 | Merge pull request #31 from kleber-goncalves/fix/header-login-signup-actions |
-| 8d9f6f8 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
-| 703e1c9 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
-| 13efc04 | 2026-11-23 | style(header): distinguir ações de login e cadastro |
-| e8c28a8 | 2026-11-23 | fix(header): separar ações de login e cadastro |
-| cc39175 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 4696a50 | 2026-11-21 | Merge pull request #30 from kleber-goncalves/feat/autenticacao-compartilhada-navegacao |
-| 8558a8e | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
+| cc8d95d | 2026-11-23 | docs(profile): documentar evolução da conta e perfil |
+| 97467e1 | 2026-11-23 | style(profile): estilizar formulário de edição do perfil |
+| 7a69de5 | 2026-11-23 | test(profile): restringir campos enviados ao gateway |
+| 7151880 | 2026-11-23 | test(profile): validar atualização do nome completo |
+| 4a6ae4a | 2026-11-23 | feat(profile): validar e salvar nome completo |
+| b0997d3 | 2026-11-23 | feat(profile): encaminhar nome completo na allowlist |
+| a684a58 | 2026-11-23 | feat(profile): adicionar edição dos dados do perfil |
+| 9136929 | 2026-11-23 | feat(auth): permitir atualização segura do usuário na sessão |
 
 <!-- END AUTO-GENERATED SECTION -->
