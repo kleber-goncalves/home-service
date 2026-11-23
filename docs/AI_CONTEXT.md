@@ -401,9 +401,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 69a72e53f58e4b7d6950df35e3f493df8aea3fc1
-- **Data do commit:** 2026-11-23T16:57:05-03:00
-- **Mensagem do commit:** style(profile-photo): estilizar gerenciador de foto
+- **Commit de referência:** 124f5b0ccc884c85a77eb41d7c05e9b25bc0f8c2
+- **Data do commit:** 2026-11-23T16:57:45-03:00
+- **Mensagem do commit:** fix(profile-photo): endurecer substituição e leitura da foto
 - **Branch desta execução:** feat/foto-perfil-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -528,13 +528,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 124f5b0 | 2026-11-23 | fix(profile-photo): endurecer substituição e leitura da foto |
+| 99df794 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
+| 6df8ca1 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | 69a72e5 | 2026-11-23 | style(profile-photo): estilizar gerenciador de foto |
 | 493da83 | 2026-11-23 | feat(header): exibir foto de perfil no menu da conta |
 | bc33f6a | 2026-11-23 | feat(profile-photo): integrar foto na área de conta |
 | 35f27f1 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | 28479b0 | 2026-11-23 | feat(profile-photo): criar gerenciador de foto de perfil |
-| 08bed7e | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
-| 34e2df4 | 2026-11-23 | fix(profile-photo): manter foto privada e retornar id no perfil |
-| 11804da | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
