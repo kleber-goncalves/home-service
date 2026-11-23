@@ -62,6 +62,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         csrfToken,
         services,
         setServices,
+        updateUser,
         establishSession,
         logout: logoutSession,
         isLoading: authLoading,
@@ -80,6 +81,14 @@ export default function AuthDemoPage({ initialMode = "login" }) {
     const [pageLoading, setPageLoading] = useState(true);
     const [busy, setBusy] = useState(false);
     const [catalogReady, setCatalogReady] = useState(false);
+    const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [profileForm, setProfileForm] = useState({
+        fullName: "",
+        publicName: "",
+        whatsapp: "",
+        presentation: "",
+        cityId: "",
+    });
 
     const activeServices = useMemo(
         () => services.filter((service) => service.status === "published").length,
@@ -134,6 +143,17 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         return () => { active = false; };
     }, []);
 
+    useEffect(() => {
+        if (!currentUser) return;
+        setProfileForm({
+            fullName: currentUser.fullName || "",
+            publicName: currentUser.publicName || "",
+            whatsapp: currentUser.whatsapp || "",
+            presentation: currentUser.presentation || "",
+            cityId: currentUser.cityId || "",
+        });
+    }, [currentUser]);
+
     function updateRegisterField(event) {
         const { name, value } = event.target;
         setRegisterForm((current) => ({ ...current, [name]: value }));
@@ -143,6 +163,12 @@ export default function AuthDemoPage({ initialMode = "login" }) {
     function updateLoginField(event) {
         const { name, value } = event.target;
         setLoginForm((current) => ({ ...current, [name]: value }));
+        setNotice(null);
+    }
+
+    function updateProfileField(event) {
+        const { name, value } = event.target;
+        setProfileForm((current) => ({ ...current, [name]: value }));
         setNotice(null);
     }
 
@@ -247,6 +273,65 @@ export default function AuthDemoPage({ initialMode = "login" }) {
             setLoginForm((current) => ({ ...current, password: "" }));
         } catch (error) {
             setNotice({ title: "Não foi possível entrar", message: error.message, tone: "warning" });
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    function startEditingProfile() {
+        setProfileForm({
+            fullName: currentUser?.fullName || "",
+            publicName: currentUser?.publicName || "",
+            whatsapp: currentUser?.whatsapp || "",
+            presentation: currentUser?.presentation || "",
+            cityId: currentUser?.cityId || "",
+        });
+        setIsEditingProfile(true);
+        setNotice(null);
+    }
+
+    function cancelProfileEditing() {
+        setProfileForm({
+            fullName: currentUser?.fullName || "",
+            publicName: currentUser?.publicName || "",
+            whatsapp: currentUser?.whatsapp || "",
+            presentation: currentUser?.presentation || "",
+            cityId: currentUser?.cityId || "",
+        });
+        setIsEditingProfile(false);
+        setNotice(null);
+    }
+
+    async function saveProfile(event) {
+        event.preventDefault();
+        setBusy(true);
+        setNotice(null);
+        try {
+            const result = await appRequest("profile.update", {
+                nome_completo: profileForm.fullName,
+                nome_publico: profileForm.publicName,
+                whatsapp: profileForm.whatsapp,
+                apresentacao: profileForm.presentation,
+                id_cidade_principal: profileForm.cityId,
+            }, csrfToken);
+
+            if (!result?.user || result.user.idUsuario !== currentUser?.idUsuario) {
+                throw new Error("O servidor não confirmou a atualização do seu perfil.");
+            }
+
+            updateUser(result.user);
+            setIsEditingProfile(false);
+            setNotice({
+                title: "Perfil atualizado",
+                message: "Suas informações foram validadas e salvas na planilha.",
+                tone: "info",
+            });
+        } catch (error) {
+            setNotice({
+                title: "Não foi possível atualizar o perfil",
+                message: error.message || "Revise os dados e tente novamente.",
+                tone: "warning",
+            });
         } finally {
             setBusy(false);
         }
@@ -490,16 +575,71 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                                 <span className="section-eyebrow">Seu perfil</span>
                                 <h2>Informações profissionais</h2>
                             </div>
-                            <span className="demo-status-label">Conta ativa</span>
+                            <div className="demo-profile-heading-actions">
+                                <span className="demo-status-label">Conta ativa</span>
+                                {isEditingProfile ? (
+                                    <Button type="button" variant="secondary" size="sm" onClick={cancelProfileEditing} disabled={busy}>
+                                        <X size={14} aria-hidden="true" /> Cancelar
+                                    </Button>
+                                ) : (
+                                    <Button type="button" variant="secondary" size="sm" onClick={startEditingProfile} disabled={busy}>
+                                        <Pencil size={14} aria-hidden="true" /> Editar perfil
+                                    </Button>
+                                )}
+                            </div>
                         </div>
-                        <div className="demo-profile-details">
-                            <div><span>Nome público</span><strong>{currentUser.publicName}</strong></div>
-                            <div><span>Nome completo</span><strong>{currentUser.fullName}</strong></div>
-                            <div><span>E-mail</span><strong>{currentUser.email}</strong></div>
-                            <div><span>WhatsApp</span><strong>{currentUser.whatsapp}</strong></div>
-                            <div><span>Localidade</span><strong>{catalog.cities.find((city) => city.id === currentUser.cityId)?.name || currentUser.cityId}</strong></div>
-                        </div>
-                        <p className="demo-profile-description">{currentUser.presentation}</p>
+
+                        {isEditingProfile ? (
+                            <form className="demo-new-service-form demo-profile-form" onSubmit={saveProfile}>
+                                <div className="demo-new-service-fields">
+                                    <label htmlFor="profile-full-name">
+                                        Nome completo
+                                        <Input id="profile-full-name" name="fullName" autoComplete="name" value={profileForm.fullName} onChange={updateProfileField} minLength={2} maxLength={120} required />
+                                    </label>
+                                    <label htmlFor="profile-public-name">
+                                        Nome público
+                                        <Input id="profile-public-name" name="publicName" autoComplete="organization" value={profileForm.publicName} onChange={updateProfileField} minLength={2} maxLength={80} required />
+                                    </label>
+                                    <label htmlFor="profile-whatsapp">
+                                        Telefone / WhatsApp
+                                        <Input id="profile-whatsapp" name="whatsapp" type="tel" autoComplete="tel" value={profileForm.whatsapp} onChange={updateProfileField} maxLength={20} required />
+                                    </label>
+                                    <label htmlFor="profile-city">
+                                        Cidade principal
+                                        <select id="profile-city" name="cityId" value={profileForm.cityId} onChange={updateProfileField} required>
+                                            {catalog.cities.map((city) => (
+                                                <option key={city.id} value={city.id}>{city.name} - {city.state}</option>
+                                            ))}
+                                        </select>
+                                    </label>
+                                </div>
+                                <label htmlFor="profile-presentation">
+                                    Apresentação profissional
+                                    <textarea id="profile-presentation" name="presentation" rows={4} minLength={10} maxLength={500} value={profileForm.presentation} onChange={updateProfileField} required />
+                                </label>
+                                <div className="demo-profile-form-note">
+                                    <Mail size={16} aria-hidden="true" />
+                                    <span><strong>E-mail:</strong> {currentUser.email}. A alteração de e-mail será liberada em uma etapa própria, com confirmação do novo endereço.</span>
+                                </div>
+                                <div className="demo-profile-form-actions">
+                                    <Button type="button" variant="secondary" onClick={cancelProfileEditing} disabled={busy}>Cancelar</Button>
+                                    <Button type="submit" disabled={busy || !catalog.cities.length}>
+                                        <Check size={15} aria-hidden="true" /> {busy ? "Salvando..." : "Salvar alterações"}
+                                    </Button>
+                                </div>
+                            </form>
+                        ) : (
+                            <>
+                                <div className="demo-profile-details">
+                                    <div><span>Nome público</span><strong>{currentUser.publicName}</strong></div>
+                                    <div><span>Nome completo</span><strong>{currentUser.fullName}</strong></div>
+                                    <div><span>E-mail</span><strong>{currentUser.email}</strong></div>
+                                    <div><span>Telefone / WhatsApp</span><strong>{currentUser.whatsapp}</strong></div>
+                                    <div><span>Localidade</span><strong>{catalog.cities.find((city) => city.id === currentUser.cityId)?.name || currentUser.cityId}</strong></div>
+                                </div>
+                                <p className="demo-profile-description">{currentUser.presentation}</p>
+                            </>
+                        )}
                     </section>
 
                     <section className="demo-panel demo-services-panel">
