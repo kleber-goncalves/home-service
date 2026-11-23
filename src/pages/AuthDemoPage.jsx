@@ -143,17 +143,6 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         return () => { active = false; };
     }, []);
 
-    useEffect(() => {
-        if (!currentUser) return;
-        setProfileForm({
-            fullName: currentUser.fullName || "",
-            publicName: currentUser.publicName || "",
-            whatsapp: currentUser.whatsapp || "",
-            presentation: currentUser.presentation || "",
-            cityId: currentUser.cityId || "",
-        });
-    }, [currentUser]);
-
     function updateRegisterField(event) {
         const { name, value } = event.target;
         setRegisterForm((current) => ({ ...current, [name]: value }));
