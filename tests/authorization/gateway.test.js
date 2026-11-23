@@ -112,10 +112,13 @@ test("gateway encaminha somente os campos editáveis do perfil e deriva a sessã
     });
 
     const response = await handler(buildRequest("profile.update", {
+        nome_completo: "Profissional A Atualizado",
         nome_publico: "Equipe A",
         apresentacao: "Perfil fictício atualizado para o teste de autorização.",
         id_cidade_principal: "city-synthetic",
         whatsapp: "34999990001",
+        email: "email-forjado@example.test",
+        telefone_alternativo: "5534999990000",
         tokenHash: "9".repeat(64),
         id_usuario: "user-b",
         id_profissional: "profile-b",
@@ -125,6 +128,7 @@ test("gateway encaminha somente os campos editáveis do perfil e deriva a sessã
 
     assert.equal(response.status, 200);
     assert.deepEqual(forwarded, {
+        nome_completo: "Profissional A Atualizado",
         nome_publico: "Equipe A",
         apresentacao: "Perfil fictício atualizado para o teste de autorização.",
         id_cidade_principal: "city-synthetic",
