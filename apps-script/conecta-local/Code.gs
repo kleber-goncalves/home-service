@@ -756,7 +756,7 @@ function appLogout_(payload, nowMs) {
 /* ------------------------- Perfil e serviços --------------------------- */
 
 function appUpdateProfile_(payload, nowMs) {
-    if (!appHasKeys_(payload, ["tokenHash", "nome_publico", "apresentacao", "id_cidade_principal", "whatsapp"])) {
+    if (!appHasKeys_(payload, ["tokenHash", "nome_completo", "nome_publico", "apresentacao", "id_cidade_principal", "whatsapp"])) {
         throw appFault_("INVALID_INPUT", "Preencha os campos do perfil.");
     }
 
@@ -768,6 +768,7 @@ function appUpdateProfile_(payload, nowMs) {
         if (!city || String(city.status) !== "active") throw appFault_("CITY_INVALID", "Selecione uma cidade válida.");
 
         appUpdate_("PROFISSIONAIS", profile._row, {
+            nome_completo: appText_(payload.nome_completo, 2, 120, "Nome completo"),
             nome_publico: appText_(payload.nome_publico, 2, 80, "Nome público"),
             apresentacao: appText_(payload.apresentacao, 10, 500, "Apresentação"),
             id_cidade_principal: String(city.id_cidade),
