@@ -28,9 +28,9 @@ Permitir que o profissional tenha uma área de conta coerente, consiga manter se
 
 ### Etapa 2 — Edição dos dados do perfil
 
-**Status: em implementação na branch `feat/edicao-perfil-usuario`.**
+**Status: integrada em `dev` pela PR #32; testes manuais do responsável concluídos com sucesso no Preview em 23/11/2026.**
 
-Campos editáveis nesta etapa:
+Campos editáveis:
 
 - Nome completo (privado).
 - Nome público (apresentado no catálogo).
@@ -38,7 +38,7 @@ Campos editáveis nesta etapa:
 - Apresentação profissional.
 - Cidade principal.
 
-Regras:
+Regras implementadas:
 
 - O identificador do usuário, o identificador do profissional, o papel e o estado da conta são sempre derivados/validados no servidor e nunca aceitos como campos editáveis.
 - O gateway Vercel encaminha uma allowlist explícita e deriva o hash da sessão a partir do cookie HttpOnly.
@@ -48,12 +48,31 @@ Regras:
 
 ### Etapa 3 — Foto de perfil
 
-**Status: planejada.**
+**Status: em implementação na branch `feat/foto-perfil-profissional`.**
 
-- Criar fluxo de upload próprio para foto de perfil, separado do fluxo de imagens de serviços.
-- Usar a aba `IMAGENS` e o Drive com relação ao profissional, sem exigir `id_servico`.
-- Definir limite, tipos MIME, validação de conteúdo, substituição e remoção lógica.
-- Garantir que a foto só seja exibida em superfícies autorizadas e que o gateway não exponha credenciais do Drive.
+Escopo implementado na branch:
+
+- Selecionar uma foto JPG, PNG ou WebP, com até 5.000.000 bytes.
+- Exibir prévia local antes de enviar.
+- Reaproveitar o transporte retomável existente em blocos de 1 MiB, sem enviar o arquivo inteiro em Base64.
+- Armazenar metadados na aba `IMAGENS`, com `id_profissional` preenchido, `id_servico` vazio e `ordem_exibicao = 1`.
+- Permitir somente uma foto ativa por profissional. A substituição restringe a imagem anterior e a marca como `removed`; a remoção também restringe o arquivo antes de alterar o status.
+- Manter o arquivo privado no Google Drive. A leitura passa pelo gateway same-origin `/api/public-images?id=<imageId>`, que consulta o Apps Script e revalida o estado ativo da imagem e da conta. O token OAuth permanece no servidor.
+- Mostrar a foto no avatar do cabeçalho e na área autenticada, atualizando o AuthProvider após upload ou remoção.
+- Derivar o proprietário pela sessão autenticada; o navegador não escolhe `id_profissional`, pasta ou URI de upload.
+
+**Fora do escopo desta etapa:**
+
+- Cortar, girar ou editar a foto no navegador.
+- Redimensionar/comprimir imagens no servidor.
+- Upload de fotos em massa ou galeria de fotos de perfil.
+- Alteração de e-mail.
+
+**Cuidados de integração:**
+
+- O código de `apps-script/conecta-local/Code.gs` não sincroniza automaticamente com o Web App publicado. Após o merge em `dev`, é necessário sincronizar o arquivo e publicar nova versão na implantação existente.
+- As variáveis secretas do Preview continuam restritas a `gitBranch: dev`; não duplicar segredos para branches de feature.
+- A validação manual com o Google Sheets/Drive reais de teste e o Preview só será possível após integração em `dev` e publicação do Apps Script atualizado.
 
 ### Etapa 4 — Alteração de e-mail
 
@@ -68,13 +87,24 @@ Regras:
 
 ## Critérios de conclusão da Etapa 2
 
-- [ ] Edição e cancelamento funcionam na interface em desktop e mobile.
-- [ ] Campos válidos são salvos no perfil correto.
-- [ ] Cabeçalho e cartão de perfil refletem os dados salvos sem novo login.
-- [ ] Dados de outra conta não podem ser alterados.
-- [ ] E-mail, papel, estado e identificadores não podem ser alterados pelo payload.
-- [ ] Auditoria registra o ator derivado da sessão.
-- [ ] CI passa e o responsável valida a operação no Preview com o Apps Script atualizado.
+- [x] Edição e cancelamento funcionam na interface em desktop e mobile.
+- [x] Campos válidos são salvos no perfil correto.
+- [x] Cabeçalho e cartão de perfil refletem os dados salvos sem novo login.
+- [x] Dados de outra conta não podem ser alterados.
+- [x] E-mail, papel, estado e identificadores não podem ser alterados pelo payload.
+- [x] Auditoria registra o ator derivado da sessão.
+- [x] CI aprovada e responsável confirmou a operação no Preview com o Apps Script atualizado.
+
+## Critérios de conclusão da Etapa 3
+
+- [ ] Upload e cancelamento funcionam no Preview com Apps Script, Sheets e Drive atualizados.
+- [ ] Só JPG/PNG/WebP até 5 MB são aceitos; o backend confere assinatura binária e metadados reais do Drive.
+- [ ] O perfil autenticado só consegue enviar, substituir ou remover sua própria foto.
+- [ ] A substituição mantém no máximo uma foto ativa e restringe a anterior.
+- [ ] O arquivo permanece privado no Drive e o gateway só entrega registros elegíveis.
+- [ ] A foto aparece no cabeçalho e na área da conta após upload e após restauração da sessão.
+- [ ] A remoção restringe o arquivo, marca o registro como removido e retira a foto da sessão.
+- [ ] CI pós-merge aprovada e validação manual confirmada pelo responsável.
 
 ## Limites
 
