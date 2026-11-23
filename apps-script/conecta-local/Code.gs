@@ -1533,12 +1533,12 @@ function appImageFinalizeUpload_(state, driveMetadata) {
 function appImageFinalizeProfilePhotoUpload_(state, driveMetadata) {
     return appWithLock_(function () {
         var currentState = appImageReadUploadState_(String(state.uploadId));
-        var session = appRequireProfessionalSession_(String(currentState.tokenHash || state.tokenHash || ""), Date.now(), true);
-        var profile = appGetProfile_(String(session.user.id_usuario));
-        var user = session.user;
+        var profile = appFind_("PROFISSIONAIS", "id_profissional", String(currentState.profileId));
+        var user = profile ? appFind_("USUARIOS", "id_usuario", String(profile.id_usuario)) : null;
         if (String(currentState.kind || "") !== "profile"
-            || String(currentState.userId) !== String(user.id_usuario)
             || !profile
+            || !user
+            || String(currentState.userId) !== String(user.id_usuario)
             || String(profile.id_profissional) !== String(currentState.profileId)
             || String(user.status) !== "active") {
             throw appFault_("PROFILE_PHOTO_NOT_FOUND", "A sessão de foto de perfil não está disponível.");
