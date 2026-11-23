@@ -602,6 +602,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
 .demo-profile-details span { color: #8492a5; font-size: .64rem; font-weight: 700; }
 .demo-profile-details strong { overflow-wrap: anywhere; color: #263d5a; font-size: .76rem; }
 .demo-profile-description { margin: 18px 0 0; padding-top: 14px; color: #657891; border-top: 1px solid #edf1f6; font-size: .72rem; line-height: 1.7; }
+.demo-profile-heading-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 9px; }
+.demo-profile-form { margin-top: 4px; }
+.demo-profile-form-note { display: flex; align-items: flex-start; gap: 9px; padding: 11px 12px; color: #526782; background: #eef5ff; border: 1px solid #dce9f8; border-radius: 9px; font-size: .65rem; line-height: 1.55; }
+.demo-profile-form-note svg { flex: 0 0 auto; margin-top: 1px; color: #4e6d93; }
+.demo-profile-form-note strong { color: #304a6b; }
+.demo-profile-form-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 9px; }
+.demo-profile-form select { width: 100%; min-width: 0; min-height: 42px; padding: 10px 12px; color: var(--navy); background: #fff; border: 1px solid #dce5f0; border-radius: 9px; font-size: .72rem; }
 .demo-shortcuts-panel > .section-eyebrow { margin-bottom: 7px; font-size: .62rem; }
 .demo-shortcuts-panel p { margin: 10px 0 15px; color: #697d96; font-size: .73rem; line-height: 1.7; }
 .demo-shortcut-link {
