@@ -1551,10 +1551,6 @@ function appImageFinalizeProfilePhotoUpload_(state, driveMetadata) {
                 && String(item.id_servico || "") === ""
                 && String(item.status) === "active";
         });
-        if (activeRows.length > 1) {
-            throw appFault_("PROFILE_PHOTO_CONFLICT", "Há mais de uma foto de perfil ativa. Regularize os registros antes de substituir.");
-        }
-
         var driveFile;
         try {
             driveFile = DriveApp.getFileById(String(driveMetadata.id));
@@ -1563,6 +1559,11 @@ function appImageFinalizeProfilePhotoUpload_(state, driveMetadata) {
         } catch (error) {
             appImageDeleteUploadState_(currentState);
             throw appFault_("IMAGE_PERMISSION_SYNC_FAILED", "Não foi possível manter privada a nova foto no Google Drive.");
+        }
+        if (activeRows.length > 1) {
+            try { driveFile.setTrashed(true); } catch (ignored) {}
+            appImageDeleteUploadState_(currentState);
+            throw appFault_("PROFILE_PHOTO_CONFLICT", "Há mais de uma foto de perfil ativa. Regularize os registros antes de substituir.");
         }
 
         var previous = activeRows[0] || null;
@@ -1619,7 +1620,7 @@ function appImageFinalizeProfilePhotoUpload_(state, driveMetadata) {
             } catch (ignored) {}
             if (previous && previousRestricted) {
                 try {
-                    appImageSetFilePublic_(String(previous.id_arquivo_drive));
+                    appImageSetFilePrivate_(String(previous.id_arquivo_drive));
                     appUpdate_("IMAGENS", previous._row, {
                         status: "active",
                         atualizado_em: new Date().toISOString()
@@ -2109,7 +2110,11 @@ function appResolvePublicImage_(payload) {
     if (profileId !== "") {
         profile = appFind_("PROFISSIONAIS", "id_profissional", profileId);
         user = profile ? appFind_("USUARIOS", "id_usuario", String(profile.id_usuario || "")) : null;
-        if (!profile || !user || String(user.status) !== "active") {
+        var activeProfilePhoto = profile ? appGetProfilePhoto_(profileId) : null;
+        if (!profile || !user || String(user.status) !== "active"
+            || !activeProfilePhoto
+            || String(activeProfilePhoto.id_imagem) !== imageId
+            || Number(image.ordem_exibicao) !== 1) {
             throw appFault_("IMAGE_NOT_FOUND", "Imagem não encontrada ou indisponível.");
         }
     } else {
