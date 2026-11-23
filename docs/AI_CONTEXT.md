@@ -401,10 +401,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** db31cee401cb47369811a9ca2326a2268e27e51a
-- **Data do commit:** 2026-11-23T16:14:50-03:00
-- **Mensagem do commit:** Merge pull request #32 from kleber-goncalves/feat/edicao-perfil-usuario
-- **Branch desta execução:** dev
+- **Commit de referência:** 565826297abd7472fd51748750b1683b2253c309
+- **Data do commit:** 2026-11-23T16:53:49-03:00
+- **Mensagem do commit:** feat(profile-photo): adicionar fluxo de upload e resolução da foto
+- **Branch desta execução:** feat/foto-perfil-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -527,13 +527,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 5658262 | 2026-11-23 | feat(profile-photo): adicionar fluxo de upload e resolução da foto |
+| 184a295 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | db31cee | 2026-11-23 | Merge pull request #32 from kleber-goncalves/feat/edicao-perfil-usuario |
 | 0fab99b | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | 52e4858 | 2026-11-23 | fix(profile): inicializar formulário ao iniciar edição |
 | b85a92e | 2026-11-23 | docs(context): atualizar estado da autenticação e perfil |
 | 633126d | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | cc8d95d | 2026-11-23 | docs(profile): documentar evolução da conta e perfil |
-| 97467e1 | 2026-11-23 | style(profile): estilizar formulário de edição do perfil |
-| 7a69de5 | 2026-11-23 | test(profile): restringir campos enviados ao gateway |
 
 <!-- END AUTO-GENERATED SECTION -->
