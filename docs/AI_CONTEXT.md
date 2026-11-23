@@ -401,9 +401,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** ae34aea09b6c7c6cbf37a45089e116916040d5b7
-- **Data do commit:** 2026-11-23T16:55:48-03:00
-- **Mensagem do commit:** refactor(images): compartilhar cliente de upload retomável
+- **Commit de referência:** 34e2df4c932ca79e48ba7cfc3762e5fdde33a41a
+- **Data do commit:** 2026-11-23T16:56:06-03:00
+- **Mensagem do commit:** fix(profile-photo): manter foto privada e retornar id no perfil
 - **Branch desta execução:** feat/foto-perfil-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -527,13 +527,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 34e2df4 | 2026-11-23 | fix(profile-photo): manter foto privada e retornar id no perfil |
+| 11804da | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | ae34aea | 2026-11-23 | refactor(images): compartilhar cliente de upload retomável |
 | aa49acd | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | a6fb5af | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | 9420e80 | 2026-11-23 | feat(profile-photo): mapear falhas específicas do perfil |
 | 16d6873 | 2026-11-23 | feat(profile-photo): incluir operações de foto no gateway |
 | 8c97f5c | 2026-11-23 | feat(profile-photo): adicionar upload seguro de foto de perfil |
-| b4f8e85 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
-| 5658262 | 2026-11-23 | feat(profile-photo): adicionar fluxo de upload e resolução da foto |
 
 <!-- END AUTO-GENERATED SECTION -->
