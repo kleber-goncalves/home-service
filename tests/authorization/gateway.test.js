@@ -333,3 +333,93 @@ test("gateway permite remoção de imagem somente com ID e sessão derivados", a
         tokenHash: createHash("sha256").update(SESSION_TOKEN, "utf8").digest("hex"),
     });
 });
+
+
+test("gateway permite iniciar foto de perfil com metadados mínimos e sessão derivada do cookie", async () => {
+    let forwarded;
+    const handler = createHarness(async (_url, options) => {
+        const form = new URLSearchParams(options.body);
+        forwarded = {
+            action: form.get("action"),
+            payload: JSON.parse(form.get("payload")),
+        };
+        return upstreamResponse(form);
+    });
+
+    const response = await handler(buildRequest("profile.photo.upload.start", {
+        fileSize: 2048,
+        mimeType: "image/png",
+        tokenHash: "9".repeat(64),
+        id_usuario: "user-b",
+        id_profissional: "profile-b",
+        papel: "admin",
+        serviceId: "attacker-service",
+        folderId: "attacker-folder",
+        sessionUri: "https://attacker.example/upload",
+    }));
+
+    assert.equal(response.status, 200);
+    assert.equal(forwarded.action, "profile.photo.upload.start");
+    assert.deepEqual(forwarded.payload, {
+        fileSize: 2048,
+        mimeType: "image/png",
+        tokenHash: createHash("sha256").update(SESSION_TOKEN, "utf8").digest("hex"),
+    });
+});
+
+test("gateway encaminha somente uploadId e sessão para status/cancel da foto de perfil", async () => {
+    for (const action of ["profile.photo.upload.status", "profile.photo.upload.cancel"]) {
+        let forwarded;
+        const handler = createHarness(async (_url, options) => {
+            const form = new URLSearchParams(options.body);
+            forwarded = {
+                action: form.get("action"),
+                payload: JSON.parse(form.get("payload")),
+            };
+            return upstreamResponse(form);
+        });
+
+        const response = await handler(buildRequest(action, {
+            uploadId: "00000000-0000-4000-8000-000000000001",
+            tokenHash: "9".repeat(64),
+            id_usuario: "user-b",
+            id_profissional: "profile-b",
+            papel: "admin",
+        }));
+
+        assert.equal(response.status, 200, action);
+        assert.equal(forwarded.action, action);
+        assert.deepEqual(forwarded.payload, {
+            uploadId: "00000000-0000-4000-8000-000000000001",
+            tokenHash: createHash("sha256").update(SESSION_TOKEN, "utf8").digest("hex"),
+        });
+    }
+});
+
+test("gateway permite remover foto de perfil apenas com imageId e sessão derivada", async () => {
+    let forwarded;
+    const handler = createHarness(async (_url, options) => {
+        const form = new URLSearchParams(options.body);
+        forwarded = {
+            action: form.get("action"),
+            payload: JSON.parse(form.get("payload")),
+        };
+        return upstreamResponse(form);
+    });
+
+    const response = await handler(buildRequest("profile.photo.remove", {
+        imageId: "00000000-0000-4000-8000-000000000001",
+        tokenHash: "9".repeat(64),
+        id_usuario: "user-b",
+        id_profissional: "profile-b",
+        papel: "admin",
+        ownerId: "user-b",
+    }));
+
+    assert.equal(response.status, 200);
+    assert.equal(forwarded.action, "profile.photo.remove");
+    assert.deepEqual(forwarded.payload, {
+        imageId: "00000000-0000-4000-8000-000000000001",
+        tokenHash: createHash("sha256").update(SESSION_TOKEN, "utf8").digest("hex"),
+    });
+});
