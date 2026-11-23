@@ -48,7 +48,7 @@ Regras implementadas:
 
 ### Etapa 3 — Foto de perfil
 
-**Status: integrada em `dev` pela PR #33, merge commit `782d8ede22ffcf8f1b3193c70e956715ca701af0`. CI pós-merge #45255089911 concluída com SUCCESS. A validação manual com o Preview conectado ao Apps Script/Sheets/Drive ainda está pendente da sincronização e publicação do `Code.gs` atualizado.**
+**Status: integrada em `dev` pela PR #33, merge commit `782d8ede22ffcf8f1b3193c70e956715ca701af0`; CI pós-merge #45255089911 concluída com SUCCESS e testes manuais do responsável confirmados com sucesso no Preview em 23/11/2026, após sincronização/publicação do Apps Script.**
 
 Escopo implementado na branch:
 
@@ -72,7 +72,7 @@ Escopo implementado na branch:
 
 - O código de `apps-script/conecta-local/Code.gs` não sincroniza automaticamente com o Web App publicado. Após o merge em `dev`, é necessário sincronizar o arquivo e publicar nova versão na implantação existente.
 - As variáveis secretas do Preview continuam restritas a `gitBranch: dev`; não duplicar segredos para branches de feature.
-- A validação manual com o Google Sheets/Drive reais de teste e o Preview só será possível após integração em `dev` e publicação do Apps Script atualizado.
+- Para esta etapa, o responsável já sincronizou/publicou o Apps Script e confirmou os testes manuais no Preview. Nas próximas alterações do backend, repetir o procedimento na implantação existente.
 
 ### Etapa 4 — Alteração de e-mail
 
@@ -97,14 +97,14 @@ Escopo implementado na branch:
 
 ## Critérios de conclusão da Etapa 3
 
-- [ ] Upload e cancelamento funcionam no Preview com Apps Script, Sheets e Drive atualizados.
-- [ ] Só JPG/PNG/WebP até 5 MB são aceitos; o backend confere assinatura binária e metadados reais do Drive.
-- [ ] O perfil autenticado só consegue enviar, substituir ou remover sua própria foto.
-- [ ] A substituição mantém no máximo uma foto ativa e restringe a anterior.
-- [ ] O arquivo permanece privado no Drive e o gateway só entrega registros elegíveis.
-- [ ] A foto aparece no cabeçalho e na área da conta após upload e após restauração da sessão.
-- [ ] A remoção restringe o arquivo, marca o registro como removido e retira a foto da sessão.
-- [ ] CI pós-merge aprovada e validação manual confirmada pelo responsável.
+- [x] Upload e cancelamento funcionam no Preview com Apps Script, Sheets e Drive atualizados.
+- [x] Só JPG/PNG/WebP até 5 MB são aceitos; o backend confere assinatura binária e metadados reais do Drive.
+- [x] O perfil autenticado só consegue enviar, substituir ou remover sua própria foto.
+- [x] A substituição mantém no máximo uma foto ativa e restringe a anterior.
+- [x] O arquivo permanece privado no Drive e o gateway só entrega registros elegíveis.
+- [x] A foto aparece no cabeçalho e na área da conta após upload e após restauração da sessão.
+- [x] A remoção restringe o arquivo, marca o registro como removido e retira a foto da sessão.
+- [x] CI pós-merge aprovada e validação manual confirmada pelo responsável.
 
 ## Limites
 
