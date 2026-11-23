@@ -192,6 +192,8 @@ function mapAppsScriptError(output) {
         IMAGE_METADATA_SAVE_FAILED: [502, "Não foi possível registrar os metadados da imagem."],
         IMAGE_PERMISSION_SYNC_FAILED: [502, "Não foi possível atualizar a permissão da imagem."],
         PROFILE_UNAVAILABLE: [409, "O perfil profissional não está disponível."],
+        PROFILE_PHOTO_NOT_FOUND: [404, "Foto de perfil não encontrada."],
+        PROFILE_PHOTO_CONFLICT: [409, "Há mais de uma foto de perfil ativa. Regularize os registros antes de substituir."],
         STORE_SCHEMA_INVALID: [503, "A aba IMAGENS não corresponde ao esquema esperado."],
     };
     const [status, message] = known[code] || [502, "Não foi possível concluir o envio da imagem."];
