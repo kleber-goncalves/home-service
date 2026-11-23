@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
-    ArrowRight, ChevronDown, House, LogOut, Menu, UserRound, X,
+    ArrowRight, ChevronDown, House, LogOut, Menu, UserPlus, UserRound, X,
 } from "lucide-react";
 import AppLink from "@/components/public/app-link";
 import { useAuth } from "@/hooks/use-auth";
@@ -159,9 +159,16 @@ export default function SiteHeader({ active = "" }) {
                             )}
                         </div>
                     ) : (
-                        <AppLink to="/?auth=demo" className="nav-cta">
-                            Entrar <UserRound size={16} aria-hidden="true" />
-                        </AppLink>
+                        <div className="auth-actions" aria-label="Acesso à conta">
+                            <AppLink to="/?auth=demo&mode=login" className="nav-cta">
+                                <UserRound size={16} aria-hidden="true" />
+                                Entrar
+                            </AppLink>
+                            <AppLink to="/?auth=demo&mode=register" className="nav-cta nav-cta--secondary">
+                                <UserPlus size={16} aria-hidden="true" />
+                                Criar conta
+                            </AppLink>
+                        </div>
                     )}
 
                     <button
@@ -191,13 +198,22 @@ export default function SiteHeader({ active = "" }) {
                         Encontrar serviço
                     </AppLink>
                     {!isLoading && !user && (
-                        <AppLink
-                            className="mobile-nav-cta mobile-nav-cta--secondary"
-                            to="/?auth=demo"
-                            onClick={() => setMenuOpen(false)}
-                        >
-                            Entrar ou criar conta
-                        </AppLink>
+                        <div className="mobile-nav-auth-actions" aria-label="Acesso à conta">
+                            <AppLink
+                                className="mobile-nav-auth-link mobile-nav-auth-link--secondary"
+                                to="/?auth=demo&mode=login"
+                                onClick={() => setMenuOpen(false)}
+                            >
+                                Entrar
+                            </AppLink>
+                            <AppLink
+                                className="mobile-nav-auth-link"
+                                to="/?auth=demo&mode=register"
+                                onClick={() => setMenuOpen(false)}
+                            >
+                                Criar conta
+                            </AppLink>
+                        </div>
                     )}
                     {logoutError && <p className="account-menu-error" role="status">{logoutError}</p>}
                 </nav>
