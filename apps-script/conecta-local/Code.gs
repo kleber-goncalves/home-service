@@ -306,6 +306,7 @@ function appSafeUser_(user, profile) {
         cityId: profile ? String(profile.id_cidade_principal) : "",
         neighborhoods: profile ? String(profile.bairros_regioes_atendidos || "") : "",
         whatsapp: profile ? String(profile.whatsapp || "") : "",
+        photoId: profilePhoto ? String(profilePhoto.id_imagem) : "",
         photoUrl: profilePhoto ? appImageProxyUrl_(String(profilePhoto.id_imagem)) : ""
     };
 }
@@ -1570,7 +1571,8 @@ function appImageFinalizeProfilePhotoUpload_(state, driveMetadata) {
         var imageRow = 0;
         var previousRestricted = false;
         try {
-            appImageSetFilePublic_(String(driveFile.getId()));
+            // A foto permanece privada no Drive; a leitura pública passa pelo gateway,
+            // que revalida a conta ativa e nunca expõe o token OAuth ao navegador.
             if (previous) {
                 appImageSetFilePrivate_(String(previous.id_arquivo_drive));
                 previousRestricted = true;
