@@ -2,12 +2,15 @@
 
 > Documento de continuidade do projeto. Leia antes de sugerir ou realizar alterações. Reúne propósito, decisões, arquitetura planejada, estado implementado, regras de manutenção e limitações. A seção de snapshot ao final é atualizada pelo GitHub Actions.
 
-## Atualização vigente — 2026-11-21
+## Atualização vigente — 2026-11-23
 
 - Em 20/11/2026, o responsável esclareceu o contexto acadêmico: o Conecta Local está sendo desenvolvido em um curso Técnico em Informática, e não como Projeto Integrador do curso de ADS da Uniube. Não associar o projeto à Uniube.
 
 > Esta seção registra o estado mais recente conhecido. Consulte os SHAs e os arquivos do branch efetivamente em análise antes de realizar mudanças.
 
+- Em 21/11/2026, a PR #30 integrou em `dev` a sessão compartilhada pelo `AuthProvider`, o estado global de autenticação e o menu da conta com `Minha conta` e `Sair` (merge commit `4696a5039243c7baf300e835973417af6003723c`). Em 23/11/2026, a PR #31 separou os acessos de visitante em `Entrar` e `Criar conta`, com destinos diretos para login/cadastro no desktop e menu móvel (merge commit `3a99eb1650d118ce8ccb20fc3de7b179125e86b7`). O responsável confirmou a validação visual desses dois acessos no Preview de `dev`.
+- A evolução do perfil está documentada em `docs/PLANO_CONTA_PERFIL.md`. A branch `feat/edicao-perfil-usuario` foi criada a partir do HEAD de `dev` em 23/11/2026 (`3304773295e6f1f6e96350ac52b6c09482e64de7`) e contém a implementação em andamento da Etapa 2: formulário para nome completo, nome público, telefone/WhatsApp, apresentação e cidade principal; a allowlist do gateway e o Apps Script foram ampliados para aceitar somente esses campos, com identidade derivada da sessão e auditoria. A alteração de e-mail permanece fora desta etapa, pois exige reautenticação e confirmação do novo endereço; foto de perfil é etapa posterior.
+- O ambiente conectado ao Apps Script/Sheets permanece restrito ao Preview fixo da branch `dev`. A branch `feat/*` não recebe as variáveis secretas de Preview. Como o código da pasta `apps-script/conecta-local/Code.gs` não se sincroniza automaticamente com a implantação Web App do Google, após a integração da etapa será necessário sincronizar o arquivo e publicar nova versão do Apps Script antes dos testes manuais no Preview de `dev`. Não duplicar nem ampliar escopo dos segredos para testar branches de feature.
 - O PR #15 (`feat/prototipo-demo-profissional` → `dev`) foi integrado em 16/11/2026. O protótipo funcional com cadastro, confirmação demonstrativa, login, sessão, perfil, criação/pausa/publicação de serviços e persistência no Google Sheets está na branch `dev`.
 - Em 20/11/2026, após as integrações das PRs #16, #17 e #14, o responsável confirmou ter repetido os testes do fluxo principal no Preview atualizado de `dev` e informou que a demonstração está funcionando. O histórico anterior de validação do PR #15 permanece registrado em 16/11; a confirmação mais recente é a referência funcional para a continuidade.
 - O PR #16 integrou as classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`, com testes em `tests/loo/domain-entities.test.js` (`npm run test:loo`). O PR #17 corrigiu a composição da vitrine para manter os serviços de exemplo junto aos serviços cadastrados.
@@ -398,10 +401,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 3a99eb1650d118ce8ccb20fc3de7b179125e86b7
-- **Data do commit:** 2026-11-23T16:03:24-03:00
-- **Mensagem do commit:** Merge pull request #31 from kleber-goncalves/fix/header-login-signup-actions
-- **Branch desta execução:** dev
+- **Commit de referência:** 52e485841ae558cb984ed25beda0b16c010cdcb0
+- **Data do commit:** 2026-11-23T16:12:50-03:00
+- **Mensagem do commit:** fix(profile): inicializar formulário ao iniciar edição
+- **Branch desta execução:** feat/edicao-perfil-usuario
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -524,13 +527,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| 3a99eb1 | 2026-11-23 | Merge pull request #31 from kleber-goncalves/fix/header-login-signup-actions |
-| 8d9f6f8 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
-| 703e1c9 | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
-| 13efc04 | 2026-11-23 | style(header): distinguir ações de login e cadastro |
-| e8c28a8 | 2026-11-23 | fix(header): separar ações de login e cadastro |
-| cc39175 | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
-| 4696a50 | 2026-11-21 | Merge pull request #30 from kleber-goncalves/feat/autenticacao-compartilhada-navegacao |
-| 8558a8e | 2026-11-21 | docs(ai-context): atualizar snapshot automaticamente |
+| 52e4858 | 2026-11-23 | fix(profile): inicializar formulário ao iniciar edição |
+| b85a92e | 2026-11-23 | docs(context): atualizar estado da autenticação e perfil |
+| 633126d | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
+| cc8d95d | 2026-11-23 | docs(profile): documentar evolução da conta e perfil |
+| 97467e1 | 2026-11-23 | style(profile): estilizar formulário de edição do perfil |
+| 7a69de5 | 2026-11-23 | test(profile): restringir campos enviados ao gateway |
+| 7151880 | 2026-11-23 | test(profile): validar atualização do nome completo |
+| 4a6ae4a | 2026-11-23 | feat(profile): validar e salvar nome completo |
 
 <!-- END AUTO-GENERATED SECTION -->

@@ -647,6 +647,7 @@ test("alteração de perfil ignora tentativa de trocar identidade, papel e estad
     const harness = createHarness();
     const result = harness.call("profile.update", {
         tokenHash: TOKEN_HASH_A,
+        nome_completo: "Profissional A Atualizado",
         nome_publico: "Equipe A atualizada",
         apresentacao: "Apresentação atualizada para o teste de autorização.",
         id_cidade_principal: CITY_ID,
@@ -664,9 +665,12 @@ test("alteração de perfil ignora tentativa de trocar identidade, papel e estad
     const users = harness.records("USUARIOS");
 
     assert.equal(profileA.id_usuario, USER_A);
+    assert.equal(profileA.nome_completo, "Profissional A Atualizado");
     assert.equal(profileA.nome_publico, "Equipe A atualizada");
+    assert.equal(profileA.whatsapp, "5534999990001");
     assert.equal(profileB.id_usuario, USER_B);
     assert.equal(profileB.nome_publico, "Equipe B");
+    assert.equal(users.find((user) => user.id_usuario === USER_A).email, "profissional-a@example.test");
     assert.equal(users.find((user) => user.id_usuario === USER_A).papel, "professional");
     assert.equal(users.find((user) => user.id_usuario === USER_A).status, "active");
 

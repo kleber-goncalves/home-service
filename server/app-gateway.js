@@ -455,6 +455,7 @@ export function createAppHandler({
                         forwardedPayload = { tokenHash };
                     } else if (action === "profile.update") {
                         forwardedPayload = {
+                            nome_completo: payload.nome_completo,
                             nome_publico: payload.nome_publico,
                             apresentacao: payload.apresentacao,
                             id_cidade_principal: payload.id_cidade_principal,

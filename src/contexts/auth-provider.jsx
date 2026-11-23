@@ -59,6 +59,15 @@ export function AuthProvider({ children }) {
         }));
     }, []);
 
+    const updateUser = useCallback((nextUser) => {
+        setSession((current) => {
+            if (!current.user || !nextUser || current.user.idUsuario !== nextUser.idUsuario) {
+                return current;
+            }
+            return { ...current, user: nextUser };
+        });
+    }, []);
+
     const logout = useCallback(async () => {
         if (!session.user) return;
 
@@ -71,8 +80,9 @@ export function AuthProvider({ children }) {
         isLoading,
         establishSession,
         setServices: updateServices,
+        updateUser,
         logout,
-    }), [session, isLoading, establishSession, updateServices, logout]);
+    }), [session, isLoading, establishSession, updateServices, updateUser, logout]);
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
