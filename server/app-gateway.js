@@ -630,7 +630,10 @@ export function createAppHandler({
                     };
                 }
 
-                const appsAction = action === "auth.me" ? "session.me" : action === "auth.logout" ? "session.logout" : action;
+                const appsAction = action === "auth.me" ? "session.me"
+                    : action === "auth.logout" ? "session.logout"
+                        : action === "auth.email.change.confirm" ? "email.change.confirm"
+                            : action;
 
                 output = await callAppsScript({
                     action: appsAction,
