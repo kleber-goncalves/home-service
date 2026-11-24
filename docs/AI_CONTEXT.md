@@ -414,10 +414,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** b1ff6c587d6a9ba7841bda5f8d363643b2d45949
-- **Data do commit:** 2026-11-24T16:17:12-03:00
-- **Mensagem do commit:** feat(homepage): adicionar vitrine interativa por categoria (#37)
-- **Branch desta execução:** dev
+- **Commit de referência:** 550888cc12a11bd3062ef945aafcec0bf486621e
+- **Data do commit:** 2026-11-24T16:30:02-03:00
+- **Mensagem do commit:** feat(catalog): normalizar servicos ficticios no catalogo publico
+- **Branch desta execução:** feat/catalog-demo-and-published-services
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -542,13 +542,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 550888c | 2026-11-24 | feat(catalog): normalizar servicos ficticios no catalogo publico |
+| aad2f3a | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | b1ff6c5 | 2026-11-24 | feat(homepage): adicionar vitrine interativa por categoria (#37) |
 | 72fd5ec | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | e84d295 | 2026-11-24 | fix(site-header): ajustar classe CSS para melhor alinhamento da navegação |
 | e87882d | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 41ac8ee | 2026-11-24 | feat(hero-section): melhorar layout e responsividade da seção hero |
 | 7853b0e | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| 1f244f6 | 2026-11-24 | feat(homepage): adicionar ilustracoes nos cantos do hero (#36) |
-| a56b53b | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
