@@ -1,10 +1,10 @@
 # Modelagem lógica e física de dados — Conecta Local
 
 > **Versão:** 1.0  
-> **Data:** 2026-11-10  
-> **Status:** modelagem lógica e esquema físico aprovados conceitualmente; validações técnicas e implementação pendentes.  
+> **Data:** 2026-11-24  
+> **Status:** modelo lógico e esquema físico das 12 entidades aprovados como referência; implementação operacional parcial e integrada em `dev`. Estado operacional atualizado em 24/11/2026 na seção 12.  
 > **Escopo:** inventário lógico, esquema físico das 12 abas, campos, relacionamentos, integridade, estados e estratégia de persistência do MVP acadêmico.  
-> **Importante:** este documento descreve o modelo aprovado. O arquivo Google Sheets com as 12 abas e os 102 cabeçalhos foi criado e conferido pelo responsável pelo projeto; ele ainda não contém dados de negócio nem está integrado a um backend Apps Script operacional. As integrações com Drive também não estão implementadas.
+> **Importante:** este documento descreve o modelo lógico e o esquema físico de referência, não uma afirmação de que todas as 12 entidades já tenham fluxo operacional. O backend de demonstração em `dev` utiliza dez abas; `CONTROLE_AUTENTICACAO` e `DENUNCIAS` ainda não têm fluxos integrados. Imagens de serviços e fotos de perfil usam `IMAGENS` e Google Drive com rotas de upload/entrega já integradas. Consulte a seção 12 para separar o modelo aprovado do estado operacional.
 
 ## 1. Objetivo e limites
 
@@ -14,9 +14,9 @@ Este documento consolida a modelagem lógica derivada da [Especificação funcio
 - Catálogo e serviços: 5 entidades.
 - Governança: 2 entidades.
 
-A decisão aprovada é utilizar **um único arquivo Google Sheets com 12 abas**, uma para cada entidade. O Google Drive armazenará os arquivos de imagem; seus metadados e relacionamentos serão mantidos na aba `IMAGENS`.
+A modelagem aprovada prevê **um único arquivo Google Sheets com 12 abas**, uma por entidade. A demonstração operacional utiliza dez delas; `CONTROLE_AUTENTICACAO` e `DENUNCIAS` permanecem sem fluxo integrado. O Google Drive armazena imagens; metadados e relacionamentos são mantidos na aba `IMAGENS`.
 
-O projeto é uma demonstração acadêmica com dados sintéticos. Não deve receber credenciais, cadastros ou dados pessoais reais. A existência da estrutura no Google Sheets foi confirmada fora deste documento; isso não comprova integração, integridade relacional ou aplicação das regras pelo backend.
+O projeto é uma demonstração acadêmica com dados sintéticos. Não deve receber credenciais, cadastros ou dados pessoais reais. A implementação no Sheets não transforma a planilha em banco relacional: integridade, unicidade, autorização e estados dependem das validações realizadas no Apps Script.
 
 ### 1.1. Convenções de representação
 
@@ -56,9 +56,9 @@ Responsável por autenticação, papel e estado da conta. O e-mail é privado e 
 |---|---|---|---|
 | `id_usuario` | UUID (PK) | Sim | Gerado pelo backend, único e imutável. |
 | `email` | Texto até 254 | Sim | Normalizado com trim e minúsculas; único após normalização. |
-| `senha_hash` | Texto | Sim | Nunca armazenar senha em texto puro; algoritmo depende de prova de conceito aprovada. |
-| `senha_salt` | Texto | Sim | Salt individual; formato e tamanho definidos na prova de conceito criptográfica. |
-| `senha_algoritmo` | Texto | Sim | Identificador/versionamento e parâmetros do KDF efetivamente utilizado; não presumir algoritmo antes da prova de conceito. |
+| `senha_hash` | Texto | Sim | Resultado Argon2id do protótipo, gerado no gateway Node com `hash-wasm@4.13.0`; nunca armazenar senha em texto puro. |
+| `senha_salt` | Texto | Sim | Salt individual usado no cálculo Argon2id do protótipo; não reutilizar entre contas. |
+| `senha_algoritmo` | Texto | Sim | Identificador e parâmetros/versionamento do Argon2id efetivamente utilizado pelo protótipo. |
 | `papel` | ENUM | Sim | `professional` ou `admin`; nunca escolhido livremente pelo formulário público. |
 | `status` | ENUM | Sim | `pending_activation`, `active`, `suspended`, `closed`. |
 | `email_verificado_em` | DATETIME | Não | Nulo até a confirmação válida do endereço. |
@@ -68,7 +68,7 @@ Responsável por autenticação, papel e estado da conta. O e-mail é privado e 
 
 **Regras:** e-mail único após normalização; papel administrativo concedido somente por procedimento controlado; conta profissional só pode ficar ativa com um perfil profissional válido; contas administrativas não exigem perfil. Senha, hash, salt e parâmetros nunca entram em logs ou respostas ao navegador.
 
-**Bloqueio técnico:** a implementação de senha depende de prova de conceito de um KDF apropriado, com salt individual, parâmetros versionados, comparação segura e desempenho medido. SHA-256 ou HMAC isolado não é substituto de KDF de senha.
+**Estado do protótipo:** Argon2id via `hash-wasm@4.13.0`, com perfil registrado na POC-03 (`m=19456 KiB,t=2,p=1`), está integrado ao gateway Node; a comparação usa `timingSafeEqual`. Esse resultado atende à demonstração acadêmica com credenciais fictícias, não representa auditoria independente ou aprovação para produção. SHA-256 ou HMAC isolado não substitui KDF de senha.
 
 ### 3.2. PROFISSIONAIS
 
@@ -390,7 +390,7 @@ A API do Drive alerta que permissões herdadas não podem ser revogadas diretame
 
 ### 7.3. Gravações de dados e auditoria no Sheets
 
-O arquivo de dados terá as 12 abas listadas na seção 2. Para operações que exigem auditoria, a alteração do registro de negócio e a inclusão do evento deverão integrar o mesmo `spreadsheets.batchUpdate`, usando requisições de células compatíveis (por exemplo, atualizações/inserções de células) no mesmo arquivo. A API valida as solicitações antes de aplicá-las e aplica o lote de forma atômica: se uma requisição for inválida, o lote inteiro falha e nenhuma das alterações daquele lote é aplicada.
+No modelo aprovado, as operações de negócio e auditoria estão descritas para uso de `spreadsheets.batchUpdate` no mesmo arquivo. A aplicação operacional existente deve ser consultada antes de afirmar que uma gravação específica usa um único lote; não presumir atomicidade das rotinas atuais. A API Sheets aplica atomicidade dentro de um único lote, mas isso não cria transação distribuída com o Drive ou outros serviços.
 
 Referência oficial: [Google Sheets API — spreadsheets.batchUpdate](https://developers.google.com/workspace/sheets/api/reference/rest/v4/spreadsheets/batchUpdate).
 
@@ -420,19 +420,19 @@ Uma operação que dependa de alteração de permissão não será apresentada c
 - `AUDITORIA` será append-only pela aplicação, mas usuários com permissões de edição do arquivo/projeto ainda podem adulterar dados. Não classificar o Sheets como log inviolável.
 - Retenção de dados é uma regra acadêmica para dados fictícios; uma versão com dados reais exigirá política própria de finalidade, retenção e direitos dos titulares.
 
-## 9. Validações técnicas obrigatórias antes de implementar
+## 9. Validações técnicas, implementação e limites
 
-1. **Senha:** KDF apropriado, salt individual, parâmetros versionados, comparação segura e desempenho.
-2. **Sessão:** transporte, persistência, expiração, revogação e resistência a XSS/CORS no fluxo real React–Apps Script.
-3. **Códigos:** HMAC, expiração, uso único, tentativas, intervalo de reenvio e concorrência.
-4. **Bloqueio de login:** resistência a abuso e negação de serviço contra contas.
-5. **Autorização:** tentativas de alterar papel, proprietário, estado e acessar recursos de outro profissional.
-6. **Google Drive:** compartilhamento individual, revogação, herança, acesso a links antigos, falhas e reconciliação.
-7. **Sheets:** lote de dados + auditoria, concorrência, unicidade, falhas de gravação e limites/cotas.
-8. **Auditoria:** tratamento de falha tanto no lote atômico quanto na gravação separada de falha; ausência de segredos.
-9. **Integração:** comunicação React–Web App, CORS/POST/JSON, redirecionamentos, latência, cotas e limites de execução.
+1. **Senha:** Argon2id via `hash-wasm@4.13.0` e comparação Node com `timingSafeEqual` estão integrados ao gateway do protótipo. O perfil e as medições estão em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`. Não é certificação nem aprovação para credenciais reais.
+2. **Sessão:** o fluxo principal por cookie HttpOnly, CSRF, Origin, expiração, logout e revogação está integrado. A POC-04 é separada, desabilitada e não deve ser reativada.
+3. **Códigos:** cadastro e alteração demonstrativa de e-mail usam códigos HMAC, validade e limites de tentativas no backend. Não existe envio real de e-mail.
+4. **Bloqueio de login:** as regras implementadas e seus limites devem ser consultados no código e no documento da POC-03; ainda não há auditoria independente ou prova de resistência a abuso em escala.
+5. **Autorização:** papel e propriedade são validados no Apps Script; os testes e os ensaios manuais documentados cobrem recusa de acesso cruzado e de papel não autorizado.
+6. **Google Drive:** upload retomável, metadados em `IMAGENS`, permissões por elegibilidade e gateway same-origin estão integrados. A validação manual principal ocorreu no Preview com dados de teste; consultar `docs/ETAPA_4_IMAGENS_DRIVE.md` e `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`.
+7. **Sheets:** o backend usa dez abas operacionais. Não assumir atomicidade entre Sheets e Drive, ou entre gravações separadas; validar a implementação específica de cada operação.
+8. **Auditoria:** eventos são gravados pelo backend, mas `AUDITORIA` não é inviolável contra editores do projeto/planilha. Falhas de gravação e consistência distribuída permanecem limites.
+9. **Integração e operação:** comunicação React–Vercel–Apps Script, assinatura, redirecionamentos e rotas same-origin estão implementados. Quotas, concorrência, testes de carga, monitoramento e recuperação de falhas não foram comprovados em nível de produção.
 
-Se uma prova de conceito não cumprir requisitos mínimos, não implementar o fluxo por improviso. Registrar a limitação e rever a alternativa antes de prosseguir.
+Antes de qualquer uso fora da demonstração, realizar revisão técnica e de segurança específica, avaliação de quotas/desempenho, proteção de dados e procedimentos operacionais. Não converter testes de protótipo em garantia de produção.
 
 ## 10. O que não faz parte deste modelo
 
@@ -442,11 +442,11 @@ Não criar novas entidades para bairros, regiões, avaliações, favoritos, conv
 
 Esta seção registra o esquema físico aprovado e utilizado como referência para a planilha estrutural já criada do Conecta Local. Ela complementa o modelo lógico anterior: define nomes e ordem das colunas, tipo de célula no Google Sheets, valores controlados, campos opcionais e restrições operacionais.
 
-**Estado:** as 12 estruturas foram aprovadas conceitualmente e a planilha com as 12 abas e 102 cabeçalhos foi criada e conferida pelo responsável. A criação não significa que existam registros de negócio ou que a API Apps Script, autenticação, uploads ou integrações operacionais estejam implementados.
+**Estado do modelo:** as 12 estruturas e os 102 campos permanecem como esquema conceitual de referência. A implementação operacional atual utiliza dez abas, com autenticação, serviços, cobertura por cidades, imagens e auditoria no backend da demonstração. As abas `CONTROLE_AUTENTICACAO` e `DENUNCIAS` não possuem fluxos integrados.
 
 ### 11.1. Convenções gerais do arquivo
 
-- Será utilizado **um único arquivo Google Sheets**, com exatamente 12 abas operacionais, uma para cada entidade.
+- O esquema físico de referência define **um único arquivo Google Sheets com 12 abas**, uma para cada entidade. O backend atual da demonstração utiliza dez abas; `CONTROLE_AUTENTICACAO` e `DENUNCIAS` permanecem sem fluxo operacional integrado.
 - Os nomes das abas serão exatamente: USUARIOS, PROFISSIONAIS, SESSOES, CODIGOS_VERIFICACAO, CONTROLE_AUTENTICACAO, SERVICOS, CATEGORIAS, CIDADES, SERVICO_CIDADES, IMAGENS, DENUNCIAS e AUDITORIA.
 - A linha 1 conterá exclusivamente os cabeçalhos. Os registros começam na linha 2.
 - Os cabeçalhos usarão os nomes de campo em snake_case, na ordem indicada nas tabelas desta seção.
@@ -701,24 +701,34 @@ Nunca registrar senha, hash de senha, salt, parâmetros secretos, código de ver
 
 ## 12. Estado e próximos passos
 
-**Aprovado conceitualmente:**
+**Modelo aprovado como referência:**
 - inventário lógico de 12 entidades e 102 campos;
 - PKs, FKs, cardinalidades e unicidade;
 - regras de integridade, estados e visibilidade;
-- esquema físico das 12 abas, totalizando 102 colunas, com nomes, ordem, formatos, tipos de célula e validações;
+- esquema físico de referência das 12 abas, com nomes, ordem, formatos, tipos de célula e validações;
 - regras de privacidade, proteção e limites da persistência em Sheets/Drive.
 
-**Criado e conferido na planilha Google Sheets:**
-- arquivo estrutural com as 12 abas e os 102 cabeçalhos;
-- listas suspensas auxiliares aprovadas;
-- proteções e compartilhamento restrito, conforme conferência confirmada pelo responsável.
+**Estado operacional em 24/11/2026:**
 
-**Ainda não implementado:**
-- registros sintéticos de negócio;
-- projeto/API Apps Script operacional e integração com o frontend;
-- uploads e permissões efetivas do Drive;
-- autenticação, códigos e sessões;
-- provas de conceito técnicas.
+O backend da demonstração integrado em `dev` utiliza dez abas:
+- `USUARIOS`
+- `PROFISSIONAIS`
+- `SESSOES`
+- `CODIGOS_VERIFICACAO`
+- `CATEGORIAS`
+- `CIDADES`
+- `SERVICOS`
+- `SERVICO_CIDADES`
+- `IMAGENS`
+- `AUDITORIA`
 
-**Próxima etapa:** revisar a proposta em [ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md) e executar as provas de conceito, começando por transporte/CORS entre Vercel e Apps Script. A planilha já foi criada; não é necessário repetir sua inicialização. Os fluxos de autenticação, concorrência, auditoria e permissões do Drive continuam bloqueados até validação técnica.
+As abas `CONTROLE_AUTENTICACAO` e `DENUNCIAS` fazem parte do modelo aprovado, mas ainda não possuem fluxos operacionais integrados. A autenticação, sessões, autorização, serviços, cidades e imagens estão implementados em algum grau no protótipo; detalhes, evidências e limites estão em `docs/AI_CONTEXT.md`, `docs/ESPECIFICACAO_MVP.md` e nos planos específicos.
 
+**Validações que continuam necessárias antes de qualquer uso real:**
+- revisão independente de segurança;
+- testes de carga, quotas e desempenho;
+- avaliação de concorrência e falhas parciais entre Sheets e Drive;
+- política de privacidade, retenção, backup e resposta a incidentes;
+- avaliação de arquitetura e infraestrutura caso o projeto deixe de ser demonstração acadêmica.
+
+**Próxima etapa de produto:** redesign visual/UX, descrito em `docs/PLANO_REDESIGN_INTERFACE.md`. Essa etapa não exige alterar o modelo de dados. A pesquisa comunitária permanece separada e depende da orientação do professor/orientador.

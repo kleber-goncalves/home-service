@@ -6,23 +6,29 @@ O projeto tem finalidade acadêmica e busca demonstrar investigação de problem
 
 **Contexto acadêmico:** o Conecta Local está sendo desenvolvido no âmbito de um curso Técnico em Informática. Ele não é o Projeto Integrador do curso de Análise e Desenvolvimento de Sistemas da Uniube.
 
-## Estado atual — 21/11/2026
+## Estado atual — 24/11/2026
 
-A branch `dev` contém a demonstração acadêmica funcional do Conecta Local. As principais frentes integradas incluem:
+A branch `dev` contém a demonstração acadêmica funcional do Conecta Local. As principais entregas integradas incluem:
 
 - **PR #22 — autorização e integridade:** identidade, papel e propriedade de serviços são validados no Apps Script; testes automatizados e ensaios manuais foram aprovados.
-- **PR #23 — ciclo de vida dos serviços:** edição dos próprios serviços e remoção lógica, mantendo o histórico em `SERVICOS` e registrando eventos em `AUDITORIA`.
-- **PR #25 — cobertura por cidades:** um serviço pode atender vários municípios por meio da aba `SERVICO_CIDADES`; a persistência e a pesquisa pública foram validadas no Preview.
-- **PR #26 — imagens no Google Drive:** upload retomável, gerenciamento de até cinco imagens por serviço, remoção lógica e permissões por estado foram integrados em `dev` e validados no Preview com Apps Script, Sheets e Drive de teste.
+- **PR #23 — ciclo de vida dos serviços:** edição dos próprios serviços e remoção lógica, com histórico em `SERVICOS` e eventos em `AUDITORIA`.
+- **PR #25 — cobertura por cidades:** um serviço pode atender vários municípios por meio de `SERVICO_CIDADES`; a persistência e a pesquisa pública foram validadas no Preview.
+- **PR #26 — imagens de serviços:** upload retomável, até cinco imagens por serviço, remoção lógica e permissões por estado integrados e validados com Apps Script, Sheets e Drive de teste.
+- **PRs #28 e #29 — catálogo público:** homepage, catálogo `/servicos`, categorias `/categorias`, detalhes `/servicos/:serviceId`, galeria e entrega segura de imagens pela rota same-origin.
+- **PR #32 — edição do perfil:** alteração dos dados permitidos do profissional, com autorização no backend.
+- **PR #33 — foto de perfil:** upload, substituição, remoção e entrega por gateway, com arquivo privado no Drive.
+- **PR #34 — alteração de e-mail:** reautenticação, confirmação demonstrativa e revogação das sessões antigas. O fluxo não envia e-mail real.
 
-A Etapa 4 (imagens de serviços) está concluída no escopo atual. O Preview fixo de `dev` é:
+**Estado operacional verificado em 24/11/2026:**
 
-- **Preview:** https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app/
-- **Deployment de código verificado após a PR #26:** histórico de referência; consultar o deployment atual da branch `dev` antes de testes.
+- Branch de integração: `dev`, commit `d16278c5b6df6df370645b18a05dfb5ea0effe08`.
+- Preview: [abrir demonstração](https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app/).
+- Deployment Vercel: `dpl_AfNaMm1WqRFJa3jhhwXhfkgwPUTv`, estado `READY`, associado ao commit atual de `dev`.
+- Production (`main`) permanece no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`; não foi alterada nesta etapa.
 
-**Etapa 5 — catálogo público:** a PR #28 foi integrada em `dev` em 21/11/2026; as páginas `/servicos`, `/categorias` e `/servicos/:serviceId` estão na branch integrada. Após a validação manual, foi aberta a frente corretiva `fix/homepage-images-and-sections`: entrega de imagem pela Function same-origin com leitura autenticada no Drive; exemplos fictícios sempre visíveis em seção separada; restauração de `FAQSection`, `PopularServices` e `AboutSection`. As variáveis de Sheets/Drive continuam restritas a `dev`; qualquer validação real deve ocorrer no Preview fixo https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app, após merge e sincronização/publicação da nova ação do Apps Script. Consulte [Plano — catálogo público, navegação e apresentação de imagens](docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md).
+**Próxima frente aprovada: redesign visual e de experiência da interface.** O responsável considera que a interface atual está funcional, mas visualmente genérica. O próximo trabalho será revisar a identidade visual, hierarquia, tipografia, composição, cartões, navegação e consistência entre as páginas públicas e a área do profissional. O escopo e a ordem estão em [Plano de redesign da interface](docs/PLANO_REDESIGN_INTERFACE.md). A direção visual ainda deverá ser definida antes de alterações de código; não foram escolhidas cores, fontes ou referências definitivas.
 
-**Production (`main`) permanece inalterada** no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`. O gateway bloqueia operações de negócio fora de Vercel Preview; não habilitar variáveis de backend em Production nesta etapa.
+O catálogo está funcionalmente integrado e a entrega de imagens foi validada manualmente no Preview. A revisão visual ampla das páginas e a confirmação de todos os critérios de navegação/responsividade permanecem como trabalho da próxima frente, sem presumir que cada item tenha sido testado manualmente.
 
 O projeto é acadêmico, usa somente dados fictícios e não deve receber credenciais ou dados pessoais reais. Não é serviço comercial, marketplace transacional ou aplicação aprovada para produção.
 
@@ -32,9 +38,9 @@ O projeto é acadêmico, usa somente dados fictícios e não deve receber creden
 - **Backend de negócio:** Google Apps Script em `apps-script/conecta-local/Code.gs`.
 - **Persistência operacional atual:** Google Sheets nas abas `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS`, `SERVICO_CIDADES`, `IMAGENS` e `AUDITORIA`.
 - **Orientação a objetos:** classes `Usuario`, `Profissional` e `Servico` em `server/domain-entities.js`.
-- **POC-04:** integrada à `dev` pela PR #14 como experimento independente de sessão sintética. Permanece desabilitada e não integra a autenticação principal. Os recursos temporários foram limpos; os limites de hardening e a decisão de não reativação estão documentados em `docs/POC_04_SESSOES.md`.
+- **POC-04:** integrada à `dev` pela PR #14 como experimento independente de sessão sintética. Permanece desabilitada e não integra a autenticação principal; seus limites estão documentados em `docs/POC_04_SESSOES.md`.
 
-**Limitações conhecidas da demonstração:** envio real de e-mail, recuperação/alteração de senha e e-mail, painel administrativo, denúncias/moderação e gestão administrativa de categorias/cidades ainda não foram implementados. O gerenciamento de imagens de serviços está integrado à `dev` e foi validado no Preview com Apps Script, Google Sheets e Drive de teste; permanece fora de `main`/Production, que continuam sem backend habilitado. Pesquisa local com moradores e profissionais também continua pendente; os indicadores documentais não substituem dados primários de Capelinha.
+**Limitações conhecidas da demonstração:** não há envio real de e-mail, recuperação de senha, painel administrativo funcional, fluxo de denúncias/moderação ou gestão administrativa de categorias e cidades. O fluxo de alteração de e-mail é demonstrativo e não envia mensagens. A pesquisa com moradores e profissionais continua pendente de orientação do professor/orientador. O gerenciamento de imagens e as demais funcionalidades integradas em `dev` permanecem fora de `main`/Production, que continuam sem backend habilitado.
 
 ## Executar localmente
 
@@ -63,6 +69,7 @@ O GitHub Actions executa essas verificações em pushes e Pull Requests direcion
 - [Roteiro de evolução acadêmica e prioridades](docs/ROADMAP_ESTUDOS.md)
 - [Etapa 4 — arquitetura de imagens no Google Drive](docs/ETAPA_4_IMAGENS_DRIVE.md)
 - [Plano — catálogo público, navegação e apresentação de imagens](docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md)
+- [Plano de redesign visual e de experiência da interface](docs/PLANO_REDESIGN_INTERFACE.md)
 - [Questionários preliminares para moradores e profissionais](PESQUISA_COMUNIDADE.md)
 - [Guia de aplicação da pesquisa com a comunidade](docs/GUIA_APLICACAO_PESQUISA_COMUNIDADE.md)
 - [Roteiro detalhado de pesquisa exploratória](docs/ROTEIRO_PESQUISA_EXPLORATORIA.md)

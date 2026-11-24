@@ -254,7 +254,7 @@ Os testes manuais acima validam o caminho funcional principal da integração re
 
 **Estado final:** a Etapa 4 está concluída para o escopo de imagens de serviços no Preview de desenvolvimento. A funcionalidade permanece fora de Production por decisão do projeto. Foto de perfil, galeria avançada, ordenação por arrastar e soltar, compressão/otimização, painel administrativo de mídia e uso de dados reais continuam fora deste primeiro ciclo.
 
-**Próxima etapa do roadmap:** seguir para a Etapa 5 — catálogo público, navegação e apresentação de imagens, conforme `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`. A pesquisa acadêmica e o acabamento da apresentação passam a compor a Etapa 6 e continuam dependendo da orientação do professor/orientador antes da coleta com participantes. Não promover o Preview nem configurar backend em Production sem decisão explícita e revisão específica de segurança.
+**Evolução posterior:** a Etapa 5 — catálogo público, navegação e apresentação das imagens — foi integrada pelas PRs #28 e #29 e sua entrega de imagens foi validada manualmente no Preview de `dev`; consulte `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`. Em 24/11/2026, a próxima frente aprovada é o redesign visual/UX descrito em `docs/PLANO_REDESIGN_INTERFACE.md`. A pesquisa comunitária vem depois dessa melhoria e permanece condicionada à orientação do professor/orientador antes da coleta. Não promover o Preview nem configurar backend em Production sem decisão explícita e revisão específica de segurança.
 
 
 ## 11. Referências técnicas oficiais

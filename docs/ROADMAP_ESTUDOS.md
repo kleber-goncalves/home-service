@@ -1,6 +1,6 @@
 # Roteiro de evolução acadêmica — Conecta Local
 
-> **Atualizado em:** 21/11/2026  
+> **Atualizado em:** 24/11/2026  
 > **Finalidade:** organizar as próximas etapas do projeto de estudos, priorizando aprendizado técnico e conclusão coerente da demonstração. Este roteiro não é um plano de operação comercial nem uma lista de requisitos obrigatórios para Production.
 
 ## 1. Ponto de partida
@@ -16,7 +16,7 @@ O núcleo demonstrativo já está implementado na branch `dev`:
 - Controles de gateway, HMAC, Argon2id, comparação de hashes e validações de entrada.
 - Classes de domínio `Usuario`, `Profissional` e `Servico`.
 
-Em 20/11/2026, o responsável confirmou que repetiu o fluxo funcional no Preview atualizado de `dev` e que a demonstração está funcionando. A POC-04 foi integrada ao repositório, mas continua desabilitada e independente do login principal.
+Em 20/11/2026, o responsável confirmou que repetiu o fluxo funcional no Preview atualizado de `dev` e que a demonstração está funcionando. Depois disso, foram integradas as jornadas de conta e perfil (PRs #30–#34), além do catálogo público (PRs #28 e #29). Em 24/11/2026, `dev` está no commit `d16278c5b6df6df370645b18a05dfb5ea0effe08` e o Preview está READY no deployment `dpl_AfNaMm1WqRFJa3jhhwXhfkgwPUTv`. A POC-04 continua desabilitada e independente do login principal.
 
 **Limite fixo do projeto nesta fase:** usar somente dados fictícios, manter o backend restrito ao Preview e preservar `main` como vitrine pública.
 
@@ -182,78 +182,69 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 **Limites e itens fora desta etapa:** foto de perfil, galeria avançada, ordenação por arrastar e soltar, compressão/otimização de imagens, painel administrativo de mídia e operação em Production. Não declarar como testes manuais realizados nesta rodada repetição individual de todos os formatos, interrupção deliberada de blocos ou falha forçada entre Drive e Sheets.
 
-**Ambiente:** a funcionalidade está em `dev` e no Preview de desenvolvimento. `main` e Production permanecem inalteradas e sem backend habilitado. A próxima etapa do roadmap é a Etapa 5; qualquer promoção futura para Production exige decisão e revisão específicas.
+**Ambiente:** a funcionalidade está em `dev` e no Preview de desenvolvimento. `main` e Production permanecem inalteradas e sem backend habilitado. A Etapa 5 foi concluída funcionalmente pelas PRs #28 e #29; a próxima etapa do roadmap é a Etapa 6 — redesign visual/UX. Qualquer promoção futura para Production exige decisão e revisão específicas.
 
 ### Etapa 5 — Catálogo público, navegação e apresentação das imagens
 
-**Status: implementação funcional inicial concluída na branch `feat/catalogo-publico-navegacao`; PR #28 aberta para `dev` e CI aprovada. A validação integrada com Sheets deve ocorrer no Preview fixo de `dev` após a integração.** O plano detalhado está em `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`.
+**Status: entrega funcional integrada em `dev` pelas PRs #28 e #29; validação integrada da entrega de imagens concluída em 21/11/2026.** O plano detalhado está em `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`.
 
-**Objetivo:** simplificar a homepage e oferecer caminhos claros para descobrir serviços, consultar categorias e visualizar todas as imagens de cada serviço.
+**Implementado:**
+- Homepage reorganizada com pesquisa, categorias em destaque, serviços cadastrados e exemplos ilustrativos em área separada.
+- Rotas públicas `/`, `/servicos`, `/categorias` e `/servicos/:serviceId`, com suporte a URLs diretas e navegação SPA.
+- Pesquisa textual e filtros locais por categoria e cidade, com estado e parâmetros refletidos na URL.
+- Cartões reutilizáveis, imagem principal e indicador de fotos adicionais.
+- Detalhes do serviço com descrição, profissional, cidades atendidas, contato público e galeria de até cinco imagens.
+- Entrega de imagens pelo gateway same-origin `/api/public-images`, com validação de elegibilidade no Apps Script e OAuth restrito ao servidor.
+- Preservação dos exemplos ilustrativos fora do catálogo, da busca, dos filtros e da contagem de serviços cadastrados.
 
-**Implementação atual — 21/11/2026:**
-- Foram criadas as rotas públicas `/`, `/servicos`, `/categorias` e `/servicos/:serviceId`, com suporte a URL direta e histórico do navegador. Os acessos `?auth=demo` e `?poc=01` foram preservados.
-- A homepage foi simplificada para pesquisa, três categorias, até cinco serviços em destaque, apresentação curta do fluxo e CTA para profissionais.
-- O catálogo `/servicos` usa os dados públicos existentes e filtros locais por texto, categoria e cidade; os filtros ficam refletidos na URL. A normalização considera acentos e pontuação em valores como “Cidade - UF”.
-- `/categorias` apresenta todas as categorias ativas e encaminha para a pesquisa filtrada.
-- A página de detalhes apresenta descrição, cidades atendidas, profissional, contato WhatsApp e galeria das imagens ativas, com miniaturas, navegação e contador.
-- O mapeamento frontend preserva a coleção `images[]` ordenada e `categoryId`; o cartão mostra a imagem principal e `+N fotos`.
-- Foi adicionado placeholder neutro para imagem ausente ou que falha no carregamento. O código anterior descartava as imagens adicionais e não tinha fallback visual; isso foi corrigido. **Ainda não foi reproduzida no Preview a causa específica de eventual falha na primeira URL do Drive**; a confirmação com um serviço real que possui cinco imagens continua pendente.
-- Os exemplos ilustrativos da homepage ficam identificados e não entram no catálogo, nos filtros nem na contagem de serviços publicados.
-- Foi adicionado fallback de rotas SPA em `vercel.json` para links diretos; as rotas de API continuam resolvendo para suas Functions.
+**Integração e validação registradas:**
+- PR #28 integrada em `dev` pelo merge commit `22ba720c6fdd22f3bef4cc5b29963279c5119ff9`.
+- PR #29 integrada em `dev` pelo merge commit `77e88be6d9d20151a178f7fe31ea76509299becb`.
+- CI pós-merge [Validate Home Service #44937440114](https://github.com/kleber-goncalves/home-service/actions/runs/44937440114) e AI Context [#44937440122](https://github.com/kleber-goncalves/home-service/actions/runs/44937440122) concluíram SUCCESS.
+- O responsável sincronizou o Apps Script e publicou nova versão na implantação Web App existente.
+- No Preview de `dev`, cinco imagens do serviço fictício `Aparar grama` retornaram HTTP 200 com conteúdo e MIME de imagem; a pausa bloqueou as cinco com HTTP 404; a republicação restaurou HTTP 200; a remoção de uma imagem bloqueou o ID removido e preservou as outras quatro.
+- Esta evidência comprova a integração do gateway de imagens, mas não registra por si só a homologação manual completa de todos os filtros, rotas, tamanhos de tela e fluxos de conta.
 
-**Validação automatizada e de infraestrutura — PASS:**
-- GitHub Actions [#44933049890](https://github.com/kleber-goncalves/home-service/actions/runs/44933049890): auditoria bloqueante de dependências, POC-01/02/03/04, autorização/ownership, gateway de imagens, LOO, testes do catálogo, registro de ocorrências, ESLint e build concluídos com **SUCCESS**.
-- GitHub Actions AI Context [#44933049803](https://github.com/kleber-goncalves/home-service/actions/runs/44933049803): **SUCCESS**.
-- Preview isolado da feature branch: deployment `dpl_Ceu1VZvFX81JdMQrnKBxbzwKhK9K`, **READY**, URL https://home-service-8v1rdts20-kleber-goncalves-s-projects.vercel.app. Serve para inspecionar frontend/build/rotas; não tem acesso à planilha porque as variáveis do backend no Vercel estão restritas a `gitBranch: dev`.
-- Verificações HTTP nesse Preview: `/`, `/servicos`, `/categorias` e `/servicos/example-id` retornaram 200 com o shell da aplicação; `/api/app` e `/api/images` retornaram 405 em GET. Isso confirma resolução de rotas, não conexão funcional com Apps Script/Sheets.
-- Preview funcional conectado à planilha: https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app. Ele só exibirá o código desta etapa após merge da PR #28 em `dev` e novo deployment.
+**Ponto de melhoria identificado pelo responsável em 24/11/2026:** embora a estrutura funcional esteja integrada, o design visual atual foi considerado genérico. A próxima etapa será o redesign visual/UX, com diagnóstico e definição de uma identidade própria, preservando o comportamento existente. Ver `docs/PLANO_REDESIGN_INTERFACE.md`.
 
-**Validação integrada manual ainda pendente:** como as variáveis do Apps Script/Sheets estão limitadas a `gitBranch: dev`, a PR #28 precisa ser integrada em `dev` para que o novo código seja implantado no Preview fixo conectado à planilha. Após o deployment atualizado, validar em desktop/celular; testar serviço fictício com cinco imagens; conferir imagem principal/galeria; testar filtros, URLs e recarga; repetir `?auth=demo`, `?poc=01`, cadastro/gestão e upload. O Preview da feature branch não deve ser usado como prova de integração com Sheets. `main` e Production não devem ser alteradas.
+**Limites:** manter os filtros no cliente sobre os dados públicos existentes; não criar mecanismo externo de busca, geolocalização ou infraestrutura adicional sem necessidade demonstrada. Não inventar avaliações, estrelas, reputação, preço ou disponibilidade. Não alterar `main`, habilitar backend em Production ou ampliar o escopo dos segredos Vercel.
 
-**Escopo aprovado:**
-- Reduzir a homepage a uma apresentação objetiva: pesquisa por serviço/cidade, três categorias em destaque, quatro ou cinco serviços, explicação curta de como funciona, chamada para profissionais e rodapé.
-- Criar `/servicos` com catálogo público, pesquisa textual, filtros por categoria e cidade, contador, limpar filtros e estados de carregamento/vazio/erro.
-- Criar `/categorias` com todas as categorias ativas; cada categoria abre `/servicos` já filtrada.
-- Criar `/servicos/:serviceId` com dados públicos, cobertura por cidades, galeria das até cinco imagens ativas e contato por WhatsApp.
-- Consolidar um cartão reutilizável que exibe uma imagem principal e informa `+N fotos`; as demais imagens serão apresentadas na galeria de detalhes.
-- Preservar `images[]`, `categoryId`, IDs e cidades no mapeamento frontend. O cartão não deve descartar quatro imagens que o backend já retorna.
-- Separar serviços cadastrados de exemplos ilustrativos. A página de catálogo e os filtros devem conter somente serviços públicos elegíveis; exemplos locais, quando necessários para a demonstração, terão identificação explícita e não entrarão nos resultados reais.
-- Diagnosticar separadamente eventual falha no carregamento da primeira imagem: resposta de `public.services`, URL/permissão do Drive, resposta HTTP e decodificação no navegador. A inexistência de galeria não será tratada como causa comprovada de imagem em branco.
+### Etapa 6 — Redesign visual e experiência da interface
 
-**Estratégia proporcional ao MVP:**
-- Reutilizar `public.services`, `CATEGORIAS`, `CIDADES`, `SERVICO_CIDADES` e `IMAGENS`; filtros inicialmente no cliente sobre os até 100 serviços retornados.
-- Não criar mecanismo externo de busca, novo banco, geolocalização ou paginação backend sem uma limitação comprovada.
-- Adotar rotas públicas com URL direta e histórico do navegador, preservando `?auth=demo` e `?poc=01`.
-- Usar placeholder neutro para imagem ausente/quebrada; não substituir silenciosamente por foto de outro serviço/categoria.
-- Não inventar avaliações, estrelas, reputação, preço ou disponibilidade. Somente apresentar dados disponíveis e confirmados no contrato público.
+**Status: próxima etapa aprovada; ainda não iniciada.** O responsável identificou que a interface está funcional, porém visualmente genérica. O objetivo é dar ao Conecta Local uma identidade visual reconhecível, melhorar hierarquia, composição e consistência e elevar a qualidade percebida sem adicionar funcionalidades desnecessárias.
 
-**Ordem de trabalho:**
-1. Diagnosticar e corrigir, se reproduzível, a falha da primeira imagem.
-2. Preservar a lista de imagens e demais IDs no frontend; consolidar cartão reutilizável.
-3. Implementar navegação e páginas de serviços/categorias.
-4. Implementar detalhe do serviço e galeria.
-5. Simplificar a homepage e conectar os atalhos às páginas completas.
-6. Validar URLs diretas, voltar/avançar, responsividade, estados vazios, imagens quebradas e preservação dos fluxos de autenticação e área profissional.
+**Plano de trabalho:** `docs/PLANO_REDESIGN_INTERFACE.md`.
 
-**Critérios de conclusão:** critérios detalhados no plano específico; incluem catálogo real pesquisável/filtrável, três categorias e quatro/cinco serviços na homepage, galeria com até cinco imagens, diferenciação dos exemplos, compatibilidade dos acessos demonstrativos e testes/build aprovados.
+**Escopo previsto:**
+- Auditar visualmente as páginas públicas e a área autenticada em desktop e mobile.
+- Identificar padrões genéricos, inconsistências, excesso de componentes/cards e problemas de hierarquia.
+- Preparar propostas de direção visual com referências e composição próprias; nenhuma paleta, fonte ou estilo está aprovado neste momento.
+- Definir tokens de cor, tipografia, espaçamento, largura, bordas, sombras, estados e movimento.
+- Reestruturar progressivamente cabeçalho, hero, busca, categorias, cartões, galeria, rodapé, autenticação, perfil e gestão de serviços.
+- Preservar rotas, contratos de API, sessão, autorizações, upload, imagens e os fluxos já aprovados.
+- Validar responsividade, acessibilidade, estados de interface e regressões funcionais.
 
-**Limites:** implementação exclusivamente em branch derivada de `dev` e validação no Preview. Não alterar `main`, não habilitar backend em Production e não modificar o esquema do Sheets sem necessidade demonstrada.
+**Critério de sucesso:** a aplicação deixa de parecer um template genérico e passa a ter identidade visual consistente em todas as jornadas principais, sem perda de funcionalidades, acessibilidade ou responsividade.
 
-### Etapa 6 — Pesquisa acadêmica e acabamento da apresentação
+**Limites:** JavaScript/JSX, React, Vite e Tailwind existentes; evitar dependências novas e refatorações estruturais sem motivo. Não implementar um redesign baseado em tendências aleatórias nem copiar integralmente outra plataforma. Trabalhar em branch derivada de `dev`, PR direcionada a `dev`, dados fictícios e Preview; preservar `main`/Production.
 
-**Status: instrumento exploratório preparado; coleta e análise de respostas pendentes.**
+### Etapa 7 — Pesquisa acadêmica com a comunidade
 
-**Instrumento disponível:** `docs/ROTEIRO_PESQUISA_EXPLORATORIA.md`, com questionários separados para moradores e profissionais, consentimento, cuidados de privacidade e sugestões de análise.
+**Status: instrumentos preparados; revisão do professor/orientador, coleta e análise ainda pendentes.** Esta etapa será retomada depois do redesign da interface.
+
+**Instrumentos disponíveis:**
+- `PESQUISA_COMUNIDADE.md` — questionários preliminares para moradores e profissionais.
+- `docs/GUIA_APLICACAO_PESQUISA_COMUNIDADE.md` — orientações de preparação, aplicação e análise.
+- `docs/ROTEIRO_PESQUISA_EXPLORATORIA.md` — roteiro e perguntas da investigação.
 
 **Próximos passos:**
-- Confirmar com o professor/orientador se a atividade exige algum termo ou procedimento institucional antes de abordar participantes.
+- Confirmar com o professor/orientador se a atividade exige autorização, termo ou procedimento institucional antes de abordar participantes.
 - Aplicar somente após essa orientação, com participação voluntária e sem coletar nomes, e-mails, telefones, endereços ou outros dados identificáveis.
-- Buscar, se viável, 20 a 30 respostas de moradores e 10 a 15 de profissionais; a amostra é exploratória e de conveniência, não representativa do município.
+- Buscar, se viável e aprovado, 20 a 30 respostas de moradores e 10 a 15 de profissionais; a amostra será exploratória e por conveniência, não representativa do município.
 - Analisar respostas reais, calcular percentuais por pergunta e registrar também opiniões contrárias ou pouco favoráveis à proposta.
-- Revisar acessibilidade básica, responsividade, mensagens de erro, estados vazios e fluxo de demonstração.
-- Atualizar capturas, roteiro de apresentação e relatório acadêmico conforme o que estiver realmente implementado e pesquisado.
+- Atualizar o relatório acadêmico com o método, período, número de respostas válidas, limitações e resultados efetivamente obtidos.
 
-**Prioridade:** importante para a entrega acadêmica, depois da melhoria do catálogo público. Não inventar participantes, respostas, percentuais ou conclusões.
+**Regra de integridade acadêmica:** não inventar participantes, respostas, percentuais ou conclusões.
 
 ## 4. Itens que devem ficar para depois
 
@@ -261,7 +252,7 @@ Os itens abaixo não são necessários para demonstrar o núcleo atual e podem c
 
 - Painel administrativo completo e gestão de papéis.
 - Denúncias, fila de moderação e governança operacional.
-- Envio real de e-mail, recuperação de senha e alteração de e-mail.
+- Envio real de e-mail e recuperação de senha. A alteração de e-mail já existe em `dev` em modo demonstrativo, sem envio real de mensagens.
 - Analytics, dashboards, notificações e relatórios avançados.
 - Pagamentos, contratação, agendamento, chat, avaliações e favoritos.
 - Migração para PostgreSQL, Firebase, Supabase ou outra infraestrutura sem requisito concreto.
@@ -280,11 +271,11 @@ Reavaliar somente quando houver exigência acadêmica explícita ou uma necessid
 
 ## 6. Ordem prática recomendada
 
-1. **Agora:** iniciar a Etapa 5 — catálogo público, navegação e apresentação das imagens — em uma branch de funcionalidade derivada de `dev`, seguindo `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`.
-2. **Depois:** retomar a Etapa 6 — pesquisa comunitária — somente após orientação do professor do curso Técnico em Informática e confirmação do procedimento aplicável. A coleta permanece pendente.
+1. **Agora:** iniciar a Etapa 6 — redesign visual e experiência da interface — seguindo `docs/PLANO_REDESIGN_INTERFACE.md`. Começar pelo diagnóstico visual e pela exploração de direção de arte; não alterar código em larga escala antes de definir a linguagem visual.
+2. **Depois:** retomar a Etapa 7 — pesquisa comunitária — somente após a orientação do professor do curso Técnico em Informática e confirmação do procedimento aplicável. A coleta permanece pendente.
 3. **Na preparação da entrega:** revisar acessibilidade, responsividade, roteiro de demonstração e relatório acadêmico, registrando apenas funcionalidades e resultados efetivamente concluídos.
 
-Trabalhar uma etapa por branch/PR, sempre partindo de `dev`. Integrar somente depois das verificações pertinentes. Não alterar `main` sem uma decisão explícita de publicação.
+A Etapa 5 (catálogo público) está integrada pelas PRs #28 e #29; não reiniciá-la como nova funcionalidade. Seus critérios de navegação e apresentação ainda podem ser reavaliados durante o redesign. Trabalhar uma etapa por branch/PR, sempre partindo de `dev`. Integrar somente depois das verificações pertinentes. Não alterar `main` sem uma decisão explícita de publicação.
 
 ## 7. Critério de sucesso do projeto de estudos
 

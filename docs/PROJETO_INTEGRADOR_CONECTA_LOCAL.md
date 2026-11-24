@@ -2,10 +2,10 @@
 
 **Projeto:** Conecta Local (repositório `home-service`)  
 **Natureza:** projeto acadêmico de desenvolvimento web  
-**Versão do documento:** 1.1  
-**Data de consolidação:** 20 de novembro de 2026  
-**Base técnica analisada:** branch `dev` no head documental `a17f2419a4613933b03f20b2f6e312c527a53274`; código da Etapa 3 integrado no merge commit `5003604a51def9bdf58df9845d36c2ec75a4452e`. A branch `main` permanece no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`.  
-**Ambiente de demonstração:** Vercel Preview — `https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app` (deployment verificado `dpl_HxMw5f9zyTKFYbj9We6YbguNX58v`, `READY`).
+**Versão do documento:** 1.2  
+**Data de consolidação:** 24 de novembro de 2026  
+**Base técnica analisada:** branch `dev` no commit `d16278c5b6df6df370645b18a05dfb5ea0effe08`; principais entregas recentes: PRs #28/#29 (catálogo e imagens), #32 (edição de perfil), #33 (foto de perfil) e #34 (alteração de e-mail). A branch `main` permanece no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`.  
+**Ambiente de demonstração:** Vercel Preview — `https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app` (deployment verificado em 24/11/2026: `dpl_AfNaMm1WqRFJa3jhhwXhfkgwPUTv`, `READY`).
 
 > **Finalidade:** apresentar como o Conecta Local atende às oito etapas solicitadas na atividade integradora: investigação, dados, APS, LOO, PI, segurança, testes e viabilidade. O documento diferencia funcionalidades implementadas, decisões de projeto, evidências existentes e atividades ainda pendentes.
 
@@ -15,24 +15,26 @@
 
 O **Conecta Local** é uma plataforma web regional proposta para aproximar pessoas que procuram serviços locais de profissionais autônomos e pequenos empreendedores. A experiência principal é: **pesquisar → descobrir → conhecer → entrar em contato**. O sistema funciona como uma vitrine de serviços; o contato é realizado diretamente com o profissional, principalmente pelo WhatsApp divulgado no perfil.
 
-A análise da branch `dev` confirma uma homepage pública, cadastro e login demonstrativos, gerenciamento de sessão, edição e remoção lógica de serviços e associação de cada serviço a uma ou mais cidades. A arquitetura utiliza React/Vite no navegador, uma Vercel Function como gateway HTTP, Google Apps Script como autoridade de negócio e Google Sheets como armazenamento da demonstração.
+A análise da branch `dev` confirma uma aplicação pública com homepage, catálogo de serviços, páginas de categorias e detalhes, galeria de imagens, cadastro e login demonstrativos, gerenciamento de sessão, edição do perfil, foto de perfil, alteração demonstrativa de e-mail, ciclo de vida dos serviços e associação de cada serviço a uma ou mais cidades. A arquitetura utiliza React/Vite no navegador, uma Vercel Function como gateway HTTP, Google Apps Script como autoridade de negócio, Google Sheets como armazenamento e Google Drive para imagens.
 
-O projeto também possui implementação concreta de orientação a objetos, controles de segurança, testes automatizados e documentação de arquitetura e dados. Em 20/11/2026, o responsável confirmou a sincronização/publicação do Apps Script real e a validação manual da edição de serviços, da persistência em `SERVICO_CIDADES` e da pesquisa pública do mesmo serviço em duas cidades. Entretanto, **a necessidade específica do município ainda não foi comprovada por pesquisa de campo**. Os números públicos apresentados neste relatório dão contexto nacional e municipal, mas não substituem entrevistas ou questionários com moradores e profissionais locais.
+O projeto também possui implementação de orientação a objetos, controles de segurança, testes automatizados e documentação técnica. Em novembro de 2026, o responsável confirmou validações manuais de serviços, cobertura por cidades, imagens no Drive, foto de perfil e alteração de e-mail no Preview de `dev`. A interface está funcional, mas em 24/11/2026 o responsável identificou que sua aparência ainda é genérica; o próximo trabalho é o redesign visual/UX, planejado em `docs/PLANO_REDESIGN_INTERFACE.md`. Entretanto, **a necessidade específica do município ainda não foi comprovada por pesquisa de campo**. Os números públicos apresentados neste relatório dão contexto, mas não substituem a coleta local.
 
 ### Situação das oito etapas
 
 | Etapa | Situação atual | Evidência ou pendência principal |
 |---|---|---|
-| 1. Investigação | Parcial | Hipótese e instrumento de pesquisa documentados; coleta local com moradores e profissionais ainda não realizada. |
+| 1. Investigação | Parcial | Hipótese e instrumentos preparados; coleta com moradores e profissionais ainda não realizada. |
 | 2. Dados | Parcial | Indicadores públicos contextualizam o tema; faltam dados primários de Capelinha. |
-| 3. APS — Análise e Projeto de Sistemas | Desenvolvida e implementada no protótipo | Requisitos, regras, modelagem, arquitetura e fluxo de serviços documentados e exercitados. |
+| 3. APS — Análise e Projeto de Sistemas | Desenvolvida e implementada no protótipo | Requisitos, regras, modelagem, arquitetura e jornadas principais documentadas e exercitadas. |
 | 4. LOO — Linguagem Orientada a Objetos | Implementada | Classes `Usuario`, `Profissional` e `Servico`, herança e testes automatizados. |
-| 5. PI — Programação/Projeto de Interface | Implementada | Interface React/JSX, CSS/Tailwind, homepage pública e área profissional responsiva. |
-| 6. Segurança | Implementada em nível de protótipo | Argon2id, sessão, CSRF, HMAC, replay, validação de origem, autorização e auditoria; sem aprovação para produção. |
-| 7. Testes | CI aprovada e fluxos principais confirmados manualmente | Testes automatizados passaram; o responsável confirmou validação manual de edição/remoção de serviços, autorização e cobertura por duas cidades no Preview de `dev`. Origem externa, carga e auditoria independente não foram validadas nesta rodada. |
-| 8. Viabilidade | Análise preliminar | Custos de demonstração baixos; operação comercial exigiria revisão de infraestrutura, custos, privacidade e segurança. |
+| 5. PI — Programação/Projeto de Interface | Implementada funcionalmente; redesign visual planejado | Homepage, catálogo, categorias, detalhes, galeria e área autenticada estão integrados. O responsável considera o visual genérico; a melhoria de identidade e consistência é a próxima frente. |
+| 6. Segurança | Implementada em nível de protótipo | Argon2id, sessão, CSRF, HMAC, replay, validação de origem, autorização, proteção de imagens e auditoria; sem aprovação para produção. |
+| 7. Testes | CI aprovada e validações manuais específicas confirmadas | Testes automatizados passaram e o responsável confirmou diversos fluxos no Preview. Isso não equivale a auditoria independente, teste de carga ou homologação visual completa. |
+| 8. Viabilidade | Análise preliminar | Custos da demonstração são baixos; operação comercial exigiria revisão de infraestrutura, custos, privacidade e segurança. |
 
-**Critério de leitura:** “implementado” significa que há código ou estrutura versionada. Não significa, por si só, que todos os fluxos foram novamente testados em ambiente real, que houve auditoria independente ou que o sistema esteja liberado para produção.
+**Estado técnico de referência em 24/11/2026:** branch `dev` no commit `d16278c5b6df6df370645b18a05dfb5ea0effe08`; Preview READY no deployment `dpl_AfNaMm1WqRFJa3jhhwXhfkgwPUTv`. Production (`main`) permanece no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`.
+
+**Critério de leitura:** “implementado” significa que há código integrado. Não significa, por si só, que todos os fluxos foram novamente testados em ambiente real, que houve auditoria independente ou que o sistema esteja liberado para produção.
 
 ## 1. Investigação — identificação do problema real
 
@@ -307,21 +309,23 @@ O projeto utiliza React com JavaScript e JSX. O JSX permite descrever a estrutur
 
 ### 5.2. Componentes e experiência do usuário
 
-A interface pública apresenta a proposta da plataforma, campo de busca, seleção de categorias, cards de serviços/profissionais ilustrativos, explicação de como funciona, perguntas frequentes e chamadas para ação. O fluxo de cadastro e acesso apresenta formulários com validação, etapas de confirmação e área autenticada.
+A interface pública inclui homepage, pesquisa, categorias, catálogo completo de serviços, cartões, página de detalhes, galeria de imagens, contato público e exemplos ilustrativos separados dos serviços cadastrados. A área autenticada inclui cadastro, confirmação demonstrativa, login, edição de perfil, foto de perfil, alteração demonstrativa de e-mail e gestão dos próprios serviços.
 
-A busca pública consulta serviços e categorias pelo gateway e combina os serviços retornados com exemplos visuais locais. A filtragem por texto/categoria/cidade é realizada no frontend sobre os itens carregados; para serviços cadastrados, a pesquisa considera todas as cidades associadas em `SERVICO_CIDADES`. O campo de cidade não realiza geocodificação nem uma pesquisa geográfica por distância. As fotografias e os perfis de exemplo não representam profissionais cadastrados.
+A navegação pública utiliza as rotas `/`, `/servicos`, `/categorias` e `/servicos/:serviceId`. O catálogo permite pesquisa textual e filtros por categoria e cidade; a busca considera os municípios vinculados em `SERVICO_CIDADES`. A página de detalhes apresenta as imagens ativas entregues pelo gateway same-origin. Os exemplos visuais não representam profissionais cadastrados e não entram na busca nem na contagem dos serviços reais.
 
 ### 5.3. Responsividade e usabilidade
 
-A interface foi construída com classes utilitárias e regras CSS para diferentes larguras de tela. A estrutura prioriza navegação compreensível, componentes consistentes, foco visível e respeito à configuração de movimento reduzido. O teste em aparelhos e navegadores reais continua importante, especialmente em telas pequenas e dispositivos de menor desempenho.
+A interface utiliza React/JSX, Tailwind CSS e estilos locais. Há regras para diferentes larguras de tela, navegação e estados de formulário; a validação responsiva e de acessibilidade precisa continuar sendo realizada em aparelhos e navegadores reais, especialmente em telas pequenas e dispositivos de menor desempenho.
 
 ### 5.4. Limites da interface atual
 
+- O responsável considera que a linguagem visual atual parece genérica e não diferencia suficientemente o Conecta Local de um template comum.
+- A estrutura funcional das páginas públicas e da área do profissional está integrada, mas a identidade visual, hierarquia, tipografia, composição, consistência dos componentes e tratamento das imagens precisam de revisão.
+- O redesign visual/UX é a próxima frente, ainda não iniciada; consultar `docs/PLANO_REDESIGN_INTERFACE.md`.
 - Não existe painel administrativo funcional.
-- A confirmação é demonstrativa e não envia mensagens de e-mail.
+- A confirmação de cadastro e a alteração de e-mail são demonstrativas e não enviam mensagens reais.
 - Não existe fluxo de recuperação de senha.
-- Upload de fotos para Google Drive não está implementado.
-- A busca por município é textual e considera os vínculos de cada serviço; geolocalização, cálculo de distância e ordenação por proximidade não estão implementados.
+- A busca por município é textual; geolocalização, cálculo de distância e ordenação por proximidade não estão implementados.
 - Cards e fotografias de exemplo são ilustrativos e não devem ser confundidos com prestadores reais.
 
 ## 6. Segurança — proteção dos dados
@@ -377,7 +381,7 @@ O Google Sheets não impõe chaves estrangeiras ou transações relacionais auto
 
 ## 7. Testes — situações e critérios de validação
 
-O repositório possui suítes automatizadas para comunicação (POC-01), assinatura HMAC/replay (POC-02), investigação de senhas (POC-03) e LOO. O workflow `.github/workflows/validate.yml` está configurado para executar testes, auditoria de dependências, verificação do registro de ocorrências, ESLint e build.
+O repositório possui suítes automatizadas para comunicação (POC-01), assinatura HMAC/replay (POC-02), investigação de senhas (POC-03), autorização/ownership, upload e entrega de imagens, catálogo público, POC-04 e LOO. O workflow `.github/workflows/validate.yml` executa as suítes, auditoria de dependências, verificação do registro de ocorrências, ESLint e build.
 
 A existência de um teste automatizado no repositório não significa que toda a jornada da aplicação tenha sido testada manualmente após cada alteração de configuração externa. Por isso, a tabela separa a evidência automatizada da validação ponta a ponta recomendada.
 
@@ -402,6 +406,11 @@ A existência de um teste automatizado no repositório não significa que toda a
 | T15 | Acesso cruzado entre profissionais | Autenticar como profissional A e tentar alterar serviço de B usando o ID conhecido do serviço. | Operação é recusada e o registro de B permanece intacto, sem evento de sucesso indevido. | Teste manual confirmado pelo responsável em 20/11/2026: HTTP 404 / `SERVICE_NOT_FOUND`; serviço de B permaneceu publicado e a auditoria não registrou sucesso indevido. |
 | T16 | Papel não autorizado e mass assignment | Testar campos de identidade/papel enviados pelo cliente e executar ação profissional com conta cujo papel confiável não seja `professional`. | O navegador não altera identidade/proprietário; papel não autorizado é recusado. | Testes automatizados cobrem mass assignment; no Apps Script real, o responsável confirmou HTTP 403 / `ROLE_FORBIDDEN` ao executar ação profissional com a conta temporariamente marcada como `admin`. O papel foi restaurado para `professional`. |
 | T17 | Validação de cidades atendidas | Criar/editar serviço com lista vazia, ID inválido, cidade inativa ou cidade repetida; atualizar a cobertura de um serviço. | Entradas inválidas são recusadas; somente vínculos válidos do serviço em edição são mantidos ou substituídos. | Suíte automatizada da PR #25 cobre lista vazia, cidades inválidas/inativas, duplicidade e substituição dos vínculos do próprio serviço; CI do merge #44820409487 concluiu SUCCESS. A validação manual relatada focou persistência e pesquisa pública com duas cidades. |
+| T18 | Edição de perfil profissional | Editar nome completo, nome público, WhatsApp, apresentação e cidade principal da conta fictícia autenticada. | Os campos permitidos são persistidos, o contexto de autenticação é atualizado e a autorização continua no backend. | PR #32 integrada; o responsável confirmou os testes manuais no Preview em 23/11/2026 após sincronização/publicação do Apps Script. |
+| T19 | Foto de perfil | Enviar, substituir e remover a foto da conta fictícia; conferir avatar e acesso ao arquivo. | A foto fica vinculada ao profissional, armazenada no Drive privado e entregue pelo gateway após validação server-side. | PR #33 integrada; o responsável confirmou os testes manuais no Preview em 23/11/2026 após sincronização/publicação do Apps Script. |
+| T20 | Alteração de e-mail | Reautenticar com a senha atual, solicitar novo endereço, confirmar com código demonstrativo e tentar reutilizar sessão antiga. | O e-mail atual só muda após código válido; sessões antigas são revogadas; o novo login é exigido. Nenhuma mensagem real é enviada. | PR #34 integrada; CI #45434385314 e pós-merge #45434598519 SUCCESS; responsável confirmou os testes manuais no Preview em 24/11/2026. |
+| T21 | Entrega e revogação de imagens de serviço | Consultar imagens elegíveis, pausar/republicar serviço e remover uma imagem de teste. | Imagens elegíveis retornam conteúdo de imagem; a pausa bloqueia acesso; a republicação restaura; imagem removida deixa de ser entregue sem afetar as demais. | Validação manual integrada no Preview em 21/11/2026: cinco imagens HTTP 200, pausa 5/5 HTTP 404, republicação 5/5 HTTP 200 e remoção individual HTTP 404. Não equivale a teste de carga ou auditoria independente. |
+| T22 | Catálogo público e rotas | Abrir as rotas públicas de serviços, categorias e detalhes; verificar imagem principal e galeria de um serviço de teste. | As rotas resolvem e os dados disponíveis são apresentados; filtros/URLs, histórico, responsividade e fluxos adjacentes exigem homologação específica. | PRs #28/#29 integradas e CI #44937440114 SUCCESS. Integração de imagens validada manualmente; homologação visual e de navegação ampla permanece pendente para o redesign. |
 
 ### 7.2. Comandos de validação
 
@@ -522,6 +531,8 @@ A principal lacuna acadêmica agora é **validar a hipótese do problema com mor
 
 - `README.md` — visão geral, tecnologias e execução local.
 - `docs/AI_CONTEXT.md` — contexto técnico e estado registrado do projeto.
+- `docs/ROADMAP_ESTUDOS.md` — prioridades e sequência das etapas.
+- `docs/PLANO_REDESIGN_INTERFACE.md` — próxima etapa de identidade visual e experiência.
 - `docs/ESPECIFICACAO_MVP.md` — requisitos, atores e regras funcionais.
 - `docs/MODELAGEM_DADOS.md` — modelo lógico e esquema das 12 entidades.
 - `docs/LOO_ORIENTACAO_OBJETOS.md` — implementação de classes e herança.
@@ -536,4 +547,4 @@ A principal lacuna acadêmica agora é **validar a hipótese do problema com mor
 
 ---
 
-**Nota de atualização:** este relatório representa a leitura do código e da documentação disponível na branch `dev` em 20/11/2026, incluindo a cobertura por múltiplas cidades integrada pela PR #25. A seção de testes diferencia evidências automatizadas de validações manuais relatadas pelo responsável. Alterações posteriores podem exigir revisão do status, dos requisitos, da arquitetura e das evidências.
+**Nota de atualização:** versão 1.2 consolidada em 24/11/2026, com base na branch `dev` no commit `d16278c5b6df6df370645b18a05dfb5ea0effe08`. O relatório registra as entregas posteriores das PRs #28, #29 e #32–#34, além da necessidade de redesign visual identificada pelo responsável. A seção de testes diferencia evidências automatizadas de validações manuais relatadas. A pesquisa comunitária permanece pendente e a interface ainda não foi redesenhada.

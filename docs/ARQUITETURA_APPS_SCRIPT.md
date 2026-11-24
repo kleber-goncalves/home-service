@@ -1,43 +1,34 @@
 # Arquitetura da integração Vercel Functions + Google Apps Script — Conecta Local
 
 > **Versão:** 0.2  
-> **Data da atualização:** 2026-11-20  
-> **Estado atual:** o protótipo funcional (#15–#18) e a POC-04 (#14) estão integrados à branch `dev`. O responsável confirmou em 20/11/2026 que revalidou o fluxo principal no Preview atualizado e que a demonstração está funcionando. O backend principal usa Vercel Functions como gateway, Apps Script como autoridade de negócio e oito abas operacionais do Google Sheets. `main`/Production continua sendo vitrine pública, sem backend habilitado. A POC-04 foi mesclada, mas permanece independente e desabilitada; seus dois itens de hardening impedem qualquer reativação. A integração não equivale a auditoria independente, certificação ou aprovação para produção.
+> **Data da atualização:** 2026-11-24  
+> **Estado atual — 24/11/2026:** o núcleo funcional, catálogo público, gestão de perfil e fluxos de imagens estão integrados à branch `dev`. A demonstração utiliza Vercel Functions como gateway, Apps Script como autoridade de negócio, Google Sheets com dez abas operacionais e Google Drive para imagens. As PRs #28/#29 integraram catálogo e gateway de imagens; as PRs #32–#34 integraram edição do perfil, foto de perfil e alteração demonstrativa de e-mail. `main`/Production continua sendo vitrine pública, sem backend habilitado. A POC-04 (#14) permanece independente e desabilitada; seus dois itens de hardening impedem qualquer reativação. A próxima frente é o redesign visual/UX, documentado em `docs/PLANO_REDESIGN_INTERFACE.md`. A integração não equivale a auditoria independente, certificação ou aprovação para produção.
 > **Escopo:** integração React/Vite, Google Apps Script, Google Sheets e Google Drive para a demonstração acadêmica.  
-> **Premissa:** manter Apps Script como autoridade de domínio e sessão; Vercel Functions atua apenas como gateway HTTP. Qualquer fluxo de autenticação e sessão deverá ser aprovado em provas isoladas com dados sintéticos.
+> **Premissa:** manter Apps Script como autoridade de domínio e sessão; Vercel Functions atua apenas como gateway HTTP. Os fluxos principais de autenticação e sessão já estão integrados e foram validados no Preview com dados fictícios; mudanças futuras exigem testes proporcionais e revisão dos limites de segurança.
 
 ## 1. Objetivo e estado real
 
-### Protótipo funcional com persistência — branch `dev`
+### Protótipo funcional integrado — branch `dev`
 
-O fluxo funcional foi integrado à `dev` pela PR #15 e permanece no ambiente Preview para demonstração acadêmica com dados fictícios:
+O protótipo acadêmico está integrado à branch `dev` e utiliza dados fictícios no Preview:
 
 - `api/app.js` expõe a Function `POST /api/app`.
-- `server/app-gateway.js` aplica validação de Origin, contrato de JSON, Argon2id no runtime Node, comparação de hash com `timingSafeEqual`, cookie HttpOnly/Secure/SameSite, CSRF e HMAC server-to-server.
-- `apps-script/conecta-local/Code.gs` recebe ações assinadas, verifica nonce/timestamp, valida dados e grava usuários, perfis, códigos, sessões, serviços e auditoria nas abas estruturais existentes.
-- `src/services/app-api.js` conecta React à Function; `AuthDemoPage.jsx` usa o backend e `HomePage.jsx` consulta os serviços publicados.
-- A senha em texto puro não é encaminhada ao Apps Script; a Function deriva o hash Argon2id e envia somente hash, salt e algoritmo.
-- O código de confirmação é HMAC no Apps Script e exibido na interface do protótipo. Não há envio de e-mail.
-- A sessão é criada pelo backend funcional desta branch; a POC-04 de conta sintética continua separada.
+- `server/app-gateway.js` aplica controles de origem, contrato JSON, Argon2id no runtime Node, comparação com `timingSafeEqual`, cookie de sessão HttpOnly, CSRF e assinatura HMAC server-to-server.
+- `apps-script/conecta-local/Code.gs` recebe ações assinadas, valida nonce/timestamp, aplica regras de negócio e coordena Google Sheets e Google Drive.
+- O cliente React comunica-se pelas Functions same-origin. O navegador não recebe segredos HMAC nem tokens OAuth do Google.
+- O fluxo principal inclui cadastro e confirmação demonstrativa, login, sessão, logout, autorização por papel e propriedade, edição de perfil, foto de perfil, alteração demonstrativa de e-mail, CRUD de serviços e cobertura por cidades.
+- A camada de imagens inclui upload retomável, gerenciamento de até cinco imagens por serviço, fluxo de foto de perfil e entrega pública pelo gateway same-origin `/api/public-images`. A elegibilidade é revalidada no Apps Script; OAuth permanece no servidor.
+- O catálogo público inclui homepage, `/servicos`, `/categorias` e `/servicos/:serviceId`, com pesquisa, filtros, detalhes, galeria e exemplos ilustrativos separados.
+- A alteração de e-mail utiliza reautenticação, código demonstrativo, unicidade, expiração, limite de tentativas e revogação das sessões antigas. **Não há envio real de e-mail.**
+- A POC-04 é um experimento de sessão sintética independente, integrado ao repositório, mas permanece desabilitado e não faz parte do login principal.
 
-**Estado de ativação:** a integração de negócio com Apps Script e Google Sheets está ativa no Preview de `dev` e foi exercitada pelo responsável no fluxo principal. As variáveis `CONECTA_LOCAL_*` permanecem restritas ao ambiente Preview; seus valores são secretos e não devem ser registrados na documentação. O procedimento original de configuração continua em `docs/ATIVAR-PROTOTIPO-GOOGLE-SHEETS.md` para referência, mas não representa uma ativação pendente.
+**Estado de integração:** o Preview conectado a Apps Script/Sheets/Drive é restrito à branch `dev`. Em 24/11/2026, o head verificado de `dev` é `d16278c5b6df6df370645b18a05dfb5ea0effe08`; o Preview Vercel está READY no deployment `dpl_AfNaMm1WqRFJa3jhhwXhfkgwPUTv`. A branch `main` permanece no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`, sem backend de negócio habilitado.
 
-**Escopo de demonstração:** cadastro, ativação por código, login, sessão, consulta de dados e CRUD mínimo de serviços. Recuperação de senha, e-mail, upload Drive, edição completa de perfil, admin e moderação ficam fora desta rodada. Usar apenas dados fictícios; o protótipo não é declarado pronto para produção.
+**Persistência operacional:** dez abas são utilizadas pelo backend: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS`, `SERVICO_CIDADES`, `IMAGENS` e `AUDITORIA`. A modelagem estrutural prevê 12 abas; `CONTROLE_AUTENTICACAO` e `DENUNCIAS` ainda não têm fluxos operacionais integrados.
 
+**Validações registradas:** o responsável confirmou testes manuais do fluxo principal, cobertura por cidades, ciclo de vida dos serviços, upload/entrega de imagens, foto de perfil e alteração de e-mail no Preview em datas descritas em `docs/AI_CONTEXT.md` e nos planos específicos. Essas evidências são específicas aos cenários executados; não comprovam auditoria independente, teste de carga ou aprovação para produção.
 
-Este documento preserva decisões arquiteturais, detalhes técnicos e propostas que foram sendo implementadas ao longo das POCs. Em caso de divergência, `docs/AI_CONTEXT.md` e o código da branch `dev` representam o estado atual; trechos identificados como candidatos ou propostas devem ser lidos como histórico/planejamento, não como descrição de funcionalidades inexistentes.
-
-Estado conhecido na data desta revisão:
-
-- Frontend demonstrativo em React, JavaScript/JSX e Vite, publicado na Vercel.
-- Projeto configurado como módulo JavaScript ES (package.json usa type module).
-- A branch `dev` contém a Function de negócio `api/app.js`, as regras de gateway em `server/app-gateway.js` e a integração Apps Script.
-- A planilha estrutural foi criada com 12 abas/102 cabeçalhos; oito abas são utilizadas operacionalmente pelo fluxo atual.
-- O fluxo de cadastro, confirmação demonstrativa, login, sessão, perfil, criação, pausa/publicação e consulta de serviços está implementado e conectado ao Sheets.
-- A comunicação real da POC-01 foi confirmada manualmente em Preview em 2026-11-11; a evidência está em `docs/POC_01_COMUNICACAO.md`.
-- O responsável confirmou a revalidação do fluxo principal no Preview atualizado de `dev` em 20/11/2026.
-- Upload/gerenciamento de imagens no Drive e painel administrativo ainda não estão implementados.
-- `src/pages/AuthDemoPage.jsx` e `HomePage.jsx` estão conectadas ao gateway/consulta pública; não são apenas interfaces locais.
+**Próxima frente:** redesign visual e de experiência da interface. O responsável considera o design atual genérico. O diagnóstico e a direção visual ainda não foram definidos; consultar `docs/PLANO_REDESIGN_INTERFACE.md`. Não antecipar paleta, tipografia ou estilo.
 
 O projeto continua sendo uma demonstração acadêmica com dados sintéticos. Não inserir credenciais, cadastros ou dados pessoais reais.
 
@@ -47,8 +38,8 @@ O projeto continua sendo uma demonstração acadêmica com dados sintéticos. N�
 2. Google Apps Script continua sendo o único backend de negócio do MVP: é a autoridade para autenticação, autorização, regras, transições de estado, integridade e operações de dados.
 3. Vercel Functions será utilizada como **gateway HTTP server-side** entre o navegador e o Web App do Apps Script.
 4. A Function é um componente técnico de borda/transporte, não uma segunda camada de domínio. Ela não será responsável por regras de negócio, não acessará Sheets/Drive diretamente e não será fonte de verdade para usuários, sessões, papéis ou permissões.
-5. Google Sheets armazena operacionalmente os dados nas oito abas já integradas; as quatro abas restantes da modelagem continuam planejadas. Google Drive está reservado para uma etapa futura de imagens; o fluxo de upload e permissões ainda não está implementado.
-6. O navegador chamará somente rotas de mesma origem da aplicação, como /api/backend. Não chamará o Web App Apps Script diretamente.
+5. Google Sheets armazena operacionalmente os dados em dez abas; a modelagem estrutural prevê 12. `CONTROLE_AUTENTICACAO` e `DENUNCIAS` ainda não têm fluxos operacionais. O Google Drive armazena imagens de serviços e fotos de perfil; uploads e entrega estão integrados ao Preview por rotas Vercel e autorização no Apps Script.
+6. O navegador chamará somente rotas de mesma origem da aplicação, como `POST /api/app`, `POST /api/images` e `GET /api/public-images`. Não chamará o Web App Apps Script diretamente.
 7. A Vercel Function chamará o Apps Script server-to-server, acompanhará os redirecionamentos do Content Service e converterá a resposta lógica em JSON/HTTP para o frontend.
 8. Toda regra crítica e toda autorização continuarão sendo verificadas no Apps Script. A Function não poderá ser a única barreira contra chamadas diretas ao Web App.
 9. URLs e segredos da integração serão configurados como variáveis server-side da Vercel e propriedades privadas do Apps Script. Nunca usar prefixo VITE_ para segredos.
@@ -60,10 +51,10 @@ O projeto continua sendo uma demonstração acadêmica com dados sintéticos. N�
 ## 3. Visão geral da arquitetura
 
 Navegador do visitante/profissional  
-↓ mesma origem: POST /api/backend  
+↓ mesma origem: POST /api/app, POST /api/images ou GET /api/public-images  
 Frontend React + Vite — hospedagem Vercel  
 ↓  
-Vercel Function — gateway HTTP server-side  
+Vercel Functions — gateway HTTP server-side  
 - valida método, formato, tamanho e contrato de entrada;
 - aplica controles de borda e timeout;
 - autentica a chamada servidor-servidor;
@@ -141,6 +132,8 @@ A Vercel Function pode emitir uma resposta HTTP própria para o navegador, separ
 
 O responsável confirmou a revalidação do fluxo principal no Preview atualizado de `dev` em 20/11/2026. A POC-04 é um experimento separado de sessão sintética; foi mesclada em `dev`, mas continua desabilitada e não faz parte desta autenticação.
 ## 5. Comunicação React/Vite ↔ Vercel Function ↔ Apps Script
+
+> **Nota de histórico:** as subseções 5.6–5.8 descrevem o desenho das POCs iniciais e podem citar a rota candidata `/api/backend`. Elas são referência histórica do transporte; a aplicação integrada atual usa `POST /api/app` para operações de negócio e rotas separadas para upload/entrega de imagens, conforme a seção 1. Não implementar novas chamadas usando a rota antiga sem verificar o código atual.
 
 ### 5.1. Navegador → Vercel Function
 
@@ -433,7 +426,7 @@ Sheets e Drive não compartilham transação distribuída. Uma operação que at
 
 Não apresentar sucesso integral quando a atualização de permissões falhar. Os procedimentos devem ser idempotentes e testados com falhas parciais.
 
-## 10. Autenticação e segurança — bloqueios de implementação
+## 10. Autenticação e segurança — implementação e limites atuais
 
 ### 10.1. Senhas
 
@@ -560,35 +553,37 @@ Nenhuma implementação de autenticação, publicação anônima ou escrita oper
 
 **Critério de interrupção:** se qualquer requisito crítico de assinatura, senha, sessão, transporte ou autorização não puder ser atendido sem improviso inseguro, interromper a implementação correspondente e reabrir a decisão arquitetural com o responsável.
 
-## 15. Ordem de trabalho proposta
+## 15. Estado das POCs e evolução atual
 
-1. **POC-01 — comunicação:** concluída e integrada pelo PR #10.
-2. **POC-02 — assinatura do gateway:** concluída e integrada pelo PR #11; o protocolo também é utilizado no gateway de negócio.
-3. **POC-03 — senha e política de entrada:** estudo concluído; Argon2id e comparação Node com `timingSafeEqual` foram posteriormente integrados ao gateway do protótipo principal. A blocklist e a sonda Pwned Passwords continuam como pesquisa isolada, sem integração afirmada ao fluxo.
+1. **POC-01 — comunicação:** concluída e integrada; o gateway de negócio utiliza a comunicação Vercel Functions → Apps Script.
+2. **POC-02 — assinatura do gateway:** concluída e integrada; HMAC, timestamp e nonce continuam utilizados na comunicação interna.
+3. **POC-03 — senha e política de entrada:** investigação concluída; Argon2id e comparação Node com `timingSafeEqual` integrados ao gateway do protótipo principal. A blocklist didática/Pwned Passwords permanece pesquisa isolada, sem afirmar integração ao cadastro/login.
 4. **POC-04 — sessão sintética independente:** PR #14 integrada à `dev`; ensaios concluídos, rota desabilitada e dois bloqueios de hardening registrados para qualquer reativação. Não conectar ao login principal.
-5. **Próxima prioridade — autorização e integridade:** verificar acesso cruzado entre profissionais, manipulação de proprietário/estado e consistência de auditoria. O roteiro está em `docs/ROADMAP_ESTUDOS.md`.
-6. **Depois — ciclo de vida dos serviços:** implementar edição e remoção lógica com validações no Apps Script e registro de auditoria.
-7. **Opcional — localidades e imagens:** concluir vínculo de serviços a múltiplas cidades e/ou integração de imagens no Drive, somente se agregarem valor à demonstração e ao aprendizado.
-8. **Adiadas:** painel administrativo completo, denúncias, envio real de e-mail, recuperação de senha e infraestrutura de produção; não são pré-requisitos para o projeto acadêmico atual.
+5. **Autorização e integridade:** PR #22 integrada; propriedade e papel confiável são verificados no Apps Script.
+6. **Ciclo de vida dos serviços:** PR #23 integrada; edição e remoção lógica dos próprios serviços.
+7. **Cobertura por cidades:** PR #25 integrada; relação `SERVICO_CIDADES` sustenta atendimento em múltiplas localidades.
+8. **Imagens no Drive:** PR #26 integrada; upload retomável, gerenciamento e permissões por estado.
+9. **Catálogo e entrega de imagens:** PRs #28 e #29 integradas; rotas públicas, galeria e gateway same-origin validados no Preview.
+10. **Conta e perfil:** PRs #30–#34 integradas; navegação de sessão, dados de perfil, foto e alteração demonstrativa de e-mail.
 
-Não ampliar a arquitetura nem introduzir serviços externos antes de uma necessidade didática ou funcional demonstrável.
+**Próxima prioridade do produto:** redesign visual/UX, sem mudança da arquitetura de backend. Ver `docs/PLANO_REDESIGN_INTERFACE.md`. O redesign deverá preservar rotas, contratos, autenticação, autorização, sessões, serviços e uploads.
 
-**Trabalho visual independente das POCs:** é permitido desenvolver e revisar a experiência visual de cadastro/login em React usando estado local efêmero, desde que não envie credenciais, não persista valores, não crie uma falsa sessão e deixe explícito que o backend não está conectado. Essa permissão não libera a implementação de autenticação, verificação de e-mail, recuperação de senha ou sessão no Apps Script/Vercel.
+A POC-04 permanece desabilitada. Não ativar credenciais reais, não habilitar backend em Production e não interpretar estas integrações como auditoria independente ou aprovação para uso comercial.
 
-## 16. Decisões ainda abertas
+## 16. Limites e decisões futuras
 
-- Local e formato definitivos da Vercel Function (a POC deverá avaliar a convenção /api/ no projeto Vite atual).
-- Formato do envelope e serialização do payload Vercel → Apps Script.
-- Variáveis e escopo dos ambientes Development, Preview e Production.
-- Timeout e região da Function compatíveis com os limites do Apps Script.
-- Estratégia de verificação de senha que preserve a autoridade do Apps Script: o XOR não foi aprovado e o helper Node com `timingSafeEqual` não foi selecionado; qualquer nova fronteira de confiança exige decisão e prova próprias.
-- Geração de token e estratégia de cookie no navegador; atributos SameSite e defesa CSRF.
-- Viabilidade prática de upload binário com limite de 5.000.000 bytes.
-- Comportamento das permissões do Drive na conta Google utilizada.
-- Ferramenta de sincronização/versionamento do código Apps Script.
-- Quotas efetivas da conta e tempos medidos.
+As decisões estruturais principais do protótipo foram implementadas no ambiente de demonstração. Permanecem como limites ou decisões futuras:
 
-As decisões abertas não alteram as regras de negócio aprovadas. Elas impedem a implementação das partes correspondentes até serem resolvidas.
+- **Atomicidade e consistência:** confirmar em cada operação crítica se os dados de negócio e a auditoria estão gravados no mesmo lote. Não presumir transação atômica entre Google Sheets e Google Drive.
+- **Controles operacionais:** quotas, concorrência, latência, testes de carga, backup, monitoramento e recuperação de falhas precisam de avaliação antes de qualquer uso fora do Preview acadêmico.
+- **Abas ainda sem fluxo:** `CONTROLE_AUTENTICACAO` e `DENUNCIAS` existem no modelo de referência, mas não possuem fluxos operacionais integrados.
+- **Autenticação futura:** recuperação de senha e envio real de e-mail continuam fora do escopo. A alteração de e-mail existente é demonstrativa e não envia mensagens.
+- **POC-04:** permanece independente, desabilitada e sem segredos; seus bloqueios de leitura limitada por stream e rate limiting impedem reativação.
+- **Publicação:** Production/`main` continua sem backend. Qualquer mudança futura exige revisão e decisão explícitas; não copiar os segredos de Preview para outros ambientes.
+- **Sincronização do Apps Script:** alterações em `apps-script/conecta-local/Code.gs` no GitHub não atualizam automaticamente o Web App. Após alterações necessárias, sincronizar o projeto Apps Script existente e publicar nova versão da implantação Web App existente, sem criar endpoint novo.
+- **Design da interface:** o próximo trabalho é o redesign visual/UX, documentado em `docs/PLANO_REDESIGN_INTERFACE.md`. Ele deve preservar arquitetura, contratos, autenticação, autorização e persistência existentes; não exige mudanças no modelo de dados.
+
+As provas de conceito anteriores e seus resultados estão registrados nos documentos específicos. Não descrever como pendentes testes ou integrações que já foram realizados; também não converter validações de demonstração em garantia de segurança ou prontidão para produção.
 
 ## 17. Referências técnicas consultadas
 
