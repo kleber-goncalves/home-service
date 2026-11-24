@@ -90,7 +90,7 @@ Implementação preparada:
 
 **Validação integrada pendente:**
 
-- A CI da PR #34 executou os testes de autorização/Apps Script e gateway, ESLint, validação do registro de ocorrências e build; resultado SUCCESS em [Validate Home Service #45434385314](https://github.com/kleber-goncalves/home-service/actions/runs/45434385314).
+- A CI da PR #34 executou os testes de autorização/Apps Script e gateway, ESLint, validação do registro de ocorrências e build; resultado SUCCESS em [Validate Home Service #45434385314](https://github.com/kleber-goncalves/home-service/actions/runs/45434385314). A CI pós-merge também concluiu SUCCESS em [Validate Home Service #45434598519](https://github.com/kleber-goncalves/home-service/actions/runs/45434598519).
 - Sincronizar o `Code.gs` deste branch `dev` com o projeto Apps Script existente e publicar nova versão da implantação Web App atual, preservando a URL.
 - Executar validação manual no Preview fixo de `dev`, usando somente contas e endereços sintéticos.
 
