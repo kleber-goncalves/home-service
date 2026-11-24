@@ -21,7 +21,10 @@ export default function HomePage() {
     const catalog = usePublicCatalog();
     const [query, setQuery] = useState("");
     const [city, setCity] = useState("");
-    const featuredServices = catalog.services.slice(0, 5);
+    const featuredServices = [
+        ...catalog.realServices.slice(0, 3),
+        ...catalog.demoServices.slice(0, 3),
+    ];
 
     function submitSearch(event) {
         event.preventDefault();
@@ -48,17 +51,22 @@ export default function HomePage() {
                     <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="public-section-heading">
                             <div>
-                                <span className="section-eyebrow">Cadastros publicados</span>
-                                <h2 id="home-services-title">Serviços em destaque</h2>
-                                <p>Serviços reais publicados por profissionais no catálogo.</p>
+                                <span className="section-eyebrow">Vitrine do Conecta Local</span>
+                                <h2 id="home-services-title">Serviços para conhecer</h2>
+                                <p>Veja exemplos fictícios e serviços cadastrados por profissionais.</p>
                             </div>
                             <AppLink to="/servicos" className="catalog-service-link">
                                 Ver todos os serviços <ArrowRight size={16} aria-hidden="true" />
                             </AppLink>
                         </div>
+                        {!catalog.loading && catalog.error && (
+                            <p className="catalog-inline-state catalog-inline-state--error" role="status">
+                                Não foi possível atualizar os cadastros reais agora; os exemplos fictícios continuam disponíveis.
+                            </p>
+                        )}
                         {catalog.loading ? (
                             <div className="catalog-state" role="status">
-                                Carregando serviços publicados...
+                                Carregando exemplos e serviços cadastrados...
                             </div>
                         ) : featuredServices.length ? (
                             <div className="catalog-service-grid">
@@ -68,8 +76,8 @@ export default function HomePage() {
                             </div>
                         ) : (
                             <div className="catalog-state">
-                                <h3>{catalog.error ? "Não foi possível carregar os serviços publicados" : "Ainda não há serviços publicados"}</h3>
-                                <p>{catalog.error ? "Os exemplos ilustrativos aparecem na próxima seção e não substituem os cadastros reais." : "Enquanto novos serviços não são publicados, conheça os exemplos de apresentação abaixo."}</p>
+                                <h3>Não há serviços disponíveis para exibir.</h3>
+                                <p>{catalog.error ? "Não foi possível carregar os cadastros e os exemplos locais estão indisponíveis." : "Os serviços e exemplos aparecerão aqui quando estiverem disponíveis."}</p>
                             </div>
                         )}
                     </div>
