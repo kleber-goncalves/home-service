@@ -1,6 +1,7 @@
 # Pesquisa com a comunidade — Conecta Local
 
 > **Status:** versão preliminar para revisão do professor/orientador. Ainda não aplicar antes de confirmar o procedimento acadêmico adequado.
+> **Prioridade atual:** a aplicação permanece posterior ao redesign visual/UX e depende da orientação do professor/orientador, conforme o roadmap.
 >
 > **Contexto:** projeto desenvolvido no âmbito de um curso Técnico em Informática.
 >
