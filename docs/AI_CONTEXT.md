@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 1f244f65c589fc4fb99db69be7c4d958f274106c
-- **Data do commit:** 2026-11-24T15:10:00-03:00
-- **Mensagem do commit:** feat(homepage): adicionar ilustracoes nos cantos do hero (#36)
+- **Commit de referência:** 41ac8ee79fdbfc221b0cc2dc0f384b9f0a967fce
+- **Data do commit:** 2026-11-24T15:50:39-03:00
+- **Mensagem do commit:** feat(hero-section): melhorar layout e responsividade da seção hero
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -541,13 +541,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 41ac8ee | 2026-11-24 | feat(hero-section): melhorar layout e responsividade da seção hero |
+| 7853b0e | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 1f244f6 | 2026-11-24 | feat(homepage): adicionar ilustracoes nos cantos do hero (#36) |
 | a56b53b | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 64d3c50 | 2026-11-24 | Add image of hands cleaning a plate with a green sponge |
 | 30ffe77 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 344e957 | 2026-11-24 | Merge pull request #35 from kleber-goncalves/docs/roadmap-redesign-interface |
 | 7581d56 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| f3cac4e | 2026-11-24 | docs(architecture): distinguir rotas atuais de referencias historicas |
-| 45bb540 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
