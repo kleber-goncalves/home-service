@@ -403,9 +403,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 758a9b229bb9ea49bdf384fd0df56ef4e9597aa8
-- **Data do commit:** 2026-11-24T13:05:39-03:00
-- **Mensagem do commit:** test(email): cobrir confirmação, reautenticação e revogação
+- **Commit de referência:** 792714b3f5f397fc88db27d01506512af69f7f1f
+- **Data do commit:** 2026-11-24T13:06:38-03:00
+- **Mensagem do commit:** fix(email): preservar código pendente ao reabrir painel
 - **Branch desta execução:** feat/alteracao-email-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -530,13 +530,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 792714b | 2026-11-24 | fix(email): preservar código pendente ao reabrir painel |
+| 147f1f1 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 758a9b2 | 2026-11-24 | test(email): cobrir confirmação, reautenticação e revogação |
 | eeb2922 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | fc473d8 | 2026-11-24 | fix(email): renovar cookie após reautenticação válida |
 | b509056 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 1e38e9d | 2026-11-24 | style(email): organizar painel de segurança da conta |
 | f1329af | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| 8466b43 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| 28fa92a | 2026-11-24 | feat(email): adicionar formulário de alteração com confirmação |
 
 <!-- END AUTO-GENERATED SECTION -->
