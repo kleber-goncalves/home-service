@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
     BriefcaseBusiness,
     Brush,
@@ -153,8 +154,8 @@ export default function CategoryFeaturedServices({ categories = [], services = [
         || categories[0]
         || null;
 
-    // public.services already returns published services with the newest publication first.
-    // Until the product records popularity metrics, this is a recent featured item, not a popularity ranking.
+    // The API returns the newest inserted published service first for each category.
+    // The product has no views/contact metrics, so this is not a popularity ranking.
     const featuredService = selectedCategory
         ? services.find((service) => service.categoryId === selectedCategory.id) || null
         : null;
