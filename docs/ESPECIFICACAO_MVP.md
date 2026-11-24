@@ -159,12 +159,14 @@ A conta poderá atender várias cidades e bairros. O endereço residencial compl
 - Invalidar todas as sessões anteriores.
 - Registrar o evento de auditoria sem armazenar senhas.
 
-**Alteração de e-mail — requisito futuro, ainda não implementado**
-- O profissional solicita a mudança autenticado.
-- Verificar se o novo endereço já está em uso.
-- Enviar/gerar código de confirmação de 6 dígitos para o novo endereço; na demonstração, exibir o código na interface.
-- O e-mail antigo continua sendo o login até a confirmação do novo.
-- Registrar a alteração na auditoria.
+**Alteração de e-mail — integrada em `dev` pela PR #34**
+- Exigir reautenticação com a senha atual; a verificação Argon2id ocorre no gateway server-side.
+- Normalizar e validar o novo endereço e verificar unicidade e reserva concorrente no Apps Script.
+- Gerar código demonstrativo com HMAC vinculado ao usuário e ao destino, validade de 10 minutos, até cinco tentativas e intervalo mínimo de 60 segundos.
+- Manter o endereço atual até a confirmação válida.
+- No sucesso, consumir o código, atualizar o e-mail verificado, invalidar outros códigos, registrar auditoria e revogar todas as sessões; novo login é exigido.
+- A confirmação foi testada manualmente pelo responsável no Preview em 24/11/2026 após sincronização/publicação do Apps Script.
+- **Limite:** o código é exibido na interface e nenhum e-mail real é enviado.
 
 **Envio real de e-mail no futuro**
 - Não enviar e-mails nesta etapa.
@@ -243,12 +245,16 @@ O administrador poderá cadastrar, editar, desativar e reativar categorias. Cate
 
 ### 6.6. Imagens e visibilidade no Google Drive
 
-A decisão funcional é que o Apps Script altere as permissões dos arquivos conforme a elegibilidade. **O fluxo de upload e gerenciamento de permissões no Drive ainda não está implementado na demonstração.**
-- serviço publicado e conta ativa: permitir visualização pública por link;
-- serviço pausado, suspenso ou removido: restringir o arquivo;
-- conta suspensa ou encerrada: restringir as imagens associadas.
+O fluxo de upload e gerenciamento de imagens no Drive está integrado em `dev` pela PR #26. A implementação aceita JPG/JPEG/PNG/WebP até 5.000.000 bytes, limita a cinco imagens ativas por serviço, utiliza upload retomável e mantém metadados em `IMAGENS`. A foto de perfil tem fluxo próprio integrado pela PR #33.
 
-O comportamento pretendido utiliza permissões equivalentes a `ANYONE_WITH_LINK`/visualização e `PRIVATE`, quando permitido pelas configurações da conta. O compartilhamento será individual por arquivo, com pasta raiz privada. A revogação será confirmada no Drive; permissões herdadas de pastas exigem atenção. O limite por arquivo é 5.000.000 bytes. Isso exige teste no Drive real antes de ser considerado implementado.
+- Serviço publicado e conta ativa: a imagem elegível pode ser visualizada pelo gateway público.
+- Serviço pausado, suspenso ou removido: a entrega é bloqueada.
+- Conta suspensa ou encerrada: as imagens associadas deixam de ser elegíveis.
+- Arquivos permanecem privados no Drive; o navegador recebe o conteúdo pela rota same-origin `/api/public-images?id=<imageId>`.
+- O token OAuth permanece no servidor; o Apps Script revalida a elegibilidade, MIME e tamanho do arquivo.
+- A validação manual no Preview de `dev` em 21/11/2026 confirmou cinco imagens elegíveis com HTTP 200, bloqueio durante pausa, recuperação após republicação e bloqueio individual após remoção.
+
+A integração foi confirmada pelo responsável com Apps Script, Sheets e Drive de teste. Isso não constitui auditoria independente, teste de carga ou aprovação para Production. A limitação permanece: revogar acesso no Drive não apaga cópias já baixadas ou capturadas.
 
 **Limitação conhecida:** uma pessoa pode copiar ou baixar uma imagem enquanto ela estiver pública. Revogar o acesso no Drive não apaga cópias já baixadas, capturas de tela ou arquivos redistribuídos. A mudança de permissão também deve ser verificada em testes de transição e falha parcial.
 
@@ -444,5 +450,5 @@ O esquema físico das 12 abas foi aprovado conceitualmente e também está docum
 
 A estrutura planejada contém um único arquivo Google Sheets com 12 abas. O arquivo estrutural foi criado pelo responsável pelo projeto e sua exportação foi conferida; as abas e cabeçalhos estão presentes. Isso não significa que os registros sintéticos, o backend Apps Script ou as integrações com Drive tenham sido implementados.
 
-**Estado em 20/11/2026:** modelagem e planilha estrutural estão concluídas; o backend da demonstração utiliza oito abas e o fluxo principal de cadastro/login/serviços foi implementado e revalidado pelo responsável no Preview atualizado de `dev`. A PR #14 também foi integrada, mantendo a POC-04 desabilitada e independente. As próximas etapas recomendadas estão priorizadas em `docs/ROADMAP_ESTUDOS.md`; Drive, administração, denúncias, recuperação de senha e demais requisitos permanecem como evolução opcional, não como pré-requisito para a demonstração acadêmica.
+**Estado em 24/11/2026:** a modelagem estrutural de 12 abas está documentada; o fluxo operacional da demonstração utiliza dez abas: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS`, `SERVICO_CIDADES`, `IMAGENS` e `AUDITORIA`. As abas `CONTROLE_AUTENTICACAO` e `DENUNCIAS` ainda não têm fluxos operacionais integrados. O catálogo público, imagens, perfil e alteração demonstrativa de e-mail estão integrados em `dev`. O roadmap prioriza agora o redesign visual/UX (Etapa 6); a pesquisa comunitária é a Etapa 7 e continua pendente de orientação do professor/orientador. Consulte `docs/ROADMAP_ESTUDOS.md`.
 
