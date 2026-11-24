@@ -403,10 +403,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** f8361e1331ca75d0efb6d9ac3839bbe6a8c4a87d
-- **Data do commit:** 2026-11-24T13:12:17-03:00
-- **Mensagem do commit:** test(email): verificar limpeza de dados do código consumido
-- **Branch desta execução:** feat/alteracao-email-profissional
+- **Commit de referência:** 9aa91e089b689602dd5fd6743bab10f95f7175cf
+- **Data do commit:** 2026-11-24T13:13:24-03:00
+- **Mensagem do commit:** Merge pull request #34 from kleber-goncalves/feat/alteracao-email-profissional
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -530,13 +530,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 9aa91e0 | 2026-11-24 | Merge pull request #34 from kleber-goncalves/feat/alteracao-email-profissional |
+| 3cb6dda | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | f8361e1 | 2026-11-24 | test(email): verificar limpeza de dados do código consumido |
 | f8087ce | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 6189fe2 | 2026-11-24 | docs(email): ajustar referências ao branch dev |
 | 7a85c3f | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 02902ba | 2026-11-24 | fix(email): mapear confirmação para ação interna do Apps Script |
 | e6f6e3a | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| 1c38a7d | 2026-11-24 | fix(email): limpar destino e HMAC após uso ou invalidação |
-| bd2690c | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
