@@ -568,20 +568,20 @@ Nenhuma implementação de autenticação, publicação anônima ou escrita oper
 
 A POC-04 permanece desabilitada. Não ativar credenciais reais, não habilitar backend em Production e não interpretar estas integrações como auditoria independente ou aprovação para uso comercial.
 
-## 16. Decisões ainda abertas
+## 16. Limites e decisões futuras
 
-- Local e formato definitivos da Vercel Function (a POC deverá avaliar a convenção /api/ no projeto Vite atual).
-- Formato do envelope e serialização do payload Vercel → Apps Script.
-- Variáveis e escopo dos ambientes Development, Preview e Production.
-- Timeout e região da Function compatíveis com os limites do Apps Script.
-- Estratégia de verificação de senha que preserve a autoridade do Apps Script: o XOR não foi aprovado e o helper Node com `timingSafeEqual` não foi selecionado; qualquer nova fronteira de confiança exige decisão e prova próprias.
-- Geração de token e estratégia de cookie no navegador; atributos SameSite e defesa CSRF.
-- Viabilidade prática de upload binário com limite de 5.000.000 bytes.
-- Comportamento das permissões do Drive na conta Google utilizada.
-- Ferramenta de sincronização/versionamento do código Apps Script.
-- Quotas efetivas da conta e tempos medidos.
+As decisões estruturais principais do protótipo foram implementadas no ambiente de demonstração. Permanecem como limites ou decisões futuras:
 
-As decisões abertas não alteram as regras de negócio aprovadas. Elas impedem a implementação das partes correspondentes até serem resolvidas.
+- **Atomicidade e consistência:** confirmar em cada operação crítica se os dados de negócio e a auditoria estão gravados no mesmo lote. Não presumir transação atômica entre Google Sheets e Google Drive.
+- **Controles operacionais:** quotas, concorrência, latência, testes de carga, backup, monitoramento e recuperação de falhas precisam de avaliação antes de qualquer uso fora do Preview acadêmico.
+- **Abas ainda sem fluxo:** `CONTROLE_AUTENTICACAO` e `DENUNCIAS` existem no modelo de referência, mas não possuem fluxos operacionais integrados.
+- **Autenticação futura:** recuperação de senha e envio real de e-mail continuam fora do escopo. A alteração de e-mail existente é demonstrativa e não envia mensagens.
+- **POC-04:** permanece independente, desabilitada e sem segredos; seus bloqueios de leitura limitada por stream e rate limiting impedem reativação.
+- **Publicação:** Production/`main` continua sem backend. Qualquer mudança futura exige revisão e decisão explícitas; não copiar os segredos de Preview para outros ambientes.
+- **Sincronização do Apps Script:** alterações em `apps-script/conecta-local/Code.gs` no GitHub não atualizam automaticamente o Web App. Após alterações necessárias, sincronizar o projeto Apps Script existente e publicar nova versão da implantação Web App existente, sem criar endpoint novo.
+- **Design da interface:** o próximo trabalho é o redesign visual/UX, documentado em `docs/PLANO_REDESIGN_INTERFACE.md`. Ele deve preservar arquitetura, contratos, autenticação, autorização e persistência existentes; não exige mudanças no modelo de dados.
+
+As provas de conceito anteriores e seus resultados estão registrados nos documentos específicos. Não descrever como pendentes testes ou integrações que já foram realizados; também não converter validações de demonstração em garantia de segurança ou prontidão para produção.
 
 ## 17. Referências técnicas consultadas
 
