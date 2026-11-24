@@ -65,6 +65,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         setServices,
         updateUser,
         establishSession,
+        clearSession,
         logout: logoutSession,
         isLoading: authLoading,
     } = useAuth();
@@ -90,6 +91,10 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         presentation: "",
         cityId: "",
     });
+    const [isEmailChangeOpen, setIsEmailChangeOpen] = useState(false);
+    const [emailChangeForm, setEmailChangeForm] = useState({ currentPassword: "", newEmail: "" });
+    const [pendingEmailChange, setPendingEmailChange] = useState(null);
+    const [emailChangeCodeInput, setEmailChangeCodeInput] = useState("");
 
     const activeServices = useMemo(
         () => services.filter((service) => service.status === "published").length,
@@ -329,6 +334,117 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         } finally {
             setBusy(false);
         }
+    }
+
+
+    function openEmailChange() {
+        setEmailChangeForm({ currentPassword: "", newEmail: "" });
+        setPendingEmailChange(null);
+        setEmailChangeCodeInput("");
+        setIsEmailChangeOpen(true);
+        setNotice(null);
+    }
+
+    function closeEmailChange() {
+        setIsEmailChangeOpen(false);
+        setEmailChangeForm({ currentPassword: "", newEmail: "" });
+        setEmailChangeCodeInput("");
+        setNotice(null);
+    }
+
+    function updateEmailChangeField(event) {
+        const { name, value } = event.target;
+        setEmailChangeForm((current) => ({ ...current, [name]: value }));
+        setNotice(null);
+    }
+
+    async function requestEmailChange(event) {
+        event.preventDefault();
+        setBusy(true);
+        setNotice(null);
+        try {
+            const result = await appRequest("auth.email.change.start", {
+                currentPassword: emailChangeForm.currentPassword,
+                newEmail: emailChangeForm.newEmail,
+            }, csrfToken);
+
+            if (!result?.requested || !result.pendingEmail || !result.verificationCode) {
+                throw new Error("O servidor não confirmou a criação do código.");
+            }
+
+            setPendingEmailChange({
+                email: result.pendingEmail,
+                verificationCode: String(result.verificationCode),
+                expiresAt: result.expiresAt || "",
+            });
+            setEmailChangeCodeInput("");
+            setEmailChangeForm((current) => ({ ...current, currentPassword: "" }));
+            setNotice({
+                title: "Código demonstrativo gerado",
+                message: "O novo endereço ainda não foi gravado. Confirme o código abaixo para concluir a alteração. Nenhum e-mail é enviado neste protótipo.",
+                tone: "info",
+            });
+        } catch (error) {
+            setNotice({
+                title: "Não foi possível solicitar a alteração",
+                message: error.message || "Confira a senha atual e o novo endereço.",
+                tone: "warning",
+            });
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    async function confirmEmailChange(event) {
+        event.preventDefault();
+        if (!/^\d{6}$/.test(emailChangeCodeInput)) {
+            setNotice({ title: "Código inválido", message: "Digite os seis números apresentados nesta demonstração.", tone: "warning" });
+            return;
+        }
+
+        setBusy(true);
+        setNotice(null);
+        try {
+            const result = await appRequest("auth.email.change.confirm", {
+                code: emailChangeCodeInput,
+            }, csrfToken);
+
+            if (!result?.changed || !result.requiresLogin || !result.email) {
+                throw new Error("O servidor não confirmou a alteração do e-mail.");
+            }
+
+            const confirmedEmail = result.email;
+            clearSession();
+            setLoginForm({ email: confirmedEmail, password: "" });
+            setPendingEmailChange(null);
+            setEmailChangeCodeInput("");
+            setIsEmailChangeOpen(false);
+            setMode("login");
+            setNotice({
+                title: "E-mail alterado com sucesso",
+                message: "Todas as sessões anteriores foram encerradas por segurança. Entre novamente usando o novo e-mail e sua senha atual.",
+                tone: "info",
+            });
+        } catch (error) {
+            setNotice({
+                title: "Não foi possível confirmar o novo e-mail",
+                message: error.message || "O código não foi aceito. Confira o prazo e as tentativas restantes.",
+                tone: "warning",
+            });
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    function requestAnotherEmailCode() {
+        setPendingEmailChange(null);
+        setEmailChangeCodeInput("");
+        setEmailChangeForm({ currentPassword: "", newEmail: "" });
+        setNotice({
+            title: "Nova solicitação",
+            message: "Aguarde pelo menos 60 segundos desde a solicitação anterior antes de gerar outro código.",
+            tone: "info",
+        });
     }
 
     async function refreshServices() {
@@ -620,10 +736,6 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                                     Apresentação profissional
                                     <textarea id="profile-presentation" name="presentation" rows={4} minLength={10} maxLength={500} value={profileForm.presentation} onChange={updateProfileField} required />
                                 </label>
-                                <div className="demo-profile-form-note">
-                                    <Mail size={16} aria-hidden="true" />
-                                    <span><strong>E-mail:</strong> {currentUser.email}. A alteração de e-mail será liberada em uma etapa própria, com confirmação do novo endereço.</span>
-                                </div>
                                 <div className="demo-profile-form-actions">
                                     <Button type="button" variant="secondary" onClick={cancelProfileEditing} disabled={busy}>Cancelar</Button>
                                     <Button type="submit" disabled={busy || !catalog.cities.length}>
@@ -636,13 +748,103 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                                 <div className="demo-profile-details">
                                     <div><span>Nome público</span><strong>{currentUser.publicName}</strong></div>
                                     <div><span>Nome completo</span><strong>{currentUser.fullName}</strong></div>
-                                    <div><span>E-mail</span><strong>{currentUser.email}</strong></div>
                                     <div><span>Telefone / WhatsApp</span><strong>{currentUser.whatsapp}</strong></div>
                                     <div><span>Localidade</span><strong>{catalog.cities.find((city) => city.id === currentUser.cityId)?.name || currentUser.cityId}</strong></div>
                                 </div>
                                 <p className="demo-profile-description">{currentUser.presentation}</p>
                             </>
                         )}
+
+                        <div className="demo-email-change-panel">
+                            <div className="demo-email-change-copy">
+                                <span className="section-eyebrow">E-mail de acesso</span>
+                                <strong>{currentUser.email}</strong>
+                                <p>Para trocar este endereço, confirme sua senha atual e valide um código demonstrativo de uso único.</p>
+                            </div>
+                            {!isEmailChangeOpen && (
+                                <Button type="button" variant="secondary" size="sm" onClick={openEmailChange} disabled={busy}>
+                                    <Mail size={15} aria-hidden="true" /> Alterar e-mail
+                                </Button>
+                            )}
+                        </div>
+
+                        {isEmailChangeOpen && (
+                            <section className="demo-email-change-form" aria-labelledby="email-change-heading">
+                                <div className="demo-email-change-form-heading">
+                                    <div>
+                                        <span className="section-eyebrow">Segurança da conta</span>
+                                        <h3 id="email-change-heading">{pendingEmailChange ? "Confirmar novo endereço" : "Alterar e-mail de acesso"}</h3>
+                                    </div>
+                                    <button type="button" className="auth-demo-text-button" onClick={closeEmailChange} disabled={busy}>Fechar</button>
+                                </div>
+
+                                {!pendingEmailChange ? (
+                                    <form className="demo-new-service-form" onSubmit={requestEmailChange}>
+                                        <p className="demo-email-change-explainer">A senha atual será validada novamente. O endereço só será trocado depois que o código de confirmação for aceito.</p>
+                                        <label htmlFor="email-change-current-password">
+                                            Senha atual
+                                            <Input
+                                                id="email-change-current-password"
+                                                name="currentPassword"
+                                                type="password"
+                                                autoComplete="current-password"
+                                                value={emailChangeForm.currentPassword}
+                                                onChange={updateEmailChangeField}
+                                                required
+                                            />
+                                        </label>
+                                        <label htmlFor="email-change-new-address">
+                                            Novo e-mail
+                                            <Input
+                                                id="email-change-new-address"
+                                                name="newEmail"
+                                                type="email"
+                                                autoComplete="email"
+                                                value={emailChangeForm.newEmail}
+                                                onChange={updateEmailChangeField}
+                                                maxLength={254}
+                                                placeholder="novo-endereco@exemplo.invalid"
+                                                required
+                                            />
+                                        </label>
+                                        <div className="demo-profile-form-actions">
+                                            <Button type="button" variant="secondary" onClick={closeEmailChange} disabled={busy}>Cancelar</Button>
+                                            <Button type="submit" disabled={busy}>
+                                                <ShieldCheck size={15} aria-hidden="true" /> {busy ? "Validando..." : "Validar senha e gerar código"}
+                                            </Button>
+                                        </div>
+                                    </form>
+                                ) : (
+                                    <form className="demo-new-service-form" onSubmit={confirmEmailChange}>
+                                        <div className="demo-code-card">
+                                            <span>Código demonstrativo de alteração de e-mail</span>
+                                            <strong>{pendingEmailChange.verificationCode}</strong>
+                                            <small>Novo endereço: {pendingEmailChange.email}. Válido por 10 minutos e até cinco tentativas. Nenhuma mensagem foi enviada.</small>
+                                        </div>
+                                        <label htmlFor="email-change-code">
+                                            Digite os seis números
+                                            <Input
+                                                id="email-change-code"
+                                                inputMode="numeric"
+                                                autoComplete="one-time-code"
+                                                maxLength={6}
+                                                value={emailChangeCodeInput}
+                                                onChange={(event) => setEmailChangeCodeInput(event.target.value.replace(/\D/g, "").slice(0, 6))}
+                                                placeholder="000000"
+                                                required
+                                            />
+                                        </label>
+                                        <div className="demo-profile-form-actions">
+                                            <Button type="button" variant="secondary" onClick={requestAnotherEmailCode} disabled={busy}>Solicitar outro código</Button>
+                                            <Button type="submit" disabled={busy || emailChangeCodeInput.length !== 6}>
+                                                <Check size={15} aria-hidden="true" /> {busy ? "Confirmando..." : "Confirmar novo e-mail"}
+                                            </Button>
+                                        </div>
+                                    </form>
+                                )}
+                            </section>
+                        )}
+
                     </section>
 
                     <section className="demo-panel demo-services-panel">
