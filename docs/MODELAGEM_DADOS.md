@@ -56,9 +56,9 @@ Responsável por autenticação, papel e estado da conta. O e-mail é privado e 
 |---|---|---|---|
 | `id_usuario` | UUID (PK) | Sim | Gerado pelo backend, único e imutável. |
 | `email` | Texto até 254 | Sim | Normalizado com trim e minúsculas; único após normalização. |
-| `senha_hash` | Texto | Sim | Nunca armazenar senha em texto puro; algoritmo depende de prova de conceito aprovada. |
-| `senha_salt` | Texto | Sim | Salt individual; formato e tamanho definidos na prova de conceito criptográfica. |
-| `senha_algoritmo` | Texto | Sim | Identificador/versionamento e parâmetros do KDF efetivamente utilizado; não presumir algoritmo antes da prova de conceito. |
+| `senha_hash` | Texto | Sim | Resultado Argon2id do protótipo, gerado no gateway Node com `hash-wasm@4.13.0`; nunca armazenar senha em texto puro. |
+| `senha_salt` | Texto | Sim | Salt individual usado no cálculo Argon2id do protótipo; não reutilizar entre contas. |
+| `senha_algoritmo` | Texto | Sim | Identificador e parâmetros/versionamento do Argon2id efetivamente utilizado pelo protótipo. |
 | `papel` | ENUM | Sim | `professional` ou `admin`; nunca escolhido livremente pelo formulário público. |
 | `status` | ENUM | Sim | `pending_activation`, `active`, `suspended`, `closed`. |
 | `email_verificado_em` | DATETIME | Não | Nulo até a confirmação válida do endereço. |
@@ -68,7 +68,7 @@ Responsável por autenticação, papel e estado da conta. O e-mail é privado e 
 
 **Regras:** e-mail único após normalização; papel administrativo concedido somente por procedimento controlado; conta profissional só pode ficar ativa com um perfil profissional válido; contas administrativas não exigem perfil. Senha, hash, salt e parâmetros nunca entram em logs ou respostas ao navegador.
 
-**Bloqueio técnico:** a implementação de senha depende de prova de conceito de um KDF apropriado, com salt individual, parâmetros versionados, comparação segura e desempenho medido. SHA-256 ou HMAC isolado não é substituto de KDF de senha.
+**Estado do protótipo:** Argon2id via `hash-wasm@4.13.0`, com perfil registrado na POC-03 (`m=19456 KiB,t=2,p=1`), está integrado ao gateway Node; a comparação usa `timingSafeEqual`. Esse resultado atende à demonstração acadêmica com credenciais fictícias, não representa auditoria independente ou aprovação para produção. SHA-256 ou HMAC isolado não substitui KDF de senha.
 
 ### 3.2. PROFISSIONAIS
 
@@ -420,19 +420,19 @@ Uma operação que dependa de alteração de permissão não será apresentada c
 - `AUDITORIA` será append-only pela aplicação, mas usuários com permissões de edição do arquivo/projeto ainda podem adulterar dados. Não classificar o Sheets como log inviolável.
 - Retenção de dados é uma regra acadêmica para dados fictícios; uma versão com dados reais exigirá política própria de finalidade, retenção e direitos dos titulares.
 
-## 9. Validações técnicas obrigatórias antes de implementar
+## 9. Validações técnicas, implementação e limites
 
-1. **Senha:** KDF apropriado, salt individual, parâmetros versionados, comparação segura e desempenho.
-2. **Sessão:** transporte, persistência, expiração, revogação e resistência a XSS/CORS no fluxo real React–Apps Script.
-3. **Códigos:** HMAC, expiração, uso único, tentativas, intervalo de reenvio e concorrência.
-4. **Bloqueio de login:** resistência a abuso e negação de serviço contra contas.
-5. **Autorização:** tentativas de alterar papel, proprietário, estado e acessar recursos de outro profissional.
-6. **Google Drive:** compartilhamento individual, revogação, herança, acesso a links antigos, falhas e reconciliação.
-7. **Sheets:** lote de dados + auditoria, concorrência, unicidade, falhas de gravação e limites/cotas.
-8. **Auditoria:** tratamento de falha tanto no lote atômico quanto na gravação separada de falha; ausência de segredos.
-9. **Integração:** comunicação React–Web App, CORS/POST/JSON, redirecionamentos, latência, cotas e limites de execução.
+1. **Senha:** Argon2id via `hash-wasm@4.13.0` e comparação Node com `timingSafeEqual` estão integrados ao gateway do protótipo. O perfil e as medições estão em `docs/POC_03_ARMAZENAMENTO_SENHAS.md`. Não é certificação nem aprovação para credenciais reais.
+2. **Sessão:** o fluxo principal por cookie HttpOnly, CSRF, Origin, expiração, logout e revogação está integrado. A POC-04 é separada, desabilitada e não deve ser reativada.
+3. **Códigos:** cadastro e alteração demonstrativa de e-mail usam códigos HMAC, validade e limites de tentativas no backend. Não existe envio real de e-mail.
+4. **Bloqueio de login:** as regras implementadas e seus limites devem ser consultados no código e no documento da POC-03; ainda não há auditoria independente ou prova de resistência a abuso em escala.
+5. **Autorização:** papel e propriedade são validados no Apps Script; os testes e os ensaios manuais documentados cobrem recusa de acesso cruzado e de papel não autorizado.
+6. **Google Drive:** upload retomável, metadados em `IMAGENS`, permissões por elegibilidade e gateway same-origin estão integrados. A validação manual principal ocorreu no Preview com dados de teste; consultar `docs/ETAPA_4_IMAGENS_DRIVE.md` e `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`.
+7. **Sheets:** o backend usa dez abas operacionais. Não assumir atomicidade entre Sheets e Drive, ou entre gravações separadas; validar a implementação específica de cada operação.
+8. **Auditoria:** eventos são gravados pelo backend, mas `AUDITORIA` não é inviolável contra editores do projeto/planilha. Falhas de gravação e consistência distribuída permanecem limites.
+9. **Integração e operação:** comunicação React–Vercel–Apps Script, assinatura, redirecionamentos e rotas same-origin estão implementados. Quotas, concorrência, testes de carga, monitoramento e recuperação de falhas não foram comprovados em nível de produção.
 
-Se uma prova de conceito não cumprir requisitos mínimos, não implementar o fluxo por improviso. Registrar a limitação e rever a alternativa antes de prosseguir.
+Antes de qualquer uso fora da demonstração, realizar revisão técnica e de segurança específica, avaliação de quotas/desempenho, proteção de dados e procedimentos operacionais. Não converter testes de protótipo em garantia de produção.
 
 ## 10. O que não faz parte deste modelo
 
