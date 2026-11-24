@@ -403,9 +403,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 2976b583c1c54c8ad46e6015381d28651f579f8f
-- **Data do commit:** 2026-11-24T13:54:49-03:00
-- **Mensagem do commit:** docs(spec): atualizar estado e pendências do MVP
+- **Commit de referência:** 0d67291a9140d8f4708bbe63df329190171933e3
+- **Data do commit:** 2026-11-24T13:55:22-03:00
+- **Mensagem do commit:** docs(report): atualizar estado e registrar redesign visual
 - **Branch desta execução:** docs/roadmap-redesign-interface
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -530,13 +530,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 0d67291 | 2026-11-24 | docs(report): atualizar estado e registrar redesign visual |
+| 5aa5d72 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 2976b58 | 2026-11-24 | docs(spec): atualizar estado e pendências do MVP |
 | 6f9686c | 2026-11-24 | docs(roadmap): priorizar redesign visual após catálogo |
 | 021c45f | 2026-11-24 | docs(readme): atualizar estado atual e próxima etapa |
 | d16278c | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 4c287ff | 2026-11-24 | docs(ai-context): registrar etapa 4 validada manualmente |
 | 0a1f325 | 2026-11-24 | docs(perfil): registrar validação manual da etapa 4 |
-| 4e41670 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| 51f9f8f | 2026-11-24 | docs(ai-context): registrar CI pós-merge da etapa 4 |
 
 <!-- END AUTO-GENERATED SECTION -->
