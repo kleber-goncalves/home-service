@@ -446,7 +446,7 @@ Esta seção registra o esquema físico aprovado e utilizado como referência pa
 
 ### 11.1. Convenções gerais do arquivo
 
-- Será utilizado **um único arquivo Google Sheets**, com exatamente 12 abas operacionais, uma para cada entidade.
+- O esquema físico de referência define **um único arquivo Google Sheets com 12 abas**, uma para cada entidade. O backend atual da demonstração utiliza dez abas; `CONTROLE_AUTENTICACAO` e `DENUNCIAS` permanecem sem fluxo operacional integrado.
 - Os nomes das abas serão exatamente: USUARIOS, PROFISSIONAIS, SESSOES, CODIGOS_VERIFICACAO, CONTROLE_AUTENTICACAO, SERVICOS, CATEGORIAS, CIDADES, SERVICO_CIDADES, IMAGENS, DENUNCIAS e AUDITORIA.
 - A linha 1 conterá exclusivamente os cabeçalhos. Os registros começam na linha 2.
 - Os cabeçalhos usarão os nomes de campo em snake_case, na ordem indicada nas tabelas desta seção.
