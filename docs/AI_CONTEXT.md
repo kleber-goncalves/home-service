@@ -414,10 +414,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 84a869cc105a0363339fd25e45aecb5fa91624e6
-- **Data do commit:** 2026-11-24T16:14:33-03:00
-- **Mensagem do commit:** fix(homepage): importar estado da categoria selecionada
-- **Branch desta execução:** feat/homepage-category-featured-services
+- **Commit de referência:** b1ff6c587d6a9ba7841bda5f8d363643b2d45949
+- **Data do commit:** 2026-11-24T16:17:12-03:00
+- **Mensagem do commit:** feat(homepage): adicionar vitrine interativa por categoria (#37)
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -542,13 +542,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| 84a869c | 2026-11-24 | fix(homepage): importar estado da categoria selecionada |
-| fa65d2d | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| 388d178 | 2026-11-24 | style(homepage): desenhar vitrine de categorias responsiva |
-| b4d2b0c | 2026-11-24 | feat(homepage): adicionar vitrine de servicos por categoria |
-| c8b6693 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| 9821077 | 2026-11-24 | feat(homepage): criar vitrine de servicos por categoria |
+| b1ff6c5 | 2026-11-24 | feat(homepage): adicionar vitrine interativa por categoria (#37) |
 | 72fd5ec | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | e84d295 | 2026-11-24 | fix(site-header): ajustar classe CSS para melhor alinhamento da navegação |
+| e87882d | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
+| 41ac8ee | 2026-11-24 | feat(hero-section): melhorar layout e responsividade da seção hero |
+| 7853b0e | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
+| 1f244f6 | 2026-11-24 | feat(homepage): adicionar ilustracoes nos cantos do hero (#36) |
+| a56b53b | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
