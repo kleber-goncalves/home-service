@@ -252,7 +252,7 @@ Os itens abaixo não são necessários para demonstrar o núcleo atual e podem c
 
 - Painel administrativo completo e gestão de papéis.
 - Denúncias, fila de moderação e governança operacional.
-- Envio real de e-mail, recuperação de senha e alteração de e-mail.
+- Envio real de e-mail e recuperação de senha. A alteração de e-mail já existe em `dev` em modo demonstrativo, sem envio real de mensagens.
 - Analytics, dashboards, notificações e relatórios avançados.
 - Pagamentos, contratação, agendamento, chat, avaliações e favoritos.
 - Migração para PostgreSQL, Firebase, Supabase ou outra infraestrutura sem requisito concreto.
