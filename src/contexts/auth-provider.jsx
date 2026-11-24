@@ -75,6 +75,10 @@ export function AuthProvider({ children }) {
         setSession(EMPTY_SESSION);
     }, [session.csrfToken, session.user]);
 
+    const clearSession = useCallback(() => {
+        setSession(EMPTY_SESSION);
+    }, []);
+
     const value = useMemo(() => ({
         ...session,
         isLoading,
@@ -82,7 +86,8 @@ export function AuthProvider({ children }) {
         setServices: updateServices,
         updateUser,
         logout,
-    }), [session, isLoading, establishSession, updateServices, updateUser, logout]);
+        clearSession,
+    }), [session, isLoading, establishSession, updateServices, updateUser, logout, clearSession]);
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
