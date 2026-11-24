@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { filterPublicServices, mapPublicService } from "../../src/lib/public-catalog.js";
+import { createDemoCategories, createDemoServices, filterPublicServices, mapPublicService } from "../../src/lib/public-catalog.js";
 
 const imageIds = {
     first: "00000000-0000-4000-8000-000000000001",
@@ -84,4 +84,51 @@ test("filtra por categoria, cidade e texto usando todos os municípios atendidos
     assert.deepEqual(filterPublicServices(services, { city: "turmalina - mg", query: "carlos" }).map((item) => item.id), ["service-1"]);
     assert.deepEqual(filterPublicServices(services, { query: "carlos" }).map((item) => item.id), ["service-1"]);
     assert.deepEqual(filterPublicServices(services, { query: "limpeza" }).map((item) => item.id), ["service-2"]);
+});
+
+
+test("mantém exemplos fictícios junto aos serviços cadastrados e os associa às categorias ativas", () => {
+    const categories = [
+        { id: "category-cleaning", name: "Limpeza" },
+        { id: "category-electric", name: "Elétrica" },
+    ];
+    const demoServices = createDemoServices(categories);
+
+    assert.ok(demoServices.length > 0);
+    assert.ok(demoServices.every((service) => service.isDemo === true && service.isPersisted === false));
+    assert.ok(demoServices.some((service) => service.categoryId === "category-cleaning"));
+    assert.ok(demoServices.some((service) => service.categoryId === "category-electric"));
+    assert.ok(demoServices.every((service) => service.whatsapp === ""));
+    assert.ok(demoServices.every((service) => service.cities.length === 0));
+    assert.ok(demoServices.every((service) => service.images[0].url.startsWith("https://")));
+});
+
+test("cria categorias locais de demonstração quando o catálogo remoto não está disponível", () => {
+    const demoCategories = createDemoCategories();
+
+    assert.ok(demoCategories.length > 0);
+    assert.ok(demoCategories.every((category) => category.isDemo === true));
+    assert.ok(demoCategories.every((category) => category.id.startsWith("demo-category-")));
+});
+
+test("mantém exemplos na busca textual e por categoria, mas nunca os associa a uma cidade real", () => {
+    const demoServices = createDemoServices([
+        { id: "category-cleaning", name: "Limpeza" },
+        { id: "category-electric", name: "Elétrica" },
+    ]);
+    const cleaningDemo = demoServices.find((service) => service.category === "Limpeza");
+
+    assert.ok(cleaningDemo);
+    assert.deepEqual(
+        filterPublicServices(demoServices, { categoryId: "category-cleaning" }).map((service) => service.id),
+        [cleaningDemo.id],
+    );
+    assert.deepEqual(
+        filterPublicServices(demoServices, { query: "limpeza residencial" }).map((service) => service.id),
+        [cleaningDemo.id],
+    );
+    assert.deepEqual(
+        filterPublicServices(demoServices, { city: "Capelinha - MG" }),
+        [],
+    );
 });
