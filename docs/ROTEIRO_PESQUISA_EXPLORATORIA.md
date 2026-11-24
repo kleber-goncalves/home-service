@@ -1,6 +1,7 @@
 # Roteiro de pesquisa exploratória — Conecta Local
 
 > **Status:** instrumento sugerido, ainda não aplicado.  
+> **Prioridade atual:** retomar após o redesign visual/UX e somente depois da orientação do professor/orientador.  
 > **Data de elaboração:** 20/11/2026  
 > **Finalidade:** apoiar a investigação acadêmica da hipótese de que moradores têm dificuldade para encontrar serviços locais e de que profissionais precisam de canais organizados de divulgação.
 
