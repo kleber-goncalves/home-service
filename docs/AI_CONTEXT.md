@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 0a72ee44318ca527aea6155c76c25783de492594
-- **Data do commit:** 2026-11-24T13:56:15-03:00
-- **Mensagem do commit:** docs(catalogo): consolidar validacao e vincular redesign
+- **Commit de referência:** f0ff9d56b1bedecf45c57a97c1eb01a52df10d18
+- **Data do commit:** 2026-11-24T13:56:43-03:00
+- **Mensagem do commit:** docs(research): registrar redesign antes da coleta
 - **Branch desta execução:** docs/roadmap-redesign-interface
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -541,13 +541,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| f0ff9d5 | 2026-11-24 | docs(research): registrar redesign antes da coleta |
+| 301586e | 2026-11-24 | docs(research): registrar ordem atual da pesquisa |
+| 4188025 | 2026-11-24 | docs(research): alinhar prioridade da pesquisa ao roadmap |
+| 07d1033 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
+| 75282ae | 2026-11-24 | docs(design): planejar redesign visual e UX |
 | 0a72ee4 | 2026-11-24 | docs(catalogo): consolidar validacao e vincular redesign |
 | 863355d | 2026-11-24 | docs(ai-context): registrar redesign como proxima frente |
 | 7e5d3f2 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| 2855faf | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| 48935cb | 2026-11-24 | docs(images): atualizar sequencia do roadmap |
-| 2544d09 | 2026-11-24 | docs(prototype): atualizar fluxos integrados do prototipo |
-| 0d67291 | 2026-11-24 | docs(report): atualizar estado e registrar redesign visual |
-| 5aa5d72 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
