@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** c99778115a2af9c6eaef7c0f8eb6704e3be819d1
-- **Data do commit:** 2026-11-24T16:30:06-03:00
-- **Mensagem do commit:** test(catalog): cobrir exemplos e registros cadastrados
+- **Commit de referência:** fe50661790c3d71dcab1fff7c33f8b90030376ae
+- **Data do commit:** 2026-11-24T16:30:54-03:00
+- **Mensagem do commit:** fix(homepage): distinguir destaque real de exemplo
 - **Branch desta execução:** feat/catalog-demo-and-published-services
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -542,13 +542,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| fe50661 | 2026-11-24 | fix(homepage): distinguir destaque real de exemplo |
+| b7cfccf | 2026-11-24 | fix(catalog): identificar detalhes de servicos ficticios |
+| 48d1dc0 | 2026-11-24 | feat(categories): mostrar contagem de exemplos e cadastros |
+| d8764a9 | 2026-11-24 | feat(catalog): incluir exemplos na busca e listagem |
+| d7c8fba | 2026-11-24 | feat(homepage): exibir exemplos e servicos cadastrados |
+| 3ca88eb | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
+| 8839a65 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | c997781 | 2026-11-24 | test(catalog): cobrir exemplos e registros cadastrados |
-| 4fabe37 | 2026-11-24 | feat(catalog): combinar exemplos e servicos cadastrados |
-| 550888c | 2026-11-24 | feat(catalog): normalizar servicos ficticios no catalogo publico |
-| aad2f3a | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| b1ff6c5 | 2026-11-24 | feat(homepage): adicionar vitrine interativa por categoria (#37) |
-| 72fd5ec | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| e84d295 | 2026-11-24 | fix(site-header): ajustar classe CSS para melhor alinhamento da navegação |
-| e87882d | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
