@@ -403,9 +403,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 9a255e0f260dfcd4a0eb746107136096efcc2124
-- **Data do commit:** 2026-11-24T13:03:27-03:00
-- **Mensagem do commit:** feat(email): validar senha atual e proteger confirmação no gateway
+- **Commit de referência:** 8d85ee59317489841ac4c037a243fcd85bd76136
+- **Data do commit:** 2026-11-24T13:04:14-03:00
+- **Mensagem do commit:** feat(email): permitir limpar sessão após troca de endereço
 - **Branch desta execução:** feat/alteracao-email-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -530,13 +530,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 8d85ee5 | 2026-11-24 | feat(email): permitir limpar sessão após troca de endereço |
+| e19650f | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 9a255e0 | 2026-11-24 | feat(email): validar senha atual e proteger confirmação no gateway |
 | 7585e88 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | a7bcbd7 | 2026-11-24 | feat(email): adicionar fluxo seguro de alteração no Apps Script |
 | 32a800d | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
 | b0cbb92 | 2026-11-23 | docs(ai-context): registrar foto de perfil validada |
 | 62fb3ad | 2026-11-23 | docs(profile): concluir validação manual da foto de perfil |
-| 04f84bf | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
-| d08348c | 2026-11-23 | docs(context): registrar conclusão da implementação da foto |
 
 <!-- END AUTO-GENERATED SECTION -->
