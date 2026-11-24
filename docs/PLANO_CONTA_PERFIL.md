@@ -76,7 +76,7 @@ Escopo implementado na branch:
 
 ### Etapa 4 — Alteração de e-mail
 
-**Status: integrada em `dev` pela PR #34, merge commit `9aa91e089b689602dd5fd6743bab10f95f7175cf`. A validação automatizada da PR passou; a validação manual integrada ainda depende da sincronização/publicação do Apps Script e dos testes no Preview.**
+**Status: concluída em `dev` pela PR #34 e validada manualmente no Preview em 24/11/2026.**
 
 Implementação preparada:
 
@@ -88,11 +88,12 @@ Implementação preparada:
 - Registrar solicitações e confirmações na aba `AUDITORIA`, sem gravar código, senha ou endereço de destino nos detalhes do evento.
 - Exibir o código somente como recurso demonstrativo na interface. Nenhum e-mail é enviado e a interface informa essa limitação.
 
-**Validação integrada pendente:**
+**Validação concluída em 24/11/2026:**
 
 - A CI da PR #34 executou os testes de autorização/Apps Script e gateway, ESLint, validação do registro de ocorrências e build; resultado SUCCESS em [Validate Home Service #45434385314](https://github.com/kleber-goncalves/home-service/actions/runs/45434385314). A CI pós-merge também concluiu SUCCESS em [Validate Home Service #45434598519](https://github.com/kleber-goncalves/home-service/actions/runs/45434598519).
-- Sincronizar o `Code.gs` deste branch `dev` com o projeto Apps Script existente e publicar nova versão da implantação Web App atual, preservando a URL.
-- Executar validação manual no Preview fixo de `dev`, usando somente contas e endereços sintéticos.
+- O responsável confirmou que sincronizou/publicou o Apps Script e realizou os testes manuais da alteração de e-mail com sucesso no Preview de `dev`.
+- Preview verificado: deployment `dpl_4jh3WSBqjU2hFSrFG2KuDUTAzWoe`, estado READY, commit `4e416702083750e599588db22ac6a1be4723361c`.
+- A confirmação continua demonstrativa: o código é apresentado na interface e não há envio de e-mail real.
 
 ## Critérios de conclusão da Etapa 2
 
@@ -127,7 +128,7 @@ Implementação preparada:
 - [x] Confirmação atualiza e verifica o e-mail somente uma vez.
 - [x] Todas as sessões anteriores são revogadas e a interface exige novo login.
 - [x] Eventos são auditados sem segredos, credenciais, códigos ou dados desnecessários.
-- [ ] CI pós-merge confirmada e validação manual concluída no Preview com Apps Script atualizado.
+- [x] CI pós-merge aprovada e validação manual concluída pelo responsável no Preview com Apps Script atualizado (24/11/2026).
 
 ## Limites
 
