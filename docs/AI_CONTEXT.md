@@ -403,9 +403,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 1020a466663d8d89c654d2a73cabd0730d654da0
-- **Data do commit:** 2026-11-24T13:08:04-03:00
-- **Mensagem do commit:** docs(email): detalhar implementação e critérios da etapa 4
+- **Commit de referência:** 9c3f2bf340e1a32b6c215a61b57a94d7c81002b2
+- **Data do commit:** 2026-11-24T13:08:23-03:00
+- **Mensagem do commit:** docs(email): corrigir formatação do plano da etapa 4
 - **Branch desta execução:** feat/alteracao-email-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -530,13 +530,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 9c3f2bf | 2026-11-24 | docs(email): corrigir formatação do plano da etapa 4 |
+| 4847cf3 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
+| f7922a4 | 2026-11-24 | docs(ai-context): registrar etapa 4 em implementação |
 | 1020a46 | 2026-11-24 | docs(email): detalhar implementação e critérios da etapa 4 |
 | da24e88 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 10a4e23 | 2026-11-24 | test(email): validar reautenticação e allowlist do gateway |
 | 8f1fdaf | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 792714b | 2026-11-24 | fix(email): preservar código pendente ao reabrir painel |
-| 147f1f1 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| 758a9b2 | 2026-11-24 | test(email): cobrir confirmação, reautenticação e revogação |
-| eeb2922 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
