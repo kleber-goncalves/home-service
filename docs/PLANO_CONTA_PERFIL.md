@@ -76,23 +76,23 @@ Escopo implementado na branch:
 
 ### Etapa 4 — Alteração de e-mail
 
-**Status: implementação em andamento na branch \`feat/alteracao-email-profissional\`; ainda não integrada em \`dev\` nem validada manualmente.**
+**Status: implementação em andamento na branch `feat/alteracao-email-profissional`; ainda não integrada em `dev` nem validada manualmente.**
 
 Implementação preparada:
 
 - Solicitar a senha atual e validar novamente com Argon2id no gateway; o Apps Script devolve os dados de verificação somente ao servidor, nunca ao navegador.
 - Normalizar o novo endereço, validar formato/tamanho e verificar unicidade dentro do bloqueio de concorrência do Apps Script.
-- Reservar temporariamente o destino em \`CODIGOS_VERIFICACAO\`, com finalidade \`change_email\`; o e-mail atual permanece intacto até a confirmação.
+- Reservar temporariamente o destino em `CODIGOS_VERIFICACAO`, com finalidade `change_email`; o e-mail atual permanece intacto até a confirmação.
 - Armazenar HMAC vinculado ao usuário, ao novo endereço e ao código; validade de 10 minutos, cinco tentativas e intervalo mínimo de 60 segundos entre solicitações.
-- No sucesso, consumir o código, atualizar \`USUARIOS.email\` e \`email_verificado_em\`, invalidar outros códigos pendentes, revogar todas as sessões e exigir novo login.
-- Registrar solicitações e confirmações na aba \`AUDITORIA\`, sem gravar código, senha ou endereço de destino nos detalhes do evento.
+- No sucesso, consumir o código, atualizar `USUARIOS.email` e `email_verificado_em`, invalidar outros códigos pendentes, revogar todas as sessões e exigir novo login.
+- Registrar solicitações e confirmações na aba `AUDITORIA`, sem gravar código, senha ou endereço de destino nos detalhes do evento.
 - Exibir o código somente como recurso demonstrativo na interface. Nenhum e-mail é enviado e a interface informa essa limitação.
 
 **Integração e validação pendentes:**
 
 - Concluir os testes automatizados de Apps Script e gateway, lint e build pela CI.
-- Integrar por PR em \`dev\), sincronizar o \`Code.gs\` no projeto Apps Script existente e publicar nova versão da implantação Web App atual.
-- Executar validação manual no Preview fixo de \`dev\), usando somente contas e endereços sintéticos.
+- Integrar por PR em `dev\), sincronizar o `Code.gs` no projeto Apps Script existente e publicar nova versão da implantação Web App atual.
+- Executar validação manual no Preview fixo de `dev\), usando somente contas e endereços sintéticos.
 
 ## Critérios de conclusão da Etapa 2
 
