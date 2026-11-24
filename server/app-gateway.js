@@ -662,6 +662,10 @@ export function createAppHandler({
             return fail(requestId, code, message, code.startsWith("PASSWORD_") ? 400 : 502);
         }
 
+        if (action === "auth.email.change.start" && output?.ok) {
+            cookieToSet = buildSessionCookie(sessionToken);
+        }
+
         if (!output?.ok) {
             const mapped = mapAppsScriptError(output);
             const clear = ["SESSION_INVALID", "SESSION_EXPIRED"].includes(mapped.code) ? clearSessionCookie() : null;
