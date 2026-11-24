@@ -1,7 +1,7 @@
 # Plano — catálogo público, navegação e apresentação de imagens
 
-> **Atualizado em:** 21/11/2026  
-> **Status:** PR #28 e PR #29 integradas em `dev`; Apps Script sincronizado/atualizado e validação manual integrada do gateway de imagens aprovada no Preview em 21/11/2026.
+> **Atualizado em:** 24/11/2026  
+> **Status:** PR #28 e PR #29 integradas em `dev`; integração real de imagens validada manualmente no Preview em 21/11/2026. A homologação visual ampla será retomada no redesign descrito em `docs/PLANO_REDESIGN_INTERFACE.md`.
 > **Branch de referência:** `dev` (documentação consolidada após a PR #29).
 > **Preview integrado da planilha:** https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app — deployment verificado `dpl_3me1dDL9tjaeQveKPFx8YXYfrDm3` (`READY`, commit `cf0e932`).
 > **Segurança:** dados fictícios; não duplicar nem ampliar escopo de segredos Vercel. Production permanece fora deste trabalho.
@@ -13,6 +13,12 @@ Evoluir a vitrine pública do Conecta Local para que a pessoa consiga entender a
 O foco desta frente é a experiência pública: organização da homepage, catálogo, categorias, cartões e detalhes dos serviços. O cadastro/autenticação do profissional, o upload no Drive e as regras de segurança existentes devem ser preservados.
 
 Este documento registra o escopo e o estado de implementação. As rotas públicas foram integradas em `dev` pela PR #28 e corrigidas pela PR #29. A validação integrada com Apps Script/Sheets/Drive foi executada no Preview fixo da branch `dev`; os Preview de outras branches não recebem as variáveis restritas a `gitBranch: dev`.
+
+### Estado consolidado em 24/11/2026
+
+A entrega funcional do catálogo e a correção da entrega de imagens estão integradas. A validação manual documentada cobriu cinco imagens reais de teste, bloqueio durante pausa, recuperação após republicação e remoção individual. Não há registro nesta documentação de que todos os critérios de navegação, filtros, responsividade e fluxos adjacentes tenham sido novamente homologados manualmente após as últimas mudanças de conta.
+
+Em 24/11/2026, o responsável apontou que o resultado visual ainda parece genérico. Portanto, a próxima atividade não será adicionar mais recursos ao catálogo: será revisar e elevar o design de toda a interface, mantendo os comportamentos existentes. O plano específico é `docs/PLANO_REDESIGN_INTERFACE.md`.
 
 ## 2. Diagnóstico do comportamento atual
 
@@ -200,34 +206,28 @@ Não alterar o esquema do Google Sheets nem a estrutura da aba `IMAGENS` apenas 
 6. **Enxugar a homepage:** três categorias, quatro ou cinco serviços em destaque, pesquisa e links para as páginas completas.
 7. **Validar navegação e apresentação:** telas pequenas/grandes, URLs diretas, voltar/avançar, dados vazios, imagens ausentes/quebradas e preservação dos fluxos existentes.
 
-### 7.1. Implementação e validação no branch
+### 7.1. Implementação e validação integrada
 
-**Implementado em `feat/catalogo-publico-navegacao`:**
-- Homepage enxuta com pesquisa, três categorias e até cinco serviços em destaque.
-- Catálogo `/servicos` com busca textual, filtros de categoria/cidade, contador, limpar filtros e estado vazio/erro/loading.
-- Página `/categorias` com as categorias ativas.
-- Detalhe `/servicos/:serviceId` com galeria de até cinco imagens, miniaturas, setas, contador, cidades atendidas e WhatsApp.
-- Modelo de apresentação que preserva `images[]`, `categoryId` e vínculos de cidades; cartão com imagem principal e indicador de fotos adicionais.
-- Placeholder neutro para imagens ausentes ou que não carregam; exemplos ilustrativos identificados e separados dos resultados reais.
-- Rewrite SPA em `vercel.json` para URLs diretas; as rotas `/api/app` e `/api/images` permanecem funcionais.
+**Implementado e integrado em `dev`:**
+- Homepage compacta com pesquisa, três categorias em destaque, até cinco serviços cadastrados e exemplos ilustrativos em seção separada.
+- Catálogo `/servicos` com pesquisa textual, filtros de categoria/cidade, contador, limpeza e estados de interface.
+- Página `/categorias` com categorias ativas.
+- Detalhes `/servicos/:serviceId` com galeria de até cinco imagens, miniaturas, navegação, contador, cidades atendidas e contato por WhatsApp.
+- Modelo do catálogo preserva `images[]`, `categoryId`, IDs e cidades; os cartões exibem a imagem principal e a quantidade de fotos adicionais.
+- Placeholder neutro para imagens ausentes ou quebradas; exemplos ilustrativos não entram nos resultados reais.
+- Rewrite SPA em `vercel.json` para suportar URLs diretas.
+- Entrega binária de imagens por gateway same-origin; token OAuth permanece no servidor.
 
-**Validação automatizada — concluída:** GitHub Actions [#44933049890](https://github.com/kleber-goncalves/home-service/actions/runs/44933049890) SUCCESS, incluindo auditoria, POC-01/02/03/04, autorização/ownership, testes de imagem, LOO, testes do catálogo, registro de ocorrências, ESLint e build. A sincronização de contexto [#44933049803](https://github.com/kleber-goncalves/home-service/actions/runs/44933049803) também passou.
+**Integração real confirmada:**
+- PR #28: merge commit `22ba720c6fdd22f3bef4cc5b29963279c5119ff9`.
+- PR #29: merge commit `77e88be6d9d20151a178f7fe31ea76509299becb`.
+- CI pós-merge [#44937440114](https://github.com/kleber-goncalves/home-service/actions/runs/44937440114) e AI Context [#44937440122](https://github.com/kleber-goncalves/home-service/actions/runs/44937440122): SUCCESS.
+- Apps Script sincronizado e nova versão publicada pelo responsável na implantação Web App existente.
+- Cinco imagens do serviço fictício de teste carregaram no Preview com HTTP 200; a pausa bloqueou 5/5 com HTTP 404; a republicação restaurou 5/5; a remoção de uma imagem tornou seu ID inelegível (HTTP 404), preservando as outras quatro.
 
-**Preview isolado da feature READY:** [abrir aplicação](https://home-service-6mgrjabmj-kleber-goncalves-s-projects.vercel.app). As rotas `/`, `/servicos`, `/categorias` e `/servicos/example-id` responderam HTTP 200; GET em `/api/app` e `/api/images` respondeu 405. Esses testes verificam shell/rotas e preservação das Functions, não integração com Sheets porque as variáveis de backend não estão disponíveis nesta branch.
+**Homologação visual e de navegação:** os critérios abaixo permanecem como itens a verificar, e não devem ser marcados como concluídos sem confirmação real. Serão revisitados dentro da etapa de redesign para evitar validar a aparência atual duas vezes e, em seguida, alterá-la.
 
-**Checklist de validação integrada após o merge em `dev`:** a integração é necessária para executar o código novo no único Preview que possui as variáveis de ambiente do Apps Script/Sheets, restritas à branch `dev`.
-1. Após o merge e o novo deployment, abrir o Preview fixo `https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app` em desktop e celular; revisar alinhamento, texto, menus e responsividade.
-2. Localizar um serviço de teste publicado com cinco imagens ativas e confirmar que o cartão mostra a primeira imagem e o indicador `+4 fotos`.
-3. Abrir os detalhes desse serviço; selecionar todas as miniaturas, usar anterior/próxima e conferir o contador e a descrição/cidades.
-4. Testar pesquisa textual, categoria, cidade no formato `Cidade - UF`, limpar filtros e recarregar a URL com filtros ativos.
-5. Abrir diretamente uma URL `/servicos/:serviceId` e usar voltar/avançar do navegador.
-6. Abrir `/?auth=demo` e `/?poc=01`; confirmar que continuam levando às telas demonstrativas correspondentes.
-7. Na área do profissional, confirmar listagem/edição/pausa/publicação de serviços e gerenciamento/upload de imagens.
-8. Observar se a primeira imagem real carrega. Se não carregar, anotar URL/serviço, status no Network e mensagem do Console; placeholder é fallback visual, não prova que a origem do problema foi resolvida.
-
-Histórico: a PR #28 foi integrada em `dev` no merge commit `22ba720c6fdd22f3bef4cc5b29963279c5119ff9`. As correções desta rodada estão isoladas em `fix/homepage-images-and-sections`. O Preview fixo de `dev` continua sendo o único ambiente conectado a Sheets/Drive; não ampliar o escopo das variáveis para branches de feature. Manter `main` e Production inalteradas.
-
-Trabalhar em `fix/homepage-images-and-sections`, derivada de `dev`. Não implementar diretamente em `dev`.
+**Operação:** o Preview fixo de `dev` é o único ambiente ligado às variáveis de Apps Script/Sheets/Drive. Não copiar segredos para branches de feature nem ampliar o escopo dos ambientes. O código Apps Script não se publica automaticamente: mudanças futuras no `Code.gs` exigem sincronização e nova versão na implantação Web App existente. Uma alteração exclusivamente visual, sem mudança no Apps Script, não exige nova publicação desse backend.
 
 ## 8. Critérios de aceitação
 
@@ -266,6 +266,7 @@ Trabalhar em `fix/homepage-images-and-sections`, derivada de `dev`. Não impleme
 - `apps-script/conecta-local/Code.gs`
 - `docs/ETAPA_4_IMAGENS_DRIVE.md`
 - `docs/ROADMAP_ESTUDOS.md`
+- `docs/PLANO_REDESIGN_INTERFACE.md`
 
 ## 11. Correções pós-integração da PR #28 — 21/11/2026
 
