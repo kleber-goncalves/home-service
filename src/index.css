@@ -491,7 +491,7 @@ summary:focus-visible {
 /* Hero */
 .hero-section {
     overflow: hidden;
-    background: linear-gradient(110deg, #eaf3ff 0%, #f3f8ff 57%, #e3efff 100%);
+
 }
 .hero-inner {
     min-height: 520px;
@@ -507,7 +507,8 @@ summary:focus-visible {
     position: relative;
     text-align: center;
     z-index: 1;
-    padding: 10px 0;
+    padding: 80px 0;
+    background: linear-gradient(180deg, #97dcffc8 0%, #fafdea 100%);
 }
 .eyebrow-pill {
     display: inline-flex;
@@ -523,17 +524,15 @@ summary:focus-visible {
     font-weight: 800;
 }
 .hero-content h1 {
-    max-width: 690px;
+    max-width: 62%;
     margin: 23px 0 17px;
     color: var(--navy);
-    font-size: clamp(2.8rem, 5.1vw, 4.55rem);
+    font-size: clamp(2.8rem, 5.1vw, 9.55rem);
     font-weight: 800;
-    letter-spacing: -0.075em;
+    letter-spacing: -0.02em;
     line-height: 1.025;
 }
-.hero-content h1 span {
-    color: var(--brand);
-}
+
 .hero-description {
     max-width: 590px;
     margin: 0;
@@ -3995,7 +3994,6 @@ summary:focus-visible {
 
 .hero-content {
     width: 100%;
-    max-width: 900px;
     margin-right: auto;
     margin-left: auto;
 }
@@ -4012,15 +4010,17 @@ summary:focus-visible {
 }
 
 .hero-decoration--vacuum {
-    top: 0;
+    z-index: 99;
+    bottom: 0;
     left: 0;
-    width: clamp(150px, 18vw, 235px);
+    width: clamp(150px, 18vw, 935px);
 }
 
 .hero-decoration--dish {
+    z-index: 99;
     right: 0;
-    bottom: 0;
-    width: clamp(160px, 19vw, 250px);
+    top: 0;
+    width: clamp(160px, 19vw, 950px);
 }
 
 @media (max-width: 860px) {
