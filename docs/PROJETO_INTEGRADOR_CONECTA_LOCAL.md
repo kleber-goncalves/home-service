@@ -526,6 +526,8 @@ A principal lacuna acadêmica agora é **validar a hipótese do problema com mor
 
 - `README.md` — visão geral, tecnologias e execução local.
 - `docs/AI_CONTEXT.md` — contexto técnico e estado registrado do projeto.
+- `docs/ROADMAP_ESTUDOS.md` — prioridades e sequência das etapas.
+- `docs/PLANO_REDESIGN_INTERFACE.md` — próxima etapa de identidade visual e experiência.
 - `docs/ESPECIFICACAO_MVP.md` — requisitos, atores e regras funcionais.
 - `docs/MODELAGEM_DADOS.md` — modelo lógico e esquema das 12 entidades.
 - `docs/LOO_ORIENTACAO_OBJETOS.md` — implementação de classes e herança.
@@ -540,4 +542,4 @@ A principal lacuna acadêmica agora é **validar a hipótese do problema com mor
 
 ---
 
-**Nota de atualização:** este relatório representa a leitura do código e da documentação disponível na branch `dev` em 20/11/2026, incluindo a cobertura por múltiplas cidades integrada pela PR #25. A seção de testes diferencia evidências automatizadas de validações manuais relatadas pelo responsável. Alterações posteriores podem exigir revisão do status, dos requisitos, da arquitetura e das evidências.
+**Nota de atualização:** versão 1.2 consolidada em 24/11/2026, com base na branch `dev` no commit `d16278c5b6df6df370645b18a05dfb5ea0effe08`. O relatório registra as entregas posteriores das PRs #28, #29 e #32–#34, além da necessidade de redesign visual identificada pelo responsável. A seção de testes diferencia evidências automatizadas de validações manuais relatadas. A pesquisa comunitária permanece pendente e a interface ainda não foi redesenhada.
