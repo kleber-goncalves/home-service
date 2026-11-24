@@ -95,7 +95,7 @@ export default function SiteHeader({ active = "" }) {
         <>
             <a className="skip-link" href="#conteudo">Pular para o conteúdo</a>
             <header className="site-header">
-                <div className="nav-shell mx-auto flex w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+                <div className="nav-shell  flex w-full  items-center justify-between px-4 sm:px-6 lg:px-8">
                     <AppLink to="/" className="brand" aria-label="Conecta Local — início">
                         <span className="brand-mark" aria-hidden="true"><House size={22} strokeWidth={2.4} /></span>
                         <span className="brand-name">Conecta <strong>Local</strong></span>
