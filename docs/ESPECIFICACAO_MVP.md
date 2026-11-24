@@ -1,6 +1,6 @@
 # Especificação funcional do MVP — Conecta Local
 
-> **Status:** versão 0.4 — requisitos e modelagem consolidados; demonstração acadêmica parcialmente implementada e integrada. Estado técnico atualizado em 18/11/2026 na seção 2. Os requisitos das seções seguintes descrevem o escopo pretendido e não devem ser confundidos com funcionalidades já entregues.  
+> **Status:** versão 0.4 — requisitos e modelagem consolidados; demonstração acadêmica funcional parcialmente implementada e integrada em `dev`. Estado técnico atualizado em 24/11/2026 na seção 2. Os requisitos das seções seguintes descrevem o escopo pretendido e não devem ser confundidos com funcionalidades já entregues.  
 > **Versão:** 0.4  
 > **Data da consolidação:** 2026-11-10  
 > **Escopo:** requisitos funcionais, regras de negócio, dados demonstrativos e critérios técnicos para o MVP acadêmico.  
@@ -16,40 +16,37 @@ O projeto é uma demonstração acadêmica. O sistema deverá simular fluxos coe
 
 O MVP não será um marketplace transacional: não intermediará pagamentos, contratos, agendamentos ou conversas internas. O contato ocorrerá diretamente entre visitante e profissional, principalmente pelo WhatsApp público informado no perfil.
 
-## 2. Estado atual do projeto — 20/11/2026
+## 2. Estado atual do projeto — 24/11/2026
 
-A branch `dev` contém a demonstração acadêmica atual do Conecta Local. O PR #15 foi integrado em 16/11/2026 e acrescentou a área do profissional conectada ao Google Sheets via Vercel Function e Google Apps Script. O fluxo implementado contempla cadastro, confirmação por código demonstrativo, login, sessão, atualização de perfil, criação de serviço, pausa/publicação e consulta pública de serviços publicados.
+A branch `dev` contém a demonstração acadêmica funcional do Conecta Local. O estado foi verificado no commit `d16278c5b6df6df370645b18a05dfb5ea0effe08`; o Preview Vercel correspondente está READY no deployment `dpl_AfNaMm1WqRFJa3jhhwXhfkgwPUTv`. A branch `main` permanece no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`, sem backend de negócio habilitado.
 
-A validação manual ponta a ponta do PR #15 foi realizada em Preview em 16/11/2026, com dados fictícios. Ela confirmou catálogo, cadastro/ativação, persistência na planilha, login, criação de serviço, pausa/publicação, logout e novo login/refresh. Como os PRs #16 (orientação a objetos) e #17 (correção da vitrine) foram integrados depois, a jornada completa precisa ser repetida no Preview atualizado de `dev` antes do encerramento da demonstração.
-
-Os PRs #18 (relatório integrador) e #19 (integração de `dev` em `main`) foram concluídos. O PR #19 levou o núcleo funcional anterior ao commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`. Posteriormente, a PR #25 integrou a cobertura por múltiplas cidades exclusivamente em `dev`, pelo merge commit `5003604a51def9bdf58df9845d36c2ec75a4452e`; portanto, `dev` contém essa evolução adicional e `main` permanece inalterada no commit de release.
-
-A PR #25 adicionou a relação `SERVICO_CIDADES` e a seleção de múltiplas cidades por serviço. Em 20/11/2026, o responsável confirmou a sincronização/publicação do Apps Script real e informou que os testes manuais no Preview de `dev` passaram: a edição de um serviço existente atualizou a aba `SERVICO_CIDADES`; a homepage encontrou o serviço pela cidade já cadastrada; e, com uma segunda cidade temporária vinculada ao mesmo serviço, a pesquisa pública encontrou o serviço nas duas localidades. A CI do merge também concluiu SUCCESS e o Preview está READY. A cidade adicional foi usada somente para teste; o responsável confirmou sua remoção e a remoção dos vínculos correspondentes, mantendo apenas a cidade original e preservando os registros permanentes.
-
-**O que está implementado na demonstração**
-- Homepage pública e filtros locais sobre dados de exemplo e serviços retornados pelo backend.
+**Funcionalidades integradas em `dev`:**
+- Homepage pública e catálogo de serviços com rotas `/servicos`, `/categorias` e `/servicos/:serviceId`.
+- Pesquisa textual e filtros locais por categoria e cidade, considerando os municípios vinculados em `SERVICO_CIDADES`.
+- Detalhes públicos do serviço com dados permitidos, contato por WhatsApp e galeria de até cinco imagens.
+- Separação entre serviços publicados cadastrados e exemplos ilustrativos.
 - Cadastro, confirmação demonstrativa, login/logout e sessão por cookie HttpOnly.
-- Atualização do perfil profissional.
-- Criação, pausa e publicação de serviços, com persistência nas abas operacionais do Sheets.
-- Consulta pública dos serviços publicados e canal de contato informado pelo profissional.
-- Associação de um ou mais municípios por serviço por meio de `SERVICO_CIDADES`, com pesquisa pública considerando as localidades vinculadas.
-- Gateway com Argon2id, HMAC, proteção contra replay, CSRF, validação de Origin e controle de sessão.
-- Classes de domínio `Usuario`, `Profissional` e `Servico`, integradas pelo PR #16.
+- Edição do perfil profissional, incluindo nome completo, nome público, WhatsApp, apresentação e cidade principal.
+- Upload, substituição e remoção da foto de perfil por gateway; arquivo privado no Drive.
+- Criação, edição, pausa, publicação e remoção lógica dos próprios serviços.
+- Upload e gerenciamento de até cinco imagens por serviço, com controle de acesso ligado ao estado do serviço e da conta.
+- Alteração de e-mail com reautenticação, código demonstrativo e revogação das sessões antigas após a confirmação.
+- Gateway com Argon2id, HMAC, proteção contra replay, CSRF, validação de Origin, autorização e controle de sessão.
+- Classes de domínio `Usuario`, `Profissional` e `Servico`.
 
-**Limites e itens ainda não implementados**
-- Recuperação/alteração de senha e alteração de e-mail com confirmação.
-- Envio real de e-mail; a confirmação de cadastro é demonstrativa.
-- Upload, armazenamento e controle de permissões de imagens no Google Drive.
-- Painel administrativo, denúncias, moderação e gestão administrativa de categorias/cidades.
-- Pesquisa remota/geográfica e geolocalização.
+**Integrações e evidências:** as PRs #28 e #29 integraram o catálogo e a entrega segura das imagens em `dev`. Em 21/11/2026, o responsável confirmou no Preview a leitura de cinco imagens de teste no Drive, bloqueio de acesso quando o serviço foi pausado, restauração após republicação e revogação da imagem removida. Em 24/11/2026, confirmou a conclusão dos testes manuais da alteração de e-mail após sincronizar/publicar o Apps Script. As validações de cada fluxo são específicas às evidências registradas; não significam homologação completa de todas as jornadas.
 
-A modelagem aprovada prevê 12 abas. O Apps Script de negócio utiliza nove: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS`, `SERVICO_CIDADES` e `AUDITORIA`. As abas `CONTROLE_AUTENTICACAO`, `IMAGENS` e `DENUNCIAS` ainda não têm fluxos operacionais implementados.
+**Persistência operacional:** o Apps Script utiliza atualmente dez abas do Google Sheets: `USUARIOS`, `PROFISSIONAIS`, `SESSOES`, `CODIGOS_VERIFICACAO`, `CATEGORIAS`, `CIDADES`, `SERVICOS`, `SERVICO_CIDADES`, `IMAGENS` e `AUDITORIA`. A modelagem aprovada contempla 12 abas; `CONTROLE_AUTENTICACAO` e `DENUNCIAS` ainda não possuem fluxo operacional integrado.
 
-**Ambientes**
-- **Preview de `dev`:** ambiente destinado à demonstração funcional. A PR #25 foi integrada e a validação manual principal da cobertura por múltiplas cidades foi confirmada pelo responsável em 20/11/2026.
-- **Production (`main`):** permanece como vitrine pública. O gateway bloqueia operações de negócio fora de Vercel Preview e não há variáveis Production do backend.
+**Próxima evolução:** em 24/11/2026, o responsável identificou que a interface, embora funcional, possui aparência visual genérica. A próxima frente aprovada é o redesign visual/UX, documentado em `docs/PLANO_REDESIGN_INTERFACE.md`. A direção visual ainda não foi escolhida; cores, fontes e referências não devem ser presumidas.
 
-O projeto é acadêmico, usa exclusivamente dados fictícios e não está aprovado para produção ou uso comercial. Não inserir credenciais ou dados pessoais reais.
+**Limites e itens ainda não implementados:**
+- Envio real de e-mail e recuperação de senha.
+- Painel administrativo funcional, denúncias/moderação e gestão administrativa de categorias/cidades.
+- Pesquisa geográfica, geolocalização, cálculo de distância e ordenação por proximidade.
+- Auditoria de segurança independente, testes de carga e aprovação para produção.
+
+O código de confirmação de cadastro e a alteração de e-mail são demonstrativos; não há provedor de envio real configurado. O projeto usa apenas dados fictícios e não deve receber credenciais ou dados pessoais reais.
 
 ## 3. Classificação e leitura dos requisitos
 
@@ -416,17 +413,18 @@ As quantidades são uma base inicial para demonstração, não um limite de arqu
 
 As provas de conceito de transporte, assinatura, armazenamento de senha e o fluxo de autenticação principal foram executadas em ambiente controlado com dados sintéticos. A existência desses controles não equivale a auditoria independente, certificação ou aprovação para Production.
 
-1. **Comunicação e HMAC — implementados:** POC-01 e POC-02 foram integradas à `dev`; assinatura HMAC-SHA-256, timestamp, nonce e proteção contra replay foram validados em ensaios automatizados e manuais. O backend de negócio possui sua própria validação de assinatura.
-2. **Armazenamento de senha — integrado à demonstração:** Argon2id via `hash-wasm@4.13.0`, perfil `m=19456 KiB,t=2,p=1`, e comparação no gateway com `timingSafeEqual`. O valor de desempenho registrado na POC é uma medição pontual, não uma garantia de capacidade ou certificação.
-3. **Sessão principal — integrada:** cookie HttpOnly/Secure/SameSite, CSRF, Origin, hash de token no Sheets, logout e revogação fazem parte do fluxo do protótipo. Em 20/11/2026, o responsável confirmou a revalidação do fluxo principal no Preview atualizado de `dev`, após as integrações recentes.
-4. **POC-04 — sessão sintética independente:** a PR #14 foi mesclada em `dev` em 20/11/2026, mas a rota permanece desabilitada e não integra o login principal. Os ensaios sintéticos de cookie, CSRF, Origin/Fetch Metadata, expiração controlada, replay, concorrência, logout e revogação foram concluídos. A planilha temporária, nonces, segredo Apps Script e variáveis Vercel exclusivas foram limpos. Dois pontos de hardening bloqueiam qualquer reativação: leitura limitada por stream e rate limiting/limite de emissão. Falhas reais de armazenamento/upstream e testes de carga não foram executados. Consultar `docs/POC_04_SESSOES.md`.
-5. **Autorização — integrada e validada em `dev`:** a PR #22 integrou a autorização por papel confiável e propriedade no Apps Script. A suíte `tests/authorization/` executa o `Code.gs` real em harness Node/VM com Sheets/Properties/LockService simulados. No merge da PR #23, autorização/ownership concluiu 22/22 PASS. As validações manuais anteriores confirmaram recusa de acesso cruzado (`SERVICE_NOT_FOUND`, HTTP 404) e de papel inadequado (`ROLE_FORBIDDEN`, HTTP 403); o responsável confirmou que a conta fictícia A voltou ao papel `professional`.
-6. **Ciclo de vida dos serviços — integrado e validado em 20/11/2026:** a PR #23 integrou `service.update` e `service.remove` em `dev`. O profissional pode editar nome, categoria e descrição e remover logicamente somente os próprios serviços; o backend deriva identidade/proprietário da sessão, impede mass assignment e protege os estados `suspended` e `removed`. A remoção mantém a linha em `SERVICOS` e registra auditoria em `AUDITORIA`. A execução final da CI no merge commit `0f9e887347444deb1307e65d127d969e595c81ed` passou: autorização/ownership 22/22 e LOO 7/7, além das suítes POC-01/02/03/04, auditoria de dependências, registro de ocorrências, ESLint e build. O responsável confirmou a sincronização do Apps Script, publicação da implantação Web App existente e aprovação dos testes manuais no Preview atualizado pelo alias fixo de `dev`. A escrita do dado de negócio e da auditoria permanece separada; não declarar atomicidade.
-7. **Persistência e integridade:** o backend utiliza Google Sheets para a demonstração. Não presumir transação relacional ou atomicidade entre todas as operações; validar concorrência, consistência de gravação e auditoria. A modelagem contém 12 abas, mas apenas oito são usadas operacionalmente.
-8. **Google Drive:** upload e gerenciamento de permissões de imagens ainda não implementados. Antes de introduzi-los, validar permissões individuais, transições público/privado, falhas parciais e reconciliação.
-9. **E-mail e recuperação:** envio real, recuperação de senha e alteração de e-mail ainda não implementados. Se forem incluídos futuramente, revisar quotas, privacidade e tratamento seguro dos códigos.
-10. **Limites operacionais:** não há auditoria independente, teste de carga ou aprovação de segurança para produção. Avaliar cotas do Apps Script, latência, concorrência, backup, monitoramento e gestão de incidentes antes de qualquer uso fora da demonstração.
-
+1. **Comunicação e HMAC — integrados:** POC-01 e POC-02 foram integradas a `dev`; assinatura HMAC-SHA-256, timestamp, nonce e proteção contra replay possuem ensaios automatizados e manuais registrados.
+2. **Armazenamento de senha — integrado à demonstração:** Argon2id via `hash-wasm@4.13.0`, perfil `m=19456 KiB,t=2,p=1`, e comparação no gateway com `timingSafeEqual`. O valor de desempenho da POC é uma medição pontual, não uma garantia de capacidade ou certificação.
+3. **Sessão principal — integrada:** cookie HttpOnly/Secure/SameSite, CSRF, Origin, hash de token no Sheets, logout e revogação fazem parte do fluxo principal. O responsável confirmou a revalidação manual do fluxo principal no Preview atualizado de `dev` em 20/11/2026.
+4. **POC-04 — sessão sintética independente:** integrada pela PR #14, mas permanece desabilitada e não integra o login principal. Os ensaios sintéticos foram concluídos; recursos temporários foram limpos. Dois pontos de hardening bloqueiam qualquer reativação: leitura de corpos/respostas limitada somente após leitura integral e ausência de rate limiting/limite de emissão. Não reativar.
+5. **Autorização — integrada e validada em `dev`:** a PR #22 integrou autorização por papel confiável e propriedade no Apps Script. A suíte `tests/authorization/` usa o `Code.gs` real em harness Node/VM com Sheets/Properties/LockService simulados. Validações manuais registraram recusa de acesso cruzado (`SERVICE_NOT_FOUND`, HTTP 404) e de papel inadequado (`ROLE_FORBIDDEN`, HTTP 403).
+6. **Ciclo de vida dos serviços — integrado:** a PR #23 integra `service.update` e `service.remove`; o proprietário é derivado da sessão, mass assignment é recusado e estados administrativos são protegidos. A remoção lógica preserva a linha em `SERVICOS` e registra evento em `AUDITORIA`. O responsável confirmou a validação manual no Preview em 20/11/2026.
+7. **Persistência e integridade:** Google Sheets é utilizado para a demonstração. Não presumir transação relacional ou atomicidade entre serviços distintos. As dez abas operacionais atuais estão listadas na seção 2; `CONTROLE_AUTENTICACAO` e `DENUNCIAS` permanecem sem fluxo integrado. Gravações de negócio e auditoria não devem ser descritas como atômicas sem evidência específica.
+8. **Google Drive — imagens integradas:** upload retomável e gerenciamento de até cinco imagens por serviço; foto de perfil com fluxo próprio. Arquivos privados são entregues por gateway same-origin, que mantém OAuth no servidor e revalida elegibilidade. O responsável confirmou os fluxos manuais principais de imagens de serviço e foto de perfil no Preview; a validação não representa teste de carga ou auditoria independente.
+9. **Conta e e-mail — alteração integrada de forma demonstrativa:** a PR #34 implementa reautenticação com senha atual, confirmação de novo endereço, unicidade, expiração/limite de tentativas, auditoria e revogação de sessões. O responsável confirmou os testes manuais em 24/11/2026 após atualização do Apps Script. O código é exibido na interface e não há envio real de e-mail. Recuperação de senha ainda não está implementada.
+10. **Catálogo público — integrado:** PRs #28 e #29 implementam homepage, catálogo, categorias, detalhes, galeria e entrega segura das imagens. A integração real de imagens foi validada manualmente no Preview em 21/11/2026. Os detalhes da evidência e os critérios de interface ainda não homologados estão em `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`.
+11. **Design visual — próxima frente:** o responsável considera a aparência atual genérica. O redesign visual/UX está planejado em `docs/PLANO_REDESIGN_INTERFACE.md`; ainda não foi iniciado e não altera os requisitos funcionais do MVP.
+12. **Limites operacionais:** não há auditoria independente, teste de carga ou aprovação de segurança para produção. Antes de qualquer uso fora da demonstração, seriam necessárias revisões de cotas, latência, concorrência, backup, monitoramento, privacidade, retenção e resposta a incidentes.
 
 **Critério de bloqueio:** manter a demonstração restrita ao Preview, com dados fictícios. Não habilitar o backend em Production nem aceitar credenciais/dados pessoais reais. Registrar evidências por ambiente e data; não declarar testes manuais concluídos sem executá-los.
 
