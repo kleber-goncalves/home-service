@@ -32,6 +32,8 @@ const BROWSER_ACTIONS = new Set([
     "auth.login",
     "auth.me",
     "auth.logout",
+    "auth.email.change.start",
+    "auth.email.change.confirm",
     "profile.update",
     "service.listMine",
     "service.create",
@@ -235,6 +237,12 @@ function mapAppsScriptError(output) {
     const known = {
         EMAIL_ALREADY_EXISTS: [409, "Este e-mail já possui cadastro."],
         INVALID_CREDENTIALS: [401, "E-mail ou senha inválidos."],
+        INVALID_CURRENT_PASSWORD: [401, "A senha atual não confere."],
+        REAUTH_RATE_LIMITED: [429, "Muitas tentativas de reautenticação. Aguarde 15 minutos."],
+        EMAIL_UNCHANGED: [409, "O novo e-mail precisa ser diferente do endereço atual."],
+        EMAIL_ALREADY_RESERVED: [409, "Este endereço possui uma solicitação de confirmação pendente."],
+        EMAIL_CHANGE_PENDING_NOT_FOUND: [404, "Não há uma alteração de e-mail aguardando confirmação."],
+        VERIFICATION_RESEND_TOO_SOON: [429, "Aguarde 60 segundos antes de solicitar outro código."],
         ACCOUNT_PENDING: [403, "Confirme seu e-mail antes de entrar."],
         ACCOUNT_UNAVAILABLE: [403, "Esta conta não está disponível."],
         ROLE_FORBIDDEN: [403, "Sua conta não possui permissão para esta operação."],
@@ -294,6 +302,7 @@ export function createAppHandler({
     now = () => Date.now(),
     randomBytesImpl = (size) => randomBytes(size),
     randomIntImpl = (min, max) => randomInt(min, max),
+    derivePasswordHashImpl = derivePasswordHash,
     timeoutMs = REQUEST_TIMEOUT_MS,
 } = {}) {
     return async function appHandler(request) {
@@ -358,7 +367,7 @@ export function createAppHandler({
         }
 
         const sessionToken = parseSessionCookie(request.headers.get("cookie"));
-        const protectedActions = new Set(["auth.me", "auth.logout", "profile.update", "service.listMine", "service.create", "service.update", "service.remove", "service.setStatus", "image.upload.start", "image.upload.status", "image.upload.cancel", "image.remove", "profile.photo.upload.start", "profile.photo.upload.status", "profile.photo.upload.cancel", "profile.photo.remove"]);
+        const protectedActions = new Set(["auth.me", "auth.logout", "auth.email.change.start", "auth.email.change.confirm", "profile.update", "service.listMine", "service.create", "service.update", "service.remove", "service.setStatus", "image.upload.start", "image.upload.status", "image.upload.cancel", "image.remove", "profile.photo.upload.start", "profile.photo.upload.status", "profile.photo.upload.cancel", "profile.photo.remove"]);
         if (protectedActions.has(action) && !sessionToken) {
             return fail(requestId, "SESSION_INVALID", "Entre novamente para continuar.", 401, clearSessionCookie());
         }
@@ -419,7 +428,7 @@ export function createAppHandler({
                     } else {
                         let candidate;
                         try {
-                            candidate = await derivePasswordHash(payload.password, credentials.salt);
+                            candidate = await derivePasswordHashImpl(payload.password, credentials.salt);
                         } catch {
                             candidate = Buffer.alloc(0);
                         }
@@ -452,6 +461,84 @@ export function createAppHandler({
                         }
                     }
                 }
+            } else if (action === "auth.email.change.start") {
+                const tokenHash = createHash("sha256").update(sessionToken, "utf8").digest("hex");
+                const lookup = await callAppsScript({
+                    action: "auth.reauth.lookup",
+                    requestId,
+                    payload: { tokenHash },
+                    appsScriptUrl,
+                    secret,
+                    fetchImpl,
+                    now,
+                    randomBytesImpl,
+                    timeoutMs,
+                });
+
+                if (!lookup.ok) {
+                    output = lookup;
+                } else {
+                    const credentials = lookup.data;
+                    if (
+                        credentials?.algoritmo !== PASSWORD_ALGORITHM
+                        || !HEX_32_PATTERN.test(credentials?.salt || "")
+                        || !HEX_64_PATTERN.test(credentials?.hash || "")
+                        || typeof credentials?.idUsuario !== "string"
+                        || !credentials.idUsuario
+                    ) {
+                        output = { ok: false, error: { code: "INVALID_CURRENT_PASSWORD" } };
+                    } else {
+                        let candidate;
+                        try {
+                            candidate = await derivePasswordHashImpl(payload.currentPassword, credentials.salt);
+                        } catch {
+                            candidate = Buffer.alloc(0);
+                        }
+
+                        if (!passwordsMatch(candidate, credentials.hash)) {
+                            output = { ok: false, error: { code: "INVALID_CURRENT_PASSWORD" } };
+                        } else {
+                            const reauthenticated = await callAppsScript({
+                                action: "auth.reauth.success",
+                                requestId,
+                                payload: { tokenHash },
+                                appsScriptUrl,
+                                secret,
+                                fetchImpl,
+                                now,
+                                randomBytesImpl,
+                                timeoutMs,
+                            });
+
+                            if (!reauthenticated.ok) {
+                                output = reauthenticated;
+                            } else {
+                                const verificationCode = String(randomIntImpl(100000, 1000000));
+                                if (!/^\d{6}$/.test(verificationCode)) {
+                                    throw new Error("Não foi possível gerar o código de confirmação.");
+                                }
+                                output = await callAppsScript({
+                                    action: "email.change.start",
+                                    requestId,
+                                    payload: {
+                                        tokenHash,
+                                        newEmail: payload.newEmail,
+                                        verificationCode,
+                                    },
+                                    appsScriptUrl,
+                                    secret,
+                                    fetchImpl,
+                                    now,
+                                    randomBytesImpl,
+                                    timeoutMs,
+                                });
+                                if (output.ok) {
+                                    output.data = { ...output.data, verificationCode };
+                                }
+                            }
+                        }
+                    }
+                }
             } else {
                 let forwardedPayload = { ...payload };
                 if (protectedActions.has(action)) {
@@ -459,6 +546,11 @@ export function createAppHandler({
 
                     if (action === "auth.me" || action === "auth.logout" || action === "service.listMine") {
                         forwardedPayload = { tokenHash };
+                    } else if (action === "auth.email.change.confirm") {
+                        forwardedPayload = {
+                            code: payload.code,
+                            tokenHash,
+                        };
                     } else if (action === "profile.update") {
                         forwardedPayload = {
                             nome_completo: payload.nome_completo,
@@ -556,7 +648,9 @@ export function createAppHandler({
                     output.data = { ...output.data, csrfToken: deriveCsrfToken(sessionToken, secret) };
                 }
                 if (output.ok && protectedActions.has(action) && action !== "auth.logout") {
-                    cookieToSet = buildSessionCookie(sessionToken);
+                    cookieToSet = action === "auth.email.change.confirm"
+                        ? clearSessionCookie()
+                        : buildSessionCookie(sessionToken);
                 }
                 if (action === "auth.logout") cookieToSet = clearSessionCookie();
             }
