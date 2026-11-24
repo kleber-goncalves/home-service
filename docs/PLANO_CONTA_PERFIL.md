@@ -91,8 +91,8 @@ Implementação preparada:
 **Integração e validação pendentes:**
 
 - Concluir os testes automatizados de Apps Script e gateway, lint e build pela CI.
-- Integrar por PR em `dev\), sincronizar o `Code.gs` no projeto Apps Script existente e publicar nova versão da implantação Web App atual.
-- Executar validação manual no Preview fixo de `dev\), usando somente contas e endereços sintéticos.
+- Integrar por PR em `dev`, sincronizar o `Code.gs` no projeto Apps Script existente e publicar nova versão da implantação Web App atual.
+- Executar validação manual no Preview fixo de `dev`, usando somente contas e endereços sintéticos.
 
 ## Critérios de conclusão da Etapa 2
 
