@@ -1,4 +1,4 @@
-import { ArrowRight, MapPin, Search, Sparkles } from "lucide-react";
+import { ArrowRight, MapPin, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -7,7 +7,7 @@ export default function HeroSearch({ query, city, onQueryChange, onCityChange, o
         <section className="hero-section" id="inicio" aria-labelledby="hero-title">
             <div className="hero-inner mx-auto grid w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="hero-content">
-                    <span className="eyebrow-pill"><Sparkles size={15} aria-hidden="true" />Conectando pessoas e serviços</span>
+                 
                     <h1 id="hero-title">Encontre serviços <span>perto de você.</span></h1>
                     <p className="hero-description">Descubra profissionais da sua região, conheça o que eles oferecem e encontre o caminho para entrar em contato.</p>
                     <form className="hero-search-form" role="search" onSubmit={onSubmit}>
@@ -35,14 +35,7 @@ export default function HeroSearch({ query, city, onQueryChange, onCityChange, o
                     </form>
                     <p className="search-hint">A busca considera os municípios de atendimento vinculados a cada serviço.</p>
                 </div>
-                <div className="hero-visual">
-                    <img src="https://images.pexels.com/photos/27928762/pexels-photo-27928762.jpeg?auto=compress&cs=tinysrgb&w=1600" alt="Profissional trabalhando em um painel elétrico residencial." fetchPriority="high" loading="eager" />
-                    <div className="hero-photo-caption">
-                        <span className="hero-caption-icon" aria-hidden="true"><Search size={17} /></span>
-                        <span><strong>Descubra novas possibilidades</strong><small>Serviços para diferentes necessidades do dia a dia</small></span>
-                    </div>
-                    <span className="hero-photo-note">Imagem ilustrativa</span>
-                </div>
+               
             </div>
         </section>
     );
