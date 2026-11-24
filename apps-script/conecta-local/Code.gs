@@ -772,7 +772,11 @@ function appStartEmailChange_(payload, nowMs, secret) {
         var nowIso = new Date(nowMs).toISOString();
         userRequests.forEach(function (item) {
             if (!item.utilizado_em && !item.invalidado_em) {
-                appUpdate_("CODIGOS_VERIFICACAO", item._row, { invalidado_em: nowIso });
+                appUpdate_("CODIGOS_VERIFICACAO", item._row, {
+                    invalidado_em: nowIso,
+                    email_destino: "",
+                    codigo_hmac: ""
+                });
             }
         });
 
@@ -837,27 +841,43 @@ function appConfirmEmailChange_(payload, nowMs, secret) {
 
         var expiresAt = new Date(record.expira_em).getTime();
         if (!Number.isFinite(expiresAt) || expiresAt <= nowMs) {
-            appUpdate_("CODIGOS_VERIFICACAO", record._row, { invalidado_em: new Date(nowMs).toISOString() });
+            appUpdate_("CODIGOS_VERIFICACAO", record._row, {
+                invalidado_em: new Date(nowMs).toISOString(),
+                email_destino: "",
+                codigo_hmac: ""
+            });
             throw appFault_("VERIFICATION_EXPIRED", "O código de alteração de e-mail expirou.");
         }
 
         var attempts = Number(record.tentativas || 0);
         if (!Number.isInteger(attempts) || attempts >= APP_VERIFICATION_MAX_ATTEMPTS) {
             if (!record.invalidado_em) {
-                appUpdate_("CODIGOS_VERIFICACAO", record._row, { invalidado_em: new Date(nowMs).toISOString() });
+                appUpdate_("CODIGOS_VERIFICACAO", record._row, {
+                    invalidado_em: new Date(nowMs).toISOString(),
+                    email_destino: "",
+                    codigo_hmac: ""
+                });
             }
             throw appFault_("VERIFICATION_FAILED", "O código de confirmação não confere.");
         }
 
         var email = appNormalizeEmail_(String(record.email_destino || ""));
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || email.length > 254) {
-            appUpdate_("CODIGOS_VERIFICACAO", record._row, { invalidado_em: new Date(nowMs).toISOString() });
+            appUpdate_("CODIGOS_VERIFICACAO", record._row, {
+                invalidado_em: new Date(nowMs).toISOString(),
+                email_destino: "",
+                codigo_hmac: ""
+            });
             throw appFault_("EMAIL_CHANGE_PENDING_NOT_FOUND", "A solicitação de alteração não é válida.");
         }
 
         var duplicate = appFindByEmail_(email);
         if (duplicate && String(duplicate.id_usuario) !== userId) {
-            appUpdate_("CODIGOS_VERIFICACAO", record._row, { invalidado_em: new Date(nowMs).toISOString() });
+            appUpdate_("CODIGOS_VERIFICACAO", record._row, {
+                invalidado_em: new Date(nowMs).toISOString(),
+                email_destino: "",
+                codigo_hmac: ""
+            });
             throw appFault_("EMAIL_ALREADY_EXISTS", "Este e-mail já possui cadastro.");
         }
 
@@ -866,13 +886,15 @@ function appConfirmEmailChange_(payload, nowMs, secret) {
             attempts += 1;
             appUpdate_("CODIGOS_VERIFICACAO", record._row, {
                 tentativas: attempts,
-                invalidado_em: attempts >= APP_VERIFICATION_MAX_ATTEMPTS ? new Date(nowMs).toISOString() : ""
+                invalidado_em: attempts >= APP_VERIFICATION_MAX_ATTEMPTS ? new Date(nowMs).toISOString() : "",
+                email_destino: attempts >= APP_VERIFICATION_MAX_ATTEMPTS ? "" : email,
+                codigo_hmac: attempts >= APP_VERIFICATION_MAX_ATTEMPTS ? "" : record.codigo_hmac
             });
             throw appFault_("VERIFICATION_FAILED", "O código informado não confere.");
         }
 
         var nowIso = new Date(nowMs).toISOString();
-        appUpdate_("CODIGOS_VERIFICACAO", record._row, { utilizado_em: nowIso });
+        appUpdate_("CODIGOS_VERIFICACAO", record._row, { utilizado_em: nowIso, email_destino: "", codigo_hmac: "" });
         appUpdate_("USUARIOS", state.user._row, {
             email: email,
             email_verificado_em: nowIso,
@@ -887,7 +909,11 @@ function appConfirmEmailChange_(payload, nowMs, secret) {
 
         candidates.slice(1).forEach(function (item) {
             if (!item.utilizado_em && !item.invalidado_em) {
-                appUpdate_("CODIGOS_VERIFICACAO", item._row, { invalidado_em: nowIso });
+                appUpdate_("CODIGOS_VERIFICACAO", item._row, {
+                    invalidado_em: nowIso,
+                    email_destino: "",
+                    codigo_hmac: ""
+                });
             }
         });
 
