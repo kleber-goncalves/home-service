@@ -39,6 +39,10 @@ const HEADERS = {
         "id_sessao", "id_usuario", "token_hash", "criado_em",
         "ultima_atividade_em", "expira_em", "revogada_em",
     ],
+    CODIGOS_VERIFICACAO: [
+        "id_codigo", "id_usuario", "finalidade", "email_destino", "codigo_hmac",
+        "criado_em", "expira_em", "tentativas", "utilizado_em", "invalidado_em",
+    ],
     CATEGORIAS: ["id_categoria", "nome", "status", "criado_em", "atualizado_em"],
     CIDADES: ["id_cidade", "nome", "uf", "codigo_ibge", "status", "criado_em", "atualizado_em"],
     SERVICOS: [
@@ -680,6 +684,197 @@ test("alteração de perfil ignora tentativa de trocar identidade, papel e estad
     assert.equal(audit.id_usuario_ator, USER_A);
     assert.equal(audit.id_registro_afetado, PROFILE_A);
     assert.equal(audit.resultado, "success");
+});
+
+
+test("auth.reauth.lookup deriva credenciais da sessão e limita tentativas por conta", () => {
+    const harness = createHarness();
+
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+        const result = harness.call("auth.reauth.lookup", { tokenHash: TOKEN_HASH_A });
+        assert.equal(result.ok, true);
+        assert.equal(result.data.idUsuario, USER_A);
+        assert.equal(result.data.status, "active");
+        assert.equal(result.data.algoritmo, "argon2id$v=19$m=19456,t=2,p=1");
+    }
+
+    const blocked = harness.call("auth.reauth.lookup", { tokenHash: TOKEN_HASH_A });
+    assert.equal(blocked.ok, false);
+    assert.equal(blocked.error.code, "REAUTH_RATE_LIMITED");
+
+    const reset = harness.call("auth.reauth.success", { tokenHash: TOKEN_HASH_A });
+    assert.equal(reset.ok, true);
+    assert.equal(reset.data.reauthenticated, true);
+
+    const allowedAgain = harness.call("auth.reauth.lookup", { tokenHash: TOKEN_HASH_A });
+    assert.equal(allowedAgain.ok, true);
+});
+
+test("email.change.start mantém o e-mail atual até a confirmação e grava somente HMAC do código", () => {
+    const harness = createHarness();
+    const started = harness.call("email.change.start", {
+        tokenHash: TOKEN_HASH_A,
+        newEmail: " Novo.Endereco@Example.Test ",
+        verificationCode: "135790",
+        id_usuario: USER_B,
+        email_destino: "forjado@example.test",
+    });
+
+    assert.equal(started.ok, true);
+    assert.equal(started.data.requested, true);
+    assert.equal(started.data.pendingEmail, "novo.endereco@example.test");
+    assert.equal(harness.records("USUARIOS").find((user) => user.id_usuario === USER_A).email, "profissional-a@example.test");
+
+    const code = harness.records("CODIGOS_VERIFICACAO")[0];
+    assert.equal(code.id_usuario, USER_A);
+    assert.equal(code.finalidade, "change_email");
+    assert.equal(code.email_destino, "novo.endereco@example.test");
+    assert.equal(code.tentativas, 0);
+    assert.equal(code.utilizado_em, "");
+    assert.equal(code.invalidado_em, "");
+    assert.match(code.codigo_hmac, /^[a-f0-9]{64}$/);
+    assert.equal(code.codigo_hmac.includes("135790"), false);
+
+    const audit = harness.records("AUDITORIA").find((event) => event.acao === "auth.change_email.request");
+    assert.ok(audit);
+    assert.equal(audit.id_usuario_ator, USER_A);
+    assert.equal(audit.id_registro_afetado, code.id_codigo);
+    assert.equal(audit.resultado, "success");
+    assert.equal(audit.detalhes.includes("135790"), false);
+    assert.equal(audit.detalhes.includes("novo.endereco"), false);
+});
+
+test("email.change.start rejeita e-mail cadastrado, endereço reservado e nova solicitação antes de 60 segundos", () => {
+    const harness = createHarness();
+
+    const duplicate = harness.call("email.change.start", {
+        tokenHash: TOKEN_HASH_A,
+        newEmail: "profissional-b@example.test",
+        verificationCode: "111111",
+    });
+    assert.equal(duplicate.ok, false);
+    assert.equal(duplicate.error.code, "EMAIL_ALREADY_EXISTS");
+
+    const first = harness.call("email.change.start", {
+        tokenHash: TOKEN_HASH_A,
+        newEmail: "reservado@example.test",
+        verificationCode: "222222",
+    });
+    assert.equal(first.ok, true);
+
+    const tooSoon = harness.call("email.change.start", {
+        tokenHash: TOKEN_HASH_A,
+        newEmail: "outro@example.test",
+        verificationCode: "333333",
+    });
+    assert.equal(tooSoon.ok, false);
+    assert.equal(tooSoon.error.code, "VERIFICATION_RESEND_TOO_SOON");
+
+    const reserved = harness.call("email.change.start", {
+        tokenHash: TOKEN_HASH_B,
+        newEmail: "reservado@example.test",
+        verificationCode: "444444",
+    });
+    assert.equal(reserved.ok, false);
+    assert.equal(reserved.error.code, "EMAIL_ALREADY_RESERVED");
+});
+
+test("email.change.confirm consome código, atualiza o e-mail e revoga todas as sessões do usuário", () => {
+    const harness = createHarness();
+    const started = harness.call("email.change.start", {
+        tokenHash: TOKEN_HASH_A,
+        newEmail: "confirmado@example.test",
+        verificationCode: "246810",
+    });
+    assert.equal(started.ok, true);
+
+    const wrong = harness.call("email.change.confirm", {
+        tokenHash: TOKEN_HASH_A,
+        code: "000000",
+    });
+    assert.equal(wrong.ok, false);
+    assert.equal(wrong.error.code, "VERIFICATION_FAILED");
+    assert.equal(harness.records("USUARIOS").find((user) => user.id_usuario === USER_A).email, "profissional-a@example.test");
+    assert.equal(harness.records("CODIGOS_VERIFICACAO")[0].tentativas, 1);
+
+    const confirmed = harness.call("email.change.confirm", {
+        tokenHash: TOKEN_HASH_A,
+        code: "246810",
+    });
+    assert.equal(confirmed.ok, true);
+    assert.equal(confirmed.data.changed, true);
+    assert.equal(confirmed.data.email, "confirmado@example.test");
+    assert.equal(confirmed.data.requiresLogin, true);
+
+    const userA = harness.records("USUARIOS").find((user) => user.id_usuario === USER_A);
+    assert.equal(userA.email, "confirmado@example.test");
+    assert.ok(userA.email_verificado_em);
+    const code = harness.records("CODIGOS_VERIFICACAO")[0];
+    assert.ok(code.utilizado_em);
+    assert.equal(code.invalidado_em, "");
+
+    const sessions = harness.records("SESSOES");
+    assert.ok(sessions.find((session) => session.id_usuario === USER_A).revogada_em);
+    assert.equal(sessions.find((session) => session.id_usuario === USER_B).revogada_em, "");
+
+    const oldSession = harness.call("session.me", { tokenHash: TOKEN_HASH_A });
+    assert.equal(oldSession.ok, false);
+    assert.equal(oldSession.error.code, "SESSION_INVALID");
+
+    const audit = harness.records("AUDITORIA").find((event) => event.acao === "auth.change_email.confirm");
+    assert.ok(audit);
+    assert.equal(audit.id_usuario_ator, USER_A);
+    assert.equal(audit.id_registro_afetado, USER_A);
+    assert.equal(audit.resultado, "success");
+});
+
+test("email.change.confirm invalida o código após cinco tentativas incorretas", () => {
+    const harness = createHarness();
+    harness.call("email.change.start", {
+        tokenHash: TOKEN_HASH_A,
+        newEmail: "tentativas@example.test",
+        verificationCode: "987654",
+    });
+
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+        const result = harness.call("email.change.confirm", {
+            tokenHash: TOKEN_HASH_A,
+            code: "000000",
+        });
+        assert.equal(result.ok, false);
+        assert.equal(result.error.code, "VERIFICATION_FAILED");
+    }
+
+    const record = harness.records("CODIGOS_VERIFICACAO")[0];
+    assert.equal(record.tentativas, 5);
+    assert.ok(record.invalidado_em);
+    assert.equal(harness.records("USUARIOS").find((user) => user.id_usuario === USER_A).email, "profissional-a@example.test");
+
+    const exhausted = harness.call("email.change.confirm", {
+        tokenHash: TOKEN_HASH_A,
+        code: "987654",
+    });
+    assert.equal(exhausted.ok, false);
+    assert.equal(exhausted.error.code, "EMAIL_CHANGE_PENDING_NOT_FOUND");
+});
+
+test("email.change.start e email.change.confirm exigem sessão profissional válida", () => {
+    const harness = createHarness({ userARole: "admin" });
+
+    const start = harness.call("email.change.start", {
+        tokenHash: TOKEN_HASH_A,
+        newEmail: "admin@example.test",
+        verificationCode: "555555",
+    });
+    assert.equal(start.ok, false);
+    assert.equal(start.error.code, "ROLE_FORBIDDEN");
+
+    const noSession = harness.call("email.change.confirm", {
+        tokenHash: "9".repeat(64),
+        code: "555555",
+    });
+    assert.equal(noSession.ok, false);
+    assert.equal(noSession.error.code, "SESSION_INVALID");
 });
 
 test("criação de serviço deriva o proprietário da sessão e ignora IDs de proprietário enviados", () => {
