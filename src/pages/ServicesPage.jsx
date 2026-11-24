@@ -40,7 +40,7 @@ export default function ServicesPage() {
                 <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                     <span className="section-eyebrow">Descubra opções na sua região</span>
                     <h1>Encontre o serviço que você procura.</h1>
-                    <p>Pesquise por necessidade, categoria ou localidade e conheça os serviços publicados.</p>
+                    <p>Pesquise por necessidade, categoria ou localidade. O catálogo reúne exemplos fictícios e serviços cadastrados.</p>
                 </div>
             </section>
             <section className="public-content-section">
@@ -65,17 +65,32 @@ export default function ServicesPage() {
                         <Button type="button" variant="outline" onClick={clearFilters} disabled={!hasFilters}><X size={15} aria-hidden="true" /> Limpar</Button>
                     </form>
                     <div className="catalog-results-heading">
-                        <div><span className="section-eyebrow">Catálogo público</span><h2>{catalog.loading ? "Carregando serviços..." : `${filteredServices.length} serviço${filteredServices.length === 1 ? "" : "s"} encontrado${filteredServices.length === 1 ? "" : "s"}`}</h2></div>
+                        <div>
+                            <span className="section-eyebrow">Catálogo público</span>
+                            <h2>{catalog.loading ? "Carregando serviços..." : `${filteredServices.length} serviço${filteredServices.length === 1 ? "" : "s"} encontrado${filteredServices.length === 1 ? "" : "s"}`}</h2>
+                            {!catalog.loading && (
+                                <div className="catalog-source-counts" aria-live="polite">
+                                    <span>{filteredServices.filter((service) => !service.isDemo).length} cadastrados</span>
+                                    <span>{filteredServices.filter((service) => service.isDemo).length} exemplos fictícios</span>
+                                </div>
+                            )}
+                        </div>
                         <span className="catalog-results-note"><Filter size={14} aria-hidden="true" />Filtros atualizados automaticamente</span>
                     </div>
-                    {catalog.loading ? <div className="catalog-state" role="status">Carregando os serviços publicados...</div>
-                        : catalog.error && catalog.services.length === 0 ? <div className="catalog-state catalog-state--error" role="alert">Não foi possível carregar o catálogo agora. Atualize a página para tentar novamente.</div>
-                            : filteredServices.length ? <div className="catalog-service-grid">{filteredServices.map((service) => <ServiceCard service={service} key={service.id} />)}</div>
-                                : <div className="catalog-state">
-                                    <h3>{catalog.services.length ? "Nenhum serviço corresponde aos filtros." : "Ainda não há serviços publicados."}</h3>
-                                    <p>{catalog.services.length ? "Experimente outra palavra ou remova algum filtro." : "Os serviços aparecerão aqui quando forem publicados por profissionais."}</p>
-                                    {hasFilters && <Button variant="outline" onClick={clearFilters}>Limpar filtros</Button>}
-                                </div>}
+                    {catalog.loading ? <div className="catalog-state" role="status">Carregando exemplos e serviços cadastrados...</div>
+                        : filteredServices.length ? <>
+                            {catalog.error && (
+                                <p className="catalog-inline-state catalog-inline-state--error" role="status">
+                                    Não foi possível atualizar os serviços cadastrados. Os exemplos fictícios locais continuam disponíveis.
+                                </p>
+                            )}
+                            <div className="catalog-service-grid">{filteredServices.map((service) => <ServiceCard service={service} key={service.id} />)}</div>
+                        </>
+                            : <div className="catalog-state">
+                                <h3>Nenhum serviço corresponde aos filtros.</h3>
+                                <p>Experimente outra palavra, remova a localidade ou limpe os filtros. Os exemplos fictícios não são associados a cidades reais.</p>
+                                {hasFilters && <Button variant="outline" onClick={clearFilters}>Limpar filtros</Button>}
+                            </div>}
                 </div>
             </section>
         </main>
