@@ -1,10 +1,10 @@
 # Modelagem lógica e física de dados — Conecta Local
 
 > **Versão:** 1.0  
-> **Data:** 2026-11-10  
-> **Status:** modelagem lógica e esquema físico aprovados conceitualmente; validações técnicas e implementação pendentes.  
+> **Data:** 2026-11-24  
+> **Status:** modelo lógico e esquema físico das 12 entidades aprovados como referência; implementação operacional parcial e integrada em `dev`. Estado operacional atualizado em 24/11/2026 na seção 12.  
 > **Escopo:** inventário lógico, esquema físico das 12 abas, campos, relacionamentos, integridade, estados e estratégia de persistência do MVP acadêmico.  
-> **Importante:** este documento descreve o modelo aprovado. O arquivo Google Sheets com as 12 abas e os 102 cabeçalhos foi criado e conferido pelo responsável pelo projeto; ele ainda não contém dados de negócio nem está integrado a um backend Apps Script operacional. As integrações com Drive também não estão implementadas.
+> **Importante:** este documento descreve o modelo lógico e o esquema físico de referência, não uma afirmação de que todas as 12 entidades já tenham fluxo operacional. O backend de demonstração em `dev` utiliza dez abas; `CONTROLE_AUTENTICACAO` e `DENUNCIAS` ainda não têm fluxos integrados. Imagens de serviços e fotos de perfil usam `IMAGENS` e Google Drive com rotas de upload/entrega já integradas. Consulte a seção 12 para separar o modelo aprovado do estado operacional.
 
 ## 1. Objetivo e limites
 
@@ -14,9 +14,9 @@ Este documento consolida a modelagem lógica derivada da [Especificação funcio
 - Catálogo e serviços: 5 entidades.
 - Governança: 2 entidades.
 
-A decisão aprovada é utilizar **um único arquivo Google Sheets com 12 abas**, uma para cada entidade. O Google Drive armazenará os arquivos de imagem; seus metadados e relacionamentos serão mantidos na aba `IMAGENS`.
+A modelagem aprovada prevê **um único arquivo Google Sheets com 12 abas**, uma por entidade. A demonstração operacional utiliza dez delas; `CONTROLE_AUTENTICACAO` e `DENUNCIAS` permanecem sem fluxo integrado. O Google Drive armazena imagens; metadados e relacionamentos são mantidos na aba `IMAGENS`.
 
-O projeto é uma demonstração acadêmica com dados sintéticos. Não deve receber credenciais, cadastros ou dados pessoais reais. A existência da estrutura no Google Sheets foi confirmada fora deste documento; isso não comprova integração, integridade relacional ou aplicação das regras pelo backend.
+O projeto é uma demonstração acadêmica com dados sintéticos. Não deve receber credenciais, cadastros ou dados pessoais reais. A implementação no Sheets não transforma a planilha em banco relacional: integridade, unicidade, autorização e estados dependem das validações realizadas no Apps Script.
 
 ### 1.1. Convenções de representação
 
@@ -390,7 +390,7 @@ A API do Drive alerta que permissões herdadas não podem ser revogadas diretame
 
 ### 7.3. Gravações de dados e auditoria no Sheets
 
-O arquivo de dados terá as 12 abas listadas na seção 2. Para operações que exigem auditoria, a alteração do registro de negócio e a inclusão do evento deverão integrar o mesmo `spreadsheets.batchUpdate`, usando requisições de células compatíveis (por exemplo, atualizações/inserções de células) no mesmo arquivo. A API valida as solicitações antes de aplicá-las e aplica o lote de forma atômica: se uma requisição for inválida, o lote inteiro falha e nenhuma das alterações daquele lote é aplicada.
+No modelo aprovado, as operações de negócio e auditoria estão descritas para uso de `spreadsheets.batchUpdate` no mesmo arquivo. A aplicação operacional existente deve ser consultada antes de afirmar que uma gravação específica usa um único lote; não presumir atomicidade das rotinas atuais. A API Sheets aplica atomicidade dentro de um único lote, mas isso não cria transação distribuída com o Drive ou outros serviços.
 
 Referência oficial: [Google Sheets API — spreadsheets.batchUpdate](https://developers.google.com/workspace/sheets/api/reference/rest/v4/spreadsheets/batchUpdate).
 
@@ -442,7 +442,7 @@ Não criar novas entidades para bairros, regiões, avaliações, favoritos, conv
 
 Esta seção registra o esquema físico aprovado e utilizado como referência para a planilha estrutural já criada do Conecta Local. Ela complementa o modelo lógico anterior: define nomes e ordem das colunas, tipo de célula no Google Sheets, valores controlados, campos opcionais e restrições operacionais.
 
-**Estado:** as 12 estruturas foram aprovadas conceitualmente e a planilha com as 12 abas e 102 cabeçalhos foi criada e conferida pelo responsável. A criação não significa que existam registros de negócio ou que a API Apps Script, autenticação, uploads ou integrações operacionais estejam implementados.
+**Estado do modelo:** as 12 estruturas e os 102 campos permanecem como esquema conceitual de referência. A implementação operacional atual utiliza dez abas, com autenticação, serviços, cobertura por cidades, imagens e auditoria no backend da demonstração. As abas `CONTROLE_AUTENTICACAO` e `DENUNCIAS` não possuem fluxos integrados.
 
 ### 11.1. Convenções gerais do arquivo
 
@@ -701,24 +701,34 @@ Nunca registrar senha, hash de senha, salt, parâmetros secretos, código de ver
 
 ## 12. Estado e próximos passos
 
-**Aprovado conceitualmente:**
+**Modelo aprovado como referência:**
 - inventário lógico de 12 entidades e 102 campos;
 - PKs, FKs, cardinalidades e unicidade;
 - regras de integridade, estados e visibilidade;
-- esquema físico das 12 abas, totalizando 102 colunas, com nomes, ordem, formatos, tipos de célula e validações;
+- esquema físico de referência das 12 abas, com nomes, ordem, formatos, tipos de célula e validações;
 - regras de privacidade, proteção e limites da persistência em Sheets/Drive.
 
-**Criado e conferido na planilha Google Sheets:**
-- arquivo estrutural com as 12 abas e os 102 cabeçalhos;
-- listas suspensas auxiliares aprovadas;
-- proteções e compartilhamento restrito, conforme conferência confirmada pelo responsável.
+**Estado operacional em 24/11/2026:**
 
-**Ainda não implementado:**
-- registros sintéticos de negócio;
-- projeto/API Apps Script operacional e integração com o frontend;
-- uploads e permissões efetivas do Drive;
-- autenticação, códigos e sessões;
-- provas de conceito técnicas.
+O backend da demonstração integrado em `dev` utiliza dez abas:
+- `USUARIOS`
+- `PROFISSIONAIS`
+- `SESSOES`
+- `CODIGOS_VERIFICACAO`
+- `CATEGORIAS`
+- `CIDADES`
+- `SERVICOS`
+- `SERVICO_CIDADES`
+- `IMAGENS`
+- `AUDITORIA`
 
-**Próxima etapa:** revisar a proposta em [ARQUITETURA_APPS_SCRIPT.md](./ARQUITETURA_APPS_SCRIPT.md) e executar as provas de conceito, começando por transporte/CORS entre Vercel e Apps Script. A planilha já foi criada; não é necessário repetir sua inicialização. Os fluxos de autenticação, concorrência, auditoria e permissões do Drive continuam bloqueados até validação técnica.
+As abas `CONTROLE_AUTENTICACAO` e `DENUNCIAS` fazem parte do modelo aprovado, mas ainda não possuem fluxos operacionais integrados. A autenticação, sessões, autorização, serviços, cidades e imagens estão implementados em algum grau no protótipo; detalhes, evidências e limites estão em `docs/AI_CONTEXT.md`, `docs/ESPECIFICACAO_MVP.md` e nos planos específicos.
 
+**Validações que continuam necessárias antes de qualquer uso real:**
+- revisão independente de segurança;
+- testes de carga, quotas e desempenho;
+- avaliação de concorrência e falhas parciais entre Sheets e Drive;
+- política de privacidade, retenção, backup e resposta a incidentes;
+- avaliação de arquitetura e infraestrutura caso o projeto deixe de ser demonstração acadêmica.
+
+**Próxima etapa de produto:** redesign visual/UX, descrito em `docs/PLANO_REDESIGN_INTERFACE.md`. Essa etapa não exige alterar o modelo de dados. A pesquisa comunitária permanece separada e depende da orientação do professor/orientador.
