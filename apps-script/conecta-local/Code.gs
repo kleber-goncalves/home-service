@@ -31,6 +31,10 @@ var APP_SESSION_IDLE_MS = 30 * 60 * 1000;
 var APP_SESSION_ABSOLUTE_MS = 8 * 60 * 60 * 1000;
 var APP_VERIFICATION_TTL_MS = 10 * 60 * 1000;
 var APP_VERIFICATION_MAX_ATTEMPTS = 5;
+var APP_EMAIL_CHANGE_RESEND_MS = 60 * 1000;
+var APP_REAUTH_RATE_PREFIX = "CONECTA_LOCAL_REAUTH_RATE_V1_";
+var APP_REAUTH_RATE_WINDOW_MS = 15 * 60 * 1000;
+var APP_REAUTH_MAX_ATTEMPTS = 5;
 var APP_PASSWORD_ALGORITHM = "argon2id$v=19$m=19456,t=2,p=1";
 
 var APP_ALLOWED_ACTIONS = [
@@ -40,6 +44,10 @@ var APP_ALLOWED_ACTIONS = [
     "auth.register",
     "auth.verify",
     "auth.lookup",
+    "auth.reauth.lookup",
+    "auth.reauth.success",
+    "email.change.start",
+    "email.change.confirm",
     "session.create",
     "session.me",
     "session.logout",
@@ -190,6 +198,10 @@ function appDispatch_(action, payload, nowMs, secret) {
     if (action === "auth.register") return appRegister_(payload, nowMs, secret);
     if (action === "auth.verify") return appVerifyEmail_(payload, nowMs, secret);
     if (action === "auth.lookup") return appLookupCredentials_(payload);
+    if (action === "auth.reauth.lookup") return appLookupReauthCredentials_(payload, nowMs);
+    if (action === "auth.reauth.success") return appReauthSuccess_(payload, nowMs);
+    if (action === "email.change.start") return appStartEmailChange_(payload, nowMs, secret);
+    if (action === "email.change.confirm") return appConfirmEmailChange_(payload, nowMs, secret);
     if (action === "session.create") return appCreateSession_(payload, nowMs);
     if (action === "session.me") return appSessionMe_(payload, nowMs);
     if (action === "session.logout") return appLogout_(payload, nowMs);
@@ -633,6 +645,266 @@ function appVerifyEmail_(payload, nowMs, secret) {
         return {
             verified: true,
             user: appSafeUser_(updatedUser, appGetProfile_(String(user.id_usuario)))
+        };
+    });
+}
+
+
+function appLookupReauthCredentials_(payload, nowMs) {
+    if (!appHasKeys_(payload, ["tokenHash"])) {
+        throw appFault_("INVALID_INPUT", "Não foi possível revalidar a senha.");
+    }
+
+    return appWithLock_(function () {
+        var state = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, true);
+        var properties = PropertiesService.getScriptProperties();
+        var key = APP_REAUTH_RATE_PREFIX + String(state.user.id_usuario);
+        var stored = properties.getProperty(key);
+        var rate = null;
+
+        if (stored) {
+            try { rate = JSON.parse(stored); } catch (error) { rate = null; }
+        }
+
+        if (
+            !rate
+            || !Number.isFinite(Number(rate.windowStartedAt))
+            || !Number.isInteger(Number(rate.attempts))
+            || nowMs - Number(rate.windowStartedAt) >= APP_REAUTH_RATE_WINDOW_MS
+            || nowMs < Number(rate.windowStartedAt)
+        ) {
+            rate = { windowStartedAt: nowMs, attempts: 0 };
+        }
+
+        if (Number(rate.attempts) >= APP_REAUTH_MAX_ATTEMPTS) {
+            throw appFault_("REAUTH_RATE_LIMITED", "Muitas tentativas de reautenticação. Aguarde 15 minutos.");
+        }
+
+        rate.attempts = Number(rate.attempts) + 1;
+        properties.setProperty(key, JSON.stringify(rate));
+
+        return {
+            idUsuario: String(state.user.id_usuario),
+            status: String(state.user.status),
+            algoritmo: String(state.user.senha_algoritmo),
+            salt: String(state.user.senha_salt),
+            hash: String(state.user.senha_hash)
+        };
+    });
+}
+
+function appReauthSuccess_(payload, nowMs) {
+    if (!appHasKeys_(payload, ["tokenHash"])) {
+        throw appFault_("INVALID_INPUT", "Não foi possível concluir a reautenticação.");
+    }
+
+    return appWithLock_(function () {
+        var state = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, true);
+        PropertiesService.getScriptProperties().deleteProperty(
+            APP_REAUTH_RATE_PREFIX + String(state.user.id_usuario)
+        );
+        return { reauthenticated: true };
+    });
+}
+
+function appStartEmailChange_(payload, nowMs, secret) {
+    if (!appHasKeys_(payload, ["tokenHash", "newEmail", "verificationCode"])) {
+        throw appFault_("INVALID_INPUT", "Informe o novo e-mail.");
+    }
+
+    var email = appNormalizeEmail_(payload.newEmail);
+    var code = String(payload.verificationCode || "");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || email.length > 254) {
+        throw appFault_("INVALID_EMAIL", "O e-mail informado é inválido.");
+    }
+    if (!/^\d{6}$/.test(code)) {
+        throw appFault_("VERIFICATION_CODE_INVALID", "Não foi possível gerar o código demonstrativo.");
+    }
+
+    return appWithLock_(function () {
+        var state = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, true);
+        var userId = String(state.user.id_usuario);
+        var currentEmail = appNormalizeEmail_(String(state.user.email));
+
+        if (email === currentEmail) {
+            throw appFault_("EMAIL_UNCHANGED", "O novo e-mail precisa ser diferente do endereço atual.");
+        }
+
+        var existingUser = appFindByEmail_(email);
+        if (existingUser && String(existingUser.id_usuario) !== userId) {
+            throw appFault_("EMAIL_ALREADY_EXISTS", "Este e-mail já possui cadastro.");
+        }
+
+        var codes = appRecords_("CODIGOS_VERIFICACAO");
+        var userRequests = codes.filter(function (item) {
+            return String(item.id_usuario) === userId
+                && String(item.finalidade) === "change_email";
+        }).sort(function (left, right) {
+            return String(right.criado_em).localeCompare(String(left.criado_em));
+        });
+        var latest = userRequests[0];
+
+        if (latest) {
+            var latestCreatedAt = new Date(latest.criado_em).getTime();
+            if (Number.isFinite(latestCreatedAt) && nowMs >= latestCreatedAt
+                && nowMs - latestCreatedAt < APP_EMAIL_CHANGE_RESEND_MS) {
+                throw appFault_("VERIFICATION_RESEND_TOO_SOON", "Aguarde 60 segundos antes de solicitar outro código.");
+            }
+        }
+
+        var reservedByAnotherUser = codes.some(function (item) {
+            if (
+                String(item.finalidade) !== "change_email"
+                || String(item.email_destino || "") !== email
+                || String(item.id_usuario) === userId
+                || item.utilizado_em
+                || item.invalidado_em
+                || Number(item.tentativas || 0) >= APP_VERIFICATION_MAX_ATTEMPTS
+            ) return false;
+            var expiresAt = new Date(item.expira_em).getTime();
+            return Number.isFinite(expiresAt) && expiresAt > nowMs;
+        });
+
+        if (reservedByAnotherUser) {
+            throw appFault_("EMAIL_ALREADY_RESERVED", "Este endereço possui uma solicitação de confirmação pendente.");
+        }
+
+        var nowIso = new Date(nowMs).toISOString();
+        userRequests.forEach(function (item) {
+            if (!item.utilizado_em && !item.invalidado_em) {
+                appUpdate_("CODIGOS_VERIFICACAO", item._row, { invalidado_em: nowIso });
+            }
+        });
+
+        var verificationId = Utilities.getUuid();
+        appAppend_("CODIGOS_VERIFICACAO", {
+            id_codigo: verificationId,
+            id_usuario: userId,
+            finalidade: "change_email",
+            email_destino: email,
+            codigo_hmac: appEmailChangeVerificationHmac_(secret, userId, email, code),
+            criado_em: nowIso,
+            expira_em: new Date(nowMs + APP_VERIFICATION_TTL_MS).toISOString(),
+            tentativas: 0,
+            utilizado_em: "",
+            invalidado_em: ""
+        });
+
+        appAudit_(
+            userId,
+            "user",
+            "auth.change_email.request",
+            "CODIGOS_VERIFICACAO",
+            verificationId,
+            "success",
+            "Solicitação demonstrativa de alteração de e-mail criada."
+        );
+
+        return {
+            requested: true,
+            pendingEmail: email,
+            expiresAt: new Date(nowMs + APP_VERIFICATION_TTL_MS).toISOString()
+        };
+    });
+}
+
+function appConfirmEmailChange_(payload, nowMs, secret) {
+    if (!appHasKeys_(payload, ["tokenHash", "code"])) {
+        throw appFault_("INVALID_INPUT", "Informe o código de confirmação.");
+    }
+
+    var code = String(payload.code || "");
+    if (!/^\d{6}$/.test(code)) {
+        throw appFault_("VERIFICATION_FAILED", "O código de confirmação é inválido.");
+    }
+
+    return appWithLock_(function () {
+        var state = appRequireProfessionalSession_(String(payload.tokenHash), nowMs, true);
+        var userId = String(state.user.id_usuario);
+        var candidates = appRecords_("CODIGOS_VERIFICACAO").filter(function (item) {
+            return String(item.id_usuario) === userId
+                && String(item.finalidade) === "change_email"
+                && !item.utilizado_em
+                && !item.invalidado_em;
+        }).sort(function (left, right) {
+            return String(right.criado_em).localeCompare(String(left.criado_em));
+        });
+
+        var record = candidates[0];
+        if (!record) {
+            throw appFault_("EMAIL_CHANGE_PENDING_NOT_FOUND", "Não há uma alteração de e-mail aguardando confirmação.");
+        }
+
+        var expiresAt = new Date(record.expira_em).getTime();
+        if (!Number.isFinite(expiresAt) || expiresAt <= nowMs) {
+            appUpdate_("CODIGOS_VERIFICACAO", record._row, { invalidado_em: new Date(nowMs).toISOString() });
+            throw appFault_("VERIFICATION_EXPIRED", "O código de alteração de e-mail expirou.");
+        }
+
+        var attempts = Number(record.tentativas || 0);
+        if (!Number.isInteger(attempts) || attempts >= APP_VERIFICATION_MAX_ATTEMPTS) {
+            if (!record.invalidado_em) {
+                appUpdate_("CODIGOS_VERIFICACAO", record._row, { invalidado_em: new Date(nowMs).toISOString() });
+            }
+            throw appFault_("VERIFICATION_FAILED", "O código de confirmação não confere.");
+        }
+
+        var email = appNormalizeEmail_(String(record.email_destino || ""));
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || email.length > 254) {
+            appUpdate_("CODIGOS_VERIFICACAO", record._row, { invalidado_em: new Date(nowMs).toISOString() });
+            throw appFault_("EMAIL_CHANGE_PENDING_NOT_FOUND", "A solicitação de alteração não é válida.");
+        }
+
+        var duplicate = appFindByEmail_(email);
+        if (duplicate && String(duplicate.id_usuario) !== userId) {
+            appUpdate_("CODIGOS_VERIFICACAO", record._row, { invalidado_em: new Date(nowMs).toISOString() });
+            throw appFault_("EMAIL_ALREADY_EXISTS", "Este e-mail já possui cadastro.");
+        }
+
+        var expected = appEmailChangeVerificationHmac_(secret, userId, email, code);
+        if (!appConstantTimeHexEquals_(expected, String(record.codigo_hmac))) {
+            attempts += 1;
+            appUpdate_("CODIGOS_VERIFICACAO", record._row, {
+                tentativas: attempts,
+                invalidado_em: attempts >= APP_VERIFICATION_MAX_ATTEMPTS ? new Date(nowMs).toISOString() : ""
+            });
+            throw appFault_("VERIFICATION_FAILED", "O código informado não confere.");
+        }
+
+        var nowIso = new Date(nowMs).toISOString();
+        appUpdate_("CODIGOS_VERIFICACAO", record._row, { utilizado_em: nowIso });
+        appUpdate_("USUARIOS", state.user._row, {
+            email: email,
+            email_verificado_em: nowIso,
+            atualizado_em: nowIso
+        });
+
+        appRecords_("SESSOES").filter(function (session) {
+            return String(session.id_usuario) === userId && !session.revogada_em;
+        }).forEach(function (session) {
+            appUpdate_("SESSOES", session._row, { revogada_em: nowIso });
+        });
+
+        candidates.slice(1).forEach(function (item) {
+            if (!item.utilizado_em && !item.invalidado_em) {
+                appUpdate_("CODIGOS_VERIFICACAO", item._row, { invalidado_em: nowIso });
+            }
+        });
+
+        appAudit_(
+            userId,
+            "user",
+            "auth.change_email.confirm",
+            "USUARIOS",
+            userId,
+            "success",
+            "E-mail atualizado após confirmação demonstrativa; sessões revogadas."
+        );
+
+        return {
+            changed: true,
+            email: email,
+            requiresLogin: true
         };
     });
 }
@@ -2312,6 +2584,11 @@ function appIsPlainObject_(value) {
 
 function appVerificationHmac_(secret, userId, code) {
     var message = ["CONECTA_LOCAL_EMAIL_VERIFY_V1", userId, code].join("\n");
+    return appBytesToHex_(Utilities.computeHmacSha256Signature(message, secret, Utilities.Charset.UTF_8));
+}
+
+function appEmailChangeVerificationHmac_(secret, userId, email, code) {
+    var message = ["CONECTA_LOCAL_EMAIL_CHANGE_V1", userId, email, code].join("\n");
     return appBytesToHex_(Utilities.computeHmacSha256Signature(message, secret, Utilities.Charset.UTF_8));
 }
 
