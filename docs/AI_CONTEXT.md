@@ -403,9 +403,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 6189fe2f64b40221232453a5c08c18bb58145985
-- **Data do commit:** 2026-11-24T13:11:19-03:00
-- **Mensagem do commit:** docs(email): ajustar referências ao branch dev
+- **Commit de referência:** f8361e1331ca75d0efb6d9ac3839bbe6a8c4a87d
+- **Data do commit:** 2026-11-24T13:12:17-03:00
+- **Mensagem do commit:** test(email): verificar limpeza de dados do código consumido
 - **Branch desta execução:** feat/alteracao-email-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -530,13 +530,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| f8361e1 | 2026-11-24 | test(email): verificar limpeza de dados do código consumido |
+| f8087ce | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 6189fe2 | 2026-11-24 | docs(email): ajustar referências ao branch dev |
 | 7a85c3f | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 02902ba | 2026-11-24 | fix(email): mapear confirmação para ação interna do Apps Script |
 | e6f6e3a | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 1c38a7d | 2026-11-24 | fix(email): limpar destino e HMAC após uso ou invalidação |
 | bd2690c | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| 9c3f2bf | 2026-11-24 | docs(email): corrigir formatação do plano da etapa 4 |
-| 4847cf3 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
