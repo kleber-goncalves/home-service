@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 5e42e07c8dd37dc20aba36086ddf45d8269f9bac
-- **Data do commit:** 2026-11-24T14:00:23-03:00
-- **Mensagem do commit:** docs(architecture): atualizar estado real da integracao
+- **Commit de referência:** aee904ce09ba545c82376badc1c3f1dc7019d501
+- **Data do commit:** 2026-11-24T14:00:39-03:00
+- **Mensagem do commit:** docs(modelagem): atualizar estado operacional e referencias
 - **Branch desta execução:** docs/roadmap-redesign-interface
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -541,13 +541,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| aee904c | 2026-11-24 | docs(modelagem): atualizar estado operacional e referencias |
+| c1c8d80 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 5e42e07 | 2026-11-24 | docs(architecture): atualizar estado real da integracao |
 | a4c0b65 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 5c9e59e | 2026-11-24 | docs(roadmap): corrigir prioridades e proxima etapa |
 | 604c7b1 | 2026-11-24 | docs(spec): corrigir status de e-mail e imagens |
 | 0188adf | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 72ee575 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| f7aca65 | 2026-11-24 | docs(report): atualizar referencias e nota de versao |
-| f0ff9d5 | 2026-11-24 | docs(research): registrar redesign antes da coleta |
 
 <!-- END AUTO-GENERATED SECTION -->
