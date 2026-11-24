@@ -414,10 +414,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** f3cac4ee8312b521c9f986f00b6d7125e6a6df91
-- **Data do commit:** 2026-11-24T14:04:38-03:00
-- **Mensagem do commit:** docs(architecture): distinguir rotas atuais de referencias historicas
-- **Branch desta execução:** docs/roadmap-redesign-interface
+- **Commit de referência:** 344e957ec618e12786d2cbecdb0212d2095bfb5c
+- **Data do commit:** 2026-11-24T14:08:03-03:00
+- **Mensagem do commit:** Merge pull request #35 from kleber-goncalves/docs/roadmap-redesign-interface
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -541,13 +541,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 344e957 | 2026-11-24 | Merge pull request #35 from kleber-goncalves/docs/roadmap-redesign-interface |
+| 7581d56 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | f3cac4e | 2026-11-24 | docs(architecture): distinguir rotas atuais de referencias historicas |
 | 45bb540 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 8b5ca5e | 2026-11-24 | docs(report): registrar testes das jornadas recentes |
 | 02e29a1 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | d868e4c | 2026-11-24 | docs(modelagem): atualizar kdf e evidencias das validacoes |
 | b7a2bfa | 2026-11-24 | docs(architecture): corrigir rotas same-origin |
-| 95b42e3 | 2026-11-24 | docs(roadmap): corrigir limite do fluxo de e-mail |
-| 82d7536 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
