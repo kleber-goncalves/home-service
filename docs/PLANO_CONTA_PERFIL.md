@@ -76,14 +76,23 @@ Escopo implementado na branch:
 
 ### Etapa 4 — Alteração de e-mail
 
-**Status: planejada.**
+**Status: implementação em andamento na branch \`feat/alteracao-email-profissional\`; ainda não integrada em \`dev\` nem validada manualmente.**
 
-- Exigir reautenticação com a senha atual.
-- Normalizar e verificar a unicidade do novo e-mail.
-- Emitir código de uso único com finalidade `change_email`.
-- Só substituir `USUARIOS.email` após confirmação válida.
-- Invalidar sessões ou exigir novo login conforme política definida e auditada.
-- O código demonstrativo atual é exibido na tela e não envia e-mail; a etapa não deve simular entrega real.
+Implementação preparada:
+
+- Solicitar a senha atual e validar novamente com Argon2id no gateway; o Apps Script devolve os dados de verificação somente ao servidor, nunca ao navegador.
+- Normalizar o novo endereço, validar formato/tamanho e verificar unicidade dentro do bloqueio de concorrência do Apps Script.
+- Reservar temporariamente o destino em \`CODIGOS_VERIFICACAO\`, com finalidade \`change_email\`; o e-mail atual permanece intacto até a confirmação.
+- Armazenar HMAC vinculado ao usuário, ao novo endereço e ao código; validade de 10 minutos, cinco tentativas e intervalo mínimo de 60 segundos entre solicitações.
+- No sucesso, consumir o código, atualizar \`USUARIOS.email\` e \`email_verificado_em\`, invalidar outros códigos pendentes, revogar todas as sessões e exigir novo login.
+- Registrar solicitações e confirmações na aba \`AUDITORIA\`, sem gravar código, senha ou endereço de destino nos detalhes do evento.
+- Exibir o código somente como recurso demonstrativo na interface. Nenhum e-mail é enviado e a interface informa essa limitação.
+
+**Integração e validação pendentes:**
+
+- Concluir os testes automatizados de Apps Script e gateway, lint e build pela CI.
+- Integrar por PR em \`dev\), sincronizar o \`Code.gs\` no projeto Apps Script existente e publicar nova versão da implantação Web App atual.
+- Executar validação manual no Preview fixo de \`dev\), usando somente contas e endereços sintéticos.
 
 ## Critérios de conclusão da Etapa 2
 
@@ -105,6 +114,20 @@ Escopo implementado na branch:
 - [x] A foto aparece no cabeçalho e na área da conta após upload e após restauração da sessão.
 - [x] A remoção restringe o arquivo, marca o registro como removido e retira a foto da sessão.
 - [x] CI pós-merge aprovada e validação manual confirmada pelo responsável.
+
+
+## Critérios de conclusão da Etapa 4
+
+- [ ] A senha atual é revalidada no servidor; uma senha incorreta não gera solicitação.
+- [ ] Dados de identidade e destino são derivados/validados no backend; o navegador não define o proprietário.
+- [ ] E-mail é normalizado, validado e protegido contra duplicidade e reserva concorrente.
+- [ ] O endereço atual permanece ativo até a confirmação do código.
+- [ ] Código de uso único tem HMAC vinculado a usuário e destino, validade de 10 minutos e limite de cinco tentativas.
+- [ ] Nova emissão respeita intervalo mínimo de 60 segundos.
+- [ ] Confirmação atualiza e verifica o e-mail somente uma vez.
+- [ ] Todas as sessões anteriores são revogadas e a interface exige novo login.
+- [ ] Eventos são auditados sem segredos, credenciais, códigos ou dados desnecessários.
+- [ ] CI aprovada e validação manual concluída no Preview com Apps Script atualizado.
 
 ## Limites
 
