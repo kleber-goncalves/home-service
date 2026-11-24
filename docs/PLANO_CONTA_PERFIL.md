@@ -76,7 +76,7 @@ Escopo implementado na branch:
 
 ### Etapa 4 — Alteração de e-mail
 
-**Status: implementação em andamento na branch `feat/alteracao-email-profissional`; ainda não integrada em `dev` nem validada manualmente.**
+**Status: integrada em `dev` pela PR #34, merge commit `9aa91e089b689602dd5fd6743bab10f95f7175cf`. A validação automatizada da PR passou; a validação manual integrada ainda depende da sincronização/publicação do Apps Script e dos testes no Preview.**
 
 Implementação preparada:
 
@@ -88,10 +88,10 @@ Implementação preparada:
 - Registrar solicitações e confirmações na aba `AUDITORIA`, sem gravar código, senha ou endereço de destino nos detalhes do evento.
 - Exibir o código somente como recurso demonstrativo na interface. Nenhum e-mail é enviado e a interface informa essa limitação.
 
-**Integração e validação pendentes:**
+**Validação integrada pendente:**
 
-- Concluir os testes automatizados de Apps Script e gateway, lint e build pela CI.
-- Integrar por PR em `dev`, sincronizar o `Code.gs` no projeto Apps Script existente e publicar nova versão da implantação Web App atual.
+- A CI da PR #34 executou os testes de autorização/Apps Script e gateway, ESLint, validação do registro de ocorrências e build; resultado SUCCESS em [Validate Home Service #45434385314](https://github.com/kleber-goncalves/home-service/actions/runs/45434385314).
+- Sincronizar o `Code.gs` deste branch `dev` com o projeto Apps Script existente e publicar nova versão da implantação Web App atual, preservando a URL.
 - Executar validação manual no Preview fixo de `dev`, usando somente contas e endereços sintéticos.
 
 ## Critérios de conclusão da Etapa 2
@@ -118,16 +118,16 @@ Implementação preparada:
 
 ## Critérios de conclusão da Etapa 4
 
-- [ ] A senha atual é revalidada no servidor; uma senha incorreta não gera solicitação.
-- [ ] Dados de identidade e destino são derivados/validados no backend; o navegador não define o proprietário.
-- [ ] E-mail é normalizado, validado e protegido contra duplicidade e reserva concorrente.
-- [ ] O endereço atual permanece ativo até a confirmação do código.
-- [ ] Código de uso único tem HMAC vinculado a usuário e destino, validade de 10 minutos e limite de cinco tentativas.
-- [ ] Nova emissão respeita intervalo mínimo de 60 segundos.
-- [ ] Confirmação atualiza e verifica o e-mail somente uma vez.
-- [ ] Todas as sessões anteriores são revogadas e a interface exige novo login.
-- [ ] Eventos são auditados sem segredos, credenciais, códigos ou dados desnecessários.
-- [ ] CI aprovada e validação manual concluída no Preview com Apps Script atualizado.
+- [x] A senha atual é revalidada no servidor; uma senha incorreta não gera solicitação.
+- [x] Dados de identidade e destino são derivados/validados no backend; o navegador não define o proprietário.
+- [x] E-mail é normalizado, validado e protegido contra duplicidade e reserva concorrente.
+- [x] O endereço atual permanece ativo até a confirmação do código.
+- [x] Código de uso único tem HMAC vinculado a usuário e destino, validade de 10 minutos e limite de cinco tentativas.
+- [x] Nova emissão respeita intervalo mínimo de 60 segundos.
+- [x] Confirmação atualiza e verifica o e-mail somente uma vez.
+- [x] Todas as sessões anteriores são revogadas e a interface exige novo login.
+- [x] Eventos são auditados sem segredos, credenciais, códigos ou dados desnecessários.
+- [ ] CI pós-merge confirmada e validação manual concluída no Preview com Apps Script atualizado.
 
 ## Limites
 
