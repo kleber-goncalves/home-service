@@ -4,7 +4,7 @@
 > **Data da atualização:** 2026-11-24  
 > **Estado atual — 24/11/2026:** o núcleo funcional, catálogo público, gestão de perfil e fluxos de imagens estão integrados à branch `dev`. A demonstração utiliza Vercel Functions como gateway, Apps Script como autoridade de negócio, Google Sheets com dez abas operacionais e Google Drive para imagens. As PRs #28/#29 integraram catálogo e gateway de imagens; as PRs #32–#34 integraram edição do perfil, foto de perfil e alteração demonstrativa de e-mail. `main`/Production continua sendo vitrine pública, sem backend habilitado. A POC-04 (#14) permanece independente e desabilitada; seus dois itens de hardening impedem qualquer reativação. A próxima frente é o redesign visual/UX, documentado em `docs/PLANO_REDESIGN_INTERFACE.md`. A integração não equivale a auditoria independente, certificação ou aprovação para produção.
 > **Escopo:** integração React/Vite, Google Apps Script, Google Sheets e Google Drive para a demonstração acadêmica.  
-> **Premissa:** manter Apps Script como autoridade de domínio e sessão; Vercel Functions atua apenas como gateway HTTP. Qualquer fluxo de autenticação e sessão deverá ser aprovado em provas isoladas com dados sintéticos.
+> **Premissa:** manter Apps Script como autoridade de domínio e sessão; Vercel Functions atua apenas como gateway HTTP. Os fluxos principais de autenticação e sessão já estão integrados e foram validados no Preview com dados fictícios; mudanças futuras exigem testes proporcionais e revisão dos limites de segurança.
 
 ## 1. Objetivo e estado real
 
@@ -51,10 +51,10 @@ O projeto continua sendo uma demonstração acadêmica com dados sintéticos. N�
 ## 3. Visão geral da arquitetura
 
 Navegador do visitante/profissional  
-↓ mesma origem: POST /api/backend  
+↓ mesma origem: POST /api/app, POST /api/images ou GET /api/public-images  
 Frontend React + Vite — hospedagem Vercel  
 ↓  
-Vercel Function — gateway HTTP server-side  
+Vercel Functions — gateway HTTP server-side  
 - valida método, formato, tamanho e contrato de entrada;
 - aplica controles de borda e timeout;
 - autentica a chamada servidor-servidor;
@@ -132,6 +132,8 @@ A Vercel Function pode emitir uma resposta HTTP própria para o navegador, separ
 
 O responsável confirmou a revalidação do fluxo principal no Preview atualizado de `dev` em 20/11/2026. A POC-04 é um experimento separado de sessão sintética; foi mesclada em `dev`, mas continua desabilitada e não faz parte desta autenticação.
 ## 5. Comunicação React/Vite ↔ Vercel Function ↔ Apps Script
+
+> **Nota de histórico:** as subseções 5.6–5.8 descrevem o desenho das POCs iniciais e podem citar a rota candidata `/api/backend`. Elas são referência histórica do transporte; a aplicação integrada atual usa `POST /api/app` para operações de negócio e rotas separadas para upload/entrega de imagens, conforme a seção 1. Não implementar novas chamadas usando a rota antiga sem verificar o código atual.
 
 ### 5.1. Navegador → Vercel Function
 
