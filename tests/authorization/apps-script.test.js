@@ -812,6 +812,8 @@ test("email.change.confirm consome código, atualiza o e-mail e revoga todas as 
     const code = harness.records("CODIGOS_VERIFICACAO")[0];
     assert.ok(code.utilizado_em);
     assert.equal(code.invalidado_em, "");
+    assert.equal(code.email_destino, "");
+    assert.equal(code.codigo_hmac, "");
 
     const sessions = harness.records("SESSOES");
     assert.ok(sessions.find((session) => session.id_usuario === USER_A).revogada_em);
