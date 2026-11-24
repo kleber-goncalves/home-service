@@ -2,6 +2,7 @@ import { ArrowRight, BriefcaseBusiness } from "lucide-react";
 import { useState } from "react";
 import SiteHeader from "@/components/home/site-header";
 import HeroSearch from "@/components/home/hero-search";
+import CategoryFeaturedServices from "@/components/home/category-featured-services";
 import {
     AboutSection,
     FAQSection,
@@ -35,6 +36,13 @@ export default function HomePage() {
             <SiteHeader active="inicio" />
             <main id="conteudo" tabIndex="-1">
                 <HeroSearch query={query} city={city} onQueryChange={setQuery} onCityChange={setCity} onSubmit={submitSearch} availableCities={catalog.cities} />
+
+                <CategoryFeaturedServices
+                    categories={catalog.categories}
+                    services={catalog.services}
+                    loading={catalog.loading}
+                    error={catalog.error}
+                />
 
                 <section className="public-home-section public-home-services" id="servicos" aria-labelledby="home-services-title">
                     <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
