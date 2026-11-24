@@ -182,7 +182,7 @@ Não reabrir esta etapa sem um bug reproduzível ou mudança de requisito.
 
 **Limites e itens fora desta etapa:** foto de perfil, galeria avançada, ordenação por arrastar e soltar, compressão/otimização de imagens, painel administrativo de mídia e operação em Production. Não declarar como testes manuais realizados nesta rodada repetição individual de todos os formatos, interrupção deliberada de blocos ou falha forçada entre Drive e Sheets.
 
-**Ambiente:** a funcionalidade está em `dev` e no Preview de desenvolvimento. `main` e Production permanecem inalteradas e sem backend habilitado. A próxima etapa do roadmap é a Etapa 5; qualquer promoção futura para Production exige decisão e revisão específicas.
+**Ambiente:** a funcionalidade está em `dev` e no Preview de desenvolvimento. `main` e Production permanecem inalteradas e sem backend habilitado. A Etapa 5 foi concluída funcionalmente pelas PRs #28 e #29; a próxima etapa do roadmap é a Etapa 6 — redesign visual/UX. Qualquer promoção futura para Production exige decisão e revisão específicas.
 
 ### Etapa 5 — Catálogo público, navegação e apresentação das imagens
 
@@ -271,11 +271,11 @@ Reavaliar somente quando houver exigência acadêmica explícita ou uma necessid
 
 ## 6. Ordem prática recomendada
 
-1. **Agora:** iniciar a Etapa 5 — catálogo público, navegação e apresentação das imagens — em uma branch de funcionalidade derivada de `dev`, seguindo `docs/PLANO_CATALOGO_PUBLICO_E_NAVEGACAO.md`.
-2. **Depois:** retomar a Etapa 6 — pesquisa comunitária — somente após orientação do professor do curso Técnico em Informática e confirmação do procedimento aplicável. A coleta permanece pendente.
+1. **Agora:** iniciar a Etapa 6 — redesign visual e experiência da interface — seguindo `docs/PLANO_REDESIGN_INTERFACE.md`. Começar pelo diagnóstico visual e pela exploração de direção de arte; não alterar código em larga escala antes de definir a linguagem visual.
+2. **Depois:** retomar a Etapa 7 — pesquisa comunitária — somente após a orientação do professor do curso Técnico em Informática e confirmação do procedimento aplicável. A coleta permanece pendente.
 3. **Na preparação da entrega:** revisar acessibilidade, responsividade, roteiro de demonstração e relatório acadêmico, registrando apenas funcionalidades e resultados efetivamente concluídos.
 
-Trabalhar uma etapa por branch/PR, sempre partindo de `dev`. Integrar somente depois das verificações pertinentes. Não alterar `main` sem uma decisão explícita de publicação.
+A Etapa 5 (catálogo público) está integrada pelas PRs #28 e #29; não reiniciá-la como nova funcionalidade. Seus critérios de navegação e apresentação ainda podem ser reavaliados durante o redesign. Trabalhar uma etapa por branch/PR, sempre partindo de `dev`. Integrar somente depois das verificações pertinentes. Não alterar `main` sem uma decisão explícita de publicação.
 
 ## 7. Critério de sucesso do projeto de estudos
 
