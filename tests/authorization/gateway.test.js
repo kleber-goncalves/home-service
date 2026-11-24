@@ -41,7 +41,7 @@ function buildRequest(action, payload, options = {}) {
     });
 }
 
-function createHarness(fetchImpl) {
+function createHarness(fetchImpl, options = {}) {
     return createAppHandler({
         env: {
             VERCEL_ENV: "preview",
@@ -51,6 +51,7 @@ function createHarness(fetchImpl) {
         },
         fetchImpl,
         now: () => Date.UTC(2026, 10, 20, 12, 0, 0),
+        ...options,
     });
 }
 
@@ -394,6 +395,182 @@ test("gateway encaminha somente uploadId e sessão para status/cancel da foto de
             tokenHash: createHash("sha256").update(SESSION_TOKEN, "utf8").digest("hex"),
         });
     }
+});
+
+
+test("gateway reautentica a conta, não encaminha a senha ao Apps Script e só então inicia a troca de e-mail", async () => {
+    const forwarded = [];
+    const handler = createHarness(async (_url, options) => {
+        const form = new URLSearchParams(options.body);
+        const action = form.get("action");
+        const payload = JSON.parse(form.get("payload"));
+        forwarded.push({ action, payload });
+
+        const data = action === "auth.reauth.lookup"
+            ? {
+                idUsuario: "user-synthetic",
+                status: "active",
+                algoritmo: "argon2id$v=19$m=19456,t=2,p=1",
+                salt: "a".repeat(32),
+                hash: "b".repeat(64),
+            }
+            : action === "auth.reauth.success"
+                ? { reauthenticated: true }
+                : {
+                    requested: true,
+                    pendingEmail: "new-address@example.test",
+                    expiresAt: "2026-11-20T12:10:00.000Z",
+                };
+
+        return {
+            ok: true,
+            status: 200,
+            redirected: true,
+            url: "https://script.googleusercontent.com/macros/echo?authorization-test=1",
+            async text() {
+                return JSON.stringify({ ok: true, action, requestId: form.get("requestId"), data });
+            },
+        };
+    }, {
+        derivePasswordHashImpl: async (password, salt) => {
+            assert.equal(password, "synthetic-current-password");
+            assert.equal(salt, "a".repeat(32));
+            return Buffer.from("b".repeat(64), "hex");
+        },
+        randomIntImpl: () => 123456,
+    });
+
+    const response = await handler(buildRequest("auth.email.change.start", {
+        currentPassword: "synthetic-current-password",
+        newEmail: " New-Address@Example.Test ",
+        id_usuario: "attacker-user",
+        tokenHash: "9".repeat(64),
+        email_destino: "attacker@example.test",
+        verificationCode: "999999",
+    }));
+    const body = await response.json();
+    const expectedTokenHash = createHash("sha256").update(SESSION_TOKEN, "utf8").digest("hex");
+
+    assert.equal(response.status, 200);
+    assert.equal(body.ok, true);
+    assert.equal(body.data.pendingEmail, "new-address@example.test");
+    assert.equal(body.data.verificationCode, "123456");
+    assert.deepEqual(forwarded.map((item) => item.action), [
+        "auth.reauth.lookup",
+        "auth.reauth.success",
+        "email.change.start",
+    ]);
+    assert.deepEqual(forwarded[0].payload, { tokenHash: expectedTokenHash });
+    assert.deepEqual(forwarded[1].payload, { tokenHash: expectedTokenHash });
+    assert.deepEqual(forwarded[2].payload, {
+        tokenHash: expectedTokenHash,
+        newEmail: " New-Address@Example.Test ",
+        verificationCode: "123456",
+    });
+    assert.equal(JSON.stringify(forwarded).includes("synthetic-current-password"), false);
+    assert.equal(JSON.stringify(forwarded).includes("attacker-user"), false);
+    assert.ok((response.headers.get("set-cookie") || "").startsWith(COOKIE_NAME + "=" + SESSION_TOKEN));
+    assert.match(response.headers.get("set-cookie") || "", /HttpOnly/);
+});
+
+test("gateway não cria solicitação de troca de e-mail quando a senha atual está incorreta", async () => {
+    const actions = [];
+    const handler = createHarness(async (_url, options) => {
+        const form = new URLSearchParams(options.body);
+        const action = form.get("action");
+        actions.push(action);
+        const data = {
+            idUsuario: "user-synthetic",
+            status: "active",
+            algoritmo: "argon2id$v=19$m=19456,t=2,p=1",
+            salt: "a".repeat(32),
+            hash: "b".repeat(64),
+        };
+        return {
+            ok: true,
+            status: 200,
+            redirected: true,
+            url: "https://script.googleusercontent.com/macros/echo?authorization-test=1",
+            async text() {
+                return JSON.stringify({ ok: true, action, requestId: form.get("requestId"), data });
+            },
+        };
+    }, {
+        derivePasswordHashImpl: async () => Buffer.alloc(32, 0xCC),
+        randomIntImpl: () => 123456,
+    });
+
+    const response = await handler(buildRequest("auth.email.change.start", {
+        currentPassword: "wrong-password-value",
+        newEmail: "new-address@example.test",
+    }));
+    const body = await response.json();
+
+    assert.equal(response.status, 401);
+    assert.equal(body.error.code, "INVALID_CURRENT_PASSWORD");
+    assert.deepEqual(actions, ["auth.reauth.lookup"]);
+    assert.equal(response.headers.get("set-cookie"), null);
+});
+
+test("gateway encaminha somente código e sessão na confirmação e remove cookie após revogação", async () => {
+    let forwarded;
+    const handler = createHarness(async (_url, options) => {
+        const form = new URLSearchParams(options.body);
+        forwarded = {
+            action: form.get("action"),
+            payload: JSON.parse(form.get("payload")),
+        };
+        return {
+            ok: true,
+            status: 200,
+            redirected: true,
+            url: "https://script.googleusercontent.com/macros/echo?authorization-test=1",
+            async text() {
+                return JSON.stringify({
+                    ok: true,
+                    action: form.get("action"),
+                    requestId: form.get("requestId"),
+                    data: { changed: true, email: "new-address@example.test", requiresLogin: true },
+                });
+            },
+        };
+    });
+
+    const response = await handler(buildRequest("auth.email.change.confirm", {
+        code: "123456",
+        email: "attacker@example.test",
+        id_usuario: "attacker-user",
+        tokenHash: "9".repeat(64),
+        papel: "admin",
+    }));
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(body.data.changed, true);
+    assert.equal(forwarded.action, "email.change.confirm");
+    assert.deepEqual(forwarded.payload, {
+        code: "123456",
+        tokenHash: createHash("sha256").update(SESSION_TOKEN, "utf8").digest("hex"),
+    });
+    assert.match(response.headers.get("set-cookie") || "", /Max-Age=0/);
+    assert.match(response.headers.get("set-cookie") || "", /HttpOnly/);
+});
+
+test("gateway exige CSRF para as ações de alteração de e-mail", async () => {
+    let fetchCalled = false;
+    const handler = createHarness(async () => {
+        fetchCalled = true;
+        throw new Error("O upstream não deveria ser chamado.");
+    });
+
+    const response = await handler(buildRequest("auth.email.change.confirm", {
+        code: "123456",
+    }, { headers: { "X-CSRF-Token": "0".repeat(64) } }));
+    const body = await response.json();
+
+    assert.equal(response.status, 403);
+    assert.equal(body.error.code, "CSRF_REJECTED");
+    assert.equal(fetchCalled, false);
 });
 
 test("gateway permite remover foto de perfil apenas com imageId e sessão derivada", async () => {
