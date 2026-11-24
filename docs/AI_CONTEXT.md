@@ -403,9 +403,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 1c38a7d0e5890b9ace604d0628471891b6afdf4f
-- **Data do commit:** 2026-11-24T13:09:30-03:00
-- **Mensagem do commit:** fix(email): limpar destino e HMAC após uso ou invalidação
+- **Commit de referência:** 02902baa4b11bef61de667b873119327a7e6876a
+- **Data do commit:** 2026-11-24T13:10:44-03:00
+- **Mensagem do commit:** fix(email): mapear confirmação para ação interna do Apps Script
 - **Branch desta execução:** feat/alteracao-email-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -530,13 +530,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 02902ba | 2026-11-24 | fix(email): mapear confirmação para ação interna do Apps Script |
+| e6f6e3a | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 1c38a7d | 2026-11-24 | fix(email): limpar destino e HMAC após uso ou invalidação |
 | bd2690c | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 9c3f2bf | 2026-11-24 | docs(email): corrigir formatação do plano da etapa 4 |
 | 4847cf3 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | f7922a4 | 2026-11-24 | docs(ai-context): registrar etapa 4 em implementação |
 | 1020a46 | 2026-11-24 | docs(email): detalhar implementação e critérios da etapa 4 |
-| da24e88 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| 10a4e23 | 2026-11-24 | test(email): validar reautenticação e allowlist do gateway |
 
 <!-- END AUTO-GENERATED SECTION -->
