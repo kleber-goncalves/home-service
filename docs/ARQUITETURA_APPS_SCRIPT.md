@@ -39,7 +39,7 @@ O projeto continua sendo uma demonstração acadêmica com dados sintéticos. N�
 3. Vercel Functions será utilizada como **gateway HTTP server-side** entre o navegador e o Web App do Apps Script.
 4. A Function é um componente técnico de borda/transporte, não uma segunda camada de domínio. Ela não será responsável por regras de negócio, não acessará Sheets/Drive diretamente e não será fonte de verdade para usuários, sessões, papéis ou permissões.
 5. Google Sheets armazena operacionalmente os dados em dez abas; a modelagem estrutural prevê 12. `CONTROLE_AUTENTICACAO` e `DENUNCIAS` ainda não têm fluxos operacionais. O Google Drive armazena imagens de serviços e fotos de perfil; uploads e entrega estão integrados ao Preview por rotas Vercel e autorização no Apps Script.
-6. O navegador chamará somente rotas de mesma origem da aplicação, como /api/backend. Não chamará o Web App Apps Script diretamente.
+6. O navegador chamará somente rotas de mesma origem da aplicação, como `POST /api/app`, `POST /api/images` e `GET /api/public-images`. Não chamará o Web App Apps Script diretamente.
 7. A Vercel Function chamará o Apps Script server-to-server, acompanhará os redirecionamentos do Content Service e converterá a resposta lógica em JSON/HTTP para o frontend.
 8. Toda regra crítica e toda autorização continuarão sendo verificadas no Apps Script. A Function não poderá ser a única barreira contra chamadas diretas ao Web App.
 9. URLs e segredos da integração serão configurados como variáveis server-side da Vercel e propriedades privadas do Apps Script. Nunca usar prefixo VITE_ para segredos.
