@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** d868e4c5524dfe50b6b8ad37fd1bf81c1d7b65b7
-- **Data do commit:** 2026-11-24T14:02:13-03:00
-- **Mensagem do commit:** docs(modelagem): atualizar kdf e evidencias das validacoes
+- **Commit de referência:** 8b5ca5e28d7f772f08fc1f3c785cba558f57322d
+- **Data do commit:** 2026-11-24T14:04:10-03:00
+- **Mensagem do commit:** docs(report): registrar testes das jornadas recentes
 - **Branch desta execução:** docs/roadmap-redesign-interface
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -541,13 +541,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 8b5ca5e | 2026-11-24 | docs(report): registrar testes das jornadas recentes |
+| 02e29a1 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | d868e4c | 2026-11-24 | docs(modelagem): atualizar kdf e evidencias das validacoes |
 | b7a2bfa | 2026-11-24 | docs(architecture): corrigir rotas same-origin |
 | 95b42e3 | 2026-11-24 | docs(roadmap): corrigir limite do fluxo de e-mail |
 | 82d7536 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 85134dd | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 5fc07b1 | 2026-11-24 | docs(architecture): atualizar limites e decisoes futuras |
-| 52b2d12 | 2026-11-24 | docs(modelagem): distinguir abas previstas e operacionais |
-| 42dec01 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
