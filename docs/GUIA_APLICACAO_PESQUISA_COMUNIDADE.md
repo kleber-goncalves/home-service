@@ -1,6 +1,7 @@
 # Guia de aplicação da pesquisa com a comunidade — Conecta Local
 
 > **Status:** orientação de planejamento. Não representa autorização para coleta de dados.
+> **Prioridade no roadmap:** retomar a pesquisa depois do redesign visual/UX e somente após a orientação do professor/orientador.
 >
 > **Contexto acadêmico:** projeto desenvolvido no âmbito de um curso Técnico em Informática.
 >
