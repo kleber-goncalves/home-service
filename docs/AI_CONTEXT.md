@@ -4,6 +4,16 @@
 
 ## Atualização vigente — 2026-11-24
 
+### Situação atual e próxima frente — verificada em 24/11/2026
+
+- A branch `dev` está no commit `d16278c5b6df6df370645b18a05dfb5ea0effe08`. O Preview Vercel associado é `dpl_AfNaMm1WqRFJa3jhhwXhfkgwPUTv`, estado `READY`, URL https://home-service-git-dev-kleber-goncalves-s-projects.vercel.app.
+- A Production (`main`) permanece no commit `49354a46863d5a5eb36ce32e450b975d4087fe3b`. Não promover mudanças nem habilitar backend em Production sem decisão explícita.
+- As PRs #28 e #29 integraram o catálogo público e a correção da entrega de imagens em `dev`. A integração real de imagens foi validada no Preview em 21/11/2026 com cinco imagens do Drive: HTTP 200 quando elegíveis, HTTP 404 durante pausa e após remoção, e recuperação após republicação. A validação registrada cobre esse fluxo; não equivale a homologação visual completa de todas as páginas.
+- Em 24/11/2026, o responsável classificou o design atual como genérico e definiu o redesign visual/UX como próxima frente do projeto. A funcionalidade existente deve ser preservada; a prioridade é criar identidade visual própria, melhor hierarquia e consistência entre homepage, catálogo, categorias, detalhes e área do profissional.
+- O plano de trabalho é `docs/PLANO_REDESIGN_INTERFACE.md`; o roadmap foi reorganizado para posicionar o redesign antes da pesquisa com a comunidade. A direção visual ainda não foi escolhida. Não antecipar cores, fontes, referências, estilo ou implementação antes da etapa de diagnóstico e aprovação da direção visual.
+- A pesquisa comunitária continua preparada, mas não aplicada. A coleta permanece condicionada à orientação do professor/orientador e será retomada depois do redesign.
+
+
 - Em 20/11/2026, o responsável esclareceu o contexto acadêmico: o Conecta Local está sendo desenvolvido em um curso Técnico em Informática, e não como Projeto Integrador do curso de ADS da Uniube. Não associar o projeto à Uniube.
 
 > Esta seção registra o estado mais recente conhecido. Consulte os SHAs e os arquivos do branch efetivamente em análise antes de realizar mudanças.
@@ -374,6 +384,7 @@ Em falhas: informar estado de carregamento/sucesso/erro; não declarar sucesso a
 - Este `AI_CONTEXT.md` descreve o estado atual e as regras de continuidade. Em uma conversa nova, leia-o por inteiro antes de qualquer alteração.
 - `POC_04_SESSOES.md` registra a implementação, os ensaios, a revisão estática e o merge da PR #14 em `dev`. A sessão sintética continua separada e desabilitada; os dois pontos de hardening bloqueiam sua reativação. A POC não implementa autenticação de usuários nem se conecta ao fluxo principal.
 - `ROADMAP_ESTUDOS.md` organiza a evolução por valor didático e relevância para a demonstração, sem ampliar o escopo para uma operação comercial.
+- `PLANO_REDESIGN_INTERFACE.md` define a próxima frente visual/UX; a direção visual ainda depende de diagnóstico e aprovação, e não deve ser presumida.
 - `ESPECIFICACAO_MVP.md` v0.4 consolida os requisitos funcionais; as Etapas 3 e 4 do roadmap estão implementadas e validadas funcionalmente em `dev`/Preview. `MODELAGEM_DADOS.md` contém a modelagem lógica e o esquema físico aprovado conceitualmente (12 entidades/102 campos e 12 abas/102 colunas); outras funcionalidades permanecem no backlog.
 - `REGISTRO_DE_OCORRENCIAS.md` preserva o histórico de bugs, erros, vulnerabilidades e incidentes. Não criar ocorrência apenas por haver pendência de projeto ou risco conhecido ainda não observado como falha.
 - Atualize o contexto narrativo no mesmo trabalho quando decisões ou comportamentos relevantes mudarem.
