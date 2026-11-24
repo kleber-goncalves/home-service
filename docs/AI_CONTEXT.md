@@ -403,9 +403,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 1e38e9d9ecd1bd3bb55ee411bfc4fb9e1f6831c2
-- **Data do commit:** 2026-11-24T13:04:41-03:00
-- **Mensagem do commit:** style(email): organizar painel de segurança da conta
+- **Commit de referência:** fc473d8b5c70b5b2e99d99e4b788dec09ec82319
+- **Data do commit:** 2026-11-24T13:05:12-03:00
+- **Mensagem do commit:** fix(email): renovar cookie após reautenticação válida
 - **Branch desta execução:** feat/alteracao-email-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -530,13 +530,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| fc473d8 | 2026-11-24 | fix(email): renovar cookie após reautenticação válida |
+| b509056 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 1e38e9d | 2026-11-24 | style(email): organizar painel de segurança da conta |
 | f1329af | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 8466b43 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 28fa92a | 2026-11-24 | feat(email): adicionar formulário de alteração com confirmação |
 | 8d85ee5 | 2026-11-24 | feat(email): permitir limpar sessão após troca de endereço |
 | e19650f | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| 9a255e0 | 2026-11-24 | feat(email): validar senha atual e proteger confirmação no gateway |
-| 7585e88 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
