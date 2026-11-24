@@ -2,7 +2,7 @@
 
 > Documento de continuidade do projeto. Leia antes de sugerir ou realizar alterações. Reúne propósito, decisões, arquitetura planejada, estado implementado, regras de manutenção e limitações. A seção de snapshot ao final é atualizada pelo GitHub Actions.
 
-## Atualização vigente — 2026-11-23
+## Atualização vigente — 2026-11-24
 
 - Em 20/11/2026, o responsável esclareceu o contexto acadêmico: o Conecta Local está sendo desenvolvido em um curso Técnico em Informática, e não como Projeto Integrador do curso de ADS da Uniube. Não associar o projeto à Uniube.
 
@@ -11,7 +11,7 @@
 - Em 21/11/2026, a PR #30 integrou em `dev` a sessão compartilhada pelo `AuthProvider`, o estado global de autenticação e o menu da conta com `Minha conta` e `Sair` (merge commit `4696a5039243c7baf300e835973417af6003723c`). Em 23/11/2026, a PR #31 separou os acessos de visitante em `Entrar` e `Criar conta`, com destinos diretos para login/cadastro no desktop e menu móvel (merge commit `3a99eb1650d118ce8ccb20fc3de7b179125e86b7`). O responsável confirmou a validação visual desses dois acessos no Preview de `dev`.
 - A Etapa 2 — edição dos dados do perfil — foi integrada em `dev` pela PR #32, merge commit `db31cee401cb47369811a9ca2326a2268e27e51a`. Permite editar nome completo, nome público, WhatsApp, apresentação e cidade principal, com allowlist no gateway, validação/autorização no Apps Script, atualização do AuthProvider e auditoria. Em 23/11/2026, o responsável confirmou que testou e que a edição funcionou no Preview após sincronizar/publicar o Apps Script.
 - A Etapa 3 — foto de perfil — foi integrada exclusivamente em `dev` pela PR #33, merge commit `782d8ede22ffcf8f1b3193c70e956715ca701af0`. A CI pós-merge [Validate Home Service #45255089911](https://github.com/kleber-goncalves/home-service/actions/runs/45255089911) concluiu SUCCESS, incluindo os testes de autorização/foto, cliente de upload, ESLint e build. O Preview atualizado ficou READY no deployment `dpl_FhiT8ui3hTvyKfgrjYezGf7qL364`, commit `a16fc2ad52236c293d54927b73e3a300240cc645`, no alias fixo de `dev`. A foto usa o transporte retomável existente, mas reserva a imagem pelo profissional e grava `IMAGENS` com `id_profissional` preenchido e `id_servico` vazio. O arquivo fica privado no Google Drive; a entrega passa por `/api/public-images?id=<imageId>` e o Apps Script revalida registro e conta ativos. Upload, substituição, remoção, sessão e avatar do cabeçalho estão implementados. **Validação manual concluída em 23/11/2026:** após sincronizar o `apps-script/conecta-local/Code.gs` e publicar nova versão da implantação Web App existente, o responsável confirmou que os testes no Preview passaram. `main` permanece inalterada em `49354a46863d5a5eb36ce32e450b975d4087fe3`.
-- A alteração de e-mail continua planejada em etapa separada, pois exige reautenticação, unicidade e confirmação do novo endereço; não alterar `USUARIOS.email` como campo comum de perfil.
+- Em 24/11/2026, a Etapa 4 — alteração de e-mail — está em implementação na branch `feat/alteracao-email-profissional`, ainda sem merge em `dev`. O fluxo revalida a senha atual por Argon2id no gateway, mantém o novo endereço pendente até código de uso único, vincula o HMAC ao usuário e destino, aplica validade de 10 minutos, cinco tentativas e intervalo de 60 segundos, atualiza `USUARIOS.email` somente após confirmação e revoga todas as sessões para exigir novo login. A interface apresenta o código apenas como demonstração e informa que nenhum e-mail é enviado. Testes automatizados, CI, merge e validação integrada no Preview ainda são pendentes; não apresentar a etapa como concluída.
 - O ambiente conectado ao Apps Script/Sheets permanece restrito ao Preview fixo da branch `dev`. A branch `feat/*` não recebe as variáveis secretas de Preview. Como o código da pasta `apps-script/conecta-local/Code.gs` não se sincroniza automaticamente com a implantação Web App do Google, após a integração da etapa será necessário sincronizar o arquivo e publicar nova versão do Apps Script antes dos testes manuais no Preview de `dev`. Não duplicar nem ampliar escopo dos segredos para testar branches de feature.
 - O PR #15 (`feat/prototipo-demo-profissional` → `dev`) foi integrado em 16/11/2026. O protótipo funcional com cadastro, confirmação demonstrativa, login, sessão, perfil, criação/pausa/publicação de serviços e persistência no Google Sheets está na branch `dev`.
 - Em 20/11/2026, após as integrações das PRs #16, #17 e #14, o responsável confirmou ter repetido os testes do fluxo principal no Preview atualizado de `dev` e informou que a demonstração está funcionando. O histórico anterior de validação do PR #15 permanece registrado em 16/11; a confirmação mais recente é a referência funcional para a continuidade.
@@ -288,7 +288,7 @@ O fluxo principal está implementado em `src/pages/AuthDemoPage.jsx`, `src/servi
 
 **Limitações funcionais ainda abertas**
 - A confirmação de cadastro é demonstrativa: o código é exibido na interface, sem envio real de e-mail.
-- Recuperação de senha, alteração de senha, alteração de e-mail com confirmação e envio real de e-mail não estão implementados.
+- Recuperação de senha, alteração de senha e envio real de e-mail não estão implementados. A alteração de e-mail está em desenvolvimento na branch `feat/alteracao-email-profissional`; ainda não está integrada nem validada no `dev`/Preview.
 - Edição/remoção dos próprios serviços e gerenciamento de imagens no Google Drive estão integrados em `dev` e validados funcionalmente no Preview. A entrega pública usa `server/public-image-gateway.js` + `public.image.resolve`, com token OAuth apenas server-side e revalidação da elegibilidade em cada requisição. Os cenários reais de publicação, pausa, republicação e remoção de imagens foram aprovados em 21/11/2026. Painel administrativo, denúncias/moderação e gestão administrativa ainda não estão implementados.
 - Não há auditoria independente, certificação, teste de carga ou autorização para uso em produção.
 
@@ -403,10 +403,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 62fb3ad246f84c7179708d75588c49033ddc5129
-- **Data do commit:** 2026-11-23T17:20:03-03:00
-- **Mensagem do commit:** docs(profile): concluir validação manual da foto de perfil
-- **Branch desta execução:** dev
+- **Commit de referência:** f8361e1331ca75d0efb6d9ac3839bbe6a8c4a87d
+- **Data do commit:** 2026-11-24T13:12:17-03:00
+- **Mensagem do commit:** test(email): verificar limpeza de dados do código consumido
+- **Branch desta execução:** feat/alteracao-email-profissional
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -530,13 +530,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| 62fb3ad | 2026-11-23 | docs(profile): concluir validação manual da foto de perfil |
-| 04f84bf | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
-| d08348c | 2026-11-23 | docs(context): registrar conclusão da implementação da foto |
-| e80ffd6 | 2026-11-23 | docs(profile): registrar integração da foto de perfil |
-| a16fc2a | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
-| 782d8ed | 2026-11-23 | Merge pull request #33 from kleber-goncalves/feat/foto-perfil-profissional |
-| cef494f | 2026-11-23 | docs(ai-context): atualizar snapshot automaticamente |
-| e00d2d5 | 2026-11-23 | test(profile-photo): usar token OAuth sintético válido |
+| f8361e1 | 2026-11-24 | test(email): verificar limpeza de dados do código consumido |
+| f8087ce | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
+| 6189fe2 | 2026-11-24 | docs(email): ajustar referências ao branch dev |
+| 7a85c3f | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
+| 02902ba | 2026-11-24 | fix(email): mapear confirmação para ação interna do Apps Script |
+| e6f6e3a | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
+| 1c38a7d | 2026-11-24 | fix(email): limpar destino e HMAC após uso ou invalidação |
+| bd2690c | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->

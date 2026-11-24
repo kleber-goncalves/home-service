@@ -645,6 +645,33 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
 .demo-profile-form-note svg { flex: 0 0 auto; margin-top: 1px; color: #4e6d93; }
 .demo-profile-form-note strong { color: #304a6b; }
 .demo-profile-form-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 9px; }
+.demo-email-change-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 18px;
+    padding: 14px 15px;
+    background: #f8fbff;
+    border: 1px solid #e2ebf6;
+    border-radius: 11px;
+}
+.demo-email-change-copy { display: grid; min-width: 0; gap: 5px; }
+.demo-email-change-copy strong { overflow-wrap: anywhere; color: #263d5a; font-size: .78rem; }
+.demo-email-change-copy p { margin: 0; color: #70819a; font-size: .65rem; line-height: 1.55; }
+.demo-email-change-form {
+    display: grid;
+    gap: 12px;
+    margin-top: 13px;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #e2ebf6;
+    border-radius: 11px;
+}
+.demo-email-change-form-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.demo-email-change-form-heading h3 { margin: 4px 0 0; color: var(--navy); font-size: .86rem; font-weight: 800; }
+.demo-email-change-form .demo-new-service-form { margin: 0; }
+.demo-email-change-explainer { margin: 0; color: #687d96; font-size: .68rem; line-height: 1.6; }
 .demo-profile-form select { width: 100%; min-width: 0; min-height: 42px; padding: 10px 12px; color: var(--navy); background: #fff; border: 1px solid #dce5f0; border-radius: 9px; font-size: .72rem; }
 .demo-shortcuts-panel > .section-eyebrow { margin-bottom: 7px; font-size: .62rem; }
 .demo-shortcuts-panel p { margin: 10px 0 15px; color: #697d96; font-size: .73rem; line-height: 1.7; }
@@ -856,6 +883,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
     .demo-dashboard-welcome { padding-top: 29px; }
 }
 @media (max-width: 560px) {
+    .demo-email-change-panel { align-items: flex-start; flex-direction: column; }
+    .demo-email-change-panel > button { width: 100%; justify-content: center; }
     .demo-dashboard-header { gap: 10px; padding: 10px 14px; }
     .demo-dashboard-header .brand-name { font-size: .9rem; }
     .demo-dashboard-header-actions { gap: 8px; }
