@@ -403,9 +403,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 74eee3fd5fd33a895f7e10cc4c62a261f8911d40
-- **Data do commit:** 2026-11-24T13:13:59-03:00
-- **Mensagem do commit:** docs(email): registrar integração da etapa 4 em dev
+- **Commit de referência:** 44b5311cfd2f315433de55bda00ebf7ebbfab90b
+- **Data do commit:** 2026-11-24T13:15:05-03:00
+- **Mensagem do commit:** docs(email): registrar CI pós-merge da etapa 4
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -530,13 +530,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 44b5311 | 2026-11-24 | docs(email): registrar CI pós-merge da etapa 4 |
+| 36781f8 | 2026-11-24 | docs(ai-context): registrar etapa 4 integrada em dev |
+| 892b99d | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 74eee3f | 2026-11-24 | docs(email): registrar integração da etapa 4 em dev |
 | fec1470 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 9aa91e0 | 2026-11-24 | Merge pull request #34 from kleber-goncalves/feat/alteracao-email-profissional |
 | 3cb6dda | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | f8361e1 | 2026-11-24 | test(email): verificar limpeza de dados do código consumido |
-| f8087ce | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| 6189fe2 | 2026-11-24 | docs(email): ajustar referências ao branch dev |
-| 7a85c3f | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
