@@ -338,8 +338,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
 
 
     function openEmailChange() {
-        setEmailChangeForm({ currentPassword: "", newEmail: "" });
-        setPendingEmailChange(null);
+        setEmailChangeForm({ currentPassword: "", newEmail: pendingEmailChange?.email || "" });
         setEmailChangeCodeInput("");
         setIsEmailChangeOpen(true);
         setNotice(null);
