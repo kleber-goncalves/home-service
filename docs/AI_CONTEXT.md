@@ -414,10 +414,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** e84d2959c9df83b6933d04ddc13dd800a4932fc9
-- **Data do commit:** 2026-11-24T16:04:23-03:00
-- **Mensagem do commit:** fix(site-header): ajustar classe CSS para melhor alinhamento da navegação
-- **Branch desta execução:** dev
+- **Commit de referência:** 98210775244da432c7b4e901d3e470bbd2c2bd33
+- **Data do commit:** 2026-11-24T16:13:43-03:00
+- **Mensagem do commit:** feat(homepage): criar vitrine de servicos por categoria
+- **Branch desta execução:** feat/homepage-category-featured-services
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -494,6 +494,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 ### Arquivos JavaScript/JSX em src/
 
 - src/App.jsx
+- src/components/home/category-featured-services.jsx
 - src/components/home/hero-search.jsx
 - src/components/home/home-sections.jsx
 - src/components/home/site-header.jsx
@@ -541,13 +542,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 9821077 | 2026-11-24 | feat(homepage): criar vitrine de servicos por categoria |
+| 72fd5ec | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | e84d295 | 2026-11-24 | fix(site-header): ajustar classe CSS para melhor alinhamento da navegação |
 | e87882d | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 41ac8ee | 2026-11-24 | feat(hero-section): melhorar layout e responsividade da seção hero |
 | 7853b0e | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | 1f244f6 | 2026-11-24 | feat(homepage): adicionar ilustracoes nos cantos do hero (#36) |
 | a56b53b | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| 64d3c50 | 2026-11-24 | Add image of hands cleaning a plate with a green sponge |
-| 30ffe77 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
