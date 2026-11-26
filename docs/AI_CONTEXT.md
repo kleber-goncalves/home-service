@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 9b707e6f08f9f6ff62f2477d94ea2a45d45143da
-- **Data do commit:** 2026-11-26T15:02:18-03:00
-- **Mensagem do commit:** feat(homepage): atualizar titulo e estrutura da vitrine de serviços
+- **Commit de referência:** 1792669e814c36828d6bd9e21a6c11c3c7486096
+- **Data do commit:** 2026-11-26T15:02:39-03:00
+- **Mensagem do commit:** style(homepage): redesenhar cards da vitrine de serviços
 - **Branch desta execução:** feat/homepage-services-card-redesign
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -544,13 +544,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 1792669 | 2026-11-26 | style(homepage): redesenhar cards da vitrine de serviços |
+| dccdb8c | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
+| 1e82a5a | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 9b707e6 | 2026-11-26 | feat(homepage): atualizar titulo e estrutura da vitrine de serviços |
 | f17101e | 2026-11-26 | feat(homepage): criar card de serviço para vitrine visual |
 | 520af02 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 72a2bd9 | 2026-11-26 | refactor(homepage): ajustar layout e otimizar texto da seção de serviços |
 | 2d6aaf1 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
-| 3376a89 | 2026-11-26 | Merge pull request #39 from kleber-goncalves/feat/homepage-local-service-overview |
-| fd5a988 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
-| 7659d03 | 2026-11-26 | fix(homepage): remover variável não utilizada da galeria |
 
 <!-- END AUTO-GENERATED SECTION -->
