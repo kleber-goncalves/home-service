@@ -3,6 +3,7 @@ import { useState } from "react";
 import SiteHeader from "@/components/home/site-header";
 import HeroSearch from "@/components/home/hero-search";
 import CategoryFeaturedServices from "@/components/home/category-featured-services";
+import LocalServiceOverview from "@/components/home/local-service-overview";
 import {
     AboutSection,
     FAQSection,
@@ -43,6 +44,15 @@ export default function HomePage() {
                 <CategoryFeaturedServices
                     categories={catalog.categories}
                     services={catalog.services}
+                    loading={catalog.loading}
+                    error={catalog.error}
+                />
+
+                <LocalServiceOverview
+                    realServices={catalog.realServices}
+                    demoServices={catalog.demoServices}
+                    categories={catalog.categories}
+                    cities={catalog.cities}
                     loading={catalog.loading}
                     error={catalog.error}
                 />
