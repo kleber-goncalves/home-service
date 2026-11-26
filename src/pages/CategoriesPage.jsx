@@ -120,7 +120,7 @@ export default function CategoriesPage() {
                                                 </p>
                                             </div>
 
-                                            <div className="categories-page-card-counts" aria-label="Quantidade de serviços nesta categoria">
+                                            <div className="categories-page-card-counts" role="group" aria-label="Quantidade de serviços nesta categoria">
                                                 <span className="categories-page-count categories-page-count--published">
                                                     <strong>{formatCount(counts.published)}</strong>
                                                     cadastrados
