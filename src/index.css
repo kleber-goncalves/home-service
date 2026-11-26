@@ -5781,7 +5781,7 @@ summary:focus-visible {
     overflow: hidden;
     background: #fff;
     border: 1px solid #e9edef;
-    border-radius: clamp(28px, 3vw, 40px);
+    border-radius: 46px;
     box-shadow: 0 8px 26px rgba(22, 35, 48, 0.045);
     transition:
         transform 180ms ease,
