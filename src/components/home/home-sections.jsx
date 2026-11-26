@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpRight, Check, ChevronDown, House, MapPin, MessageCircle, Search, Users, UserRoundSearch, BriefcaseBusiness, CheckCircle2 } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, House, MapPin, MessageCircle, Minus, Plus, Search, Sparkles, Users, UserRoundSearch, BriefcaseBusiness, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -245,18 +245,48 @@ export function ProfessionalsCTA() {
 
 export function FAQSection() {
     return (
-        <section className="faq-section section-space" id="perguntas">
+        <section className="faq-section section-space" id="perguntas" aria-labelledby="faq-title">
             <div className="mx-auto grid w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="faq-intro">
-                    <SectionHeading eyebrow="Dúvidas comuns" title="Perguntas frequentes" description="Veja como consultar serviços, conhecer os exemplos e entender os limites desta demonstração." />
-                    <p className="faq-contact">Não encontrou sua dúvida? Acompanhe a evolução do projeto pelo repositório.</p>
-                    <a className="text-link" href="https://github.com/kleber-goncalves/home-service" target="_blank" rel="noreferrer">Acessar o projeto <ChevronDown size={15} /></a>
+                    <div className="faq-illustration" aria-hidden="true">
+                        <span className="faq-illustration-bubble">
+                            <MessageCircle size={43} strokeWidth={1.7} />
+                            <span className="faq-illustration-mark">?</span>
+                        </span>
+                        <Sparkles className="faq-illustration-spark" size={19} strokeWidth={1.8} />
+                        <span className="faq-illustration-accent" />
+                    </div>
+
+                    <h2 className="faq-title" id="faq-title">
+                        <span>Perguntas</span>
+                        <span>frequentes</span>
+                    </h2>
+
+                    <p className="faq-description">
+                        Veja como consultar serviços, conhecer os exemplos e entender os limites desta demonstração.
+                    </p>
+
+                    <div className="faq-support">
+                        <span>Não encontrou sua dúvida?</span>
+                        <a href="https://github.com/kleber-goncalves/home-service" target="_blank" rel="noreferrer">
+                            Acessar o projeto <ArrowUpRight size={14} aria-hidden="true" />
+                        </a>
+                    </div>
                 </div>
+
                 <div className="faq-list">
-                    {frequentlyAskedQuestions.map((item, index) => (
-                        <details className="faq-item" key={item.question} open={index === 0}>
-                            <summary><span>{item.question}</span><ChevronDown size={18} /></summary>
-                            <div className="faq-answer">{item.answer}</div>
+                    {frequentlyAskedQuestions.map((item) => (
+                        <details className="faq-item" key={item.question}>
+                            <summary>
+                                <span className="faq-question">{item.question}</span>
+                                <span className="faq-toggle" aria-hidden="true">
+                                    <Plus className="faq-toggle-plus" size={21} strokeWidth={1.9} />
+                                    <Minus className="faq-toggle-minus" size={21} strokeWidth={1.9} />
+                                </span>
+                            </summary>
+                            <div className="faq-answer">
+                                <p>{item.answer}</p>
+                            </div>
                         </details>
                     ))}
                 </div>
