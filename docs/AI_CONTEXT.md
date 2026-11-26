@@ -414,10 +414,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** e826754af9ab2fcb81df7c3d2667bfd659c82e9b
-- **Data do commit:** 2026-11-26T17:19:36-03:00
-- **Mensagem do commit:** style(categories): alinhar curvas dos cartões à identidade visual
-- **Branch desta execução:** feat/categories-page-redesign
+- **Commit de referência:** e0cec6108c377e88dc66a40b680da2ce76e42c06
+- **Data do commit:** 2026-11-26T17:24:31-03:00
+- **Mensagem do commit:** Merge pull request #44 from kleber-goncalves/feat/categories-page-redesign
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -544,13 +544,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| e0cec61 | 2026-11-26 | Merge pull request #44 from kleber-goncalves/feat/categories-page-redesign |
+| c894129 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
+| 44d8a42 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | e826754 | 2026-11-26 | style(categories): alinhar curvas dos cartões à identidade visual |
 | a426556 | 2026-11-26 | fix(categories): identificar grupo de contadores para leitores de tela |
 | 84a1a79 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 67546d8 | 2026-11-26 | style(categories): aplicar identidade visual arredondada à página |
 | e82ea12 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
-| d92ff95 | 2026-11-26 | style(categories): atualizar estrutura visual da página de categorias |
-| 60f7423 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
-| 6bccbab | 2026-11-26 | Merge pull request #43 from kleber-goncalves/docs/design-system-baseline |
 
 <!-- END AUTO-GENERATED SECTION -->
