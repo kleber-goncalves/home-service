@@ -1,14 +1,12 @@
-import { ArrowRight, BriefcaseBusiness } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import SiteHeader from "@/components/home/site-header";
 import HeroSearch from "@/components/home/hero-search";
 import CategoryFeaturedServices from "@/components/home/category-featured-services";
 import LocalServiceOverview from "@/components/home/local-service-overview";
 import {
-    AboutSection,
+
     FAQSection,
-    HowItWorks,
-    PopularServices,
     ProfessionalsCTA,
 } from "@/components/home/home-sections";
 import AppLink from "@/components/public/app-link";
@@ -95,42 +93,10 @@ export default function HomePage() {
                     </div>
                 </section>
 
-                <section className="public-home-section public-home-categories" id="categorias" aria-labelledby="home-categories-title">
-                    <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="public-section-heading">
-                            <div>
-                                <span className="section-eyebrow">Encontre por categoria</span>
-                                <h2 id="home-categories-title">Por onde você quer começar?</h2>
-                            </div>
-                            <AppLink to="/categorias" className="catalog-service-link">
-                                Ver todas as categorias <ArrowRight size={16} aria-hidden="true" />
-                            </AppLink>
-                        </div>
-                        {catalog.loading ? (
-                            <p className="catalog-inline-state" role="status">
-                                Carregando categorias...
-                            </p>
-                        ) : catalog.categories.length ? (
-                            <div className="home-category-grid">
-                                {catalog.categories.slice(0, 3).map((category) => (
-                                    <AppLink to={`/servicos?categoria=${encodeURIComponent(category.id)}`} className="home-category-card" key={category.id}>
-                                        <span className="home-category-icon">
-                                            <BriefcaseBusiness size={22} aria-hidden="true" />
-                                        </span>
-                                        <span className="home-category-name">{category.name}</span>
-                                        <ArrowRight size={17} aria-hidden="true" />
-                                    </AppLink>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="catalog-inline-state">{catalog.error ? "Não foi possível carregar as categorias agora." : "As categorias serão exibidas aqui quando estiverem disponíveis."}</p>
-                        )}
-                    </div>
-                </section>
 
-                <PopularServices />
-                <AboutSection />
-                <HowItWorks />
+    
+
+        
                 <ProfessionalsCTA />
                 <FAQSection />
 
