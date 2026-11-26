@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** a426556198bbe1554a3304c7b3d9cf3a647c5ed0
-- **Data do commit:** 2026-11-26T17:19:34-03:00
-- **Mensagem do commit:** fix(categories): identificar grupo de contadores para leitores de tela
+- **Commit de referência:** e826754af9ab2fcb81df7c3d2667bfd659c82e9b
+- **Data do commit:** 2026-11-26T17:19:36-03:00
+- **Mensagem do commit:** style(categories): alinhar curvas dos cartões à identidade visual
 - **Branch desta execução:** feat/categories-page-redesign
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -544,6 +544,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| e826754 | 2026-11-26 | style(categories): alinhar curvas dos cartões à identidade visual |
 | a426556 | 2026-11-26 | fix(categories): identificar grupo de contadores para leitores de tela |
 | 84a1a79 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 67546d8 | 2026-11-26 | style(categories): aplicar identidade visual arredondada à página |
@@ -551,6 +552,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | d92ff95 | 2026-11-26 | style(categories): atualizar estrutura visual da página de categorias |
 | 60f7423 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 6bccbab | 2026-11-26 | Merge pull request #43 from kleber-goncalves/docs/design-system-baseline |
-| e52cd83 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
