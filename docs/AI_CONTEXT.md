@@ -414,10 +414,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 72a2bd951141c0d81f81930a951c74c7d6cc1fe0
-- **Data do commit:** 2026-11-26T14:57:47-03:00
-- **Mensagem do commit:** refactor(homepage): ajustar layout e otimizar texto da seção de serviços
-- **Branch desta execução:** dev
+- **Commit de referência:** f17101e979a69959306906b9f2fb61f2f2a96181
+- **Data do commit:** 2026-11-26T15:02:08-03:00
+- **Mensagem do commit:** feat(homepage): criar card de serviço para vitrine visual
+- **Branch desta execução:** feat/homepage-services-card-redesign
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -495,6 +495,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 - src/App.jsx
 - src/components/home/category-featured-services.jsx
+- src/components/home/featured-service-card.jsx
 - src/components/home/hero-search.jsx
 - src/components/home/home-sections.jsx
 - src/components/home/local-service-overview.jsx
@@ -543,13 +544,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| f17101e | 2026-11-26 | feat(homepage): criar card de serviço para vitrine visual |
+| 520af02 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 72a2bd9 | 2026-11-26 | refactor(homepage): ajustar layout e otimizar texto da seção de serviços |
 | 2d6aaf1 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 3376a89 | 2026-11-26 | Merge pull request #39 from kleber-goncalves/feat/homepage-local-service-overview |
 | fd5a988 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 7659d03 | 2026-11-26 | fix(homepage): remover variável não utilizada da galeria |
 | 6594192 | 2026-11-26 | style(homepage): criar layout responsivo do resumo local |
-| 99c4d57 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
-| 8982fe3 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
