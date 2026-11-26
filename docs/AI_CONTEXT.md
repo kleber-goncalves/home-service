@@ -414,10 +414,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 6bccbab9efecee99bd2e8df93ae3db9a711c476d
-- **Data do commit:** 2026-11-26T17:15:43-03:00
-- **Mensagem do commit:** Merge pull request #43 from kleber-goncalves/docs/design-system-baseline
-- **Branch desta execução:** dev
+- **Commit de referência:** d92ff958c2641b7bcc0da36428e09b71792f571d
+- **Data do commit:** 2026-11-26T17:18:59-03:00
+- **Mensagem do commit:** style(categories): atualizar estrutura visual da página de categorias
+- **Branch desta execução:** feat/categories-page-redesign
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -544,13 +544,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| d92ff95 | 2026-11-26 | style(categories): atualizar estrutura visual da página de categorias |
+| 60f7423 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 6bccbab | 2026-11-26 | Merge pull request #43 from kleber-goncalves/docs/design-system-baseline |
 | e52cd83 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | bac082c | 2026-11-26 | docs: adicionar baseline do design system atual |
 | eaa3bd2 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | eb7d4fd | 2026-11-26 | refactor: ajustar layout e estilização de componentes na página inicial |
 | 6f99d6f | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
-| 5d87cad | 2026-11-26 | Merge pull request #42 from kleber-goncalves/feat/homepage-footer-redesign |
-| c468822 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
