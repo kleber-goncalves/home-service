@@ -15,22 +15,22 @@ import {
 import AppLink from "@/components/public/app-link";
 import ServiceImage from "@/components/public/service-image";
 
-function categoryIcon(category = "") {
+function CategoryIcon({ category = "" }) {
     const normalized = String(category)
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .toLocaleLowerCase("pt-BR");
 
-    if (/limpez|faxin/.test(normalized)) return Brush;
-    if (/eletric/.test(normalized)) return Zap;
-    if (/hidraul|encan/.test(normalized)) return Droplets;
-    if (/constr|reform|obra|montag|moveis/.test(normalized)) return Hammer;
-    if (/pint/.test(normalized)) return Paintbrush;
-    if (/jardin|paisag/.test(normalized)) return Leaf;
-    if (/manuten|repar/.test(normalized)) return Wrench;
-    if (/domestic|residencial|casa/.test(normalized)) return House;
+    if (/limpez|faxin/.test(normalized)) return <Brush size={54} strokeWidth={1.25} aria-hidden="true" />;
+    if (/eletric/.test(normalized)) return <Zap size={54} strokeWidth={1.25} aria-hidden="true" />;
+    if (/hidraul|encan/.test(normalized)) return <Droplets size={54} strokeWidth={1.25} aria-hidden="true" />;
+    if (/constr|reform|obra|montag|moveis/.test(normalized)) return <Hammer size={54} strokeWidth={1.25} aria-hidden="true" />;
+    if (/pint/.test(normalized)) return <Paintbrush size={54} strokeWidth={1.25} aria-hidden="true" />;
+    if (/jardin|paisag/.test(normalized)) return <Leaf size={54} strokeWidth={1.25} aria-hidden="true" />;
+    if (/manuten|repar/.test(normalized)) return <Wrench size={54} strokeWidth={1.25} aria-hidden="true" />;
+    if (/domestic|residencial|casa/.test(normalized)) return <House size={54} strokeWidth={1.25} aria-hidden="true" />;
 
-    return BriefcaseBusiness;
+    return <BriefcaseBusiness size={54} strokeWidth={1.25} aria-hidden="true" />;
 }
 
 export default function HomeFeaturedServiceCard({ service }) {
@@ -39,7 +39,6 @@ export default function HomeFeaturedServiceCard({ service }) {
     const serviceHref = service.isDemo
         ? "/servicos"
         : `/servicos/${encodeURIComponent(service.id)}`;
-    const CategoryIcon = categoryIcon(service.category);
     const location = service.isDemo
         ? "Sem localidade real"
         : (service.cityLabel || "Localidade não informada");
@@ -83,12 +82,9 @@ export default function HomeFeaturedServiceCard({ service }) {
                             <AppLink to={serviceHref}>{service.title}</AppLink>
                         </h3>
                     </div>
-                    <CategoryIcon
-                        className="home-featured-service-icon"
-                        size={54}
-                        strokeWidth={1.25}
-                        aria-hidden="true"
-                    />
+                    <span className="home-featured-service-icon" aria-hidden="true">
+                        <CategoryIcon category={service.category} />
+                    </span>
                 </div>
 
                 {service.description && (
