@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 62cbcc5931cb6f7ce4f85b2d812e9e70f36735bc
-- **Data do commit:** 2026-11-26T15:20:35-03:00
-- **Mensagem do commit:** Merge pull request #41 from kleber-goncalves/feat/homepage-faq-section-redesign
+- **Commit de referência:** 949c55ef05b910052dacb64c492b595452f09726
+- **Data do commit:** 2026-11-26T15:22:21-03:00
+- **Mensagem do commit:** refactor(homepage): remover seção de CTA final da página inicial
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -544,13 +544,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 949c55e | 2026-11-26 | refactor(homepage): remover seção de CTA final da página inicial |
+| a3cf494 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 62cbcc5 | 2026-11-26 | Merge pull request #41 from kleber-goncalves/feat/homepage-faq-section-redesign |
 | 5462ffd | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 3f8c79f | 2026-11-26 | style(homepage): aplicar layout editorial na seção FAQ |
 | 0f34dcc | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | aea1f48 | 2026-11-26 | style(homepage): reorganizar estrutura da seção FAQ |
 | c53ce89 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
-| e9b82c0 | 2026-11-26 | refactor(homepage): remover seções não utilizadas e otimizar importações |
-| 2a9d737 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
