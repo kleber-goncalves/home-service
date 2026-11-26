@@ -37,7 +37,7 @@ export default function LocalServiceOverview({
 
     return (
         <section className="home-local-overview" aria-labelledby="home-local-overview-title">
-            <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className=" w-full px-4 sm:px-6 lg:px-29">
                 <div className="home-local-overview-intro">
                     <div className="home-local-overview-copy">
                         <h2 id="home-local-overview-title">

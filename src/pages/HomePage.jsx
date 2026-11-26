@@ -7,7 +7,6 @@ import LocalServiceOverview from "@/components/home/local-service-overview";
 import {
 
     FAQSection,
-    ProfessionalsCTA,
 } from "@/components/home/home-sections";
 import AppLink from "@/components/public/app-link";
 import HomeFeaturedServiceCard from "@/components/home/featured-service-card";
@@ -38,24 +37,12 @@ export default function HomePage() {
             <main id="conteudo" tabIndex="-1">
                 <HeroSearch query={query} city={city} onQueryChange={setQuery} onCityChange={setCity} onSubmit={submitSearch} availableCities={catalog.cities} />
 
-                <CategoryFeaturedServices
-                    categories={catalog.categories}
-                    services={catalog.services}
-                    loading={catalog.loading}
-                    error={catalog.error}
-                />
+                <CategoryFeaturedServices categories={catalog.categories} services={catalog.services} loading={catalog.loading} error={catalog.error} />
 
-                <LocalServiceOverview
-                    realServices={catalog.realServices}
-                    demoServices={catalog.demoServices}
-                    categories={catalog.categories}
-                    cities={catalog.cities}
-                    loading={catalog.loading}
-                    error={catalog.error}
-                />
+                <LocalServiceOverview realServices={catalog.realServices} demoServices={catalog.demoServices} categories={catalog.categories} cities={catalog.cities} loading={catalog.loading} error={catalog.error} />
 
                 <section className="public-home-section public-home-services" id="servicos" aria-labelledby="home-services-title">
-                    <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className=" w-full px-4 sm:px-6 lg:px-29">
                         <div className="home-featured-services-heading">
                             <h2 id="home-services-title">Serviços para conhecer</h2>
                             <p>Explore serviços publicados e exemplos ilustrativos do Conecta Local.</p>
@@ -85,21 +72,14 @@ export default function HomePage() {
                         )}
 
                         <div className="home-featured-services-all">
-                            <AppLink to="/servicos" className="catalog-service-link">
-                                Ver todos os serviços <ArrowRight size={16} aria-hidden="true" />
+                            <AppLink to="/servicos" className="category-featured-contact">
+                                <p>Ver todos os serviços</p> <ArrowRight size={16} aria-hidden="true" />
                             </AppLink>
                         </div>
                     </div>
                 </section>
 
-
-    
-
-        
-                <ProfessionalsCTA />
                 <FAQSection />
-
-
             </main>
             <SiteFooter />
         </>

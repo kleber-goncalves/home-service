@@ -96,7 +96,6 @@ function ServiceSummary({ service }) {
 
     return (
         <aside className="category-featured-card category-featured-summary">
-            <span className="category-featured-kicker">Serviço em destaque</span>
             <h3>{service.title}</h3>
             <p className="category-featured-description">{service.description}</p>
 
@@ -172,10 +171,13 @@ export default function CategoryFeaturedServices({ categories = [], services = [
 
     return (
         <section className="category-featured-section" id="servicos-por-categoria" aria-labelledby="category-featured-title">
-            <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className=" w-full px-4 sm:px-6 lg:px-29">
                 <div className="category-featured-heading">
                     <h2 id="category-featured-title">Serviços que você pode encontrar.</h2>
                     <p className="pt-4 font-bold opacity-75 text-lg">Find trusted local experts just around the corner.</p>
+                    <div>
+                        
+                    </div>
                 </div>
 
                 {loading ? (
@@ -195,7 +197,7 @@ export default function CategoryFeaturedServices({ categories = [], services = [
 
                                 return (
                                     <button className={`category-featured-tab${isSelected ? " is-active" : ""}`} type="button" role="tab" id={`category-featured-tab-${category.id}`} aria-selected={isSelected} aria-controls="category-featured-panel" key={category.id} onClick={() => setSelectedCategoryId(category.id)}>
-                                        <Icon size={17} strokeWidth={1.8} aria-hidden="true" />
+                                        <Icon size={23} strokeWidth={1.8} aria-hidden="true" />
                                         <span>{category.name}</span>
                                     </button>
                                 );

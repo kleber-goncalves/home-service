@@ -245,8 +245,8 @@ export function ProfessionalsCTA() {
 
 export function FAQSection() {
     return (
-        <section className="faq-section section-space" id="perguntas" aria-labelledby="faq-title">
-            <div className="mx-auto grid w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="faq-section section-space " id="perguntas" aria-labelledby="faq-title">
+            <div className=" grid w-full px-4 sm:px-6 lg:px-29">
                 <div className="faq-intro">
                     <div className="faq-illustration" aria-hidden="true">
                         <span className="faq-illustration-bubble">

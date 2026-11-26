@@ -48,7 +48,7 @@ const projectInformation = [
 export default function SiteFooter() {
     return (
         <footer className="site-footer">
-            <div className="site-footer-panel mx-auto w-full max-w-7xl">
+            <div className="site-footer-panel w-full">
                 <div className="footer-top">
                     <div className="footer-intro">
                         <AppLink

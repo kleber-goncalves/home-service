@@ -1,4 +1,4 @@
-import { ArrowRight, MapPin, Search } from "lucide-react";
+import { MapPin, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -9,7 +9,7 @@ export default function HeroSearch({ query, city, onQueryChange, onCityChange, o
 
             <img className="hero-decoration hero-decoration--dish" src="/M%C3%A3o%20segurando%20aspirador%20azul.png" alt="" aria-hidden="true" width={1230} height={1278} loading="eager" decoding="async" draggable={false} />
             <div className="hero-inner mx-auto grid w-full  max-w-9xl px-4 sm:px-6 lg:px-15">
-                <div className="hero-content  rounded-2xl ">
+                <div className="hero-content  rounded-[46px] ">
                     <h1 id="hero-title">Uma maneira  simples de contratar com confiança.</h1>
                     <p className="hero-description">Descubra profissionais da sua região, conheça o que eles oferecem e encontre o caminho para entrar em contato.</p>
                     <form className="hero-search-form" role="search" onSubmit={onSubmit}>
@@ -34,7 +34,7 @@ export default function HeroSearch({ query, city, onQueryChange, onCityChange, o
                             </span>
                         </label>
                         <Button type="submit" size="lg" className="search-submit">
-                            Buscar <ArrowRight size={17} aria-hidden="true" />
+                            Buscar
                         </Button>
                     </form>
                     <p className="search-hint">A busca considera os municípios de atendimento vinculados a cada serviço.</p>
