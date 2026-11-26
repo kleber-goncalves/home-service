@@ -52,7 +52,7 @@ export default function LocalServiceOverview({
                     </div>
 
                     <div className="home-local-overview-gallery" role="group" aria-label="Imagens de serviços e exemplos do catálogo">
-                        {photoServices.map((service, index) => {
+                        {photoServices.map((service) => {
                             const image = service.images.find((item) => item?.url);
 
                             return (
