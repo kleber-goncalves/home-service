@@ -40,15 +40,11 @@ export default function LocalServiceOverview({
             <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="home-local-overview-intro">
                     <div className="home-local-overview-copy">
-                        <span className="home-local-overview-eyebrow">Conecta Local</span>
                         <h2 id="home-local-overview-title">
                             Encontre serviços para cuidar da casa e da rotina
                             <span> sem complicar o caminho.</span>
+                            <span> Explore categorias, conheça exemplos de demonstração e consulte os serviços publicados no Conecta Local.</span>
                         </h2>
-                        <p>
-                            Explore categorias, conheça exemplos de demonstração e consulte os
-                            serviços publicados no Conecta Local.
-                        </p>
                     </div>
 
                     <div className="home-local-overview-gallery" role="group" aria-label="Imagens de serviços e exemplos do catálogo">
@@ -57,11 +53,7 @@ export default function LocalServiceOverview({
 
                             return (
                                 <figure className="home-local-overview-photo" key={service.id}>
-                                    <ServiceImage
-                                        image={image}
-                                        alt={image.alt || `Imagem do serviço: ${service.title}`}
-                                        loading="lazy"
-                                    />
+                                    <ServiceImage image={image} alt={image.alt || `Imagem do serviço: ${service.title}`} loading="lazy" />
                                 </figure>
                             );
                         })}
@@ -77,11 +69,7 @@ export default function LocalServiceOverview({
                     ))}
                 </ul>
 
-                <p className="home-local-overview-note">
-                    {error
-                        ? "Os exemplos continuam disponíveis; não foi possível atualizar todos os indicadores do catálogo."
-                        : "Indicadores calculados com os dados retornados pelo catálogo público. A lista de serviços considera até os 100 registros publicados mais recentes."}
-                </p>
+                <p className="home-local-overview-note">{error ? "Os exemplos continuam disponíveis; não foi possível atualizar todos os indicadores do catálogo." : "Indicadores calculados com os dados retornados pelo catálogo público. A lista de serviços considera até os 100 registros publicados mais recentes."}</p>
             </div>
         </section>
     );

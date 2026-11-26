@@ -61,9 +61,9 @@ export default function HomePage() {
                     <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                         <div className="public-section-heading">
                             <div>
-                                <span className="section-eyebrow">Vitrine do Conecta Local</span>
+                               
                                 <h2 id="home-services-title">Serviços para conhecer</h2>
-                                <p>Veja exemplos fictícios e serviços cadastrados por profissionais.</p>
+
                             </div>
                             <AppLink to="/servicos" className="catalog-service-link">
                                 Ver todos os serviços <ArrowRight size={16} aria-hidden="true" />
