@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** d92ff958c2641b7bcc0da36428e09b71792f571d
-- **Data do commit:** 2026-11-26T17:18:59-03:00
-- **Mensagem do commit:** style(categories): atualizar estrutura visual da página de categorias
+- **Commit de referência:** 67546d8cc00dbe8304a67d72d4e36af7cbc2ba6c
+- **Data do commit:** 2026-11-26T17:19:21-03:00
+- **Mensagem do commit:** style(categories): aplicar identidade visual arredondada à página
 - **Branch desta execução:** feat/categories-page-redesign
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -544,13 +544,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 67546d8 | 2026-11-26 | style(categories): aplicar identidade visual arredondada à página |
+| e82ea12 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | d92ff95 | 2026-11-26 | style(categories): atualizar estrutura visual da página de categorias |
 | 60f7423 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 6bccbab | 2026-11-26 | Merge pull request #43 from kleber-goncalves/docs/design-system-baseline |
 | e52cd83 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | bac082c | 2026-11-26 | docs: adicionar baseline do design system atual |
 | eaa3bd2 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
-| eb7d4fd | 2026-11-26 | refactor: ajustar layout e estilização de componentes na página inicial |
-| 6f99d6f | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
