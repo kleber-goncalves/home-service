@@ -414,10 +414,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** eb7d4fd2881055b0faf68732fa3d02b30615cc52
-- **Data do commit:** 2026-11-26T17:05:19-03:00
-- **Mensagem do commit:** refactor: ajustar layout e estilização de componentes na página inicial
-- **Branch desta execução:** dev
+- **Commit de referência:** bac082ccf8c3b33ddbfecbafb7a38c99059e5991
+- **Data do commit:** 2026-11-26T17:14:42-03:00
+- **Mensagem do commit:** docs: adicionar baseline do design system atual
+- **Branch desta execução:** docs/design-system-baseline
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -544,13 +544,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| bac082c | 2026-11-26 | docs: adicionar baseline do design system atual |
+| eaa3bd2 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | eb7d4fd | 2026-11-26 | refactor: ajustar layout e estilização de componentes na página inicial |
 | 6f99d6f | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 5d87cad | 2026-11-26 | Merge pull request #42 from kleber-goncalves/feat/homepage-footer-redesign |
 | c468822 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 8b91792 | 2026-11-26 | style(footer): criar painel escuro responsivo com colunas |
 | a0fcf63 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
-| 148159f | 2026-11-26 | fix(footer): remover imports de ícones não utilizados |
-| 60a6c3d | 2026-11-26 | style(footer): reorganizar navegação e chamadas do rodapé |
 
 <!-- END AUTO-GENERATED SECTION -->
