@@ -175,30 +175,26 @@ export default function CategoryFeaturedServices({ categories = [], services = [
             <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="category-featured-heading">
                     <h2 id="category-featured-title">Serviços que você pode encontrar.</h2>
+                    <p className="pt-4 font-bold opacity-75 text-lg">Find trusted local experts just around the corner.</p>
                 </div>
 
                 {loading ? (
-                    <p className="category-featured-state" role="status">Carregando categorias e serviços...</p>
+                    <p className="category-featured-state" role="status">
+                        Carregando categorias e serviços...
+                    </p>
                 ) : error && !categories.length ? (
-                    <p className="category-featured-state" role="alert">Não foi possível carregar as categorias agora.</p>
+                    <p className="category-featured-state" role="alert">
+                        Não foi possível carregar as categorias agora.
+                    </p>
                 ) : categories.length ? (
                     <>
-                        <div className="category-featured-tabs" role="tablist" aria-label="Categorias de serviços">
+                        <div className="category-featured-tabs pt-11" role="tablist" aria-label="Categorias de serviços">
                             {categories.map((category) => {
                                 const Icon = iconForCategory(category.name);
                                 const isSelected = selectedCategory?.id === category.id;
 
                                 return (
-                                    <button
-                                        className={`category-featured-tab${isSelected ? " is-active" : ""}`}
-                                        type="button"
-                                        role="tab"
-                                        id={`category-featured-tab-${category.id}`}
-                                        aria-selected={isSelected}
-                                        aria-controls="category-featured-panel"
-                                        key={category.id}
-                                        onClick={() => setSelectedCategoryId(category.id)}
-                                    >
+                                    <button className={`category-featured-tab${isSelected ? " is-active" : ""}`} type="button" role="tab" id={`category-featured-tab-${category.id}`} aria-selected={isSelected} aria-controls="category-featured-panel" key={category.id} onClick={() => setSelectedCategoryId(category.id)}>
                                         <Icon size={17} strokeWidth={1.8} aria-hidden="true" />
                                         <span>{category.name}</span>
                                     </button>
@@ -206,13 +202,7 @@ export default function CategoryFeaturedServices({ categories = [], services = [
                             })}
                         </div>
 
-                        <div
-                            id="category-featured-panel"
-                            className="category-featured-panel"
-                            role="tabpanel"
-                            aria-labelledby={`category-featured-tab-${selectedCategory.id}`}
-                            tabIndex={0}
-                        >
+                        <div id="category-featured-panel" className="category-featured-panel" role="tabpanel" aria-labelledby={`category-featured-tab-${selectedCategory.id}`} tabIndex={0}>
                             {featuredService ? (
                                 <FeaturedServicePanel service={featuredService} categoryName={selectedCategory.name} />
                             ) : (
@@ -224,11 +214,7 @@ export default function CategoryFeaturedServices({ categories = [], services = [
                         </div>
                     </>
                 ) : (
-                    <p className="category-featured-state">
-                        {error
-                            ? "Não foi possível carregar as categorias e serviços."
-                            : "As categorias serão exibidas aqui quando estiverem disponíveis."}
-                    </p>
+                    <p className="category-featured-state">{error ? "Não foi possível carregar as categorias e serviços." : "As categorias serão exibidas aqui quando estiverem disponíveis."}</p>
                 )}
             </div>
         </section>

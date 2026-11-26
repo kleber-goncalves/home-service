@@ -21,6 +21,7 @@
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
     --brand: #1558d6;
+    --brand500: #eff6ff;
     --brand-dark: #0e3474;
     --navy: #102849;
     --ink: #172b49;
@@ -4064,17 +4065,18 @@ summary:focus-visible {
 /* Category featured services showcase */
 .category-featured-section {
     padding: clamp(52px, 6vw, 82px) 0;
-    background: #f7f6f2;
+    background: transparent;
 }
 
 .category-featured-heading {
+    max-width: 65%;
     margin-bottom: 28px;
 }
 
 .category-featured-heading h2 {
     margin: 0;
     color: var(--navy);
-    font-size: clamp(1.85rem, 3.6vw, 2.65rem);
+    font-size: clamp(1.85rem, 3.6vw, 3.35rem);
     font-weight: 800;
     letter-spacing: -0.055em;
     line-height: 1.12;
@@ -4083,26 +4085,26 @@ summary:focus-visible {
 .category-featured-tabs {
     display: flex;
     align-items: stretch;
-    gap: 5px;
+    gap: 16px;
     overflow-x: auto;
-    margin-bottom: 31px;
-    border-bottom: 1px solid #d7dce3;
+    margin-bottom: 23px;
     scrollbar-width: thin;
     scrollbar-color: #b8c8dc transparent;
 }
 
 .category-featured-tab {
     display: inline-flex;
-    min-height: 48px;
+    min-height: 44px;
     flex: 0 0 auto;
     align-items: center;
+    background-color: transparent;
+    border-radius: 17px;
+
     justify-content: center;
-    gap: 9px;
-    padding: 0 13px 10px;
-    color: #42536a;
-    background: transparent;
+    gap: 8px;
+    padding: 0 13px 4px;
+    color: #000;
     border: 0;
-    border-bottom: 2px solid transparent;
     font: inherit;
     font-size: 0.83rem;
     font-weight: 600;
@@ -4115,8 +4117,8 @@ summary:focus-visible {
 }
 
 .category-featured-tab.is-active {
-    color: var(--brand);
-    border-bottom-color: var(--brand);
+    color: var(--brand500);
+    background-color: var(--brand);
 }
 
 .category-featured-tab:focus-visible {
@@ -4139,7 +4141,7 @@ summary:focus-visible {
 
 .category-featured-facts {
     padding: clamp(20px, 2.1vw, 27px);
-    background: #d9efff;
+    background: linear-gradient(180deg, #97dcffc8 0%, #fafdea 100%);
 }
 
 .category-featured-facts h3 {
@@ -4197,7 +4199,7 @@ summary:focus-visible {
     justify-content: center;
     flex-direction: column;
     gap: 11px;
-    color: #6b7e93;
+    color: #000000;
     background: #e6edf2;
     font-size: 0.8rem;
 }
@@ -4206,13 +4208,13 @@ summary:focus-visible {
     display: flex;
     flex-direction: column;
     padding: clamp(20px, 2.1vw, 27px);
-    color: #fff;
-    background: #102247;
+    color: #000000;
+    background: linear-gradient(180deg, #97dcffc8 0%, #f9ffd3 100%);
 }
 
 .category-featured-kicker {
     margin-bottom: 12px;
-    color: #b7c8e1;
+    color: #000000;
     font-size: 0.69rem;
     font-weight: 800;
     letter-spacing: 0.07em;
@@ -4221,7 +4223,7 @@ summary:focus-visible {
 
 .category-featured-summary h3 {
     margin: 0;
-    color: #fff;
+    color: #000000;
     font-size: clamp(1.15rem, 1.7vw, 1.45rem);
     font-weight: 800;
     letter-spacing: -0.035em;
@@ -4230,7 +4232,7 @@ summary:focus-visible {
 
 .category-featured-description {
     margin: 15px 0 0;
-    color: #e0e8f3;
+    color: #000000;
     font-size: 0.81rem;
     line-height: 1.65;
     overflow-wrap: anywhere;
@@ -4240,7 +4242,7 @@ summary:focus-visible {
     width: 100%;
     height: 1px;
     margin: 22px 0 17px;
-    background: rgba(218, 230, 247, 0.22);
+    background: rgba(0, 0, 0, 0.499);
 }
 
 .category-featured-owner {
@@ -4250,7 +4252,7 @@ summary:focus-visible {
 
 .category-featured-owner-label {
     margin-bottom: 1px;
-    color: #b7c8e1;
+    color: #000000;
     font-size: 0.67rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -4261,7 +4263,7 @@ summary:focus-visible {
     min-width: 0;
     align-items: flex-start;
     gap: 9px;
-    color: #e0e8f3;
+    color: #000000;
     font-size: 0.78rem;
     line-height: 1.45;
     overflow-wrap: anywhere;
@@ -4270,11 +4272,11 @@ summary:focus-visible {
 .category-featured-owner-line svg {
     flex: 0 0 auto;
     margin-top: 1px;
-    color: #d9e7fb;
+    color: #000000;
 }
 
 .category-featured-owner-line strong {
-    color: #fff;
+    color: #000000;
     font-weight: 800;
 }
 
@@ -4287,9 +4289,9 @@ summary:focus-visible {
     gap: 8px;
     margin-top: auto;
     padding: 11px 15px;
-    color: #102247;
-    background: #f1f5fb;
-    border: 1px solid #e1eaf5;
+    color: #ffffff;
+    background: var(--brand);
+    border: 1px solid #000000;
     border-radius: 10px;
     font-size: 0.81rem;
     font-weight: 800;
@@ -4298,7 +4300,7 @@ summary:focus-visible {
 }
 
 .category-featured-contact:hover {
-    background: #fff;
+    background: #082e6b;
     transform: translateY(-1px);
 }
 
