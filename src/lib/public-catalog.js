@@ -1,3 +1,5 @@
+import { professionals as demoServiceDefinitions } from "../data/homepage.js";
+
 function normalizeSearch(value) {
     return String(value || "")
         .normalize("NFD")
@@ -5,6 +7,55 @@ function normalizeSearch(value) {
         .toLocaleLowerCase("pt-BR")
         .replace(/[^a-z0-9]+/g, " ")
         .trim();
+}
+
+function categoryFallbackId(name) {
+    return "demo-category-" + normalizeSearch(name).replace(/\s+/g, "-");
+}
+
+export function createDemoCategories() {
+    const seen = new Set();
+
+    return demoServiceDefinitions.reduce((result, service) => {
+        const normalizedName = normalizeSearch(service.category);
+        if (seen.has(normalizedName)) return result;
+        seen.add(normalizedName);
+        result.push({
+            id: categoryFallbackId(service.category),
+            name: service.category,
+            isDemo: true,
+        });
+        return result;
+    }, []);
+}
+
+export function createDemoServices(categories = []) {
+    return demoServiceDefinitions.map((service) => {
+        const normalizedCategory = normalizeSearch(service.category);
+        const matchingCategory = categories.find(
+            (category) => normalizeSearch(category.name) === normalizedCategory,
+        );
+
+        return {
+            id: "demo-" + service.id,
+            categoryId: matchingCategory?.id || categoryFallbackId(service.category),
+            category: service.category,
+            title: service.title,
+            description: service.description,
+            professionalName: "Perfil fictício de demonstração",
+            cityIds: [],
+            cities: [],
+            cityLabel: "Sem localidade real (exemplo)",
+            whatsapp: "",
+            images: [{
+                id: "demo-image-" + service.id,
+                url: service.image,
+                alt: service.imageAlt,
+            }],
+            isPersisted: false,
+            isDemo: true,
+        };
+    });
 }
 
 const IMAGE_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -76,10 +127,11 @@ export function filterPublicServices(services, { query = "", categoryId = "", ci
     return services.filter((service) => {
         const matchesCategory = !categoryId || service.categoryId === String(categoryId);
         const serviceCities = [
-            ...service.cities.map((item) => [item.name, item.state].filter(Boolean).join(" ")),
-            service.cityLabel || "",
-        ].map(normalizeSearch).join(" ");
-        const matchesCity = !normalizedCity || serviceCities.includes(normalizedCity);
+            ...(Array.isArray(service.cities) ? service.cities : [])
+                .map((item) => [item.name, item.state].filter(Boolean).join(" ")),
+            service.isDemo ? "" : (service.cityLabel || ""),
+        ].filter(Boolean).map(normalizeSearch).join(" ");
+        const matchesCity = !normalizedCity || (!service.isDemo && serviceCities.includes(normalizedCity));
         const searchText = normalizeSearch([
             service.title,
             service.category,

@@ -4420,3 +4420,52 @@ summary:focus-visible {
         padding: 20px;
     }
 }
+
+/* Distinguish illustrative examples from published catalog records */
+.catalog-source-counts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.catalog-source-counts span,
+.catalog-category-counts span {
+    display: inline-flex;
+    min-height: 25px;
+    align-items: center;
+    padding: 4px 8px;
+    color: #536985;
+    background: #edf3fa;
+    border-radius: 999px;
+    font-size: 0.64rem;
+    font-weight: 700;
+}
+
+.catalog-source-counts span:last-child,
+.catalog-category-counts span:last-child {
+    color: #76521d;
+    background: #fbf1dc;
+}
+
+.catalog-category-counts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 12px;
+}
+
+.service-detail-demo-badge {
+    display: inline-flex;
+    width: fit-content;
+    max-width: 100%;
+    margin-top: 10px;
+    padding: 7px 10px;
+    color: #76521d;
+    background: #fbf1dc;
+    border: 1px solid #f1dfb8;
+    border-radius: 999px;
+    font-size: 0.66rem;
+    font-weight: 800;
+    line-height: 1.4;
+}

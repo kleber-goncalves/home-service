@@ -18,7 +18,7 @@ export default function ServiceDetailPage({ serviceId }) {
     const service = catalog.services.find((item) => item.id === serviceId);
     const images = service?.images || [];
     const activeImage = images[activeIndex] || null;
-    const whatsappUrl = service ? createWhatsappUrl(service.whatsapp, service.title) : null;
+    const whatsappUrl = service && !service.isDemo ? createWhatsappUrl(service.whatsapp, service.title) : null;
 
     return <>
         <SiteHeader active="servicos" />
@@ -52,6 +52,7 @@ export default function ServiceDetailPage({ serviceId }) {
                                     </section>
                                     <section className="service-detail-copy">
                                         <span className="catalog-service-category">{service.category}</span>
+                                        {service.isDemo && <span className="service-detail-demo-badge">Exemplo fictício — não representa um cadastro real</span>}
                                         <h1>{service.title}</h1>
                                         <p className="service-detail-description">{service.description}</p>
                                         <div className="service-detail-meta">
@@ -59,8 +60,8 @@ export default function ServiceDetailPage({ serviceId }) {
                                             <div><BriefcaseBusiness size={17} aria-hidden="true" /><span><strong>Profissional</strong>{service.professionalName}</span></div>
                                         </div>
                                         {whatsappUrl ? <a className="service-contact-button" href={whatsappUrl} target="_blank" rel="noreferrer"><MessageCircle size={18} aria-hidden="true" /> Entrar em contato pelo WhatsApp</a>
-                                            : <p className="service-contact-unavailable">Este serviço ainda não possui um WhatsApp público disponível.</p>}
-                                        <p className="service-detail-note">As informações exibidas são as informações públicas disponibilizadas pelo profissional.</p>
+                                            : <p className="service-contact-unavailable">{service.isDemo ? "Este é um exemplo fictício: não existe profissional real nem canal de contato associado." : "Este serviço ainda não possui um WhatsApp público disponível."}</p>}
+                                        <p className="service-detail-note">{service.isDemo ? "Conteúdo demonstrativo com imagem e informações fictícias, sem vínculo com um profissional real." : "As informações exibidas são as informações públicas disponibilizadas pelo profissional."}</p>
                                     </section>
                                 </div>}
                 </div>

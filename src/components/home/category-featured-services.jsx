@@ -62,6 +62,8 @@ function serviceLocationTags(service) {
         );
     }
 
+    if (service.isDemo) return [];
+
     return service.cityLabel
         ? [{ key: "service-location", label: service.cityLabel }]
         : [];
@@ -76,11 +78,13 @@ function ServiceFacts({ service, categoryName }) {
             <h3>Informações rápidas</h3>
             <div className="category-featured-tags">
                 <span className="category-featured-tag">{categoryName}</span>
-                <span className="category-featured-tag">Cadastro publicado</span>
+                <span className="category-featured-tag">{service.isDemo ? "Exemplo fictício" : "Cadastro publicado"}</span>
                 {locationTags.map((location) => (
                     <span className="category-featured-tag" key={location.key}>{location.label}</span>
                 ))}
-                {whatsappUrl && <span className="category-featured-tag">WhatsApp disponível</span>}
+                {service.isDemo
+                    ? <span className="category-featured-tag">Sem contato real</span>
+                    : whatsappUrl && <span className="category-featured-tag">WhatsApp disponível</span>}
             </div>
         </aside>
     );
@@ -88,7 +92,7 @@ function ServiceFacts({ service, categoryName }) {
 
 function ServiceSummary({ service }) {
     const whatsappUrl = createWhatsappUrl(service.whatsapp, service.title);
-    const serviceHref = `/servicos/${encodeURIComponent(service.id)}`;
+    const serviceHref = service.isDemo ? "/servicos" : `/servicos/${encodeURIComponent(service.id)}`;
 
     return (
         <aside className="category-featured-card category-featured-summary">
@@ -102,7 +106,7 @@ function ServiceSummary({ service }) {
                 <span className="category-featured-owner-label">Quem oferece</span>
                 <span className="category-featured-owner-line">
                     <BriefcaseBusiness size={17} aria-hidden="true" />
-                    <strong>{service.professionalName || "Profissional"}</strong>
+                    <strong>{service.professionalName || (service.isDemo ? "Perfil fictício" : "Profissional")}</strong>
                 </span>
                 <span className="category-featured-owner-line">
                     <MapPin size={17} aria-hidden="true" />
@@ -110,7 +114,11 @@ function ServiceSummary({ service }) {
                 </span>
             </div>
 
-            {whatsappUrl ? (
+            {service.isDemo ? (
+                <AppLink to={serviceHref} className="category-featured-contact">
+                    Ver serviços disponíveis
+                </AppLink>
+            ) : whatsappUrl ? (
                 <a className="category-featured-contact" href={whatsappUrl} target="_blank" rel="noreferrer">
                     <MessageCircle size={17} aria-hidden="true" />
                     Entrar em contato
@@ -154,11 +162,13 @@ export default function CategoryFeaturedServices({ categories = [], services = [
         || categories[0]
         || null;
 
-    // The API returns the newest inserted published service first for each category.
-    // The product has no views/contact metrics, so this is not a popularity ranking.
-    const featuredService = selectedCategory
-        ? services.find((service) => service.categoryId === selectedCategory.id) || null
-        : null;
+    // Prefer a real published service. When a category has no published entry, show its local example.
+    const categoryServices = selectedCategory
+        ? services.filter((service) => service.categoryId === selectedCategory.id)
+        : [];
+    const featuredService = categoryServices.find((service) => !service.isDemo)
+        || categoryServices.find((service) => service.isDemo)
+        || null;
 
     return (
         <section className="category-featured-section" id="servicos-por-categoria" aria-labelledby="category-featured-title">
@@ -207,8 +217,8 @@ export default function CategoryFeaturedServices({ categories = [], services = [
                                 <FeaturedServicePanel service={featuredService} categoryName={selectedCategory.name} />
                             ) : (
                                 <div className="category-featured-empty">
-                                    <h3>Ainda não há serviço publicado nesta categoria.</h3>
-                                    <p>Quando um profissional publicar um serviço nesta área, ele aparecerá aqui.</p>
+                                    <h3>Ainda não há serviço nem exemplo nesta categoria.</h3>
+                                    <p>Quando houver um serviço cadastrado ou um exemplo ilustrativo para esta área, ele aparecerá aqui.</p>
                                 </div>
                             )}
                         </div>
