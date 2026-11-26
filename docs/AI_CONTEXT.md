@@ -414,10 +414,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** fdd7ac8dcacb4c2e62d3c58146a15a03fe201b43
-- **Data do commit:** 2026-11-26T14:36:27-03:00
-- **Mensagem do commit:** feat(category-featured-services): melhorar a apresentação e responsividade da seção de serviços
-- **Branch desta execução:** dev
+- **Commit de referência:** fe25f122c6b6e0554d04ef60db67f5cb4655384d
+- **Data do commit:** 2026-11-26T14:43:40-03:00
+- **Mensagem do commit:** feat(homepage): adicionar resumo visual do catálogo local
+- **Branch desta execução:** feat/homepage-local-service-overview
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -497,6 +497,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/components/home/category-featured-services.jsx
 - src/components/home/hero-search.jsx
 - src/components/home/home-sections.jsx
+- src/components/home/local-service-overview.jsx
 - src/components/home/site-header.jsx
 - src/components/professional/profile-photo-manager.jsx
 - src/components/professional/service-image-manager.jsx
@@ -542,13 +543,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| fe25f12 | 2026-11-26 | feat(homepage): adicionar resumo visual do catálogo local |
+| b8d4683 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | fdd7ac8 | 2026-11-26 | feat(category-featured-services): melhorar a apresentação e responsividade da seção de serviços |
 | 2cf93b5 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | e8ab7ae | 2026-11-26 | Merge pull request #38 from kleber-goncalves/feat/catalog-demo-and-published-services |
 | e6da7a5 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | d8ded0e | 2026-11-24 | style(catalog): diferenciar exemplos e servicos cadastrados |
 | 3b3d544 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
-| fe50661 | 2026-11-24 | fix(homepage): distinguir destaque real de exemplo |
-| b7cfccf | 2026-11-24 | fix(catalog): identificar detalhes de servicos ficticios |
 
 <!-- END AUTO-GENERATED SECTION -->
