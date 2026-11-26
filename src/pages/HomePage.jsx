@@ -12,7 +12,6 @@ import {
 import AppLink from "@/components/public/app-link";
 import HomeFeaturedServiceCard from "@/components/home/featured-service-card";
 import SiteFooter from "@/components/public/site-footer";
-import { Button } from "@/components/ui/button";
 import usePublicCatalog from "@/hooks/use-public-catalog";
 import { navigateTo } from "@/lib/navigation";
 
@@ -100,17 +99,7 @@ export default function HomePage() {
                 <ProfessionalsCTA />
                 <FAQSection />
 
-                <section className="public-home-final-cta">
-                    <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-                        <div>
-                            <strong>Está procurando um serviço?</strong>
-                            <span>Explore o catálogo completo e use os filtros.</span>
-                        </div>
-                        <Button type="button" onClick={() => navigateTo("/servicos")}>
-                            Explorar serviços <ArrowRight size={16} aria-hidden="true" />
-                        </Button>
-                    </div>
-                </section>
+
             </main>
             <SiteFooter />
         </>
