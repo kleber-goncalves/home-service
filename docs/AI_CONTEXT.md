@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 148159f20201e738a981c178d3f3b99d56ceb1e3
-- **Data do commit:** 2026-11-26T15:25:37-03:00
-- **Mensagem do commit:** fix(footer): remover imports de ícones não utilizados
+- **Commit de referência:** 8b917920fe24d5e8ccfe70010442c98141e39acc
+- **Data do commit:** 2026-11-26T15:26:05-03:00
+- **Mensagem do commit:** style(footer): criar painel escuro responsivo com colunas
 - **Branch desta execução:** feat/homepage-footer-redesign
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -544,13 +544,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 8b91792 | 2026-11-26 | style(footer): criar painel escuro responsivo com colunas |
+| a0fcf63 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 148159f | 2026-11-26 | fix(footer): remover imports de ícones não utilizados |
 | 60a6c3d | 2026-11-26 | style(footer): reorganizar navegação e chamadas do rodapé |
 | 349ad27 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 949c55e | 2026-11-26 | refactor(homepage): remover seção de CTA final da página inicial |
 | a3cf494 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 62cbcc5 | 2026-11-26 | Merge pull request #41 from kleber-goncalves/feat/homepage-faq-section-redesign |
-| 5462ffd | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
-| 3f8c79f | 2026-11-26 | style(homepage): aplicar layout editorial na seção FAQ |
 
 <!-- END AUTO-GENERATED SECTION -->
