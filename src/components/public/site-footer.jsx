@@ -1,13 +1,9 @@
 import {
     ArrowUpRight,
     BriefcaseBusiness,
-    CircleHelp,
-    Code2,
     Compass,
     House,
     Layers3,
-    UserRound,
-    UserRoundPlus,
 } from "lucide-react";
 import AppLink from "@/components/public/app-link";
 
