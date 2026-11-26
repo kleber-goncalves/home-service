@@ -414,10 +414,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** e9b82c00bc1215a220b322dc167ea11e99262a3a
-- **Data do commit:** 2026-11-26T15:13:40-03:00
-- **Mensagem do commit:** refactor(homepage): remover seções não utilizadas e otimizar importações
-- **Branch desta execução:** dev
+- **Commit de referência:** aea1f48cba11df643b43a7bda7cb4e172cfb62b7
+- **Data do commit:** 2026-11-26T15:17:55-03:00
+- **Mensagem do commit:** style(homepage): reorganizar estrutura da seção FAQ
+- **Branch desta execução:** feat/homepage-faq-section-redesign
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -544,13 +544,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| aea1f48 | 2026-11-26 | style(homepage): reorganizar estrutura da seção FAQ |
+| c53ce89 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | e9b82c0 | 2026-11-26 | refactor(homepage): remover seções não utilizadas e otimizar importações |
 | 2a9d737 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 046dd6e | 2026-11-26 | Merge pull request #40 from kleber-goncalves/feat/homepage-services-card-redesign |
 | 298ef0d | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | ebe1598 | 2026-11-26 | fix(homepage): estabilizar seletor de ícones dos cards |
 | f092854 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
-| 1792669 | 2026-11-26 | style(homepage): redesenhar cards da vitrine de serviços |
-| dccdb8c | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
