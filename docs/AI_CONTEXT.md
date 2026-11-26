@@ -414,10 +414,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 7659d0371cfd84f9896d9bfdf7dd8b589845ba0f
-- **Data do commit:** 2026-11-26T14:44:19-03:00
-- **Mensagem do commit:** fix(homepage): remover variável não utilizada da galeria
-- **Branch desta execução:** feat/homepage-local-service-overview
+- **Commit de referência:** 3376a89871ffaef1c1345f808f540ecf974dd1dd
+- **Data do commit:** 2026-11-26T14:48:32-03:00
+- **Mensagem do commit:** Merge pull request #39 from kleber-goncalves/feat/homepage-local-service-overview
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -543,13 +543,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 3376a89 | 2026-11-26 | Merge pull request #39 from kleber-goncalves/feat/homepage-local-service-overview |
+| fd5a988 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 7659d03 | 2026-11-26 | fix(homepage): remover variável não utilizada da galeria |
 | 6594192 | 2026-11-26 | style(homepage): criar layout responsivo do resumo local |
 | 99c4d57 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | 8982fe3 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | ed4a3fb | 2026-11-26 | feat(homepage): posicionar resumo do catálogo após vitrine por categoria |
 | fe25f12 | 2026-11-26 | feat(homepage): adicionar resumo visual do catálogo local |
-| b8d4683 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
-| fdd7ac8 | 2026-11-26 | feat(category-featured-services): melhorar a apresentação e responsividade da seção de serviços |
 
 <!-- END AUTO-GENERATED SECTION -->
