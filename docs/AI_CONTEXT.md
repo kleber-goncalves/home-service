@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** e8ab7ae00c57ab00ad236e128c49c5817e5398d7
-- **Data do commit:** 2026-11-26T10:37:13-03:00
-- **Mensagem do commit:** Merge pull request #38 from kleber-goncalves/feat/catalog-demo-and-published-services
+- **Commit de referência:** fdd7ac8dcacb4c2e62d3c58146a15a03fe201b43
+- **Data do commit:** 2026-11-26T14:36:27-03:00
+- **Mensagem do commit:** feat(category-featured-services): melhorar a apresentação e responsividade da seção de serviços
 - **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -542,13 +542,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| fdd7ac8 | 2026-11-26 | feat(category-featured-services): melhorar a apresentação e responsividade da seção de serviços |
+| 2cf93b5 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 | e8ab7ae | 2026-11-26 | Merge pull request #38 from kleber-goncalves/feat/catalog-demo-and-published-services |
 | e6da7a5 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | d8ded0e | 2026-11-24 | style(catalog): diferenciar exemplos e servicos cadastrados |
 | 3b3d544 | 2026-11-24 | docs(ai-context): atualizar snapshot automaticamente |
 | fe50661 | 2026-11-24 | fix(homepage): distinguir destaque real de exemplo |
 | b7cfccf | 2026-11-24 | fix(catalog): identificar detalhes de servicos ficticios |
-| 48d1dc0 | 2026-11-24 | feat(categories): mostrar contagem de exemplos e cadastros |
-| d8764a9 | 2026-11-24 | feat(catalog): incluir exemplos na busca e listagem |
 
 <!-- END AUTO-GENERATED SECTION -->
