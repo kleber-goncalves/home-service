@@ -12,7 +12,7 @@ import {
     ProfessionalsCTA,
 } from "@/components/home/home-sections";
 import AppLink from "@/components/public/app-link";
-import ServiceCard from "@/components/public/service-card";
+import HomeFeaturedServiceCard from "@/components/home/featured-service-card";
 import SiteFooter from "@/components/public/site-footer";
 import { Button } from "@/components/ui/button";
 import usePublicCatalog from "@/hooks/use-public-catalog";
@@ -59,29 +59,25 @@ export default function HomePage() {
 
                 <section className="public-home-section public-home-services" id="servicos" aria-labelledby="home-services-title">
                     <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="public-section-heading">
-                            <div>
-                               
-                                <h2 id="home-services-title">Serviços para conhecer</h2>
-
-                            </div>
-                            <AppLink to="/servicos" className="catalog-service-link">
-                                Ver todos os serviços <ArrowRight size={16} aria-hidden="true" />
-                            </AppLink>
+                        <div className="home-featured-services-heading">
+                            <h2 id="home-services-title">Serviços para conhecer</h2>
+                            <p>Explore serviços publicados e exemplos ilustrativos do Conecta Local.</p>
                         </div>
+
                         {!catalog.loading && catalog.error && (
                             <p className="catalog-inline-state catalog-inline-state--error" role="status">
                                 Não foi possível atualizar os cadastros reais agora; os exemplos fictícios continuam disponíveis.
                             </p>
                         )}
+
                         {catalog.loading ? (
                             <div className="catalog-state" role="status">
                                 Carregando exemplos e serviços cadastrados...
                             </div>
                         ) : featuredServices.length ? (
-                            <div className="catalog-service-grid">
+                            <div className="home-featured-service-grid">
                                 {featuredServices.map((service) => (
-                                    <ServiceCard service={service} key={service.id} />
+                                    <HomeFeaturedServiceCard service={service} key={service.id} />
                                 ))}
                             </div>
                         ) : (
@@ -90,6 +86,12 @@ export default function HomePage() {
                                 <p>{catalog.error ? "Não foi possível carregar os cadastros e os exemplos locais estão indisponíveis." : "Os serviços e exemplos aparecerão aqui quando estiverem disponíveis."}</p>
                             </div>
                         )}
+
+                        <div className="home-featured-services-all">
+                            <AppLink to="/servicos" className="catalog-service-link">
+                                Ver todos os serviços <ArrowRight size={16} aria-hidden="true" />
+                            </AppLink>
+                        </div>
                     </div>
                 </section>
 
