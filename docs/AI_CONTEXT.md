@@ -425,10 +425,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** cb9e9f2b2daaa2b00a32751eb7a94526ba8a00f6
-- **Data do commit:** 2026-11-27T16:54:37-03:00
-- **Mensagem do commit:** Merge pull request #56 from kleber-goncalves/fix/managed-image-origin-fallback
-- **Branch desta execução:** dev
+- **Commit de referência:** ddb26042b5bc921bd450f569427af82bc4a68bd3
+- **Data do commit:** 2026-11-27T17:10:13-03:00
+- **Mensagem do commit:** feat(professional): add service form dialog
+- **Branch desta execução:** feat/service-form-dialog
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 15
 - **Dependências de runtime:** 6
@@ -527,6 +527,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/components/professional/services/professional-service-actions.jsx
 - src/components/professional/services/professional-service-card.jsx
 - src/components/professional/services/professional-service-filters.jsx
+- src/components/professional/services/professional-service-form-dialog.jsx
 - src/components/professional/services/professional-service-list.jsx
 - src/components/professional/services/professional-service-utils.js
 - src/components/public/app-link.jsx
@@ -575,13 +576,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| ddb2604 | 2026-11-27 | feat(professional): add service form dialog |
+| b345152 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | cb9e9f2 | 2026-11-27 | Merge pull request #56 from kleber-goncalves/fix/managed-image-origin-fallback |
 | fe3787d | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 6cbf840 | 2026-11-27 | test(images): verify private image delivery without Origin |
 | 3c040f5 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 8b5aee5 | 2026-11-27 | fix(images): allow verified same-origin GET without Origin |
 | 76e63aa | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 791bfde | 2026-11-27 | Merge pull request #55 from kleber-goncalves/fix/public-service-image-proxy |
-| eac5eb4 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
