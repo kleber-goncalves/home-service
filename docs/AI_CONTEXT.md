@@ -425,10 +425,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** c1e6abdf8dae65bdef56de1d6aeafcb038c62be5
-- **Data do commit:** 2026-11-27T12:44:11-03:00
-- **Mensagem do commit:** Merge pull request #51 from kleber-goncalves/feat/professional-dashboard-motion-charts
-- **Branch desta execução:** dev
+- **Commit de referência:** e88131dacd06636582fd6cb6c40eca19a83d8b13
+- **Data do commit:** 2026-11-27T13:56:09-03:00
+- **Mensagem do commit:** chore(preview): remover pagina temporaria de dados ficticios
+- **Branch desta execução:** feat/professional-dashboard-chart-visual-review
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 6
@@ -559,13 +559,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| c1e6abd | 2026-11-27 | Merge pull request #51 from kleber-goncalves/feat/professional-dashboard-motion-charts |
-| f52ddb9 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 9223984 | 2026-11-27 | feat(professional): animate interactive dashboard charts |
-| fabbc97 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 0853c4d | 2026-11-27 | chore(deps): adicionar gsap e recharts |
-| 8a51ccc | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| d39ae32 | 2026-11-27 | Merge pull request #50 from kleber-goncalves/feat/professional-dashboard-analytics |
-| 65dd0fd | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| e88131d | 2026-11-27 | chore(preview): remover pagina temporaria de dados ficticios |
+| 4ebec83 | 2026-11-27 | style(dashboard): remover estilos exclusivos da previa |
+| 40fa1a5 | 2026-11-27 | chore(preview): remover rota temporaria de demonstracao |
+| 55b937b | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| e1985df | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| c98a5cd | 2026-11-27 | style(preview): diferenciar identificador de demonstracao |
+| fa16ccb | 2026-11-27 | fix(preview): identificar dados ficticios na barra superior |
+| e07cf1f | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
