@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** a1252b2395acbbd1b1a660bebef42c99647e4b42
-- **Data do commit:** 2026-11-27T00:59:23-03:00
-- **Mensagem do commit:** docs(design): documentar cadastro multipasso
+- **Commit de referência:** 1b5592d613e3e23d96dc4b6215da550de8354edc
+- **Data do commit:** 2026-11-27T00:59:55-03:00
+- **Mensagem do commit:** docs(design): ajustar numeração das seções de autenticação
 - **Branch desta execução:** feat/login-page-editorial-refresh
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -544,13 +544,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 1b5592d | 2026-11-27 | docs(design): ajustar numeração das seções de autenticação |
+| 827b52a | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| 95bc0ab | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | a1252b2 | 2026-11-27 | docs(design): documentar cadastro multipasso |
 | 486c450 | 2026-11-27 | style(auth): adicionar progresso e navegação ao cadastro |
 | 6853ffb | 2026-11-27 | feat(auth): dividir cadastro profissional em etapas |
 | 27f62b8 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | e93f70b | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 6f8ef8e | 2026-11-27 | docs(design): document authentication page visual language |
-| 94acb2c | 2026-11-27 | style(auth): align authentication page with editorial design system |
-| 490cfe3 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
