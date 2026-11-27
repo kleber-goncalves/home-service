@@ -158,11 +158,29 @@ test("gateway rejeita origem externa, consulta duplicada e execução fora do Pr
     assert.equal(upstreamCalled, false);
 });
 
-test("gateway aceita GET same-origin sem Origin quando Fetch Metadata e Referer são válidos", async () => {
-    let upstreamCalled = false;
-    const handler = createHarness(async () => {
-        upstreamCalled = true;
-        throw new Error("Falha simulada depois da validação de origem.");
+test("gateway entrega imagem privada em GET same-origin sem Origin com Fetch Metadata e Referer válidos", async () => {
+    const handler = createHarness(async (url, options) => {
+        if (url === SCRIPT_URL) {
+            const form = new URLSearchParams(options.body);
+            return createUpstreamResponse({
+                ok: true,
+                action: "image.resolve.mine",
+                requestId: form.get("requestId"),
+                data: {
+                    fileId: DRIVE_FILE_ID,
+                    mimeType: "image/png",
+                    sizeBytes: IMAGE_BYTES.length,
+                    accessToken: ACCESS_TOKEN,
+                },
+            }, "https://script.googleusercontent.com/macros/echo?managed-image=no-origin");
+        }
+
+        const response = new Response(IMAGE_BYTES, {
+            status: 200,
+            headers: { "Content-Type": "image/png", "Content-Length": String(IMAGE_BYTES.length) },
+        });
+        Object.defineProperty(response, "url", { value: url });
+        return response;
     });
 
     const response = await handler(buildRequest({
@@ -171,9 +189,9 @@ test("gateway aceita GET same-origin sem Origin quando Fetch Metadata e Referer 
         referer: ORIGIN + "/?auth=demo",
     }));
 
-    assert.equal(upstreamCalled, true);
-    assert.equal(response.status, 502);
-    assert.equal((await response.json()).error.code, "IMAGE_LOOKUP_FAILED");
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("content-type"), "image/png");
+    assert.deepEqual(Buffer.from(await response.arrayBuffer()), IMAGE_BYTES);
 });
 
 test("gateway rejeita fallback sem Origin quando os sinais same-origin estão ausentes ou inconsistentes", async () => {
