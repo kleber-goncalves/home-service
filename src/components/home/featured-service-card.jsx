@@ -33,11 +33,11 @@ function CategoryIcon({ category = "" }) {
     return <BriefcaseBusiness size={54} strokeWidth={1.25} aria-hidden="true" />;
 }
 
-export default function HomeFeaturedServiceCard({ service }) {
+export default function HomeFeaturedServiceCard({ service, demoHref = "/servicos" }) {
     const image = service.images?.[0] || null;
     const additionalImages = Math.max(0, (service.images?.length || 0) - 1);
     const serviceHref = service.isDemo
-        ? "/servicos"
+        ? demoHref
         : `/servicos/${encodeURIComponent(service.id)}`;
     const location = service.isDemo
         ? "Sem localidade real"
