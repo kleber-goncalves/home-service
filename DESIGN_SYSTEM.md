@@ -238,9 +238,11 @@ Arquivos:
 O componente `HomeFeaturedServiceCard` é compartilhado pela vitrine de serviços da homepage (`public-home-services`) e pelo catálogo completo (`/servicos`). As duas páginas usam o mesmo cartão e os mesmos estilos, evitando implementações visuais paralelas.
 
 - Cartões brancos, com fotografia no topo, cantos amplos e superfícies discretas.
-- Categoria, título, descrição, ícone ilustrativo e informação de atendimento.
+- Categoria, título, descrição e ícone ilustrativo.
+- Metadados de atendimento/localidade e profissional responsável, com ícones lineares e valores que podem quebrar linha em nomes longos.
 - Identificação visual para exemplos fictícios e contador de fotos adicionais.
 - Ação contextual: “Ver catálogo” para exemplos fictícios e “Ver detalhes” para serviços publicados.
+- Rodapé organizado em coluna: os metadados ocupam a largura disponível e a ação fica alinhada à direita abaixo deles, mantendo a leitura em cartões estreitos.
 - Hover com pequeno deslocamento vertical e ampliação discreta da imagem.
 - Grade de três cartões em telas maiores, duas colunas em telas intermediárias e uma coluna em telas menores.
 - No catálogo, os links de exemplos fictícios preservam os filtros atuais na URL.

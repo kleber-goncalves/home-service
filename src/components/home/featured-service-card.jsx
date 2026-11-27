@@ -42,6 +42,7 @@ export default function HomeFeaturedServiceCard({ service, demoHref = "/servicos
     const location = service.isDemo
         ? "Sem localidade real"
         : (service.cityLabel || "Localidade não informada");
+    const professionalName = service.professionalName || "Profissional não informado";
 
     return (
         <article className="home-featured-service-card">
@@ -94,12 +95,21 @@ export default function HomeFeaturedServiceCard({ service, demoHref = "/servicos
                 )}
 
                 <div className="home-featured-service-footer">
-                    <div className="home-featured-service-location">
-                        <span>Atendimento</span>
-                        <strong>
-                            <MapPin size={14} aria-hidden="true" />
-                            {location}
-                        </strong>
+                    <div className="home-featured-service-meta">
+                        <div className="home-featured-service-meta-item">
+                            <span>Atendimento</span>
+                            <strong>
+                                <MapPin size={14} aria-hidden="true" />
+                                {location}
+                            </strong>
+                        </div>
+                        <div className="home-featured-service-meta-item">
+                            <span>Profissional</span>
+                            <strong>
+                                <BriefcaseBusiness size={14} aria-hidden="true" />
+                                {professionalName}
+                            </strong>
+                        </div>
                     </div>
                     <AppLink
                         to={serviceHref}
