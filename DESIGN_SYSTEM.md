@@ -272,7 +272,10 @@ Arquivo: `src/pages/AuthDemoPage.jsx`
 - Botão principal azul, de largura total, com cantos arredondados.
 - Avisos de demonstração e feedbacks preservam contraste e distinção semântica.
 - Em telas de até 820 px, a composição passa a uma coluna; em telas estreitas, os campos em grade são empilhados.
-- O redesign altera apenas a apresentação visual; os fluxos de login, cadastro, confirmação e sessão permanecem os mesmos.
+- O cadastro profissional é progressivo, dividido em três etapas: dados pessoais, contato e perfil, e segurança da conta.
+- O formulário apresenta indicador de progresso, valida os campos visíveis antes de avançar e permite voltar sem perder os dados preenchidos.
+- O envio para `auth.register` ocorre somente na última etapa; a confirmação de e-mail existente permanece como etapa posterior do fluxo.
+- O redesign altera apenas a apresentação e a organização do cadastro; contratos de API, validações de segurança, login, sessão e confirmação permanecem os mesmos.
 
 ### 8.7. SiteFooter
 
