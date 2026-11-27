@@ -1826,7 +1826,7 @@ function appImageFinalizeUpload_(state, driveMetadata) {
                 sizeBytes: Number(currentState.fileSize),
                 status: "active",
                 url: String(service.status) === "published"
-                    ? appImagePublicUrl_(String(driveFile.getId()))
+                    ? appImageProxyUrl_(String(imageId))
                     : null
             }
         };
@@ -2219,7 +2219,7 @@ function appImageFinalizeServiceImageReplacement_(state, driveMetadata) {
                 sizeBytes: Number(currentState.fileSize),
                 status: "active",
                 url: String(service.status) === "published"
-                    ? appImagePublicUrl_(String(newFile.getId()))
+                    ? appImageProxyUrl_(String(replaceImageId))
                     : null
             }
         };
@@ -2476,7 +2476,7 @@ function appImageUploadStatus_(payload, nowMs) {
                 url: imageIsPublic
                     ? (String(authorized.state.kind || "service") === "profile"
                         ? appImageProxyUrl_(String(completedImage.id_imagem))
-                        : appImagePublicUrl_(String(completedImage.id_arquivo_drive)))
+                        : appImageProxyUrl_(String(completedImage.id_imagem)))
                     : null
             }
         };
@@ -2570,10 +2570,6 @@ function appSetServiceImagesVisibility_(serviceId, publicAccess) {
     }
 }
 
-function appImagePublicUrl_(fileId) {
-    return "https://drive.google.com/uc?export=view&id=" + encodeURIComponent(String(fileId));
-}
-
 function appGetServiceImages_(serviceId, publicAccess) {
     return appRecords_("IMAGENS")
         .filter(function (item) {
@@ -2587,7 +2583,7 @@ function appGetServiceImages_(serviceId, publicAccess) {
                 mimeType: String(item.tipo_mime),
                 sizeBytes: Number(item.tamanho_bytes),
                 status: String(item.status),
-                url: publicAccess ? appImagePublicUrl_(String(item.id_arquivo_drive)) : null
+                url: publicAccess ? appImageProxyUrl_(String(item.id_imagem)) : null
             };
         });
 }
