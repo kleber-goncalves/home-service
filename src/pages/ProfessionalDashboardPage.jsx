@@ -129,6 +129,7 @@ export default function ProfessionalDashboardPage({
     cancelServiceForm,
     saveService,
     serviceFormError,
+    initialServiceForm,
     editingServiceId,
     newService,
     editingService,
@@ -544,6 +545,7 @@ export default function ProfessionalDashboardPage({
                             editingService={editingService}
                             editingServiceId={editingServiceId}
                             serviceForm={newService}
+                            initialServiceForm={initialServiceForm}
                             serviceFormError={serviceFormError}
                             busy={busy}
                             onServiceFormChange={updateServiceFormField}
