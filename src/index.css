@@ -8095,8 +8095,9 @@ summary:focus-visible {
 .image-editor-preview {
     position: relative;
     display: grid;
-    width: 100%;
+    width: min(100%, calc(58vh * var(--crop-ratio)));
     max-height: 58vh;
+    margin-inline: auto;
     place-items: center;
     overflow: hidden;
     background: #111827;
@@ -8255,6 +8256,7 @@ summary:focus-visible {
         gap: 13px;
     }
     .image-editor-preview {
+        width: min(100%, calc(42vh * var(--crop-ratio)));
         max-height: 42vh;
     }
     .image-editor-controls {

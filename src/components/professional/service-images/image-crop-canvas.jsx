@@ -99,10 +99,13 @@ export default function ImageCropCanvas({
         rotation,
     );
 
+    const imageDimensions = naturalSize.width > 0 && naturalSize.height > 0
+        ? { naturalWidth: naturalSize.width, naturalHeight: naturalSize.height }
+        : null;
     const normalizedOffset = clampOffset(
         offset,
         viewport,
-        imageRef.current,
+        imageDimensions,
         zoom,
         rotation,
     );
@@ -242,7 +245,7 @@ export default function ImageCropCanvas({
             <div
                 ref={viewportRef}
                 className="image-editor-preview"
-                style={{ aspectRatio: String(aspect) }}
+                style={{ aspectRatio: String(aspect), "--crop-ratio": String(aspect) }}
                 role="group"
                 aria-label="Área de recorte. Arraste a imagem ou use as setas do teclado para posicioná-la."
                 tabIndex={0}

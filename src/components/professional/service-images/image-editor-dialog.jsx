@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { Check, LoaderCircle, X } from "lucide-react";
 import {
     Dialog,
@@ -21,6 +21,7 @@ export default function ImageEditorDialog({
     onSave,
 }) {
     const exportRef = useRef(null);
+    const titleId = useId();
     const [zoom, setZoom] = useState(1);
     const [rotation, setRotation] = useState(0);
     const [aspectRatio, setAspectRatio] = useState("16:10");
@@ -55,13 +56,13 @@ export default function ImageEditorDialog({
                     onOpenChange(nextOpen);
                 }
             }}
-            ariaLabelledBy="service-image-editor-title"
+            ariaLabelledBy={titleId}
             className="image-editor-dialog"
         >
             <DialogContent>
                 <DialogHeader className="image-editor-header">
                     <div>
-                        <DialogTitle id="service-image-editor-title">{title}</DialogTitle>
+                        <DialogTitle id={titleId}>{title}</DialogTitle>
                         <DialogDescription>
                             Ajuste o enquadramento sem alterar a imagem original até confirmar.
                         </DialogDescription>
