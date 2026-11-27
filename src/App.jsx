@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import AuthDemoPage from "@/pages/AuthDemoPage";
 import CategoriesPage from "@/pages/CategoriesPage";
-import DashboardVisualPreviewPage from "@/pages/DashboardVisualPreviewPage";
 import HomePage from "@/pages/HomePage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import Poc01Page from "@/pages/Poc01Page";
@@ -34,7 +33,6 @@ export default function App() {
 
     if (params.get("poc") === "01") return <Poc01Page />;
     if (params.get("auth") === "demo") return <AuthDemoPage initialMode={params.get("mode")} />;
-    if (pathname === "/dashboard-visual-preview") return <DashboardVisualPreviewPage />;
     if (pathname === "/") return <HomePage />;
     if (pathname === "/servicos") return <ServicesPage key={route} />;
     if (pathname === "/categorias") return <CategoriesPage />;
