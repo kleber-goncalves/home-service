@@ -33,15 +33,16 @@ function CategoryIcon({ category = "" }) {
     return <BriefcaseBusiness size={54} strokeWidth={1.25} aria-hidden="true" />;
 }
 
-export default function HomeFeaturedServiceCard({ service }) {
+export default function HomeFeaturedServiceCard({ service, demoHref = "/servicos" }) {
     const image = service.images?.[0] || null;
     const additionalImages = Math.max(0, (service.images?.length || 0) - 1);
     const serviceHref = service.isDemo
-        ? "/servicos"
+        ? demoHref
         : `/servicos/${encodeURIComponent(service.id)}`;
     const location = service.isDemo
         ? "Sem localidade real"
         : (service.cityLabel || "Localidade não informada");
+    const professionalName = service.professionalName || "Profissional não informado";
 
     return (
         <article className="home-featured-service-card">
@@ -94,12 +95,21 @@ export default function HomeFeaturedServiceCard({ service }) {
                 )}
 
                 <div className="home-featured-service-footer">
-                    <div className="home-featured-service-location">
-                        <span>Atendimento</span>
-                        <strong>
-                            <MapPin size={14} aria-hidden="true" />
-                            {location}
-                        </strong>
+                    <div className="home-featured-service-meta">
+                        <div className="home-featured-service-meta-item">
+                            <span>Atendimento</span>
+                            <strong>
+                                <MapPin size={14} aria-hidden="true" />
+                                {location}
+                            </strong>
+                        </div>
+                        <div className="home-featured-service-meta-item">
+                            <span>Profissional</span>
+                            <strong>
+                                <BriefcaseBusiness size={14} aria-hidden="true" />
+                                {professionalName}
+                            </strong>
+                        </div>
                     </div>
                     <AppLink
                         to={serviceHref}

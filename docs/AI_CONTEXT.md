@@ -414,10 +414,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 32976d436a7220b75f30e4f30d2c68ecefb20558
-- **Data do commit:** 2026-11-26T23:31:46-03:00
-- **Mensagem do commit:** style(services): ajustar espaçamento em elementos da página de serviços
-- **Branch desta execução:** dev
+- **Commit de referência:** ca592884679f0e4a8a165faa373604e81a90942c
+- **Data do commit:** 2026-11-26T23:41:30-03:00
+- **Mensagem do commit:** fix(services): restore professional metadata in shared cards
+- **Branch desta execução:** feat/shared-service-card
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -544,13 +544,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| ca59288 | 2026-11-26 | fix(services): restore professional metadata in shared cards |
+| 30fe3ed | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| 2080dad | 2026-11-26 | docs(design): document shared public service card |
+| bc9fecb | 2026-11-26 | style(services): remove duplicate catalog card styles |
+| 3e44558 | 2026-11-26 | refactor(services): reuse homepage service cards |
+| b5fdbcc | 2026-11-26 | feat(services): allow custom catalog return URL |
+| 8f75f26 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 32976d4 | 2026-11-26 | style(services): ajustar espaçamento em elementos da página de serviços |
-| 1d4644d | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
-| b3d97fc | 2026-11-26 | Merge pull request #45 from kleber-goncalves/feat/services-page-redesign |
-| 0686009 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
-| 74f214c | 2026-11-26 | style(services): align catalog page with design system |
-| edffd11 | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
-| 0d049a2 | 2026-11-26 | feat(services): redesign catalog page structure |
-| 789902e | 2026-11-26 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
