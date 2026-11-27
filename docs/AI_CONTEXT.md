@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** c502b3360f394e53085cfc8c5706fc9164012612
-- **Data do commit:** 2026-11-27T01:21:09-03:00
-- **Mensagem do commit:** refactor(professional): extract authenticated dashboard page
+- **Commit de referência:** 2a826c1ca86f4ea45668025786273433cc614f9d
+- **Data do commit:** 2026-11-27T01:21:12-03:00
+- **Mensagem do commit:** refactor(auth): delegate professional area to dashboard page
 - **Branch desta execução:** feat/professional-dashboard-refresh
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -545,6 +545,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 2a826c1 | 2026-11-27 | refactor(auth): delegate professional area to dashboard page |
 | c502b33 | 2026-11-27 | refactor(professional): extract authenticated dashboard page |
 | b8438d7 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 909d1e1 | 2026-11-27 | feat(auth): modernizar login e dividir cadastro em etapas |
@@ -552,6 +553,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 1b5592d | 2026-11-27 | docs(design): ajustar numeração das seções de autenticação |
 | 827b52a | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 95bc0ab | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| a1252b2 | 2026-11-27 | docs(design): documentar cadastro multipasso |
 
 <!-- END AUTO-GENERATED SECTION -->
