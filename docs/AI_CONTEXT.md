@@ -425,10 +425,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 59b91774e077d21bdf729dfd9a55bf3e457c9988
-- **Data do commit:** 2026-11-27T13:57:23-03:00
-- **Mensagem do commit:** Merge pull request #52 from kleber-goncalves/feat/professional-dashboard-chart-visual-review
-- **Branch desta execução:** dev
+- **Commit de referência:** 19b9004ca0769ca61ba6e33b518df24a2319a652
+- **Data do commit:** 2026-11-27T14:52:47-03:00
+- **Mensagem do commit:** feat(images): add reusable image editor primitives
+- **Branch desta execução:** feat/professional-image-editor
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 6
@@ -515,6 +515,8 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/components/home/site-header.jsx
 - src/components/professional/profile-photo-manager.jsx
 - src/components/professional/service-image-manager.jsx
+- src/components/professional/service-images/image-crop-canvas.jsx
+- src/components/professional/service-images/image-utils.js
 - src/components/public/app-link.jsx
 - src/components/public/service-card.jsx
 - src/components/public/service-image.jsx
@@ -523,7 +525,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/components/ui/button.jsx
 - src/components/ui/card.jsx
 - src/components/ui/chart.jsx
+- src/components/ui/dialog.jsx
 - src/components/ui/input.jsx
+- src/components/ui/slider.jsx
 - src/contexts/auth-context.js
 - src/contexts/auth-provider.jsx
 - src/data/homepage.js
@@ -559,13 +563,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 19b9004 | 2026-11-27 | feat(images): add reusable image editor primitives |
+| 918e758 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 59b9177 | 2026-11-27 | Merge pull request #52 from kleber-goncalves/feat/professional-dashboard-chart-visual-review |
 | d49743c | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 1b4e656 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | e88131d | 2026-11-27 | chore(preview): remover pagina temporaria de dados ficticios |
 | 4ebec83 | 2026-11-27 | style(dashboard): remover estilos exclusivos da previa |
 | 40fa1a5 | 2026-11-27 | chore(preview): remover rota temporaria de demonstracao |
-| 55b937b | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| e1985df | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
