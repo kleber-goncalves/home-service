@@ -425,9 +425,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** d5813c81c8e8e0d42a26ccfede144b411be218c5
-- **Data do commit:** 2026-11-27T12:51:53-03:00
-- **Mensagem do commit:** feat(preview): criar showcase com dados ficticios isolados
+- **Commit de referência:** fa16ccb653d0d6f775d98f1f2334804889e1d113
+- **Data do commit:** 2026-11-27T12:52:11-03:00
+- **Mensagem do commit:** fix(preview): identificar dados ficticios na barra superior
 - **Branch desta execução:** feat/professional-dashboard-chart-visual-review
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -560,13 +560,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| fa16ccb | 2026-11-27 | fix(preview): identificar dados ficticios na barra superior |
+| e07cf1f | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | d5813c8 | 2026-11-27 | feat(preview): criar showcase com dados ficticios isolados |
 | bff02fb | 2026-11-27 | feat(preview): adicionar rota visual sem autenticacao |
 | d6e2032 | 2026-11-27 | style(dashboard): refinar proporcao e responsividade dos graficos |
 | 1dbc1fd | 2026-11-27 | style(dashboard): ampliar graficos e melhorar legibilidade |
 | 7f27abd | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | c1e6abd | 2026-11-27 | Merge pull request #51 from kleber-goncalves/feat/professional-dashboard-motion-charts |
-| f52ddb9 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 9223984 | 2026-11-27 | feat(professional): animate interactive dashboard charts |
 
 <!-- END AUTO-GENERATED SECTION -->
