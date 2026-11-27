@@ -1095,72 +1095,6 @@ summary:focus-visible {
     font-size: 0.62rem;
 }
 
-/* Journey */
-.how-section {
-    background: #f6f9fe;
-}
-.steps-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 17px;
-    margin-top: 39px;
-}
-.step-card {
-    position: relative;
-    min-height: 205px;
-    padding: 22px;
-    background: #fff;
-    border: 1px solid #e1eaf6;
-    border-radius: 16px;
-}
-.step-topline {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.step-number {
-    color: #6b8fbe;
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.13em;
-}
-.step-icon {
-    display: grid;
-    width: 43px;
-    height: 43px;
-    place-items: center;
-    color: var(--brand);
-    background: #edf4ff;
-    border-radius: 13px;
-}
-.step-card h3 {
-    margin: 23px 0 8px;
-    color: var(--navy);
-    font-size: 1.05rem;
-    font-weight: 800;
-}
-.step-card p {
-    max-width: 280px;
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.79rem;
-    line-height: 1.65;
-}
-.step-arrow {
-    position: absolute;
-    top: 50%;
-    right: -19px;
-    z-index: 1;
-    color: #9bb5d8;
-    transform: translateY(-50%);
-}
-.steps-note {
-    margin: 18px 0 0;
-    color: #7b8ba0;
-    font-size: 0.68rem;
-    text-align: center;
-}
-
 /* CTA */
 .professionals-cta-section {
     padding-top: 25px;
@@ -1842,21 +1776,6 @@ summary:focus-visible {
         bottom: 12px;
         max-width: 175px;
         padding: 11px 12px;
-    }
-    .steps-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-        margin-top: 28px;
-    }
-    .step-card {
-        min-height: unset;
-        padding: 19px;
-    }
-    .step-card h3 {
-        margin-top: 15px;
-    }
-    .step-arrow {
-        display: none;
     }
     .professionals-cta-section {
         padding-top: 8px;
