@@ -425,10 +425,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 9223984f16dcfc28faefbd7e70ce5329edc4804c
-- **Data do commit:** 2026-11-27T12:39:26-03:00
-- **Mensagem do commit:** feat(professional): animate interactive dashboard charts
-- **Branch desta execução:** feat/professional-dashboard-motion-charts
+- **Commit de referência:** c1e6abdf8dae65bdef56de1d6aeafcb038c62be5
+- **Data do commit:** 2026-11-27T12:44:11-03:00
+- **Mensagem do commit:** Merge pull request #51 from kleber-goncalves/feat/professional-dashboard-motion-charts
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 6
@@ -559,13 +559,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| c1e6abd | 2026-11-27 | Merge pull request #51 from kleber-goncalves/feat/professional-dashboard-motion-charts |
+| f52ddb9 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 9223984 | 2026-11-27 | feat(professional): animate interactive dashboard charts |
 | fabbc97 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 0853c4d | 2026-11-27 | chore(deps): adicionar gsap e recharts |
 | 8a51ccc | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | d39ae32 | 2026-11-27 | Merge pull request #50 from kleber-goncalves/feat/professional-dashboard-analytics |
 | 65dd0fd | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| d635922 | 2026-11-27 | feat(professional): add account-based dashboard analytics |
-| 10311af | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
