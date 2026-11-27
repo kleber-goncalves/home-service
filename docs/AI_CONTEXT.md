@@ -425,10 +425,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 791bfde764f03ba076dbbf74b6d2cf6b11838e56
-- **Data do commit:** 2026-11-27T16:37:04-03:00
-- **Mensagem do commit:** Merge pull request #55 from kleber-goncalves/fix/public-service-image-proxy
-- **Branch desta execução:** dev
+- **Commit de referência:** 6cbf840627b5152b36228b785922718f6e022670
+- **Data do commit:** 2026-11-27T16:53:02-03:00
+- **Mensagem do commit:** test(images): verify private image delivery without Origin
+- **Branch desta execução:** fix/managed-image-origin-fallback
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 15
 - **Dependências de runtime:** 6
@@ -575,13 +575,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 6cbf840 | 2026-11-27 | test(images): verify private image delivery without Origin |
+| 3c040f5 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| 8b5aee5 | 2026-11-27 | fix(images): allow verified same-origin GET without Origin |
+| 76e63aa | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 791bfde | 2026-11-27 | Merge pull request #55 from kleber-goncalves/fix/public-service-image-proxy |
 | eac5eb4 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | f383a50 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 71f9f51 | 2026-11-27 | docs(images): document public image proxy delivery |
-| b4b765b | 2026-11-27 | test(images): cover public service image gateway URLs |
-| 67d00ff | 2026-11-27 | fix(images): deliver service photos through public gateway |
-| 666d74c | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 729d7f6 | 2026-11-27 | Merge pull request #54 from kleber-goncalves/feat/professional-service-cards |
 
 <!-- END AUTO-GENERATED SECTION -->

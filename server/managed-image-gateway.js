@@ -46,11 +46,43 @@ function parseAllowedOrigin(value) {
     }
 }
 
+function isAllowedReferer(value, allowedOrigin) {
+    if (typeof value !== "string" || !value) return false;
+    try {
+        const url = new URL(value);
+        return url.protocol === "https:"
+            && !url.username
+            && !url.password
+            && url.origin === allowedOrigin;
+    } catch {
+        return false;
+    }
+}
+
 function isSameOriginRequest(request, allowedOrigin) {
     const origin = request.headers.get("origin");
-    if (!origin || origin === "null" || origin !== allowedOrigin) return false;
     const fetchSite = request.headers.get("sec-fetch-site");
-    return !fetchSite || fetchSite.toLowerCase() === "same-origin";
+    const referer = request.headers.get("referer");
+
+    if (fetchSite !== null && fetchSite.toLowerCase() !== "same-origin") return false;
+    if (referer !== null && !isAllowedReferer(referer, allowedOrigin)) return false;
+
+    if (origin !== null) {
+        if (origin === "null" || origin !== allowedOrigin) return false;
+        try {
+            const parsed = new URL(origin);
+            if (parsed.origin !== origin || parsed.protocol !== "https:") return false;
+        } catch {
+            return false;
+        }
+        return true;
+    }
+
+    // GET same-origin pode não enviar Origin. Nesse caso, exigimos os dois
+    // sinais de navegador: Fetch Metadata e Referer da origem autorizada.
+    return fetchSite !== null
+        && fetchSite.toLowerCase() === "same-origin"
+        && isAllowedReferer(referer, allowedOrigin);
 }
 
 function parseSessionCookie(cookieHeader) {

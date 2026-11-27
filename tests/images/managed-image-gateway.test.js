@@ -25,8 +25,9 @@ function deriveCsrfToken(token = SESSION_TOKEN) {
 
 function buildRequest(options = {}) {
     const headers = new Headers({
-        Origin: options.origin ?? ORIGIN,
-        "Sec-Fetch-Site": options.fetchSite ?? "same-origin",
+        ...(options.origin === null ? {} : { Origin: options.origin ?? ORIGIN }),
+        ...(options.fetchSite === null ? {} : { "Sec-Fetch-Site": options.fetchSite ?? "same-origin" }),
+        ...(options.referer !== undefined ? { Referer: options.referer } : {}),
         ...(options.cookie !== undefined ? { Cookie: options.cookie } : { Cookie: "__Host-conecta_local_session=" + SESSION_TOKEN }),
         ...(options.csrf !== undefined ? { "X-CSRF-Token": options.csrf } : { "X-CSRF-Token": deriveCsrfToken() }),
     });
@@ -154,6 +155,66 @@ test("gateway rejeita origem externa, consulta duplicada e execução fora do Pr
     assert.equal(external.status, 403);
     assert.equal(duplicate.status, 404);
     assert.equal(production.status, 404);
+    assert.equal(upstreamCalled, false);
+});
+
+test("gateway entrega imagem privada em GET same-origin sem Origin com Fetch Metadata e Referer válidos", async () => {
+    const handler = createHarness(async (url, options) => {
+        if (url === SCRIPT_URL) {
+            const form = new URLSearchParams(options.body);
+            return createUpstreamResponse({
+                ok: true,
+                action: "image.resolve.mine",
+                requestId: form.get("requestId"),
+                data: {
+                    fileId: DRIVE_FILE_ID,
+                    mimeType: "image/png",
+                    sizeBytes: IMAGE_BYTES.length,
+                    accessToken: ACCESS_TOKEN,
+                },
+            }, "https://script.googleusercontent.com/macros/echo?managed-image=no-origin");
+        }
+
+        const response = new Response(IMAGE_BYTES, {
+            status: 200,
+            headers: { "Content-Type": "image/png", "Content-Length": String(IMAGE_BYTES.length) },
+        });
+        Object.defineProperty(response, "url", { value: url });
+        return response;
+    });
+
+    const response = await handler(buildRequest({
+        origin: null,
+        fetchSite: "same-origin",
+        referer: ORIGIN + "/?auth=demo",
+    }));
+
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("content-type"), "image/png");
+    assert.deepEqual(Buffer.from(await response.arrayBuffer()), IMAGE_BYTES);
+});
+
+test("gateway rejeita fallback sem Origin quando os sinais same-origin estão ausentes ou inconsistentes", async () => {
+    let upstreamCalled = false;
+    const handler = createHarness(async () => {
+        upstreamCalled = true;
+        throw new Error("O upstream não deveria ser chamado.");
+    });
+    const invalidRequests = [
+        { origin: null, fetchSite: "same-origin" },
+        { origin: null, fetchSite: null, referer: ORIGIN + "/" },
+        { origin: null, fetchSite: "cross-site", referer: ORIGIN + "/" },
+        { origin: null, fetchSite: "same-origin", referer: "https://attacker.example/" },
+        { origin: "null", fetchSite: "same-origin", referer: ORIGIN + "/" },
+        { origin: ORIGIN, fetchSite: "cross-site", referer: ORIGIN + "/" },
+        { origin: ORIGIN, fetchSite: "same-origin", referer: "https://attacker.example/" },
+    ];
+
+    for (const options of invalidRequests) {
+        const response = await handler(buildRequest(options));
+        assert.equal(response.status, 403);
+        assert.equal((await response.json()).error.code, "ORIGIN_REJECTED");
+    }
     assert.equal(upstreamCalled, false);
 });
 
