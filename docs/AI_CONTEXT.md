@@ -3,14 +3,15 @@
 > Documento de continuidade do projeto. Leia antes de sugerir ou realizar alterações. Reúne propósito, decisões, arquitetura planejada, estado implementado, regras de manutenção e limitações. A seção de snapshot ao final é atualizada pelo GitHub Actions.
 
 
-## Atualização — analytics da área profissional (27/11/2026)
+## Atualização — gráficos animados na área profissional (27/11/2026)
 
-- A visão geral da área profissional foi redesenhada para usar componentes locais em src/components/ui, com APIs inspiradas no shadcn/ui. A solução não instala o pacote completo do shadcn nem adiciona dependência de gráficos.
-- Os componentes reutilizáveis incluem cartões compostos (CardHeader, CardTitle, CardDescription, CardContent, CardFooter) e gráficos DonutChart/HorizontalBarChart.
-- Os gráficos são calculados a partir dos serviços da conta: distribuição por situação, categoria, cidade e presença de imagens ativas. A lista de serviços, edição, publicação, pausa, imagens, perfil, conta e logout permanecem nos fluxos existentes.
-- Os números fictícios de visualizações e cliques foram retirados da visão geral. Audiência e contatos permanecem como etapa futura, pois ainda não há coleta de eventos reais.
-- Detalhamento visual e regras de manutenção: seção 10 de DESIGN_SYSTEM.md.
-- A integração deve permanecer em branch de feature → PR para dev. Autenticação e validação funcional integrada devem ser feitas somente no deployment fixo de dev, pois branches feat/* não recebem as variáveis do Apps Script. main não deve ser alterada sem autorização explícita.
+- A branch feat/professional-dashboard-motion-charts adiciona GSAP 3.15.1 e Recharts 3.11.2 como dependências de runtime.
+- src/components/ui/chart.jsx implementa DonutChart e HorizontalBarChart com Recharts, tooltips customizados, responsividade, destaque interativo da legenda e estados vazios.
+- GSAP é usado somente para a entrada do cabeçalho, indicadores, cartões analíticos e painéis das seções; gsap.context é revertido ao navegar ou desmontar.
+- Recharts cuida das animações de segmentos e barras. As animações de ambas as bibliotecas são desativadas para prefers-reduced-motion.
+- Os gráficos continuam consumindo apenas dados reais da lista de serviços da conta: status, categoria, cidade e imagens ativas. Nenhuma métrica de audiência foi simulada ou criada.
+- A coleta de visualizações do perfil/serviço e cliques de contato segue como etapa backend separada; não misturar métricas de engajamento com os atuais indicadores de gestão.
+- A integração permanece em branch de feature → PR para dev. Autenticação e validação integrada devem ocorrer somente no deployment fixo de dev. main não deve ser alterada sem autorização explícita.
 
 ## Atualização vigente — 2026-11-24
 
@@ -424,13 +425,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** d39ae3243f78e4624914d5615e861425a607631b
-- **Data do commit:** 2026-11-27T01:44:49-03:00
-- **Mensagem do commit:** Merge pull request #50 from kleber-goncalves/feat/professional-dashboard-analytics
-- **Branch desta execução:** dev
+- **Commit de referência:** 9223984f16dcfc28faefbd7e70ce5329edc4804c
+- **Data do commit:** 2026-11-27T12:39:26-03:00
+- **Mensagem do commit:** feat(professional): animate interactive dashboard charts
+- **Branch desta execução:** feat/professional-dashboard-motion-charts
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
-- **Dependências de runtime:** 4
+- **Dependências de runtime:** 6
 - **Dependências de desenvolvimento:** 11
 - **Workflows:** 2
 - **Scripts de automação:** 3
@@ -469,10 +470,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Pacote | Versão declarada |
 |---|---|
+| gsap | ^3.15.1 |
 | hash-wasm | 4.13.0 |
 | lucide-react | ^1.61.0 |
 | react | ^19.3.1 |
 | react-dom | ^19.3.1 |
+| recharts | ^3.11.2 |
 
 ### Dependências de desenvolvimento
 
@@ -556,13 +559,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 9223984 | 2026-11-27 | feat(professional): animate interactive dashboard charts |
+| fabbc97 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| 0853c4d | 2026-11-27 | chore(deps): adicionar gsap e recharts |
+| 8a51ccc | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | d39ae32 | 2026-11-27 | Merge pull request #50 from kleber-goncalves/feat/professional-dashboard-analytics |
 | 65dd0fd | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | d635922 | 2026-11-27 | feat(professional): add account-based dashboard analytics |
 | 10311af | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| c7b2da6 | 2026-11-27 | Merge pull request #49 from kleber-goncalves/feat/professional-dashboard-refresh |
-| f8d7e26 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 79ec113 | 2026-11-27 | fix(professional): forward form state setters to dashboard |
-| a589810 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
 import {
     ArrowUpRight, BriefcaseBusiness, Check, ChevronRight, ImageIcon, Info,
     LayoutDashboard, LogOut, Mail, MapPin, Menu, Pencil, Plus, ShieldCheck,
@@ -138,6 +139,67 @@ export default function ProfessionalDashboardPage({
 }) {
     const [activeSection, setActiveSection] = useState("overview");
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const dashboardContentRef = useRef(null);
+
+    useLayoutEffect(() => {
+        const content = dashboardContentRef.current;
+        const prefersReducedMotion = typeof window !== "undefined"
+            && typeof window.matchMedia === "function"
+            && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        if (!content || prefersReducedMotion) return undefined;
+
+        const animationContext = gsap.context(() => {
+            const timeline = gsap.timeline({ defaults: { ease: "power2.out" } });
+            const heading = content.querySelector(".professional-dashboard-page-heading");
+
+            if (heading) {
+                timeline.fromTo(
+                    heading,
+                    { autoAlpha: 0, y: 14 },
+                    { autoAlpha: 1, y: 0, duration: 0.42 },
+                );
+            }
+
+            if (activeSection === "overview") {
+                const indicators = content.querySelectorAll(".professional-dashboard-kpi");
+                const charts = content.querySelectorAll(
+                    ".pro-dashboard-chart-card, .pro-dashboard-analytics-note, .professional-dashboard-services-summary",
+                );
+
+                if (indicators.length) {
+                    timeline.fromTo(
+                        indicators,
+                        { autoAlpha: 0, y: 16 },
+                        { autoAlpha: 1, y: 0, duration: 0.44, stagger: 0.07 },
+                        "-=0.16",
+                    );
+                }
+
+                if (charts.length) {
+                    timeline.fromTo(
+                        charts,
+                        { autoAlpha: 0, y: 18 },
+                        { autoAlpha: 1, y: 0, duration: 0.48, stagger: 0.075 },
+                        "-=0.18",
+                    );
+                }
+            } else {
+                const sectionPanel = content.querySelector(".professional-dashboard-section > *");
+                if (sectionPanel) {
+                    timeline.fromTo(
+                        sectionPanel,
+                        { autoAlpha: 0, y: 14 },
+                        { autoAlpha: 1, y: 0, duration: 0.42 },
+                        "-=0.14",
+                    );
+                }
+            }
+        }, content);
+
+        return () => animationContext.revert();
+    }, [activeSection]);
+
     const serviceList = Array.isArray(services) ? services : [];
     const draftServices = serviceList.filter((service) => service.status === "draft").length;
     const suspendedServices = serviceList.filter((service) => service.status === "suspended").length;
@@ -263,7 +325,7 @@ export default function ProfessionalDashboardPage({
                     <span className="professional-dashboard-connected"><i aria-hidden="true" /> Dados da conta conectados</span>
                 </header>
 
-                <div className="professional-dashboard-content" id="professional-dashboard-content" tabIndex="-1">
+                <div ref={dashboardContentRef} className="professional-dashboard-content" id="professional-dashboard-content" tabIndex="-1">
                     <div className="professional-dashboard-page-heading">
                         <div>
                             <span className="section-eyebrow">{pageHeading.eyebrow}</span>
