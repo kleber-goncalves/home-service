@@ -425,9 +425,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** a758ddee6d63c80186b7beea1ab40dac1387cf42
-- **Data do commit:** 2026-11-27T17:10:56-03:00
-- **Mensagem do commit:** feat(professional): use modal for service creation and editing
+- **Commit de referência:** 908a4144ac2a6c584d81de7fe72519a16b2cca03
+- **Data do commit:** 2026-11-27T17:11:22-03:00
+- **Mensagem do commit:** style(professional): add responsive service form dialog
 - **Branch desta execução:** feat/service-form-dialog
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 15
@@ -576,13 +576,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 908a414 | 2026-11-27 | style(professional): add responsive service form dialog |
+| 8ae6bc0 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | a758dde | 2026-11-27 | feat(professional): use modal for service creation and editing |
 | a3446bb | 2026-11-27 | feat(professional): keep service form feedback inside dialog |
 | 794a2f5 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | ddb2604 | 2026-11-27 | feat(professional): add service form dialog |
 | b345152 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | cb9e9f2 | 2026-11-27 | Merge pull request #56 from kleber-goncalves/fix/managed-image-origin-fallback |
-| fe3787d | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 6cbf840 | 2026-11-27 | test(images): verify private image delivery without Origin |
 
 <!-- END AUTO-GENERATED SECTION -->
