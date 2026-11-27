@@ -1358,7 +1358,7 @@ test("image.upload.start e image.upload.chunk gravam metadados somente após con
     assert.equal(uploaded.data.image.order, 1);
     assert.equal(uploaded.data.image.mimeType, "image/png");
     assert.equal(uploaded.data.image.sizeBytes, 24);
-    assert.match(uploaded.data.image.url, /^https:\/\/drive\.google\.com\/uc\?export=view&id=/);
+    assert.equal(uploaded.data.image.url, "/api/public-images?id=" + uploaded.data.image.id);
 
     const rows = harness.records("IMAGENS");
     assert.equal(rows.length, 1);
@@ -1553,6 +1553,7 @@ test("image.upload.status recupera recibo quando a conclusão já foi gravada no
     assert.equal(status.data.completed, true);
     assert.equal(status.data.image.id, uploaded.data.image.id);
     assert.equal(status.data.image.status, "active");
+    assert.equal(status.data.image.url, "/api/public-images?id=" + uploaded.data.image.id);
     assert.equal(
         harness.driveCalls.filter((call) => String(call.options.method).toLowerCase() === "put").length,
         drivePutCount,
@@ -1810,6 +1811,55 @@ test("public.image.resolve permite foto ativa somente do profissional com conta 
 });
 
 
+
+test("service.listMine usa o gateway público e a resolução revalida o serviço publicado", () => {
+    const harness = createHarness();
+    const { uploaded } = startPngUpload(harness);
+    assert.equal(uploaded.ok, true);
+    const imageId = uploaded.data.image.id;
+
+    const listed = harness.call("service.listMine", { tokenHash: TOKEN_HASH_A });
+    assert.equal(listed.ok, true);
+    assert.equal(listed.data.services[0].images[0].url, "/api/public-images?id=" + imageId);
+
+    const resolved = harness.call("public.image.resolve", { imageId });
+    assert.equal(resolved.ok, true);
+    assert.equal(resolved.data.fileId, "synthetic-drive-file-1");
+    assert.equal(resolved.data.mimeType, "image/png");
+
+    const paused = harness.call("service.setStatus", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        status: "paused",
+    });
+    assert.equal(paused.ok, true);
+
+    const pausedList = harness.call("service.listMine", { tokenHash: TOKEN_HASH_A });
+    assert.equal(pausedList.data.services[0].images[0].url, null);
+
+    const hidden = harness.call("public.image.resolve", { imageId });
+    assert.equal(hidden.ok, false);
+    assert.equal(hidden.error.code, "IMAGE_NOT_FOUND");
+});
+
+test("serviço pausado não expõe URL pública no upload, na listagem ou na recuperação", () => {
+    const harness = createHarness({ serviceAStatus: "paused" });
+    const { started, uploaded } = startPngUpload(harness);
+    assert.equal(uploaded.ok, true);
+    assert.equal(uploaded.data.image.url, null);
+
+    const listed = harness.call("service.listMine", { tokenHash: TOKEN_HASH_A });
+    assert.equal(listed.ok, true);
+    assert.equal(listed.data.services[0].images[0].url, null);
+
+    const status = harness.call("image.upload.status", {
+        tokenHash: TOKEN_HASH_A,
+        uploadId: started.data.uploadId,
+    });
+    assert.equal(status.ok, true);
+    assert.equal(status.data.image.url, null);
+});
+
 test("substituição de imagem preserva ID e ordem mesmo quando o serviço já possui cinco imagens", () => {
     const harness = createHarness();
     const originals = [];
@@ -1845,6 +1895,7 @@ test("substituição de imagem preserva ID e ordem mesmo quando o serviço já p
     assert.equal(uploaded.data.completed, true);
     assert.equal(uploaded.data.image.id, target.id);
     assert.equal(uploaded.data.image.order, target.order);
+    assert.equal(uploaded.data.image.url, "/api/public-images?id=" + target.id);
 
     const records = harness.records("IMAGENS").filter((item) => item.status === "active");
     assert.equal(records.length, 5);
