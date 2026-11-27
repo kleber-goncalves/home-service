@@ -28,6 +28,7 @@ export default function ImageCropCanvas({
     aspectRatio,
     zoom,
     rotation,
+    resetVersion,
     exportRef,
 }) {
     const viewportRef = useRef(null);
@@ -36,18 +37,27 @@ export default function ImageCropCanvas({
     const dragRef = useRef(null);
     const [viewport, setViewport] = useState({ width: 0, height: 0 });
     const [loadedImage, setLoadedImage] = useState(null);
-    const [offsetState, setOffsetState] = useState({ file: null, value: { x: 0, y: 0 } });
+    const [offsetState, setOffsetState] = useState({
+        file: null,
+        resetVersion: null,
+        value: { x: 0, y: 0 },
+    });
     const naturalSize = loadedImage?.file === file
         ? { width: loadedImage.width, height: loadedImage.height }
         : { width: 0, height: 0 };
     const imageError = loadedImage?.file === file ? loadedImage.error : "";
-    const offset = offsetState.file === file ? offsetState.value : { x: 0, y: 0 };
+    const offset = offsetState.file === file && offsetState.resetVersion === resetVersion
+        ? offsetState.value
+        : { x: 0, y: 0 };
 
     function updateOffset(nextValue) {
         setOffsetState((current) => ({
             file,
+            resetVersion,
             value: typeof nextValue === "function"
-                ? nextValue(current.file === file ? current.value : { x: 0, y: 0 })
+                ? nextValue(current.file === file && current.resetVersion === resetVersion
+                    ? current.value
+                    : { x: 0, y: 0 })
                 : nextValue,
         }));
     }

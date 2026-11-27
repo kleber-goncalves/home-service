@@ -27,12 +27,14 @@ export default function ImageEditorDialog({
     const [zoom, setZoom] = useState(1);
     const [rotation, setRotation] = useState(0);
     const [aspectRatio, setAspectRatio] = useState("16:10");
+    const [resetVersion, setResetVersion] = useState(0);
     const [error, setError] = useState("");
 
     function resetEditor() {
         setZoom(1);
         setRotation(0);
         setAspectRatio("16:10");
+        setResetVersion((current) => current + 1);
         setError("");
     }
 
@@ -88,6 +90,7 @@ export default function ImageEditorDialog({
                             aspectRatio={aspectRatio}
                             zoom={zoom}
                             rotation={rotation}
+                            resetVersion={resetVersion}
                             exportRef={exportRef}
                         />
                         <ImageEditorControls
