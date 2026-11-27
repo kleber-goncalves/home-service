@@ -425,10 +425,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** c4b878e7e735bacdb6c8f80860d32b0764624147
-- **Data do commit:** 2026-11-27T15:06:50-03:00
-- **Mensagem do commit:** fix(images): reset crop position with editor controls
-- **Branch desta execução:** feat/professional-image-editor
+- **Commit de referência:** 3364a6962be01ac7aded48338270b0a2703d1706
+- **Data do commit:** 2026-11-27T15:23:25-03:00
+- **Mensagem do commit:** Merge pull request #53 from kleber-goncalves/feat/professional-image-editor
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 6
@@ -569,13 +569,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 3364a69 | 2026-11-27 | Merge pull request #53 from kleber-goncalves/feat/professional-image-editor |
+| cac4d50 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | c4b878e | 2026-11-27 | fix(images): reset crop position with editor controls |
 | e7384fb | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 6b157a2 | 2026-11-27 | fix(images): resolve editor lint and interaction states |
 | cc8bf5d | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 807155e | 2026-11-27 | test(images): compare preserved order numerically |
 | f3ca4c0 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 7f5de2a | 2026-11-27 | feat(images): add cancellable replacement progress and cleanup |
-| 8d3d9b2 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
