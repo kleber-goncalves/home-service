@@ -70,6 +70,7 @@ export async function createEditedImageFile({
     const ratio = getImageAspectRatio(aspectRatio, image.naturalWidth, image.naturalHeight, normalizedRotation);
 
     const sourceCropWidth = Math.min(orientedWidth, orientedHeight * ratio);
+    const sourceCropHeight = sourceCropWidth / ratio;
     const outputScale = Math.min(1, 1920 / Math.max(sourceCropWidth, sourceCropHeight));
     let outputWidth = Math.max(1, Math.floor(sourceCropWidth * outputScale));
     let outputHeight = Math.max(1, Math.floor(outputWidth / ratio));

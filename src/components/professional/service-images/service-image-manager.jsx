@@ -226,7 +226,7 @@ export default function ServiceImageManager({ service, csrfToken, onServicesChan
                                     key={image.id}
                                     image={image}
                                     serviceTitle={service.title}
-                                    busy={busyImageId === image.id || loadingImageId === image.id || uploading}
+                                    busy={busy}
                                     onEdit={() => openSavedEditor(image)}
                                     onRemove={() => removeImage(image)}
                                 />

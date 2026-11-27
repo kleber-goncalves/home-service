@@ -35,29 +35,45 @@ export default function ImageCropCanvas({
     const imageRef = useRef(null);
     const dragRef = useRef(null);
     const [viewport, setViewport] = useState({ width: 0, height: 0 });
-    const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 });
-    const [offset, setOffset] = useState({ x: 0, y: 0 });
-    const [imageError, setImageError] = useState("");
+    const [loadedImage, setLoadedImage] = useState(null);
+    const [offsetState, setOffsetState] = useState({ file: null, value: { x: 0, y: 0 } });
+    const naturalSize = loadedImage?.file === file
+        ? { width: loadedImage.width, height: loadedImage.height }
+        : { width: 0, height: 0 };
+    const imageError = loadedImage?.file === file ? loadedImage.error : "";
+    const offset = offsetState.file === file ? offsetState.value : { x: 0, y: 0 };
+
+    function updateOffset(nextValue) {
+        setOffsetState((current) => ({
+            file,
+            value: typeof nextValue === "function"
+                ? nextValue(current.file === file ? current.value : { x: 0, y: 0 })
+                : nextValue,
+        }));
+    }
 
     useEffect(() => {
         if (!file) return undefined;
 
         const image = new Image();
         const objectUrl = URL.createObjectURL(file);
-        setImageError("");
-        setNaturalSize({ width: 0, height: 0 });
-        setOffset({ x: 0, y: 0 });
-
         image.onload = () => {
             imageRef.current = image;
-            setNaturalSize({
+            setLoadedImage({
+                file,
                 width: image.naturalWidth,
                 height: image.naturalHeight,
+                error: "",
             });
         };
         image.onerror = () => {
             imageRef.current = null;
-            setImageError("Não foi possível abrir esta imagem no navegador.");
+            setLoadedImage({
+                file,
+                width: 0,
+                height: 0,
+                error: "Não foi possível abrir esta imagem no navegador.",
+            });
         };
         image.src = objectUrl;
 
@@ -109,17 +125,6 @@ export default function ImageCropCanvas({
         zoom,
         rotation,
     );
-
-    useEffect(() => {
-        if (!viewport.width || !viewport.height || !imageRef.current) return;
-        setOffset((current) => clampOffset(
-            current,
-            viewport,
-            imageRef.current,
-            zoom,
-            rotation,
-        ));
-    }, [viewport, zoom, rotation, naturalSize.width, naturalSize.height]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -215,7 +220,7 @@ export default function ImageCropCanvas({
             x: drag.offset.x + event.clientX - drag.x,
             y: drag.offset.y + event.clientY - drag.y,
         };
-        setOffset(clampOffset(next, viewport, imageRef.current, zoom, rotation));
+        updateOffset(clampOffset(next, viewport, imageRef.current, zoom, rotation));
     }
 
     function handlePointerEnd(event) {
@@ -234,7 +239,7 @@ export default function ImageCropCanvas({
         const delta = movementByKey[event.key];
         if (!delta) return;
         event.preventDefault();
-        setOffset(clampOffset({
+        updateOffset(clampOffset({
             x: normalizedOffset.x + delta.x,
             y: normalizedOffset.y + delta.y,
         }, viewport, imageRef.current, zoom, rotation));
@@ -245,7 +250,10 @@ export default function ImageCropCanvas({
             <div
                 ref={viewportRef}
                 className="image-editor-preview"
-                style={{ aspectRatio: String(aspect), "--crop-ratio": String(aspect) }}
+                style={{
+                    aspectRatio: String(aspect),
+                    width: "min(100%, " + (58 * aspect) + "vh)",
+                }}
                 role="group"
                 aria-label="Área de recorte. Arraste a imagem ou use as setas do teclado para posicioná-la."
                 tabIndex={0}
