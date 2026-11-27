@@ -1,13 +1,4 @@
-import { ArrowRight } from "lucide-react";
-import { useState } from "react";
-import SiteHeader from "@/components/home/site-header";
-import HeroSearch from "@/components/home/hero-search";
-import CategoryFeaturedServices from "@/components/home/category-featured-services";
-import LocalServiceOverview from "@/components/home/local-service-overview";
-import {
-
-    FAQSection,
-} from "@/components/home/home-sections";
+import { FAQSection, HowSection } from "@/components/home/home-sections";
 import AppLink from "@/components/public/app-link";
 import HomeFeaturedServiceCard from "@/components/home/featured-service-card";
 import SiteFooter from "@/components/public/site-footer";
@@ -36,6 +27,7 @@ export default function HomePage() {
             <SiteHeader active="inicio" />
             <main id="conteudo" tabIndex="-1">
                 <HeroSearch query={query} city={city} onQueryChange={setQuery} onCityChange={setCity} onSubmit={submitSearch} availableCities={catalog.cities} />
+                <HowSection />
 
                 <CategoryFeaturedServices categories={catalog.categories} services={catalog.services} loading={catalog.loading} error={catalog.error} />
 

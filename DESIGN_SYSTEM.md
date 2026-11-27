@@ -188,12 +188,13 @@ O uso de `clamp()` é recorrente em títulos, espaçamentos e dimensões de áre
 
 Arquivo: `src/components/home/site-header.jsx`
 
-- Cabeçalho branco e sticky.
-- Fundo branco com transparência e blur.
-- Linha inferior discreta.
-- Marca com ícone de casa e nome Conecta Local.
-- Navegação principal horizontal em telas maiores.
-- Menu móvel e ações da conta em estruturas próprias.
+- Cabeçalho branco, sticky, com superfície limpa, borda inferior discreta e sombra muito suave.
+- Marca Conecta Local posicionada à esquerda.
+- Navegação desktop enxuta com “Como funciona”, menu suspenso “Serviços” (todos os serviços e categorias) e acesso “Seja um profissional”.
+- Campo de busca horizontal e expansível à direita da navegação; envia a palavra-chave ao catálogo por meio do parâmetro `q`.
+- Os botões “Entrar” e “Criar conta” permanecem imediatamente à direita da busca; quando há sessão, essa área é substituída pelo menu da conta.
+- Em telas de até 960 px, a navegação, a busca e as ações de acesso são agrupadas em um menu móvel expansível, que mantém a busca e os links de autenticação.
+- A busca do header preserva categoria e cidade quando submetida a partir de `/servicos`; a busca completa do Hero continua oferecendo os campos de serviço e localidade.
 
 ### 8.2. HeroSearch
 
@@ -247,11 +248,12 @@ O componente `HomeFeaturedServiceCard` é compartilhado pela vitrine de serviço
 - Grade de três cartões em telas maiores, duas colunas em telas intermediárias e uma coluna em telas menores.
 - No catálogo, os links de exemplos fictícios preservam os filtros atuais na URL.
 
-### 8.6. FAQSection
+### 8.6. HowSection e FAQSection
 
 Arquivo: `src/components/home/home-sections.jsx`
 
-- Layout editorial dividido em duas colunas no desktop.
+- A seção “Como funciona” é exibida na homepage após o Hero e recebe o identificador `como-funciona`, utilizado pelo link principal do header.
+- A FAQ apresenta layout editorial dividido em duas colunas no desktop.
 - Coluna de introdução com ilustração decorativa, título e texto de apoio.
 - Coluna de perguntas com blocos cinza-claro e grandes curvas.
 - Acordeão nativo com `details/summary`.
@@ -297,7 +299,8 @@ O projeto utiliza breakpoints definidos por componente. Os valores observados no
 | 960 px | Mudança de composição do destaque por categoria |
 | 920 px | FAQ em uma coluna |
 | 900 px | Grade de cartões e composição de indicadores |
-| 860 px | Cabeçalho e Hero |
+| 960 px | Header troca a navegação horizontal por menu móvel com busca e acesso à conta |
+| 860 px | Ajustes adicionais do Hero e demais seções |
 | 760 px | Footer empilhado e diretório em duas colunas |
 | 680 px | LocalServiceOverview em uma coluna |
 | 640 px | Cards de serviço e destaque por categoria em uma coluna |
@@ -360,7 +363,7 @@ Esses pontos ficam registrados para uma etapa futura de melhoria e refatoração
 | Destaque por categoria | `src/components/home/category-featured-services.jsx` |
 | Resumo do catálogo | `src/components/home/local-service-overview.jsx` |
 | Cartão público de serviço (homepage e catálogo) | `src/components/home/featured-service-card.jsx` |
-| FAQ e demais seções da homepage | `src/components/home/home-sections.jsx` |
+| Seções Como funciona e FAQ | `src/components/home/home-sections.jsx` |
 | Rodapé | `src/components/public/site-footer.jsx` |
 | Composição da homepage | `src/pages/HomePage.jsx` |
 
