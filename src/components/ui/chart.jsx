@@ -86,14 +86,14 @@ export function DonutChart({
                                 nameKey="label"
                                 cx="50%"
                                 cy="50%"
-                                innerRadius="62%"
-                                outerRadius="84%"
+                                innerRadius="64%"
+                                outerRadius="88%"
                                 paddingAngle={chartData.length > 1 ? 2 : 0}
-                                cornerRadius={4}
+                                cornerRadius={5}
                                 stroke="none"
                                 isAnimationActive={animate}
-                                animationBegin={80}
-                                animationDuration={850}
+                                animationBegin={90}
+                                animationDuration={900}
                                 animationEasing="ease-out"
                                 onMouseEnter={(entry) => setActiveLabel(entry?.label || null)}
                                 onMouseLeave={() => setActiveLabel(null)}
@@ -102,7 +102,7 @@ export function DonutChart({
                                     <Cell
                                         key={item.label}
                                         fill={item.color}
-                                        fillOpacity={!activeLabel || activeLabel === item.label ? 1 : 0.35}
+                                        fillOpacity={!activeLabel || activeLabel === item.label ? 1 : 0.32}
                                     />
                                 ))}
                             </Pie>
@@ -162,7 +162,8 @@ export function HorizontalBarChart({
     }));
     const hasValues = normalizedData.some((item) => item.value > 0);
     const animate = motionIsAllowed();
-    const chartHeight = Math.max(180, normalizedData.length * 43);
+    const chartHeight = Math.max(248, normalizedData.length * 48);
+    const categoryGap = normalizedData.length <= 3 ? "42%" : "24%";
 
     if (!normalizedData.length || !hasValues) {
         return (
@@ -178,41 +179,42 @@ export function HorizontalBarChart({
                 <BarChart
                     data={normalizedData}
                     layout="vertical"
-                    margin={{ top: 6, right: 18, bottom: 2, left: 2 }}
-                    barCategoryGap="24%"
+                    margin={{ top: 10, right: 22, bottom: 8, left: 4 }}
+                    barCategoryGap={categoryGap}
                     accessibilityLayer
                 >
-                    <CartesianGrid horizontal={false} vertical stroke="#edf1f6" strokeDasharray="3 5" />
+                    <CartesianGrid horizontal={false} vertical stroke="#e8eef6" strokeDasharray="4 6" />
                     <XAxis
                         type="number"
                         allowDecimals={false}
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fill: "#94a0ae", fontSize: 10 }}
+                        tick={{ fill: "#8795a8", fontSize: 11 }}
                     />
                     <YAxis
                         type="category"
                         dataKey="label"
-                        width={106}
+                        width={128}
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fill: "#64748b", fontSize: 10 }}
+                        tick={{ fill: "#53657d", fontSize: 12, fontWeight: 600 }}
                         tickFormatter={(value) => {
                             const label = String(value);
-                            return label.length > 17 ? label.slice(0, 16) + "…" : label;
+                            return label.length > 20 ? label.slice(0, 19) + "…" : label;
                         }}
                     />
                     <Tooltip
-                        cursor={{ fill: "rgba(37, 99, 235, 0.055)" }}
+                        cursor={{ fill: "#f3f7fd" }}
                         content={<ChartTooltip valueFormatter={valueFormatter} />}
                     />
                     <Bar
                         dataKey="value"
                         name="Serviços"
-                        barSize={20}
-                        radius={[0, 7, 7, 0]}
+                        barSize={24}
+                        radius={[0, 9, 9, 0]}
                         isAnimationActive={animate}
-                        animationDuration={850}
+                        animationBegin={100}
+                        animationDuration={900}
                         animationEasing="ease-out"
                     >
                         {normalizedData.map((item) => (
