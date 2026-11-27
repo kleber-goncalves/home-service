@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 789e11dce980deb2dd81be3c3b372023fda9b8a9
-- **Data do commit:** 2026-11-27T01:24:53-03:00
-- **Mensagem do commit:** feat(professional): add responsive dashboard with separated analytics
+- **Commit de referência:** 79ec113687cc834fe94d017081d410cdf7984bfa
+- **Data do commit:** 2026-11-27T01:26:19-03:00
+- **Mensagem do commit:** fix(professional): forward form state setters to dashboard
 - **Branch desta execução:** feat/professional-dashboard-refresh
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -546,13 +546,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 79ec113 | 2026-11-27 | fix(professional): forward form state setters to dashboard |
+| a589810 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 789e11d | 2026-11-27 | feat(professional): add responsive dashboard with separated analytics |
 | 7707d6f | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | ad31ab1 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 2a826c1 | 2026-11-27 | refactor(auth): delegate professional area to dashboard page |
 | c502b33 | 2026-11-27 | refactor(professional): extract authenticated dashboard page |
 | b8438d7 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 909d1e1 | 2026-11-27 | feat(auth): modernizar login e dividir cadastro em etapas |
-| 6c4930d | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
