@@ -17,8 +17,10 @@ export default function ImageEditorDialog({
     file,
     title = "Editar imagem",
     saving = false,
+    progress = 0,
     onOpenChange,
     onSave,
+    onCancel,
 }) {
     const exportRef = useRef(null);
     const titleId = useId();
@@ -101,11 +103,25 @@ export default function ImageEditorDialog({
                 )}
 
                 {error && <p className="image-editor-error" role="alert">{error}</p>}
+                {saving && (
+                    <div className="image-editor-upload-progress">
+                        <div className="demo-service-image-progress" role="progressbar" aria-label="Progresso da substituição" aria-valuemin="0" aria-valuemax="100" aria-valuenow={progress}>
+                            <span style={{ width: progress + "%" }} />
+                        </div>
+                        <small>Enviando a nova imagem: {progress}%</small>
+                    </div>
+                )}
 
                 <DialogFooter className="image-editor-footer">
-                    <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>
-                        Cancelar
-                    </Button>
+                    {saving ? (
+                        <Button type="button" variant="secondary" onClick={onCancel}>
+                            <X size={16} aria-hidden="true" /> Interromper envio
+                        </Button>
+                    ) : (
+                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                            Cancelar
+                        </Button>
+                    )}
                     <Button type="button" onClick={saveEditedImage} disabled={!file || saving}>
                         {saving ? <LoaderCircle size={16} className="animate-spin" aria-hidden="true" /> : <Check size={16} aria-hidden="true" />}
                         {saving ? "Aplicando..." : "Aplicar edição"}

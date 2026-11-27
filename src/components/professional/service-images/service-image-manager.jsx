@@ -287,6 +287,8 @@ export default function ServiceImageManager({ service, csrfToken, onServicesChan
                 file={editor?.file || null}
                 title={editor?.title}
                 saving={savingEdit}
+                progress={progress}
+                onCancel={() => abortControllerRef.current?.abort()}
                 onOpenChange={(open) => {
                     if (!open && !savingEdit) setEditor(null);
                 }}

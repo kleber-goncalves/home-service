@@ -2074,6 +2074,11 @@ function appImageFinalizeServiceImageReplacement_(state, driveMetadata) {
             || String(profile.id_profissional) !== String(currentState.profileId)
             || String(user.status) !== "active"
             || ["suspended", "removed"].indexOf(String(service.status)) !== -1) {
+            try {
+                var unavailableFile = DriveApp.getFileById(String(driveMetadata.id));
+                unavailableFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
+                unavailableFile.setTrashed(true);
+            } catch (ignored) {}
             appImageDeleteUploadState_(currentState);
             throw appFault_("SERVICE_NOT_FOUND", "Serviço não encontrado ou não disponível para substituir imagens.");
         }
@@ -2095,6 +2100,11 @@ function appImageFinalizeServiceImageReplacement_(state, driveMetadata) {
                 && String(item.status) === "active";
         });
         if (activeRows.length > 5) {
+            try {
+                var overflowFile = DriveApp.getFileById(String(driveMetadata.id));
+                overflowFile.setSharing(DriveApp.Access.PRIVATE, DriveApp.Permission.VIEW);
+                overflowFile.setTrashed(true);
+            } catch (ignored) {}
             appImageDeleteUploadState_(currentState);
             throw appFault_("IMAGE_REPLACE_CONFLICT", "O serviço excedeu o limite de imagens. Atualize a lista antes de continuar.");
         }
