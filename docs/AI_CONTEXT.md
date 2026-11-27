@@ -425,9 +425,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 57cf9eaa5f18c32d7702506df8334021c6a514c1
-- **Data do commit:** 2026-11-27T15:01:28-03:00
-- **Mensagem do commit:** fix(images): keep crop geometry and dialog labels consistent
+- **Commit de referência:** 7f5de2a66d5a8d9ffe8be196b51b47038db10188
+- **Data do commit:** 2026-11-27T15:02:18-03:00
+- **Mensagem do commit:** feat(images): add cancellable replacement progress and cleanup
 - **Branch desta execução:** feat/professional-image-editor
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -569,13 +569,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 7f5de2a | 2026-11-27 | feat(images): add cancellable replacement progress and cleanup |
+| 8d3d9b2 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 57cf9ea | 2026-11-27 | fix(images): keep crop geometry and dialog labels consistent |
 | 9b4deb5 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 43d6254 | 2026-11-27 | test(images): cover private image editing and replacement |
 | a57b56f | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 2410ec9 | 2026-11-27 | style(images): add responsive image editor and document workflow |
 | 8d9a1a2 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| d6fbaf5 | 2026-11-27 | feat(images): add reusable crop editor UI |
-| 255499f | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
