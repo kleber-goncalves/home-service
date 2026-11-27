@@ -425,9 +425,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 6b157a2ace5aafedf1bb21335f81797b4fcc201a
-- **Data do commit:** 2026-11-27T15:05:20-03:00
-- **Mensagem do commit:** fix(images): resolve editor lint and interaction states
+- **Commit de referência:** c4b878e7e735bacdb6c8f80860d32b0764624147
+- **Data do commit:** 2026-11-27T15:06:50-03:00
+- **Mensagem do commit:** fix(images): reset crop position with editor controls
 - **Branch desta execução:** feat/professional-image-editor
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -569,13 +569,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| c4b878e | 2026-11-27 | fix(images): reset crop position with editor controls |
+| e7384fb | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 6b157a2 | 2026-11-27 | fix(images): resolve editor lint and interaction states |
 | cc8bf5d | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 807155e | 2026-11-27 | test(images): compare preserved order numerically |
 | f3ca4c0 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 7f5de2a | 2026-11-27 | feat(images): add cancellable replacement progress and cleanup |
 | 8d3d9b2 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 57cf9ea | 2026-11-27 | fix(images): keep crop geometry and dialog labels consistent |
-| 9b4deb5 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
