@@ -8074,3 +8074,16 @@ summary:focus-visible {
         padding-left: 7px;
     }
 }
+
+.dashboard-visual-preview-topbar-note {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 11px;
+    color: #76520d;
+    background: #fff5dc;
+    border: 1px solid #f0dfb8;
+    border-radius: 999px;
+    font-size: 0.62rem;
+    font-weight: 850;
+    letter-spacing: 0.05em;
+}
