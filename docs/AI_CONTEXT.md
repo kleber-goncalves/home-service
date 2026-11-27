@@ -425,9 +425,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 947137730dcab12502787a3a5dbb7857456cf99e
-- **Data do commit:** 2026-11-27T17:13:08-03:00
-- **Mensagem do commit:** fix(professional): preserve default city when cancelling service form
+- **Commit de referência:** e834a63a25eb33e9fa10446b0a2c75d08f8578c5
+- **Data do commit:** 2026-11-27T17:13:11-03:00
+- **Mensagem do commit:** fix(professional): pass initial service form snapshot to dialog
 - **Branch desta execução:** feat/service-form-dialog
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 15
@@ -576,6 +576,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| e834a63 | 2026-11-27 | fix(professional): pass initial service form snapshot to dialog |
 | 9471377 | 2026-11-27 | fix(professional): preserve default city when cancelling service form |
 | bc5ba49 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 9187377 | 2026-11-27 | fix(professional): snapshot initial service form on open |
@@ -583,6 +584,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | 27b7759 | 2026-11-27 | fix(professional): keep dialog baseline outside effects |
 | 4fad41f | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 1535c5d | 2026-11-27 | fix(professional): place catalog feedback beside category field |
-| 023d3cc | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
