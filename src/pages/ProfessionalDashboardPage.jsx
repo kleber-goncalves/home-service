@@ -3,14 +3,14 @@ import { gsap } from "gsap";
 import {
     ArrowUpRight, BriefcaseBusiness, Check, ChevronRight, ImageIcon, Info,
     LayoutDashboard, LogOut, Mail, MapPin, Menu, Pencil, Plus, ShieldCheck,
-    Tags, Trash2, UserRound, Wrench, X,
+    Tags, UserRound, Wrench, X,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { DonutChart, HorizontalBarChart } from "@/components/ui/chart";
 import { Input } from "@/components/ui/input";
-import ServiceImageManager from "@/components/professional/service-image-manager";
+import ProfessionalServiceList from "@/components/professional/services/professional-service-list";
 import ProfilePhotoManager from "@/components/professional/profile-photo-manager";
 
 const NAV_ITEMS = [
@@ -572,61 +572,17 @@ export default function ProfessionalDashboardPage({
                             </form>
                         )}
 
-                        <div className="demo-service-list">
-                            {services.length ? services.map((service) => {
-                                const canToggle = service.status === "published" || service.status === "paused";
-                                const canEdit = ["draft", "published", "paused"].includes(service.status);
-                                const canRemove = canEdit;
-                                return (
-                                    <article className="demo-service-item" key={service.id}>
-                                        <div className="demo-service-icon"><Wrench size={19} aria-hidden="true" /></div>
-                                        <div className="demo-service-copy">
-                                            <div className="demo-service-title-row">
-                                                <h3>{service.title}</h3>
-                                                <span className={`demo-service-status is-${service.status}`}>
-                                                    {formatStatus(service.status)}
-                                                </span>
-                                            </div>
-                                            <span className="demo-service-category">{service.category}</span>
-                                            <p>{service.description}</p>
-                                            {service.city && <span className="demo-service-city-summary">Atende: {service.city}</span>}
-                                            {canEdit && (
-                                                <ServiceImageManager
-                                                    service={service}
-                                                    csrfToken={csrfToken}
-                                                    onServicesChange={setServices}
-                                                />
-                                            )}
-                                        </div>
-                                        <div className="demo-service-actions">
-                                            {canEdit && (
-                                                <Button type="button" variant="secondary" size="sm" disabled={busy} onClick={() => startEditingService(service)}>
-                                                    <Pencil size={14} aria-hidden="true" /> Editar
-                                                </Button>
-                                            )}
-                                            {canToggle && (
-                                                <Button type="button" variant="secondary" size="sm" disabled={busy} onClick={() => toggleService(service)}>
-                                                    {service.status === "published" ? "Pausar" : "Publicar"}
-                                                </Button>
-                                            )}
-                                            {canRemove && (
-                                                <Button type="button" variant="secondary" size="sm" disabled={busy} onClick={() => removeService(service)}>
-                                                    <Trash2 size={14} aria-hidden="true" /> Remover
-                                                </Button>
-                                            )}
-                                        </div>
-                                    </article>
-                                );
-                            }) : (
-                                <div className="empty-results">
-                                    <h3>Você ainda não cadastrou serviços</h3>
-                                    <p>Adicione seu primeiro serviço para começar a aparecer na vitrine pública.</p>
-                                </div>
-                            )}
-                        </div>
-                        <div className="demo-services-refresh">
-                            <button type="button" onClick={refreshServices} disabled={busy}>Atualizar lista</button>
-                        </div>
+                        <ProfessionalServiceList
+                            services={services}
+                            busy={busy}
+                            csrfToken={csrfToken}
+                            onServicesChange={setServices}
+                            onEdit={startEditingService}
+                            onToggle={toggleService}
+                            onRemove={removeService}
+                            onRefresh={refreshServices}
+                        />
+
                     </section>
                         </section>
                     )}
