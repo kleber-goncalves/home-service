@@ -414,10 +414,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** e4703ec5fbcad53a4aa33352f7f1b5730b709ce5
-- **Data do commit:** 2026-11-27T00:45:15-03:00
-- **Mensagem do commit:** style(header): atualizar estilos de navegação e ajustar espaçamentos
-- **Branch desta execução:** dev
+- **Commit de referência:** 1b5592d613e3e23d96dc4b6215da550de8354edc
+- **Data do commit:** 2026-11-27T00:59:55-03:00
+- **Mensagem do commit:** docs(design): ajustar numeração das seções de autenticação
+- **Branch desta execução:** feat/login-page-editorial-refresh
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -544,13 +544,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| e4703ec | 2026-11-27 | style(header): atualizar estilos de navegação e ajustar espaçamentos |
-| 32f07c5 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| ca491d1 | 2026-11-27 | Merge pull request #47 from kleber-goncalves/feat/header-navigation-refresh |
-| 484d777 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 9e0203c | 2026-11-27 | chore(home): remove unused how-it-works styles |
-| d7cbc80 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| aaa639e | 2026-11-27 | refactor(home): remove how it works section and navigation links |
-| 5583d2b | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| 1b5592d | 2026-11-27 | docs(design): ajustar numeração das seções de autenticação |
+| 827b52a | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| 95bc0ab | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| a1252b2 | 2026-11-27 | docs(design): documentar cadastro multipasso |
+| 486c450 | 2026-11-27 | style(auth): adicionar progresso e navegação ao cadastro |
+| 6853ffb | 2026-11-27 | feat(auth): dividir cadastro profissional em etapas |
+| 27f62b8 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| e93f70b | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->

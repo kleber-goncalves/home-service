@@ -70,6 +70,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         isLoading: authLoading,
     } = useAuth();
     const [mode, setMode] = useState(initialMode === "register" ? "register" : "login");
+    const [registerStep, setRegisterStep] = useState(1);
     const [catalog, setCatalog] = useState({ categories: [], cities: [] });
     const [registerForm, setRegisterForm] = useState(EMPTY_REGISTER);
     const [loginForm, setLoginForm] = useState({ email: "", password: "" });
@@ -172,10 +173,37 @@ export default function AuthDemoPage({ initialMode = "login" }) {
         setNotice(null);
         setVerificationCode("");
         if (nextMode === "register") {
+            setRegisterStep(1);
             setRegisterForm((current) => ({ ...current, password: "", passwordConfirmation: "" }));
         } else {
             setLoginForm((current) => ({ ...current, password: "" }));
         }
+    }
+
+    function handleRegistrationStepSubmit(event) {
+        event.preventDefault();
+
+        if (registerStep === 2 && (!catalogReady || !catalog.cities.length)) {
+            setNotice({
+                title: "Catálogo de cidades indisponível",
+                message: "Não foi possível carregar as cidades. Atualize a página e tente novamente.",
+                tone: "warning",
+            });
+            return;
+        }
+
+        if (registerStep < 3) {
+            setRegisterStep((current) => Math.min(current + 1, 3));
+            setNotice(null);
+            return;
+        }
+
+        submitRegistration(event);
+    }
+
+    function goToPreviousRegistrationStep() {
+        setRegisterStep((current) => Math.max(current - 1, 1));
+        setNotice(null);
     }
 
     async function submitRegistration(event) {
@@ -1014,6 +1042,39 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                             </div>
                         </div>
 
+                        {isRegister && (
+                            <nav className="auth-register-progress" aria-label="Progresso do cadastro">
+                                <div className="auth-register-progress-heading">
+                                    <span>Etapa {registerStep} de 3</span>
+                                    <strong>
+                                        {registerStep === 1 ? "Seus dados" : registerStep === 2 ? "Contato e perfil" : "Segurança da conta"}
+                                    </strong>
+                                </div>
+                                <ol className="auth-register-progress-list">
+                                    {[
+                                        { id: 1, label: "Seus dados" },
+                                        { id: 2, label: "Contato e perfil" },
+                                        { id: 3, label: "Segurança" },
+                                    ].map((step) => (
+                                        <li
+                                            key={step.id}
+                                            className={[
+                                                "auth-register-progress-step",
+                                                registerStep === step.id ? "is-current" : "",
+                                                registerStep > step.id ? "is-complete" : "",
+                                            ].filter(Boolean).join(" ")}
+                                            aria-current={registerStep === step.id ? "step" : undefined}
+                                        >
+                                            <span className="auth-register-progress-number">
+                                                {registerStep > step.id ? <Check size={14} aria-hidden="true" /> : step.id}
+                                            </span>
+                                            <span className="auth-register-progress-label">{step.label}</span>
+                                        </li>
+                                    ))}
+                                </ol>
+                            </nav>
+                        )}
+
                         <div className="auth-demo-warning" role="note">
                             <Info size={17} aria-hidden="true" />
                             <p><strong>Protótipo acadêmico:</strong> use dados fictícios. O cadastro, o hash de senha, a sessão e os serviços são gravados na planilha do projeto. O código de confirmação é mostrado na tela; nenhum e-mail é enviado.</p>
@@ -1039,52 +1100,92 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                                 <button className="auth-demo-text-button" type="button" onClick={() => switchMode("login")}>Voltar para entrar</button>
                             </form>
                         ) : isRegister ? (
-                            <form className="auth-demo-form" onSubmit={submitRegistration}>
-                                <div className="auth-demo-fields-grid">
-                                    <div className="auth-demo-field">
-                                        <label htmlFor="fullName">Nome completo</label>
-                                        <Input id="fullName" name="fullName" autoComplete="off" placeholder="Ex.: Alex Silva" value={registerForm.fullName} onChange={updateRegisterField} minLength={2} maxLength={120} required />
+                            <form className="auth-demo-form auth-register-form" onSubmit={handleRegistrationStepSubmit}>
+                                {registerStep === 1 && (
+                                    <div className="auth-register-step" aria-labelledby="auth-register-step-one">
+                                        <div className="auth-register-step-heading">
+                                            <span>ETAPA 1 · SEUS DADOS</span>
+                                            <h3 id="auth-register-step-one">Como podemos chamar você?</h3>
+                                            <p>Informe seu nome e como deseja aparecer para quem procura seus serviços.</p>
+                                        </div>
+                                        <div className="auth-demo-field">
+                                            <label htmlFor="fullName">Nome completo</label>
+                                            <Input id="fullName" name="fullName" autoComplete="name" placeholder="Ex.: Alex Silva" value={registerForm.fullName} onChange={updateRegisterField} minLength={2} maxLength={120} required />
+                                        </div>
+                                        <div className="auth-demo-field">
+                                            <label htmlFor="publicName">Nome público</label>
+                                            <Input id="publicName" name="publicName" autoComplete="nickname" placeholder="Ex.: Alex Reformas" value={registerForm.publicName} onChange={updateRegisterField} minLength={2} maxLength={80} required />
+                                        </div>
                                     </div>
-                                    <div className="auth-demo-field">
-                                        <label htmlFor="publicName">Nome público</label>
-                                        <Input id="publicName" name="publicName" autoComplete="off" placeholder="Ex.: Alex Reformas" value={registerForm.publicName} onChange={updateRegisterField} minLength={2} maxLength={80} required />
+                                )}
+
+                                {registerStep === 2 && (
+                                    <div className="auth-register-step" aria-labelledby="auth-register-step-two">
+                                        <div className="auth-register-step-heading">
+                                            <span>ETAPA 2 · CONTATO E PERFIL</span>
+                                            <h3 id="auth-register-step-two">Como clientes podem encontrar você?</h3>
+                                            <p>Adicione seus meios de contato e uma apresentação breve do seu trabalho.</p>
+                                        </div>
+                                        <div className="auth-demo-field">
+                                            <label htmlFor="register-email">E-mail</label>
+                                            <div className="auth-demo-input-wrap">
+                                                <Mail size={17} aria-hidden="true" />
+                                                <Input id="register-email" name="email" type="email" autoComplete="email" placeholder="voce@exemplo.invalid" value={registerForm.email} onChange={updateRegisterField} maxLength={254} required />
+                                            </div>
+                                        </div>
+                                        <div className="auth-demo-field">
+                                            <label htmlFor="register-whatsapp">WhatsApp com DDD</label>
+                                            <Input id="register-whatsapp" name="whatsapp" type="tel" autoComplete="tel" placeholder="Ex.: (33) 99999-9999" value={registerForm.whatsapp} onChange={updateRegisterField} maxLength={20} required />
+                                        </div>
+                                        <div className="auth-demo-field">
+                                            <label htmlFor="register-presentation">Apresentação profissional</label>
+                                            <textarea id="register-presentation" name="presentation" className="demo-auth-textarea" rows={3} minLength={10} maxLength={500} placeholder="Conte um pouco sobre os serviços que você oferece." value={registerForm.presentation} onChange={updateRegisterField} required />
+                                        </div>
+                                        <div className="auth-demo-field">
+                                            <label htmlFor="register-city">Cidade principal</label>
+                                            <select id="register-city" name="cityId" value={registerForm.cityId} onChange={updateRegisterField} disabled={!catalogReady || !catalog.cities.length} required>
+                                                <option value="">Selecione sua cidade</option>
+                                                {catalog.cities.map((city) => <option key={city.id} value={city.id}>{city.name} - {city.state}</option>)}
+                                            </select>
+                                            {catalogReady && !catalog.cities.length && (
+                                                <p className="auth-demo-hint">Nenhuma cidade está disponível no catálogo neste momento.</p>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="auth-demo-field">
-                                    <label htmlFor="register-email">E-mail fictício</label>
-                                    <div className="auth-demo-input-wrap">
-                                        <Mail size={17} aria-hidden="true" />
-                                        <Input id="register-email" name="email" type="email" autoComplete="off" placeholder="voce@exemplo.invalid" value={registerForm.email} onChange={updateRegisterField} maxLength={254} required />
+                                )}
+
+                                {registerStep === 3 && (
+                                    <div className="auth-register-step" aria-labelledby="auth-register-step-three">
+                                        <div className="auth-register-step-heading">
+                                            <span>ETAPA 3 · SEGURANÇA DA CONTA</span>
+                                            <h3 id="auth-register-step-three">Proteja seu acesso.</h3>
+                                            <p>Crie uma senha forte para acessar sua área profissional.</p>
+                                        </div>
+                                        <div className="auth-demo-field">
+                                            <label htmlFor="register-password">Senha</label>
+                                            <Input id="register-password" name="password" type="password" autoComplete="new-password" placeholder="Crie uma senha fictícia" value={registerForm.password} onChange={updateRegisterField} required />
+                                        </div>
+                                        <div className="auth-demo-field">
+                                            <label htmlFor="passwordConfirmation">Confirmar senha</label>
+                                            <Input id="passwordConfirmation" name="passwordConfirmation" type="password" autoComplete="new-password" placeholder="Repita a senha" value={registerForm.passwordConfirmation} onChange={updateRegisterField} required />
+                                        </div>
+                                        <p className="auth-demo-hint">Use pelo menos 15 caracteres. A senha é processada com Argon2id no servidor. Nunca use sua senha pessoal neste protótipo.</p>
                                     </div>
+                                )}
+
+                                <div className={"auth-register-navigation" + (registerStep === 1 ? " is-first-step" : "")}>
+                                    {registerStep > 1 && (
+                                        <Button type="button" className="auth-register-back" onClick={goToPreviousRegistrationStep} disabled={busy}>
+                                            <ArrowLeft size={16} aria-hidden="true" /> Voltar
+                                        </Button>
+                                    )}
+                                    <Button type="submit" className="auth-demo-submit auth-register-continue" disabled={busy}>
+                                        {registerStep === 3
+                                            ? (busy ? "Gravando cadastro..." : "Criar minha conta")
+                                            : "Continuar"}
+                                        <ArrowRight size={17} aria-hidden="true" />
+                                    </Button>
                                 </div>
-                                <div className="auth-demo-field">
-                                    <label htmlFor="register-whatsapp">WhatsApp com DDD</label>
-                                    <Input id="register-whatsapp" name="whatsapp" type="tel" autoComplete="off" placeholder="Ex.: (33) 99999-9999" value={registerForm.whatsapp} onChange={updateRegisterField} maxLength={20} required />
-                                </div>
-                                <div className="auth-demo-field">
-                                    <label htmlFor="register-presentation">Apresentação profissional</label>
-                                    <textarea id="register-presentation" name="presentation" className="demo-auth-textarea" rows={3} minLength={10} maxLength={500} placeholder="Conte um pouco sobre os serviços que você oferece." value={registerForm.presentation} onChange={updateRegisterField} required />
-                                </div>
-                                <div className="auth-demo-fields-grid">
-                                    <div className="auth-demo-field">
-                                        <label htmlFor="register-city">Cidade principal</label>
-                                        <select id="register-city" name="cityId" value={registerForm.cityId} onChange={updateRegisterField} required>
-                                            {catalog.cities.map((city) => <option key={city.id} value={city.id}>{city.name} - {city.state}</option>)}
-                                        </select>
-                                    </div>
-                                    <div className="auth-demo-field">
-                                        <label htmlFor="register-password">Senha (mínimo 15 caracteres)</label>
-                                        <Input id="register-password" name="password" type="password" autoComplete="new-password" placeholder="Crie uma senha fictícia" value={registerForm.password} onChange={updateRegisterField} required />
-                                    </div>
-                                </div>
-                                <div className="auth-demo-field">
-                                    <label htmlFor="passwordConfirmation">Confirmar senha</label>
-                                    <Input id="passwordConfirmation" name="passwordConfirmation" type="password" autoComplete="new-password" placeholder="Repita a senha" value={registerForm.passwordConfirmation} onChange={updateRegisterField} required />
-                                </div>
-                                <p className="auth-demo-hint">Senha processada com Argon2id no servidor. Nunca use sua senha pessoal neste protótipo.</p>
-                                <Button type="submit" className="auth-demo-submit" disabled={busy || !catalogReady || !catalog.cities.length}>
-                                    {busy ? "Gravando cadastro..." : "Cadastrar e salvar na planilha"} <ArrowRight size={17} aria-hidden="true" />
-                                </Button>
                                 <p className="auth-demo-switch">Já tem uma conta? <button className="auth-demo-text-button" type="button" onClick={() => switchMode("login")}>Entrar</button></p>
                             </form>
                         ) : (
