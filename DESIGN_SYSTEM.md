@@ -260,7 +260,7 @@ Arquivo: `src/components/home/home-sections.jsx`
 - Indicador visual de mais/menos para representar estado fechado/aberto.
 - Em telas menores, a introdução fica acima da lista.
 
-### 8.8. Autenticação (login, cadastro e confirmação)
+### 8.7. Autenticação (login, cadastro e confirmação)
 
 Arquivo: `src/pages/AuthDemoPage.jsx`
 
@@ -277,7 +277,7 @@ Arquivo: `src/pages/AuthDemoPage.jsx`
 - O envio para `auth.register` ocorre somente na última etapa; a confirmação de e-mail existente permanece como etapa posterior do fluxo.
 - O redesign altera apenas a apresentação e a organização do cadastro; contratos de API, validações de segurança, login, sessão e confirmação permanecem os mesmos.
 
-### 8.7. SiteFooter
+### 8.8. SiteFooter
 
 Arquivo: `src/components/public/site-footer.jsx`
 
