@@ -1,14 +1,16 @@
 import { useState } from "react";
 import {
-    ArrowUpRight, BriefcaseBusiness, ChartColumn, Check, ChevronRight, Eye,
-    Info, LayoutDashboard, LogOut, Mail, Menu, MousePointerClick, Pencil,
-    Plus, ShieldCheck, Trash2, UserRound, Wrench, X,
+    ArrowUpRight, BriefcaseBusiness, Check, ChevronRight, ImageIcon, Info,
+    LayoutDashboard, LogOut, Mail, MapPin, Menu, Pencil, Plus, ShieldCheck,
+    Tags, Trash2, UserRound, Wrench, X,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { DonutChart, HorizontalBarChart } from "@/components/ui/chart";
 import { Input } from "@/components/ui/input";
 import ServiceImageManager from "@/components/professional/service-image-manager";
 import ProfilePhotoManager from "@/components/professional/profile-photo-manager";
-import { PROFESSIONAL_DASHBOARD_DEMO } from "@/data/professional-dashboard-demo";
 
 const NAV_ITEMS = [
     { id: "overview", label: "Visão geral", icon: LayoutDashboard },
@@ -28,82 +30,67 @@ function formatStatus(status) {
     return labels[status] || "Estado desconhecido";
 }
 
-function ServiceStatusChart({ items, total }) {
-    return (
-        <div className="pro-dashboard-status-chart">
-            {total > 0 ? items.map((item) => {
-                const percent = Math.round((item.value / total) * 100);
-                return (
-                    <div className="pro-dashboard-status-row" key={item.label}>
-                        <div className="pro-dashboard-status-label">
-                            <span><i className={"pro-dashboard-status-dot is-" + item.key} />{item.label}</span>
-                            <strong>{item.value}</strong>
-                        </div>
-                        <div
-                            className="pro-dashboard-status-track"
-                            role="img"
-                            aria-label={item.label + ": " + item.value + " serviço(s), " + percent + "% do total"}
-                        >
-                            <span className={"is-" + item.key} style={{ width: percent + "%" }} />
-                        </div>
-                    </div>
-                );
-            }) : (
-                <div className="pro-dashboard-chart-empty">
-                    <BriefcaseBusiness size={22} aria-hidden="true" />
-                    <strong>Nenhum serviço cadastrado</strong>
-                    <span>Seus indicadores aparecerão aqui quando você adicionar um serviço.</span>
-                </div>
-            )}
-        </div>
-    );
+
+const CHART_COLORS = ["#2563eb", "#5486e8", "#83a5ed", "#a8bee9", "#c1d0e6", "#7892b5"];
+
+function getServiceCityNames(service) {
+    if (Array.isArray(service.cities) && service.cities.length) {
+        return service.cities
+            .map((city) => [city.name, city.state].filter(Boolean).join(" - ").trim())
+            .filter(Boolean);
+    }
+
+    return String(service.city || "")
+        .split(",")
+        .map((city) => city.trim())
+        .filter(Boolean);
 }
 
-function DemonstrationViewsChart({ analytics }) {
-    const maxValue = Math.max(...analytics.dailyViews.map((item) => item.views), 1);
-    const points = analytics.dailyViews.map((item, index) => ({
-        ...item,
-        x: 12 + (index * 276) / Math.max(analytics.dailyViews.length - 1, 1),
-        y: 82 - (item.views / maxValue) * 58,
-    }));
-    const linePoints = points.map((point) => point.x + "," + point.y).join(" ");
+function buildProfessionalAnalytics(serviceList, statusItems) {
+    const categoryCounts = new Map();
+    const cityCounts = new Map();
+    let servicesWithImages = 0;
+    let activeImages = 0;
 
-    return (
-        <div className="pro-dashboard-demo-chart">
-            <div className="pro-dashboard-demo-chart-total">
-                <div>
-                    <span>Visualizações do perfil</span>
-                    <strong>{analytics.profileViews.toLocaleString("pt-BR")}</strong>
-                </div>
-                <span className="pro-dashboard-demo-tag">Demonstrativo</span>
-            </div>
-            <svg
-                className="pro-dashboard-line-chart"
-                viewBox="0 0 300 100"
-                role="img"
-                aria-label="Gráfico fictício de visualizações ao longo de sete dias"
-            >
-                <g className="pro-dashboard-chart-grid">
-                    <path d="M10 24 H290 M10 53 H290 M10 82 H290" />
-                </g>
-                <polygon points={"12,82 " + linePoints + " 288,82"} className="pro-dashboard-chart-area" />
-                <polyline points={linePoints} className="pro-dashboard-chart-line" />
-                {points.map((point) => (
-                    <circle key={point.day} cx={point.x} cy={point.y} r="3.2" className="pro-dashboard-chart-point" />
-                ))}
-            </svg>
-            <div className="pro-dashboard-chart-days">
-                {analytics.dailyViews.map((item) => <span key={item.day}>{item.day}</span>)}
-            </div>
-            <div className="pro-dashboard-demo-contact">
-                <span><MousePointerClick size={16} aria-hidden="true" /> Cliques em contato</span>
-                <strong>{analytics.contactClicks.toLocaleString("pt-BR")}</strong>
-            </div>
-            <p className="pro-dashboard-demo-disclaimer">
-                Dados fictícios para demonstração acadêmica. A plataforma ainda não coleta visualizações ou cliques.
-            </p>
-        </div>
-    );
+    serviceList.forEach((service) => {
+        const category = String(service.category || "Sem categoria").trim() || "Sem categoria";
+        categoryCounts.set(category, (categoryCounts.get(category) || 0) + 1);
+
+        new Set(getServiceCityNames(service)).forEach((city) => {
+            cityCounts.set(city, (cityCounts.get(city) || 0) + 1);
+        });
+
+        const images = Array.isArray(service.images)
+            ? service.images.filter((image) => image && image.status === "active")
+            : [];
+        if (images.length) servicesWithImages += 1;
+        activeImages += images.length;
+    });
+
+    const sortDistribution = (entries, limit) => Array.from(entries, ([label, value], index) => ({
+        label,
+        value,
+        color: CHART_COLORS[index % CHART_COLORS.length],
+    })).sort((left, right) => right.value - left.value || left.label.localeCompare(right.label, "pt-BR")).slice(0, limit);
+
+    const total = serviceList.length;
+    return {
+        cityCount: cityCounts.size,
+        servicesWithImages,
+        servicesWithoutImages: Math.max(0, total - servicesWithImages),
+        activeImages,
+        statusDistribution: statusItems.map((item, index) => ({
+            label: item.label,
+            value: item.value,
+            color: ["#2563eb", "#d8a344", "#93a4b8", "#c66b6b", "#cbd5e1"][index],
+        })),
+        categoryDistribution: sortDistribution(categoryCounts, 6),
+        cityDistribution: sortDistribution(cityCounts, 6),
+        imageDistribution: [
+            { label: "Com imagem", value: servicesWithImages, color: "#16a36a" },
+            { label: "Sem imagem", value: Math.max(0, total - servicesWithImages), color: "#cbd5e1" },
+        ],
+    };
 }
 
 export default function ProfessionalDashboardPage({
@@ -161,6 +148,7 @@ export default function ProfessionalDashboardPage({
         { key: "suspended", label: "Suspensos", value: suspendedServices },
         { key: "removed", label: "Removidos", value: removedServices },
     ];
+    const analytics = buildProfessionalAnalytics(serviceList, statusItems);
     const pageHeading = {
         overview: {
             eyebrow: "ÁREA PROFISSIONAL",
@@ -325,43 +313,106 @@ export default function ProfessionalDashboardPage({
                                     <small>Podem ser reativados</small>
                                     <span className="professional-dashboard-data-source">Dado real</span>
                                 </article>
-                                <article className="professional-dashboard-kpi is-demo">
-                                    <span className="professional-dashboard-kpi-icon"><Eye size={17} aria-hidden="true" /></span>
-                                    <span className="professional-dashboard-kpi-label">Visualizações do perfil</span>
-                                    <strong>{PROFESSIONAL_DASHBOARD_DEMO.profileViews.toLocaleString("pt-BR")}</strong>
-                                    <small>Exemplo de visualizações</small>
-                                    <span className="professional-dashboard-data-source is-demo">Demonstrativo</span>
+                                <article className="professional-dashboard-kpi">
+                                    <span className="professional-dashboard-kpi-icon"><MapPin size={17} aria-hidden="true" /></span>
+                                    <span className="professional-dashboard-kpi-label">Cidades atendidas</span>
+                                    <strong>{analytics.cityCount}</strong>
+                                    <small>Localidades associadas aos serviços</small>
+                                    <span className="professional-dashboard-data-source">Dado real</span>
                                 </article>
                             </div>
 
-                            <div className="professional-dashboard-chart-grid">
-                                <section className="professional-dashboard-card" aria-labelledby="service-status-heading">
-                                    <div className="professional-dashboard-card-heading">
+                            <div className="professional-dashboard-analytics-grid">
+                                <Card className="pro-dashboard-chart-card pro-dashboard-chart-card--status">
+                                    <CardHeader className="pro-dashboard-chart-header">
                                         <div>
                                             <span className="professional-dashboard-card-eyebrow">DADOS DA CONTA</span>
-                                            <h2 id="service-status-heading">Situação dos serviços</h2>
-                                            <p>Distribuição dos registros atualmente cadastrados.</p>
+                                            <CardTitle className="pro-dashboard-chart-title">Situação dos serviços</CardTitle>
+                                            <CardDescription className="pro-dashboard-chart-description">Como seus serviços estão distribuídos por status.</CardDescription>
                                         </div>
-                                        <span className="professional-dashboard-card-icon"><ChartColumn size={19} aria-hidden="true" /></span>
-                                    </div>
-                                    <ServiceStatusChart items={statusItems} total={serviceList.length} />
-                                    <div className="professional-dashboard-card-foot">
+                                        <span className="professional-dashboard-card-icon"><BriefcaseBusiness size={18} aria-hidden="true" /></span>
+                                    </CardHeader>
+                                    <CardContent className="pro-dashboard-chart-content">
+                                        <DonutChart
+                                            data={analytics.statusDistribution}
+                                            total={serviceList.length}
+                                            centerLabel="serviços"
+                                            ariaLabel="Distribuição dos serviços por situação"
+                                        />
+                                    </CardContent>
+                                    <CardFooter className="pro-dashboard-chart-footer">
                                         <span>Total de registros</span>
                                         <strong>{serviceList.length}</strong>
-                                    </div>
-                                </section>
+                                    </CardFooter>
+                                </Card>
 
-                                <section className="professional-dashboard-card" aria-labelledby="profile-views-heading">
-                                    <div className="professional-dashboard-card-heading">
+                                <Card className="pro-dashboard-chart-card pro-dashboard-chart-card--categories">
+                                    <CardHeader className="pro-dashboard-chart-header">
                                         <div>
-                                            <span className="professional-dashboard-card-eyebrow">ANALYTICS DE EXEMPLO</span>
-                                            <h2 id="profile-views-heading">Visibilidade do perfil</h2>
-                                            <p>Visualizações e interesse ao longo de uma semana.</p>
+                                            <span className="professional-dashboard-card-eyebrow">ORGANIZAÇÃO DO CATÁLOGO</span>
+                                            <CardTitle className="pro-dashboard-chart-title">Serviços por categoria</CardTitle>
+                                            <CardDescription className="pro-dashboard-chart-description">Categorias com mais serviços vinculados à sua conta.</CardDescription>
                                         </div>
-                                        <span className="professional-dashboard-demo-tag">Demonstrativo</span>
+                                        <span className="professional-dashboard-card-icon"><Tags size={18} aria-hidden="true" /></span>
+                                    </CardHeader>
+                                    <CardContent className="pro-dashboard-chart-content">
+                                        <HorizontalBarChart
+                                            data={analytics.categoryDistribution}
+                                            emptyMessage="Cadastre um serviço para visualizar a distribuição por categoria."
+                                            ariaLabel="Quantidade de serviços por categoria"
+                                        />
+                                    </CardContent>
+                                </Card>
+
+                                <Card className="pro-dashboard-chart-card pro-dashboard-chart-card--cities">
+                                    <CardHeader className="pro-dashboard-chart-header">
+                                        <div>
+                                            <span className="professional-dashboard-card-eyebrow">ÁREA DE ATENDIMENTO</span>
+                                            <CardTitle className="pro-dashboard-chart-title">Cobertura por cidade</CardTitle>
+                                            <CardDescription className="pro-dashboard-chart-description">Quantidade de serviços associados a cada localidade.</CardDescription>
+                                        </div>
+                                        <span className="professional-dashboard-card-icon"><MapPin size={18} aria-hidden="true" /></span>
+                                    </CardHeader>
+                                    <CardContent className="pro-dashboard-chart-content">
+                                        <HorizontalBarChart
+                                            data={analytics.cityDistribution}
+                                            emptyMessage="As cidades vinculadas aos serviços aparecerão aqui."
+                                            ariaLabel="Quantidade de serviços por cidade atendida"
+                                        />
+                                    </CardContent>
+                                </Card>
+
+                                <Card className="pro-dashboard-chart-card pro-dashboard-chart-card--images">
+                                    <CardHeader className="pro-dashboard-chart-header">
+                                        <div>
+                                            <span className="professional-dashboard-card-eyebrow">APRESENTAÇÃO DOS SERVIÇOS</span>
+                                            <CardTitle className="pro-dashboard-chart-title">Cobertura de imagens</CardTitle>
+                                            <CardDescription className="pro-dashboard-chart-description">Serviços que já possuem pelo menos uma imagem ativa.</CardDescription>
+                                        </div>
+                                        <span className="professional-dashboard-card-icon"><ImageIcon size={18} aria-hidden="true" /></span>
+                                    </CardHeader>
+                                    <CardContent className="pro-dashboard-chart-content">
+                                        <DonutChart
+                                            data={analytics.imageDistribution}
+                                            total={serviceList.length}
+                                            centerLabel="serviços"
+                                            ariaLabel="Proporção de serviços com e sem imagens"
+                                        />
+                                    </CardContent>
+                                    <CardFooter className="pro-dashboard-chart-footer">
+                                        <span>Imagens ativas cadastradas</span>
+                                        <strong>{analytics.activeImages}</strong>
+                                    </CardFooter>
+                                </Card>
+
+                                <Card className="pro-dashboard-analytics-note">
+                                    <div className="pro-dashboard-analytics-note-icon"><MapPin size={18} aria-hidden="true" /></div>
+                                    <div>
+                                        <strong>Próxima etapa: audiência do perfil</strong>
+                                        <p>Visualizações, interesse nos serviços e cliques em contato só serão exibidos quando a plataforma registrar eventos reais. Nenhum número demonstrativo é apresentado como resultado da sua conta.</p>
                                     </div>
-                                    <DemonstrationViewsChart analytics={PROFESSIONAL_DASHBOARD_DEMO} />
-                                </section>
+                                    <Badge variant="default">Coleta futura</Badge>
+                                </Card>
                             </div>
 
                             <section className="professional-dashboard-card professional-dashboard-services-summary" aria-labelledby="overview-services-heading">
@@ -701,7 +752,7 @@ export default function ProfessionalDashboardPage({
 
                     <footer className="professional-dashboard-footer">
                         <span>Conecta Local</span>
-                        <span>Protótipo acadêmico · Métricas demonstrativas identificadas</span>
+                        <span>Protótipo acadêmico · Indicadores calculados a partir dos serviços da conta</span>
                     </footer>
                 </div>
             </div>

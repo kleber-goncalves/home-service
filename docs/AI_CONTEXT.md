@@ -2,6 +2,16 @@
 
 > Documento de continuidade do projeto. Leia antes de sugerir ou realizar alterações. Reúne propósito, decisões, arquitetura planejada, estado implementado, regras de manutenção e limitações. A seção de snapshot ao final é atualizada pelo GitHub Actions.
 
+
+## Atualização — analytics da área profissional (27/11/2026)
+
+- A visão geral da área profissional foi redesenhada para usar componentes locais em src/components/ui, com APIs inspiradas no shadcn/ui. A solução não instala o pacote completo do shadcn nem adiciona dependência de gráficos.
+- Os componentes reutilizáveis incluem cartões compostos (CardHeader, CardTitle, CardDescription, CardContent, CardFooter) e gráficos DonutChart/HorizontalBarChart.
+- Os gráficos são calculados a partir dos serviços da conta: distribuição por situação, categoria, cidade e presença de imagens ativas. A lista de serviços, edição, publicação, pausa, imagens, perfil, conta e logout permanecem nos fluxos existentes.
+- Os números fictícios de visualizações e cliques foram retirados da visão geral. Audiência e contatos permanecem como etapa futura, pois ainda não há coleta de eventos reais.
+- Detalhamento visual e regras de manutenção: seção 10 de DESIGN_SYSTEM.md.
+- A integração deve permanecer em branch de feature → PR para dev. Autenticação e validação funcional integrada devem ser feitas somente no deployment fixo de dev, pois branches feat/* não recebem as variáveis do Apps Script. main não deve ser alterada sem autorização explícita.
+
 ## Atualização vigente — 2026-11-24
 
 ### Situação atual e próxima frente — verificada em 24/11/2026
