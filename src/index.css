@@ -6114,7 +6114,7 @@ summary:focus-visible {
 
 .services-page-filter-panel {
     padding: clamp(22px, 3vw, 34px);
-    background: #fff;
+    background: linear-gradient(180deg, #97dcffc8 0%, #fafdea 100%);
     border: 1px solid #e9edef;
     border-radius: 36px;
     box-shadow: 0 8px 26px rgba(22, 35, 48, 0.045);
@@ -6196,6 +6196,7 @@ summary:focus-visible {
     border-radius: 15px;
     font-family: inherit;
     font-size: 0.78rem;
+    box-shadow: 0 16px 38px rgba(25, 72, 135, 0.11);
     font-weight: 600;
     transition:
         border-color 160ms ease,

@@ -6,6 +6,7 @@ import HomeFeaturedServiceCard from "@/components/home/featured-service-card";
 import { Button } from "@/components/ui/button";
 import usePublicCatalog from "@/hooks/use-public-catalog";
 import { filterPublicServices } from "@/lib/public-catalog";
+import { FAQSection } from "@/components/home/home-sections";
 
 function readInitialFilters() {
     const params = new URLSearchParams(window.location.search);
@@ -36,14 +37,6 @@ export default function ServicesPage() {
         () => filterPublicServices(catalog.services, filters),
         [catalog.services, filters],
     );
-    const sourceCounts = useMemo(
-        () => filteredServices.reduce((counts, service) => {
-            if (service.isDemo) counts.demo += 1;
-            else counts.published += 1;
-            return counts;
-        }, { published: 0, demo: 0 }),
-        [filteredServices],
-    );
 
     useEffect(() => {
         window.history.replaceState({}, "", buildServicesHref(filters));
@@ -68,7 +61,7 @@ export default function ServicesPage() {
                     <div className="w-full px-4 sm:px-6 lg:px-29">
                         <div className="services-page-heading">
                             <div className="services-page-heading-copy">
-                                <span className="section-eyebrow">Catálogo Conecta Local</span>
+
                                 <h1 id="services-page-title">
                                     Encontre o serviço certo para cada necessidade.
                                 </h1>
@@ -79,12 +72,7 @@ export default function ServicesPage() {
                                     Explore serviços publicados e exemplos ilustrativos. Pesquise por
                                     necessidade, escolha uma categoria ou encontre opções em sua região.
                                 </p>
-                                <div className="services-page-summary" aria-live="polite">
-                                    <span className="services-page-summary-dot" aria-hidden="true" />
-                                    {catalog.loading
-                                        ? "Carregando catálogo..."
-                                        : `${formatCount(filteredServices.length)} ${filteredServices.length === 1 ? "resultado disponível" : "resultados disponíveis"}`}
-                                </div>
+                               
                             </div>
                         </div>
                     </div>
@@ -99,7 +87,7 @@ export default function ServicesPage() {
                         >
                             <div className="services-page-filter-heading">
                                 <div>
-                                    <span className="services-page-filter-eyebrow">Encontre com facilidade</span>
+                                   
                                     <h2>Refine sua busca</h2>
                                     <p>Combine os filtros para chegar mais rápido ao serviço que procura.</p>
                                 </div>
@@ -164,24 +152,13 @@ export default function ServicesPage() {
 
                         <div className="services-page-results-heading">
                             <div className="services-page-results-copy">
-                                <span className="section-eyebrow">Explore as opções</span>
+                              
                                 <h2>
                                     {catalog.loading
                                         ? "Carregando serviços..."
                                         : `${formatCount(filteredServices.length)} serviço${filteredServices.length === 1 ? "" : "s"} encontrado${filteredServices.length === 1 ? "" : "s"}`}
                                 </h2>
-                                {!catalog.loading && (
-                                    <div className="services-page-source-counts" aria-live="polite">
-                                        <span className="services-page-source-count services-page-source-count--published">
-                                            <strong>{formatCount(sourceCounts.published)}</strong>
-                                            cadastrados
-                                        </span>
-                                        <span className="services-page-source-count services-page-source-count--demo">
-                                            <strong>{formatCount(sourceCounts.demo)}</strong>
-                                            exemplos fictícios
-                                        </span>
-                                    </div>
-                                )}
+                               
                             </div>
                             <span className="services-page-results-note">
                                 <Filter size={15} aria-hidden="true" />
@@ -230,6 +207,7 @@ export default function ServicesPage() {
                         )}
                     </div>
                 </section>
+                 <FAQSection />
             </main>
             <SiteFooter />
         </>
