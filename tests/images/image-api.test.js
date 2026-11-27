@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { uploadProfilePhoto, uploadServiceImage } from "../../src/services/image-api.js";
+import { getServiceImageFile, uploadProfilePhoto, uploadServiceImage } from "../../src/services/image-api.js";
 
 const CHUNK_BYTES = 1024 * 1024;
 
@@ -218,4 +218,65 @@ test("uploadProfilePhoto reconcilia e cancela usando as ações de perfil", asyn
         "profile.photo.upload.status",
         "profile.photo.upload.cancel",
     ]);
+});
+
+
+test("uploadServiceImage encaminha somente o ID da imagem alvo para a substituição", async () => {
+    const expectedImage = { id: "synthetic-image-replaced", order: 2, status: "active", url: null };
+    const actions = [];
+
+    await withFetchMock(async (url, options) => {
+        if (url === "/api/app") {
+            const body = JSON.parse(options.body);
+            actions.push(body.action);
+            if (body.action === "image.upload.start") {
+                assert.deepEqual(body.payload, {
+                    serviceId: "synthetic-service-4",
+                    replaceImageId: "00000000-0000-4000-8000-000000000020",
+                    fileSize: 24,
+                    mimeType: "image/jpeg",
+                });
+                return jsonResponse({ uploadId: "00000000-0000-4000-8000-000000000020", nextOffset: 0 });
+            }
+            assert.fail("Não era esperada uma ação adicional: " + body.action);
+        }
+
+        assert.equal(url, "/api/images");
+        assert.equal(options.headers["X-Image-Start-Offset"], "0");
+        assert.equal(options.body.size, 24);
+        return jsonResponse({ completed: true, image: expectedImage });
+    }, async () => {
+        const result = await uploadServiceImage({
+            serviceId: "synthetic-service-4",
+            replaceImageId: "00000000-0000-4000-8000-000000000020",
+            file: createFile(24),
+            csrfToken: "f".repeat(64),
+        });
+        assert.deepEqual(result, expectedImage);
+    });
+
+    assert.deepEqual(actions, ["image.upload.start"]);
+});
+
+test("getServiceImageFile usa rota same-origin, CSRF e retorna um File validado", async () => {
+    const bytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3, 4]);
+    await withFetchMock(async (url, options) => {
+        assert.equal(url, "/api/managed-images?id=00000000-0000-4000-8000-000000000021");
+        assert.equal(options.method, "GET");
+        assert.equal(options.credentials, "same-origin");
+        assert.equal(options.headers["X-CSRF-Token"], "1".repeat(64));
+        return new Response(new Blob([bytes], { type: "image/png" }), {
+            status: 200,
+            headers: { "Content-Type": "image/png" },
+        });
+    }, async () => {
+        const file = await getServiceImageFile(
+            "00000000-0000-4000-8000-000000000021",
+            "1".repeat(64),
+        );
+        assert.ok(file instanceof File);
+        assert.equal(file.type, "image/png");
+        assert.equal(file.size, bytes.length);
+        assert.match(file.name, /\.png$/);
+    });
 });
