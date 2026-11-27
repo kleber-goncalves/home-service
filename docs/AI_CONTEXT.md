@@ -414,10 +414,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** ca592884679f0e4a8a165faa373604e81a90942c
-- **Data do commit:** 2026-11-26T23:41:30-03:00
-- **Mensagem do commit:** fix(services): restore professional metadata in shared cards
-- **Branch desta execução:** feat/shared-service-card
+- **Commit de referência:** 31885a952951ca3b1962eec4966a0577752d74d3
+- **Data do commit:** 2026-11-26T23:43:35-03:00
+- **Mensagem do commit:** Merge pull request #46 from kleber-goncalves/feat/shared-service-card
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -544,13 +544,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 31885a9 | 2026-11-26 | Merge pull request #46 from kleber-goncalves/feat/shared-service-card |
+| 2fa1fc3 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | ca59288 | 2026-11-26 | fix(services): restore professional metadata in shared cards |
 | 30fe3ed | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 2080dad | 2026-11-26 | docs(design): document shared public service card |
 | bc9fecb | 2026-11-26 | style(services): remove duplicate catalog card styles |
 | 3e44558 | 2026-11-26 | refactor(services): reuse homepage service cards |
 | b5fdbcc | 2026-11-26 | feat(services): allow custom catalog return URL |
-| 8f75f26 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 32976d4 | 2026-11-26 | style(services): ajustar espaçamento em elementos da página de serviços |
 
 <!-- END AUTO-GENERATED SECTION -->
