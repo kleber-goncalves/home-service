@@ -113,7 +113,7 @@ export default function DashboardVisualPreviewPage() {
                     <div className="professional-dashboard-topbar-left">
                         <span className="professional-dashboard-topbar-label">PAINEL DO PROFISSIONAL · PRÉVIA</span>
                     </div>
-                    <span className="professional-dashboard-connected">AMOSTRA VISUAL</span>
+                    <span className="dashboard-visual-preview-topbar-note">AMOSTRA VISUAL · DADOS FICTÍCIOS</span>
                 </header>
 
                 <div ref={contentRef} className="professional-dashboard-content">
