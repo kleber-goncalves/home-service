@@ -66,6 +66,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
     const [verificationCodeInput, setVerificationCodeInput] = useState("");
     const [pendingEmail, setPendingEmail] = useState("");
     const [newService, setNewService] = useState(EMPTY_SERVICE);
+    const [initialServiceForm, setInitialServiceForm] = useState(null);
     const [showServiceForm, setShowServiceForm] = useState(false);
     const [editingServiceId, setEditingServiceId] = useState(null);
     const [serviceFormError, setServiceFormError] = useState(null);
@@ -479,38 +480,41 @@ export default function AuthDemoPage({ initialMode = "login" }) {
     function cancelServiceForm() {
         setShowServiceForm(false);
         setEditingServiceId(null);
+        setInitialServiceForm(null);
         setServiceFormError(null);
         setNewService({
             ...EMPTY_SERVICE,
             categoryId: catalog.categories[0]?.id || "",
-            cityIds: catalog.cities.some((city) => city.id === currentUser?.cityId) ? [currentUser.cityId] : (catalog.cities[0]?.id ? [catalog.cities[0].id] : []),
+            cityIds: catalog.cities.some((city) => city.id === currentUser?.cityId) ? [currentUser.cityId] : (catalog.cities[0]?.id ? [currentUser.cityId] : []),
         });
     }
 
     function toggleServiceForm() {
-        if (showServiceForm) {
-            cancelServiceForm();
-            return;
-        }
+        if (showServiceForm) return;
+
         setEditingServiceId(null);
-        setNewService({
+        const initialForm = {
             ...EMPTY_SERVICE,
             categoryId: catalog.categories[0]?.id || "",
             cityIds: catalog.cities.some((city) => city.id === currentUser?.cityId) ? [currentUser.cityId] : (catalog.cities[0]?.id ? [catalog.cities[0].id] : []),
-        });
+        };
+        setNewService(initialForm);
+        setInitialServiceForm(initialForm);
         setServiceFormError(null);
         setShowServiceForm(true);
         setNotice(null);
     }
 
     function startEditingService(service) {
-        setEditingServiceId(service.id);
-        setNewService({
+        const initialForm = {
             title: service.title,
             categoryId: service.categoryId || "",
             description: service.description,
             cityIds: Array.isArray(service.cityIds) ? service.cityIds.slice() : [],
-        });
+        };
+        setEditingServiceId(service.id);
+        setNewService(initialForm);
+        setInitialServiceForm(initialForm);
         setServiceFormError(null);
         setShowServiceForm(true);
         setNotice(null);
@@ -691,6 +695,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                 cancelServiceForm={cancelServiceForm}
                 saveService={saveService}
                 serviceFormError={serviceFormError}
+                initialServiceForm={initialServiceForm}
                 editingServiceId={editingServiceId}
                 newService={newService}
                 editingService={editingService}
