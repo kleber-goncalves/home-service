@@ -425,9 +425,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 2410ec9a5ffdceef4484a55dae32a34bd697b0b5
-- **Data do commit:** 2026-11-27T14:59:29-03:00
-- **Mensagem do commit:** style(images): add responsive image editor and document workflow
+- **Commit de referência:** 43d6254dc25561a81a400ea1fc0fbe46d73452ec
+- **Data do commit:** 2026-11-27T15:00:28-03:00
+- **Mensagem do commit:** test(images): cover private image editing and replacement
 - **Branch desta execução:** feat/professional-image-editor
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -452,7 +452,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run test:loo | node --test tests/loo/domain-entities.test.js |
 | npm run test:poc04 | node --test tests/poc04/gateway.test.js tests/poc04/apps-script.test.js |
 | npm run test:authorization | node --test tests/authorization/apps-script.test.js tests/authorization/gateway.test.js |
-| npm run test:images | node --test tests/images/upload-gateway.test.js tests/images/image-api.test.js tests/images/public-image-gateway.test.js |
+| npm run test:images | node --test tests/images/upload-gateway.test.js tests/images/image-api.test.js tests/images/public-image-gateway.test.js tests/images/managed-image-gateway.test.js |
 | npm run test:public-catalog | node --test tests/public-catalog/public-catalog.test.js |
 
 ### Variáveis declaradas no .env.example
@@ -569,13 +569,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 43d6254 | 2026-11-27 | test(images): cover private image editing and replacement |
+| a57b56f | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 2410ec9 | 2026-11-27 | style(images): add responsive image editor and document workflow |
 | 8d9a1a2 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | d6fbaf5 | 2026-11-27 | feat(images): add reusable crop editor UI |
 | 255499f | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | da3c385 | 2026-11-27 | feat(images): add authenticated private image reads |
 | e67ad6a | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 6127e97 | 2026-11-27 | feat(images): secure managed image replacement |
-| 5ecfeed | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
