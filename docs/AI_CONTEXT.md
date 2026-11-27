@@ -425,10 +425,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 59b91774e077d21bdf729dfd9a55bf3e457c9988
-- **Data do commit:** 2026-11-27T13:57:23-03:00
-- **Mensagem do commit:** Merge pull request #52 from kleber-goncalves/feat/professional-dashboard-chart-visual-review
-- **Branch desta execução:** dev
+- **Commit de referência:** c4b878e7e735bacdb6c8f80860d32b0764624147
+- **Data do commit:** 2026-11-27T15:06:50-03:00
+- **Mensagem do commit:** fix(images): reset crop position with editor controls
+- **Branch desta execução:** feat/professional-image-editor
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 6
@@ -452,7 +452,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | npm run test:loo | node --test tests/loo/domain-entities.test.js |
 | npm run test:poc04 | node --test tests/poc04/gateway.test.js tests/poc04/apps-script.test.js |
 | npm run test:authorization | node --test tests/authorization/apps-script.test.js tests/authorization/gateway.test.js |
-| npm run test:images | node --test tests/images/upload-gateway.test.js tests/images/image-api.test.js tests/images/public-image-gateway.test.js |
+| npm run test:images | node --test tests/images/upload-gateway.test.js tests/images/image-api.test.js tests/images/public-image-gateway.test.js tests/images/managed-image-gateway.test.js |
 | npm run test:public-catalog | node --test tests/public-catalog/public-catalog.test.js |
 
 ### Variáveis declaradas no .env.example
@@ -515,6 +515,14 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/components/home/site-header.jsx
 - src/components/professional/profile-photo-manager.jsx
 - src/components/professional/service-image-manager.jsx
+- src/components/professional/service-images/image-crop-canvas.jsx
+- src/components/professional/service-images/image-editor-controls.jsx
+- src/components/professional/service-images/image-editor-dialog.jsx
+- src/components/professional/service-images/image-utils.js
+- src/components/professional/service-images/service-image-card.jsx
+- src/components/professional/service-images/service-image-manager.jsx
+- src/components/professional/service-images/service-image-picker.jsx
+- src/components/professional/service-images/service-image-queue.jsx
 - src/components/public/app-link.jsx
 - src/components/public/service-card.jsx
 - src/components/public/service-image.jsx
@@ -523,7 +531,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/components/ui/button.jsx
 - src/components/ui/card.jsx
 - src/components/ui/chart.jsx
+- src/components/ui/dialog.jsx
 - src/components/ui/input.jsx
+- src/components/ui/slider.jsx
 - src/contexts/auth-context.js
 - src/contexts/auth-provider.jsx
 - src/data/homepage.js
@@ -559,13 +569,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| 59b9177 | 2026-11-27 | Merge pull request #52 from kleber-goncalves/feat/professional-dashboard-chart-visual-review |
-| d49743c | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 1b4e656 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| e88131d | 2026-11-27 | chore(preview): remover pagina temporaria de dados ficticios |
-| 4ebec83 | 2026-11-27 | style(dashboard): remover estilos exclusivos da previa |
-| 40fa1a5 | 2026-11-27 | chore(preview): remover rota temporaria de demonstracao |
-| 55b937b | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| e1985df | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| c4b878e | 2026-11-27 | fix(images): reset crop position with editor controls |
+| e7384fb | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| 6b157a2 | 2026-11-27 | fix(images): resolve editor lint and interaction states |
+| cc8bf5d | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| 807155e | 2026-11-27 | test(images): compare preserved order numerically |
+| f3ca4c0 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| 7f5de2a | 2026-11-27 | feat(images): add cancellable replacement progress and cleanup |
+| 8d3d9b2 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->

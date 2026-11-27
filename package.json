@@ -16,7 +16,7 @@
     "test:loo": "node --test tests/loo/domain-entities.test.js",
     "test:poc04": "node --test tests/poc04/gateway.test.js tests/poc04/apps-script.test.js",
     "test:authorization": "node --test tests/authorization/apps-script.test.js tests/authorization/gateway.test.js",
-    "test:images": "node --test tests/images/upload-gateway.test.js tests/images/image-api.test.js tests/images/public-image-gateway.test.js",
+    "test:images": "node --test tests/images/upload-gateway.test.js tests/images/image-api.test.js tests/images/public-image-gateway.test.js tests/images/managed-image-gateway.test.js",
     "test:public-catalog": "node --test tests/public-catalog/public-catalog.test.js"
   },
   "dependencies": {

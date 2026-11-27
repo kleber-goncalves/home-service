@@ -199,6 +199,7 @@ async function uploadImageFile({
 
 export async function uploadServiceImage({
     serviceId,
+    replaceImageId,
     file,
     csrfToken,
     onProgress = () => {},
@@ -207,7 +208,10 @@ export async function uploadServiceImage({
 }) {
     return uploadImageFile({
         startAction: "image.upload.start",
-        startPayload: { serviceId },
+        startPayload: {
+            serviceId,
+            ...(replaceImageId ? { replaceImageId } : {}),
+        },
         statusAction: "image.upload.status",
         cancelAction: "image.upload.cancel",
         file,
@@ -215,6 +219,40 @@ export async function uploadServiceImage({
         onProgress,
         onUploadStarted,
         signal,
+    });
+}
+
+export async function getServiceImageFile(imageId, csrfToken, signal) {
+    const response = await fetch("/api/managed-images?id=" + encodeURIComponent(imageId), {
+        method: "GET",
+        credentials: "same-origin",
+        headers: { "X-CSRF-Token": csrfToken },
+        signal,
+    });
+
+    if (!response.ok) {
+        let message = "Não foi possível abrir esta imagem para edição.";
+        try {
+            const result = await response.json();
+            message = result?.error?.message || message;
+        } catch {
+            // Keep a safe, user-facing fallback message.
+        }
+        const error = new Error(message);
+        error.status = response.status;
+        throw error;
+    }
+
+    const blob = await response.blob();
+    if (!ALLOWED_TYPES.has(blob.type) || blob.size < 12 || blob.size > MAX_FILE_BYTES) {
+        throw new Error("O servidor retornou uma imagem inválida para edição.");
+    }
+
+    const extension = blob.type === "image/png" ? "png"
+        : blob.type === "image/webp" ? "webp" : "jpg";
+    return new File([blob], "imagem-servico." + extension, {
+        type: blob.type,
+        lastModified: Date.now(),
     });
 }
 

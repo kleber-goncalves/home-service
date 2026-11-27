@@ -263,3 +263,24 @@ Os testes manuais acima validam o caminho funcional principal da integração re
 - [Apps Script — Drive Service](https://developers.google.com/apps-script/reference/drive)
 - [Apps Script — quotas e limites de UrlFetch/Properties](https://developers.google.com/apps-script/guides/services/quotas)
 - [Vercel — request body limits](https://vercel.com/docs/functions/limitations)
+
+
+
+## Editor e substituição de imagens
+
+O gerenciamento de imagens do profissional utiliza componentes separados e reutilizáveis em `src/components/professional/service-images/`. Os blocos visuais compartilhados `Dialog` e `Slider` ficam em `src/components/ui/`, seguindo a API local do projeto, sem instalar uma implementação completa do shadcn.
+
+### Edição no navegador
+
+- Imagens ainda não enviadas podem ser recortadas, reposicionadas, ampliadas e giradas antes do envio. A edição gera um novo arquivo local e não altera o arquivo original selecionado.
+- Imagens já cadastradas são carregadas por `GET /api/managed-images?id=<imageId>`, rota same-origin protegida por cookie HttpOnly, validação de origem e CSRF. O gateway consulta o Apps Script com HMAC, confirma a propriedade do serviço e lê o arquivo do Drive com o token mantido exclusivamente no servidor.
+- O editor usa Canvas nativo para exportar o recorte nos formatos JPEG, PNG ou WebP aceitos pelo upload. O resultado é limitado a 5 MB; transparência é mantida em PNG/WebP.
+- As proporções disponíveis são Original, 16:10, 1:1, 4:3 e 16:9. Rotação em incrementos de 90° e zoom de 100% a 300%.
+
+### Substituição segura
+
+A substituição usa o mesmo protocolo de upload resumível, com `replaceImageId`. O Apps Script confirma novamente a sessão, o proprietário, a imagem ativa e a posição de exibição. O registro existente conserva seu ID e sua ordem. O novo arquivo é validado e preparado antes da troca do vínculo; a imagem anterior só tem o compartilhamento restringido depois que os novos metadados foram gravados. Se uma etapa falhar, o fluxo tenta reverter o vínculo e restringir/remover o arquivo novo. O limite de cinco imagens não bloqueia a substituição porque ela ocupa a posição da imagem selecionada.
+
+### Implantação
+
+As alterações em `apps-script/conecta-local/Code.gs` no GitHub não atualizam automaticamente o Web App do Google Apps Script. Antes de validar edição/substituição no ambiente DEV, sincronize o arquivo no projeto Apps Script e publique uma nova versão na implantação Web App existente. Não é necessário criar uma implantação paralela. A rota e os gateways Vercel continuam habilitados somente em Preview, conforme o modelo atual do protótipo.

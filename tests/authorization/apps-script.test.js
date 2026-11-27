@@ -1808,3 +1808,96 @@ test("public.image.resolve permite foto ativa somente do profissional com conta 
     assert.equal(hidden.ok, false);
     assert.equal(hidden.error.code, "IMAGE_NOT_FOUND");
 });
+
+
+test("substituição de imagem preserva ID e ordem mesmo quando o serviço já possui cinco imagens", () => {
+    const harness = createHarness();
+    const originals = [];
+
+    for (let index = 0; index < 5; index += 1) {
+        const result = startPngUpload(harness);
+        assert.equal(result.uploaded.ok, true);
+        originals.push(result.uploaded.data.image);
+    }
+
+    const target = originals[0];
+    const oldRecord = harness.records("IMAGENS").find((item) => item.id_imagem === target.id);
+    const oldFile = harness.driveFiles.get(oldRecord.id_arquivo_drive);
+    const bytes = createPngBytes();
+
+    const started = harness.call("image.upload.start", {
+        tokenHash: TOKEN_HASH_A,
+        serviceId: SERVICE_A,
+        replaceImageId: target.id,
+        fileSize: bytes.length,
+        mimeType: "image/png",
+    });
+    assert.equal(started.ok, true, "A substituição deve ocupar a posição existente sem consumir um sexto slot.");
+
+    const uploaded = harness.call("image.upload.chunk", {
+        tokenHash: TOKEN_HASH_A,
+        uploadId: started.data.uploadId,
+        startOffset: 0,
+        totalSize: bytes.length,
+        chunkBase64: bytes.toString("base64"),
+    });
+    assert.equal(uploaded.ok, true);
+    assert.equal(uploaded.data.completed, true);
+    assert.equal(uploaded.data.image.id, target.id);
+    assert.equal(uploaded.data.image.order, target.order);
+
+    const records = harness.records("IMAGENS").filter((item) => item.status === "active");
+    assert.equal(records.length, 5);
+    const replaced = records.find((item) => item.id_imagem === target.id);
+    assert.equal(Number(replaced.ordem_exibicao), target.order);
+    assert.notEqual(replaced.id_arquivo_drive, oldRecord.id_arquivo_drive);
+    assert.equal(oldFile.sharing, "PRIVATE");
+    assert.equal(harness.driveFiles.get(replaced.id_arquivo_drive).sharing, "ANYONE_WITH_LINK");
+    assert.equal(
+        harness.records("AUDITORIA").filter((event) => event.acao === "image.replace").length,
+        1,
+    );
+});
+
+test("profissional não consegue substituir imagem de outro serviço", () => {
+    const harness = createHarness();
+    const { uploaded } = startPngUpload(harness);
+    assert.equal(uploaded.ok, true);
+
+    const bytes = createPngBytes();
+    const result = harness.call("image.upload.start", {
+        tokenHash: TOKEN_HASH_B,
+        serviceId: SERVICE_B,
+        replaceImageId: uploaded.data.image.id,
+        fileSize: bytes.length,
+        mimeType: "image/png",
+    });
+
+    assert.equal(result.ok, false);
+    assert.equal(result.error.code, "IMAGE_REPLACE_CONFLICT");
+    assert.equal(harness.records("IMAGENS").length, 1);
+});
+
+test("image.resolve.mine libera imagem privada somente ao profissional proprietário", () => {
+    const harness = createHarness();
+    const { uploaded } = startPngUpload(harness);
+    assert.equal(uploaded.ok, true);
+    const imageId = uploaded.data.image.id;
+
+    const resolved = harness.call("image.resolve.mine", {
+        tokenHash: TOKEN_HASH_A,
+        imageId,
+    });
+    assert.equal(resolved.ok, true);
+    assert.equal(resolved.data.fileId, "synthetic-drive-file-1");
+    assert.equal(resolved.data.mimeType, "image/png");
+    assert.equal(resolved.data.sizeBytes, 24);
+    assert.equal(resolved.data.accessToken, "synthetic-drive-oauth-token-for-test-validation");
+
+    const denied = harness.call("image.resolve.mine", {
+        tokenHash: TOKEN_HASH_B,
+        imageId,
+    });
+    assert.equal(denied.ok, false);
+    assert.equal(denied.error.code, "IMAGE_NOT_FOUND");
+});
