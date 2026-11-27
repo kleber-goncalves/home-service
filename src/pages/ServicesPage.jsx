@@ -60,7 +60,7 @@ export default function ServicesPage() {
             <SiteHeader active="servicos" />
             <main className="public-page services-page" id="conteudo" tabIndex="-1">
                 <section className="services-page-hero" aria-labelledby="services-page-title">
-                    <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className="w-full px-4 sm:px-6 lg:px-29">
                         <div className="services-page-heading">
                             <div className="services-page-heading-copy">
                                 <span className="section-eyebrow">Catálogo Conecta Local</span>
@@ -86,7 +86,7 @@ export default function ServicesPage() {
                 </section>
 
                 <section className="services-page-content" aria-label="Pesquisar e explorar serviços">
-                    <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className=" w-full px-4 sm:px-6 lg:px-29">
                         <form
                             className="services-page-filter-panel"
                             role="search"
