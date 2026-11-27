@@ -170,6 +170,11 @@ export default function ProfessionalServiceFormDialog({
                                             <option key={category.id} value={category.id}>{category.name}</option>
                                         ))}
                                     </select>
+                                    {!categories.length && !editingService && (
+                                        <small className="service-form-dialog__category-empty">
+                                            Não há categorias ativas no catálogo. O cadastro ficará indisponível até que uma categoria seja disponibilizada.
+                                        </small>
+                                    )}
                                 </label>
                             </div>
 
@@ -214,9 +219,6 @@ export default function ProfessionalServiceFormDialog({
                                         </label>
                                     ))}
                                 </div>
-                                {!categories.length && (
-                                    <small>Não há categorias ativas cadastradas no catálogo.</small>
-                                )}
                                 {!cities.length && (
                                     <small>Não há municípios disponíveis no catálogo.</small>
                                 )}
