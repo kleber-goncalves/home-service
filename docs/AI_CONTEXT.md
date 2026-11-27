@@ -3,14 +3,15 @@
 > Documento de continuidade do projeto. Leia antes de sugerir ou realizar alterações. Reúne propósito, decisões, arquitetura planejada, estado implementado, regras de manutenção e limitações. A seção de snapshot ao final é atualizada pelo GitHub Actions.
 
 
-## Atualização — analytics da área profissional (27/11/2026)
+## Atualização — gráficos animados na área profissional (27/11/2026)
 
-- A visão geral da área profissional foi redesenhada para usar componentes locais em src/components/ui, com APIs inspiradas no shadcn/ui. A solução não instala o pacote completo do shadcn nem adiciona dependência de gráficos.
-- Os componentes reutilizáveis incluem cartões compostos (CardHeader, CardTitle, CardDescription, CardContent, CardFooter) e gráficos DonutChart/HorizontalBarChart.
-- Os gráficos são calculados a partir dos serviços da conta: distribuição por situação, categoria, cidade e presença de imagens ativas. A lista de serviços, edição, publicação, pausa, imagens, perfil, conta e logout permanecem nos fluxos existentes.
-- Os números fictícios de visualizações e cliques foram retirados da visão geral. Audiência e contatos permanecem como etapa futura, pois ainda não há coleta de eventos reais.
-- Detalhamento visual e regras de manutenção: seção 10 de DESIGN_SYSTEM.md.
-- A integração deve permanecer em branch de feature → PR para dev. Autenticação e validação funcional integrada devem ser feitas somente no deployment fixo de dev, pois branches feat/* não recebem as variáveis do Apps Script. main não deve ser alterada sem autorização explícita.
+- A branch feat/professional-dashboard-motion-charts adiciona GSAP 3.15.1 e Recharts 3.11.2 como dependências de runtime.
+- src/components/ui/chart.jsx implementa DonutChart e HorizontalBarChart com Recharts, tooltips customizados, responsividade, destaque interativo da legenda e estados vazios.
+- GSAP é usado somente para a entrada do cabeçalho, indicadores, cartões analíticos e painéis das seções; gsap.context é revertido ao navegar ou desmontar.
+- Recharts cuida das animações de segmentos e barras. As animações de ambas as bibliotecas são desativadas para prefers-reduced-motion.
+- Os gráficos continuam consumindo apenas dados reais da lista de serviços da conta: status, categoria, cidade e imagens ativas. Nenhuma métrica de audiência foi simulada ou criada.
+- A coleta de visualizações do perfil/serviço e cliques de contato segue como etapa backend separada; não misturar métricas de engajamento com os atuais indicadores de gestão.
+- A integração permanece em branch de feature → PR para dev. Autenticação e validação integrada devem ocorrer somente no deployment fixo de dev. main não deve ser alterada sem autorização explícita.
 
 ## Atualização vigente — 2026-11-24
 

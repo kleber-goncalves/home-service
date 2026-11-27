@@ -420,15 +420,14 @@ A área autenticada do profissional utiliza uma estrutura de dashboard com naveg
 
 ### 16.3. Indicadores e gráficos
 
-- Serviços cadastrados, publicados, em pausa e distribuição por situação são calculados a partir da lista de serviços da conta.
-- O gráfico de situação dos serviços representa dados reais já disponíveis no estado autenticado.
-- Visualizações do perfil e cliques em contato são dados estáticos exclusivamente demonstrativos, isolados em src/data/professional-dashboard-demo.js.
-- Os indicadores fictícios exibem a identificação “Demonstrativo” e uma explicação de que a aplicação ainda não coleta esses eventos.
-- Os gráficos são construídos com CSS e SVG nativos; não há dependência adicional de gráficos.
-
+- Serviços cadastrados, publicados, em pausa e cidades atendidas são calculados a partir dos dados reais disponíveis na sessão do profissional.
+- Os quatro gráficos da visão geral mostram situação dos serviços, categorias, cidades e cobertura de imagens ativas.
+- Os gráficos são implementados com Recharts em src/components/ui/chart.jsx: donut com legenda selecionável, destaque de segmentos e tooltip; barras horizontais com tooltip, eixo e animação de entrada.
+- O Recharts controla as animações internas dos gráficos. GSAP controla somente a entrada dos blocos da página e a transição entre seções, com limpeza por gsap.context para evitar animações acumuladas.
+- A coleta de visualizações de perfil, visualizações de serviços e cliques de contato ainda não está implementada. Esses indicadores não podem ser apresentados como métricas reais.
 ### 16.4. Seções funcionais
 
-- **Visão geral:** indicadores da conta, distribuição dos serviços, analytics demonstrativos e acesso rápido à gestão.
+- **Visão geral:** indicadores reais da conta, distribuição dos serviços e acesso rápido à gestão; métricas de audiência permanecem pendentes de coleta real.
 - **Meus serviços:** mantém criação, edição, publicação, pausa, remoção lógica, municípios e imagens.
 - **Meu perfil:** mantém os dados profissionais e o gerenciador de fotografia existente.
 - **Conta e segurança:** mantém o fluxo demonstrativo de alteração e confirmação do e-mail.
@@ -439,7 +438,7 @@ A área autenticada do profissional utiliza uma estrutura de dashboard com naveg
 - Os indicadores passam a duas colunas em telas intermediárias/estreitas; gráficos são empilhados quando necessário.
 - O menu usa botões nativos, estado aria-current, aria-expanded, rótulos acessíveis e camada de fechamento.
 - Há link para pular diretamente ao conteúdo e foco visível nos controles de navegação.
-- O movimento do painel respeita prefers-reduced-motion.
+- GSAP e Recharts desativam animações quando o usuário ativa prefers-reduced-motion; a entrada das seções e os gráficos devem permanecer utilizáveis sem movimento.
 - Os gráficos expõem descrições acessíveis e os valores textuais continuam disponíveis fora do desenho SVG.
 
 ### 16.6. Arquivos de referência atualizados
@@ -448,26 +447,28 @@ A área autenticada do profissional utiliza uma estrutura de dashboard com naveg
 |---|---|
 | Autenticação e encaminhamento da sessão | src/pages/AuthDemoPage.jsx |
 | Página da área profissional | src/pages/ProfessionalDashboardPage.jsx |
-| Dados analíticos fictícios | src/data/professional-dashboard-demo.js |
+| Gráficos interativos | src/components/ui/chart.jsx |
 | Componentes de fotografia e imagens | src/components/professional/ |
 | Estilos globais e dashboard | src/index.css |
 
 Os indicadores demonstrativos não devem ser interpretados como métricas reais nem persistidos como atividade dos usuários.
 
 
-## 10. Área profissional — componentes e analytics (27/11/2026)
+## 10. Área profissional — componentes, gráficos e movimento (27/11/2026)
 
-A área profissional adota uma camada local de componentes com APIs inspiradas no shadcn/ui, sem exigir a instalação integral do shadcn CLI:
+A área profissional utiliza componentes locais com APIs inspiradas no shadcn/ui, sem exigir a instalação integral do shadcn CLI.
 
-- src/components/ui/button.jsx e input.jsx: controles com foco visível e variantes consistentes.
-- src/components/ui/card.jsx: Card, CardHeader, CardTitle, CardDescription, CardContent e CardFooter.
-- src/components/ui/chart.jsx: gráficos SVG e HTML reutilizáveis (DonutChart e HorizontalBarChart), com rótulos acessíveis, estado vazio e valores provenientes das props.
+- src/components/ui/card.jsx: cartões compostos reutilizáveis.
+- src/components/ui/chart.jsx: gráficos Recharts responsivos, tooltips próprios, legendas acessíveis e estados vazios.
+- GSAP 3.15.1: anima a entrada do cabeçalho, indicadores, cartões analíticos e painéis das demais seções. O contexto é revertido a cada navegação.
+- Recharts 3.11.2: anima os segmentos do donut e as barras; tooltips mostram detalhes; a legenda do donut permite destacar um segmento com mouse, foco ou clique.
 
 ### Regras para o dashboard
 
-- A página src/pages/ProfessionalDashboardPage.jsx usa os componentes locais e preserva a navegação e os fluxos operacionais existentes.
-- Os quatro gráficos da visão geral são calculados a partir dos serviços da conta: situação, categoria, cidade e presença de imagens ativas.
-- Os indicadores de visualização de perfil e cliques em contato não são apresentados como métricas reais. A coleta de eventos ainda não está implementada.
-- Não adicionar números simulados ao painel sem uma identificação explícita como demonstração. Indicadores de audiência só entram após uma implementação de coleta, com privacidade e origem dos dados documentadas.
-- Os gráficos precisam permanecer legíveis em telas estreitas, incluindo 320 px, com cartões em uma coluna e legendas sem overflow.
-- Não foi adicionada dependência de gráficos: a implementação usa SVG/CSS nativos e os ícones existentes de lucide-react.
+- Os gráficos permanecem ligados aos dados reais da conta: situação, categoria, cidade e presença de imagens ativas.
+- Não adicionar números simulados. Visualizações de perfil, de serviços e cliques em contato só podem aparecer depois da implementação da coleta e da persistência de eventos reais.
+- GSAP deve cuidar do movimento de composição da página; Recharts cuida das transições SVG dos gráficos. Não animar os mesmos elementos com as duas bibliotecas.
+- Respeitar prefers-reduced-motion: animações GSAP e animações dos gráficos são desativadas quando essa preferência está ativa.
+- Os gráficos devem permanecer legíveis em telas estreitas, incluindo 320 px, com cartões em uma coluna, legendas sem overflow e tooltips que não ocultem os dados essenciais.
+- O código de movimento precisa limpar timelines e estilos aplicados ao trocar de seção ou desmontar o dashboard.
+
