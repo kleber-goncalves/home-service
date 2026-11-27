@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 2a826c1ca86f4ea45668025786273433cc614f9d
-- **Data do commit:** 2026-11-27T01:21:12-03:00
-- **Mensagem do commit:** refactor(auth): delegate professional area to dashboard page
+- **Commit de referência:** 789e11dce980deb2dd81be3c3b372023fda9b8a9
+- **Data do commit:** 2026-11-27T01:24:53-03:00
+- **Mensagem do commit:** feat(professional): add responsive dashboard with separated analytics
 - **Branch desta execução:** feat/professional-dashboard-refresh
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -513,6 +513,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/contexts/auth-context.js
 - src/contexts/auth-provider.jsx
 - src/data/homepage.js
+- src/data/professional-dashboard-demo.js
 - src/hooks/use-auth.js
 - src/hooks/use-public-catalog.js
 - src/lib/navigation.js
@@ -545,13 +546,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 789e11d | 2026-11-27 | feat(professional): add responsive dashboard with separated analytics |
+| 7707d6f | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| ad31ab1 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 2a826c1 | 2026-11-27 | refactor(auth): delegate professional area to dashboard page |
 | c502b33 | 2026-11-27 | refactor(professional): extract authenticated dashboard page |
 | b8438d7 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 909d1e1 | 2026-11-27 | feat(auth): modernizar login e dividir cadastro em etapas |
 | 6c4930d | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 1b5592d | 2026-11-27 | docs(design): ajustar numeração das seções de autenticação |
-| 827b52a | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 95bc0ab | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
