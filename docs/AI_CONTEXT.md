@@ -425,9 +425,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 1535c5dd909a65f5c06391f55dd5ccc550264102
-- **Data do commit:** 2026-11-27T17:11:40-03:00
-- **Mensagem do commit:** fix(professional): place catalog feedback beside category field
+- **Commit de referência:** 27b775969a34823ab370cb0ce6ce062579d5c659
+- **Data do commit:** 2026-11-27T17:12:47-03:00
+- **Mensagem do commit:** fix(professional): keep dialog baseline outside effects
 - **Branch desta execução:** feat/service-form-dialog
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 15
@@ -576,13 +576,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 27b7759 | 2026-11-27 | fix(professional): keep dialog baseline outside effects |
+| 4fad41f | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 1535c5d | 2026-11-27 | fix(professional): place catalog feedback beside category field |
 | 023d3cc | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 908a414 | 2026-11-27 | style(professional): add responsive service form dialog |
 | 8ae6bc0 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | a758dde | 2026-11-27 | feat(professional): use modal for service creation and editing |
 | a3446bb | 2026-11-27 | feat(professional): keep service form feedback inside dialog |
-| 794a2f5 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| ddb2604 | 2026-11-27 | feat(professional): add service form dialog |
 
 <!-- END AUTO-GENERATED SECTION -->
