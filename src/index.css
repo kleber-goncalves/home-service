@@ -7907,77 +7907,16 @@ summary:focus-visible {
     font-size: 0.76rem;
 }
 
-.dashboard-visual-preview .professional-dashboard-main {
-    min-height: 100vh;
-    margin-left: 258px;
-}
 
-.dashboard-visual-preview .professional-dashboard-sidebar {
-    display: flex;
-}
 
-.dashboard-visual-preview-banner {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 20px;
-    padding: 15px 18px;
-    color: #704c0b;
-    background: #fff8e7;
-    border: 1px solid #f2dfb5;
-    border-radius: 13px;
-}
 
-.dashboard-visual-preview-banner span {
-    flex: 0 0 auto;
-    padding: 6px 9px;
-    color: #76520d;
-    background: #fbe9bd;
-    border-radius: 7px;
-    font-size: 0.64rem;
-    font-weight: 850;
-    letter-spacing: 0.06em;
-}
 
-.dashboard-visual-preview-banner p {
-    margin: 0;
-    font-size: 0.78rem;
-    line-height: 1.5;
-}
 
-.dashboard-visual-preview .professional-dashboard-kpi {
-    min-height: 150px;
-    padding: 19px 20px 17px;
-}
 
-.dashboard-visual-preview .professional-dashboard-kpi-label {
-    font-size: 0.74rem;
-}
 
-.dashboard-visual-preview .professional-dashboard-kpi strong {
-    font-size: 1.85rem;
-}
 
-.dashboard-visual-preview .professional-dashboard-kpi small {
-    font-size: 0.69rem;
-}
 
-.dashboard-visual-preview .professional-dashboard-card-eyebrow {
-    font-size: 0.65rem;
-}
 
-.dashboard-visual-preview-source {
-    display: inline-flex;
-    width: fit-content;
-    align-items: center;
-    gap: 6px;
-    margin-top: 3px;
-    color: #9a6a18;
-    font-size: 0.62rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-}
 
 @media (max-width: 1100px) {
     .pro-dashboard-chart-card,
@@ -8041,24 +7980,10 @@ summary:focus-visible {
         font-size: 0.72rem;
     }
 
-    .dashboard-visual-preview .professional-dashboard-main {
-        margin-left: 0;
+    
+    
+    
     }
-
-    .dashboard-visual-preview .professional-dashboard-sidebar {
-        display: none;
-    }
-
-    .dashboard-visual-preview .professional-dashboard-content {
-        padding: 25px 16px 32px;
-    }
-
-    .dashboard-visual-preview-banner {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 8px;
-    }
-}
 
 @media (max-width: 380px) {
     .ui-donut-chart-visual {
@@ -8075,15 +8000,3 @@ summary:focus-visible {
     }
 }
 
-.dashboard-visual-preview-topbar-note {
-    display: inline-flex;
-    align-items: center;
-    padding: 7px 11px;
-    color: #76520d;
-    background: #fff5dc;
-    border: 1px solid #f0dfb8;
-    border-radius: 999px;
-    font-size: 0.62rem;
-    font-weight: 850;
-    letter-spacing: 0.05em;
-}
