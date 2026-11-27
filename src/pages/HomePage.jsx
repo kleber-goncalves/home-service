@@ -4,10 +4,7 @@ import SiteHeader from "@/components/home/site-header";
 import HeroSearch from "@/components/home/hero-search";
 import CategoryFeaturedServices from "@/components/home/category-featured-services";
 import LocalServiceOverview from "@/components/home/local-service-overview";
-import {
-
-    FAQSection,
-} from "@/components/home/home-sections";
+import { FAQSection } from "@/components/home/home-sections";
 import AppLink from "@/components/public/app-link";
 import HomeFeaturedServiceCard from "@/components/home/featured-service-card";
 import SiteFooter from "@/components/public/site-footer";
