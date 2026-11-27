@@ -414,10 +414,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 909d1e1e767461afa852999765958bfaa1cab1c6
-- **Data do commit:** 2026-11-27T01:03:01-03:00
-- **Mensagem do commit:** feat(auth): modernizar login e dividir cadastro em etapas
-- **Branch desta execução:** dev
+- **Commit de referência:** c502b3360f394e53085cfc8c5706fc9164012612
+- **Data do commit:** 2026-11-27T01:21:09-03:00
+- **Mensagem do commit:** refactor(professional): extract authenticated dashboard page
+- **Branch desta execução:** feat/professional-dashboard-refresh
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -524,6 +524,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/pages/HomePage.jsx
 - src/pages/NotFoundPage.jsx
 - src/pages/Poc01Page.jsx
+- src/pages/ProfessionalDashboardPage.jsx
 - src/pages/ServiceDetailPage.jsx
 - src/pages/ServicesPage.jsx
 - src/services/app-api.js
@@ -544,13 +545,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| c502b33 | 2026-11-27 | refactor(professional): extract authenticated dashboard page |
+| b8438d7 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 909d1e1 | 2026-11-27 | feat(auth): modernizar login e dividir cadastro em etapas |
 | 6c4930d | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 1b5592d | 2026-11-27 | docs(design): ajustar numeração das seções de autenticação |
 | 827b52a | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 95bc0ab | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | a1252b2 | 2026-11-27 | docs(design): documentar cadastro multipasso |
-| 486c450 | 2026-11-27 | style(auth): adicionar progresso e navegação ao cadastro |
-| 6853ffb | 2026-11-27 | feat(auth): dividir cadastro profissional em etapas |
 
 <!-- END AUTO-GENERATED SECTION -->
