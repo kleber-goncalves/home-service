@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ImagePlus, Images, MapPin } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import ServiceImageManager from "@/components/professional/service-image-manager";
@@ -27,12 +27,10 @@ export default function ProfessionalServiceCard({
 }) {
     const images = getServiceActiveImages(service);
     const mainImage = images[0] || null;
-    const [imageFailed, setImageFailed] = useState(false);
+    const [failedImageUrl, setFailedImageUrl] = useState(null);
+    const imageFailed = Boolean(mainImage?.url && failedImageUrl === mainImage.url);
     const canManageImages = ["draft", "published", "paused"].includes(service.status);
 
-    useEffect(() => {
-        setImageFailed(false);
-    }, [mainImage?.url]);
 
     const imageMessage = !mainImage
         ? "Adicione uma imagem para destacar este serviço."
@@ -49,7 +47,7 @@ export default function ProfessionalServiceCard({
                         alt={"Imagem principal do serviço " + service.title}
                         loading="lazy"
                         decoding="async"
-                        onError={() => setImageFailed(true)}
+                        onError={() => setFailedImageUrl(mainImage.url)}
                     />
                 ) : (
                     <div

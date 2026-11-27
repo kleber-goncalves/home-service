@@ -583,8 +583,6 @@ export default function ProfessionalDashboardPage({
                             onRefresh={refreshServices}
                         />
 
-                            <button type="button" onClick={refreshServices} disabled={busy}>Atualizar lista</button>
-                        </div>
                     </section>
                         </section>
                     )}
