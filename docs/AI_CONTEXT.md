@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 6efbe40a635e3c56e35b6282b7e126c410df8959
-- **Data do commit:** 2026-11-27T00:28:01-03:00
-- **Mensagem do commit:** fix(header): reference the existing how-it-works section
+- **Commit de referência:** aaa639ee015bff436dbea0e6f95a4c52f34ed741
+- **Data do commit:** 2026-11-27T00:32:00-03:00
+- **Mensagem do commit:** refactor(home): remove how it works section and navigation links
 - **Branch desta execução:** feat/header-navigation-refresh
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -544,13 +544,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| aaa639e | 2026-11-27 | refactor(home): remove how it works section and navigation links |
+| 5583d2b | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 6efbe40 | 2026-11-27 | fix(header): reference the existing how-it-works section |
 | 2a09877 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 899f17b | 2026-11-27 | fix(header): restore homepage imports and align mobile actions |
 | a75891b | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 6f07025 | 2026-11-27 | feat(header): refresh navigation with integrated search |
 | e3ec6fb | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| af5c7cd | 2026-11-27 | Merge branch 'dev' of https://github.com/kleber-goncalves/home-service into dev |
-| 095ad81 | 2026-11-27 | feat(categories): adicionar seção de FAQ e otimizar layout da página de categorias |
 
 <!-- END AUTO-GENERATED SECTION -->
