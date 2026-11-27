@@ -397,3 +397,59 @@ Até que uma etapa específica de padronização seja realizada:
 ---
 
 **Resumo:** o Conecta Local está adotando uma linguagem de minimalismo editorial, grandes títulos, curvas evidentes, fotografias em destaque, superfícies claras e um Footer escuro de alto contraste. Este arquivo registra essa direção no estado atual da branch `dev`, sem antecipar a futura padronização.
+
+## 16. Área profissional — dashboard
+
+A área autenticada do profissional utiliza uma estrutura de dashboard com navegação lateral, preservando a linguagem visual do Conecta Local.
+
+### 16.1. Organização e navegação
+
+- Menu lateral fixo no desktop, com quatro destinos: Visão geral, Meus serviços, Meu perfil e Conta e segurança.
+- Em telas menores, o menu lateral torna-se um painel móvel com botão de abertura e fechamento e camada de fundo.
+- A navegação entre seções ocorre no próprio dashboard; não cria uma nova rota nem altera o fluxo de autenticação.
+- A identidade do profissional e a ação de sair ficam no rodapé do menu lateral.
+
+### 16.2. Superfícies e hierarquia
+
+- Fundo de trabalho em cinza muito claro (#F6F7F7) e painéis brancos.
+- Menu com borda direita discreta, sem gradientes decorativos ou efeitos de vidro.
+- A cor de ação utiliza a variável global --brand (#1558D6); títulos utilizam --navy (#102849).
+- Cartões de indicadores utilizam bordas suaves e valores com algarismos tabulares.
+- Ícones lineares da biblioteca lucide-react.
+- A interface mantém a família Plus Jakarta Sans já carregada globalmente.
+
+### 16.3. Indicadores e gráficos
+
+- Serviços cadastrados, publicados, em pausa e distribuição por situação são calculados a partir da lista de serviços da conta.
+- O gráfico de situação dos serviços representa dados reais já disponíveis no estado autenticado.
+- Visualizações do perfil e cliques em contato são dados estáticos exclusivamente demonstrativos, isolados em src/data/professional-dashboard-demo.js.
+- Os indicadores fictícios exibem a identificação “Demonstrativo” e uma explicação de que a aplicação ainda não coleta esses eventos.
+- Os gráficos são construídos com CSS e SVG nativos; não há dependência adicional de gráficos.
+
+### 16.4. Seções funcionais
+
+- **Visão geral:** indicadores da conta, distribuição dos serviços, analytics demonstrativos e acesso rápido à gestão.
+- **Meus serviços:** mantém criação, edição, publicação, pausa, remoção lógica, municípios e imagens.
+- **Meu perfil:** mantém os dados profissionais e o gerenciador de fotografia existente.
+- **Conta e segurança:** mantém o fluxo demonstrativo de alteração e confirmação do e-mail.
+
+### 16.5. Responsividade e acessibilidade
+
+- O menu lateral é recolhido em telas de até 780 px e passa a ser aberto como painel móvel.
+- Os indicadores passam a duas colunas em telas intermediárias/estreitas; gráficos são empilhados quando necessário.
+- O menu usa botões nativos, estado aria-current, aria-expanded, rótulos acessíveis e camada de fechamento.
+- Há link para pular diretamente ao conteúdo e foco visível nos controles de navegação.
+- O movimento do painel respeita prefers-reduced-motion.
+- Os gráficos expõem descrições acessíveis e os valores textuais continuam disponíveis fora do desenho SVG.
+
+### 16.6. Arquivos de referência atualizados
+
+| Área | Arquivo |
+|---|---|
+| Autenticação e encaminhamento da sessão | src/pages/AuthDemoPage.jsx |
+| Página da área profissional | src/pages/ProfessionalDashboardPage.jsx |
+| Dados analíticos fictícios | src/data/professional-dashboard-demo.js |
+| Componentes de fotografia e imagens | src/components/professional/ |
+| Estilos globais e dashboard | src/index.css |
+
+Os indicadores demonstrativos não devem ser interpretados como métricas reais nem persistidos como atividade dos usuários.
