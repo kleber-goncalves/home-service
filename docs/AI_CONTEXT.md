@@ -425,9 +425,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** c98a5cdd42b625687bb6a4b3f6852b7806bb3048
-- **Data do commit:** 2026-11-27T12:52:14-03:00
-- **Mensagem do commit:** style(preview): diferenciar identificador de demonstracao
+- **Commit de referência:** 40fa1a51eae7a3781649d0e063d68fe26b6a0853
+- **Data do commit:** 2026-11-27T13:56:04-03:00
+- **Mensagem do commit:** chore(preview): remover rota temporaria de demonstracao
 - **Branch desta execução:** feat/professional-dashboard-chart-visual-review
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -535,7 +535,6 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/main.jsx
 - src/pages/AuthDemoPage.jsx
 - src/pages/CategoriesPage.jsx
-- src/pages/DashboardVisualPreviewPage.jsx
 - src/pages/HomePage.jsx
 - src/pages/NotFoundPage.jsx
 - src/pages/Poc01Page.jsx
@@ -560,13 +559,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 40fa1a5 | 2026-11-27 | chore(preview): remover rota temporaria de demonstracao |
+| 55b937b | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| e1985df | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | c98a5cd | 2026-11-27 | style(preview): diferenciar identificador de demonstracao |
 | fa16ccb | 2026-11-27 | fix(preview): identificar dados ficticios na barra superior |
 | e07cf1f | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | d5813c8 | 2026-11-27 | feat(preview): criar showcase com dados ficticios isolados |
 | bff02fb | 2026-11-27 | feat(preview): adicionar rota visual sem autenticacao |
-| d6e2032 | 2026-11-27 | style(dashboard): refinar proporcao e responsividade dos graficos |
-| 1dbc1fd | 2026-11-27 | style(dashboard): ampliar graficos e melhorar legibilidade |
-| 7f27abd | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
