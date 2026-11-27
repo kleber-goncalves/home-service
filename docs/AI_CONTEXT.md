@@ -425,10 +425,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 729d7f61bf92af1e519b436461f59f1cdb83ca1e
-- **Data do commit:** 2026-11-27T16:12:22-03:00
-- **Mensagem do commit:** Merge pull request #54 from kleber-goncalves/feat/professional-service-cards
-- **Branch desta execução:** dev
+- **Commit de referência:** 67d00ff3f45d6a3cf636e169cb0bfe501d37d7f9
+- **Data do commit:** 2026-11-27T16:34:06-03:00
+- **Mensagem do commit:** fix(images): deliver service photos through public gateway
+- **Branch desta execução:** fix/public-service-image-proxy
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 15
 - **Dependências de runtime:** 6
@@ -575,13 +575,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 67d00ff | 2026-11-27 | fix(images): deliver service photos through public gateway |
+| 666d74c | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 729d7f6 | 2026-11-27 | Merge pull request #54 from kleber-goncalves/feat/professional-service-cards |
 | 4578574 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 3e2563e | 2026-11-27 | test(professional): incluir utilitarios no workflow de validacao |
 | 346a487 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 371ac1b | 2026-11-27 | fix(professional): ajustar integracao dos cards de servicos |
 | 4332da5 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 0560fed | 2026-11-27 | feat(professional): cards visuais para gestao de servicos |
-| 3112677 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
