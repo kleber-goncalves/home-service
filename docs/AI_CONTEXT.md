@@ -425,10 +425,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** cb9e9f2b2daaa2b00a32751eb7a94526ba8a00f6
-- **Data do commit:** 2026-11-27T16:54:37-03:00
-- **Mensagem do commit:** Merge pull request #56 from kleber-goncalves/fix/managed-image-origin-fallback
-- **Branch desta execução:** dev
+- **Commit de referência:** e834a63a25eb33e9fa10446b0a2c75d08f8578c5
+- **Data do commit:** 2026-11-27T17:13:11-03:00
+- **Mensagem do commit:** fix(professional): pass initial service form snapshot to dialog
+- **Branch desta execução:** feat/service-form-dialog
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 15
 - **Dependências de runtime:** 6
@@ -527,6 +527,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/components/professional/services/professional-service-actions.jsx
 - src/components/professional/services/professional-service-card.jsx
 - src/components/professional/services/professional-service-filters.jsx
+- src/components/professional/services/professional-service-form-dialog.jsx
 - src/components/professional/services/professional-service-list.jsx
 - src/components/professional/services/professional-service-utils.js
 - src/components/public/app-link.jsx
@@ -575,13 +576,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
-| cb9e9f2 | 2026-11-27 | Merge pull request #56 from kleber-goncalves/fix/managed-image-origin-fallback |
-| fe3787d | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 6cbf840 | 2026-11-27 | test(images): verify private image delivery without Origin |
-| 3c040f5 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 8b5aee5 | 2026-11-27 | fix(images): allow verified same-origin GET without Origin |
-| 76e63aa | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 791bfde | 2026-11-27 | Merge pull request #55 from kleber-goncalves/fix/public-service-image-proxy |
-| eac5eb4 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| e834a63 | 2026-11-27 | fix(professional): pass initial service form snapshot to dialog |
+| 9471377 | 2026-11-27 | fix(professional): preserve default city when cancelling service form |
+| bc5ba49 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| 9187377 | 2026-11-27 | fix(professional): snapshot initial service form on open |
+| 713e9ac | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| 27b7759 | 2026-11-27 | fix(professional): keep dialog baseline outside effects |
+| 4fad41f | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
+| 1535c5d | 2026-11-27 | fix(professional): place catalog feedback beside category field |
 
 <!-- END AUTO-GENERATED SECTION -->
