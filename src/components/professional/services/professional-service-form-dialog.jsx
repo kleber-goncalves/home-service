@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from "react";
+import { useId, useState } from "react";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,7 @@ export default function ProfessionalServiceFormDialog({
     editingService,
     editingServiceId,
     serviceForm,
+    initialServiceForm,
     serviceFormError,
     busy = false,
     onServiceFormChange,
@@ -35,7 +36,6 @@ export default function ProfessionalServiceFormDialog({
 }) {
     const titleId = useId();
     const descriptionId = useId();
-    const [baseline, setBaseline] = useState(null);
     const [showDiscardConfirmation, setShowDiscardConfirmation] = useState(false);
     const isEditing = Boolean(editingServiceId);
     const categories = Array.isArray(catalog?.categories) ? catalog.categories : [];
@@ -45,16 +45,9 @@ export default function ProfessionalServiceFormDialog({
             (city) => !(catalog?.cities || []).some((item) => item.id === city.id),
         ),
     ];
-    const isDirty = baseline !== null && baseline !== serializeServiceForm(serviceForm);
-
-    useEffect(() => {
-        if (open && baseline === null) {
-            setBaseline(serializeServiceForm(serviceForm));
-        } else if (!open && baseline !== null) {
-            setBaseline(null);
-            setShowDiscardConfirmation(false);
-        }
-    }, [open, baseline, serviceForm]);
+    const isDirty = initialServiceForm !== null
+        && initialServiceForm !== undefined
+        && serializeServiceForm(initialServiceForm) !== serializeServiceForm(serviceForm);
 
     function requestClose() {
         if (busy) return;
