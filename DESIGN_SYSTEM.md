@@ -296,10 +296,9 @@ O projeto utiliza breakpoints definidos por componente. Os valores observados no
 | Largura máxima | Exemplos de uso atual |
 |---:|---|
 | 1050 px | Reorganização das colunas do Footer |
-| 960 px | Mudança de composição do destaque por categoria |
+| 960 px | Header troca a navegação horizontal por menu móvel; destaque por categoria reorganiza suas colunas |
 | 920 px | FAQ em uma coluna |
 | 900 px | Grade de cartões e composição de indicadores |
-| 960 px | Header troca a navegação horizontal por menu móvel com busca e acesso à conta |
 | 860 px | Ajustes adicionais do Hero e demais seções |
 | 760 px | Footer empilhado e diretório em duas colunas |
 | 680 px | LocalServiceOverview em uma coluna |

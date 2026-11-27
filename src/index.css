@@ -6707,6 +6707,7 @@ summary:focus-visible {
         background: #f1f6ff;
         border: 1px solid #dce8f8;
         border-radius: 11px;
+        margin-left: 0;
     }
 
     .site-header .mobile-nav {
