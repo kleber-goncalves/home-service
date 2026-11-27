@@ -425,9 +425,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 40fa1a51eae7a3781649d0e063d68fe26b6a0853
-- **Data do commit:** 2026-11-27T13:56:04-03:00
-- **Mensagem do commit:** chore(preview): remover rota temporaria de demonstracao
+- **Commit de referência:** e88131dacd06636582fd6cb6c40eca19a83d8b13
+- **Data do commit:** 2026-11-27T13:56:09-03:00
+- **Mensagem do commit:** chore(preview): remover pagina temporaria de dados ficticios
 - **Branch desta execução:** feat/professional-dashboard-chart-visual-review
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -559,13 +559,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| e88131d | 2026-11-27 | chore(preview): remover pagina temporaria de dados ficticios |
+| 4ebec83 | 2026-11-27 | style(dashboard): remover estilos exclusivos da previa |
 | 40fa1a5 | 2026-11-27 | chore(preview): remover rota temporaria de demonstracao |
 | 55b937b | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | e1985df | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | c98a5cd | 2026-11-27 | style(preview): diferenciar identificador de demonstracao |
 | fa16ccb | 2026-11-27 | fix(preview): identificar dados ficticios na barra superior |
 | e07cf1f | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| d5813c8 | 2026-11-27 | feat(preview): criar showcase com dados ficticios isolados |
-| bff02fb | 2026-11-27 | feat(preview): adicionar rota visual sem autenticacao |
 
 <!-- END AUTO-GENERATED SECTION -->
