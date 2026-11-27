@@ -425,9 +425,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** da3c3856445fbb90e056123c10510268c8869748
-- **Data do commit:** 2026-11-27T14:56:05-03:00
-- **Mensagem do commit:** feat(images): add authenticated private image reads
+- **Commit de referência:** d6fbaf5b0672220a0cfc3c06eeec305ede81c57b
+- **Data do commit:** 2026-11-27T14:58:11-03:00
+- **Mensagem do commit:** feat(images): add reusable crop editor UI
 - **Branch desta execução:** feat/professional-image-editor
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -516,7 +516,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/components/professional/profile-photo-manager.jsx
 - src/components/professional/service-image-manager.jsx
 - src/components/professional/service-images/image-crop-canvas.jsx
+- src/components/professional/service-images/image-editor-controls.jsx
+- src/components/professional/service-images/image-editor-dialog.jsx
 - src/components/professional/service-images/image-utils.js
+- src/components/professional/service-images/service-image-card.jsx
+- src/components/professional/service-images/service-image-manager.jsx
+- src/components/professional/service-images/service-image-picker.jsx
+- src/components/professional/service-images/service-image-queue.jsx
 - src/components/public/app-link.jsx
 - src/components/public/service-card.jsx
 - src/components/public/service-image.jsx
@@ -563,13 +569,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| d6fbaf5 | 2026-11-27 | feat(images): add reusable crop editor UI |
+| 255499f | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | da3c385 | 2026-11-27 | feat(images): add authenticated private image reads |
 | e67ad6a | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 6127e97 | 2026-11-27 | feat(images): secure managed image replacement |
 | 5ecfeed | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 19b9004 | 2026-11-27 | feat(images): add reusable image editor primitives |
 | 918e758 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 59b9177 | 2026-11-27 | Merge pull request #52 from kleber-goncalves/feat/professional-dashboard-chart-visual-review |
-| d49743c | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
