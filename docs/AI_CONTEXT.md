@@ -425,9 +425,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 371ac1b0bb91fb2605c1b0b7f265f41edcc6d680
-- **Data do commit:** 2026-11-27T16:08:41-03:00
-- **Mensagem do commit:** fix(professional): ajustar integracao dos cards de servicos
+- **Commit de referência:** 3e2563e3470c5138ac09176f77f195941791eabd
+- **Data do commit:** 2026-11-27T16:09:05-03:00
+- **Mensagem do commit:** test(professional): incluir utilitarios no workflow de validacao
 - **Branch desta execução:** feat/professional-service-cards
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 15
@@ -575,13 +575,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 3e2563e | 2026-11-27 | test(professional): incluir utilitarios no workflow de validacao |
+| 346a487 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 371ac1b | 2026-11-27 | fix(professional): ajustar integracao dos cards de servicos |
 | 4332da5 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 0560fed | 2026-11-27 | feat(professional): cards visuais para gestao de servicos |
 | 3112677 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 3364a69 | 2026-11-27 | Merge pull request #53 from kleber-goncalves/feat/professional-image-editor |
 | cac4d50 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| c4b878e | 2026-11-27 | fix(images): reset crop position with editor controls |
-| e7384fb | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
