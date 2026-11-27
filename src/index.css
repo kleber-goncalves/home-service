@@ -2248,6 +2248,176 @@ summary:focus-visible {
         transition: none;
     }
 }
+
+.auth-register-progress {
+    display: grid;
+    gap: 13px;
+    margin: -4px 0 24px;
+}
+.auth-register-progress-heading {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    color: #718198;
+    font-size: 0.68rem;
+    font-weight: 750;
+}
+.auth-register-progress-heading > span {
+    color: var(--brand);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+.auth-register-progress-heading strong {
+    color: #344963;
+    font-size: 0.74rem;
+    font-weight: 850;
+    text-align: right;
+}
+.auth-register-progress-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 9px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.auth-register-progress-step {
+    display: grid;
+    min-width: 0;
+    grid-template-columns: 27px minmax(0, 1fr);
+    align-items: center;
+    gap: 7px;
+    color: #8a97a7;
+}
+.auth-register-progress-number {
+    display: grid;
+    width: 27px;
+    height: 27px;
+    place-items: center;
+    color: #75849a;
+    background: #f4f6f7;
+    border: 1px solid #e3e8eb;
+    border-radius: 50%;
+    font-size: 0.68rem;
+    font-weight: 850;
+}
+.auth-register-progress-label {
+    min-width: 0;
+    font-size: 0.65rem;
+    font-weight: 750;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+.auth-register-progress-step.is-current {
+    color: #173f79;
+}
+.auth-register-progress-step.is-current .auth-register-progress-number {
+    color: #fff;
+    background: var(--brand);
+    border-color: var(--brand);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.09);
+}
+.auth-register-progress-step.is-complete {
+    color: #315d8f;
+}
+.auth-register-progress-step.is-complete .auth-register-progress-number {
+    color: #fff;
+    background: #315d8f;
+    border-color: #315d8f;
+}
+.auth-register-form {
+    gap: 19px;
+}
+.auth-register-step {
+    display: grid;
+    gap: 17px;
+}
+.auth-register-step-heading {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 2px;
+}
+.auth-register-step-heading > span {
+    color: #718096;
+    font-size: 0.63rem;
+    font-weight: 850;
+    letter-spacing: 0.1em;
+}
+.auth-register-step-heading h3 {
+    margin: 0;
+    color: #102849;
+    font-size: clamp(1.12rem, 2vw, 1.35rem);
+    font-weight: 850;
+    letter-spacing: -0.045em;
+    line-height: 1.2;
+}
+.auth-register-step-heading p {
+    margin: 0;
+    color: #718198;
+    font-size: 0.74rem;
+    line-height: 1.55;
+}
+.auth-register-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.auth-register-navigation.is-first-step {
+    justify-content: flex-end;
+}
+.auth-register-navigation .auth-demo-submit {
+    width: auto;
+    min-width: 190px;
+    flex: 0 1 235px;
+}
+.auth-register-back {
+    min-height: 52px;
+    gap: 7px;
+    padding: 0 17px;
+    color: #405572;
+    background: #f5f7f8;
+    border: 1px solid #e2e8ec;
+    border-radius: 14px;
+}
+.auth-register-back:hover {
+    color: var(--brand);
+    background: #edf4ff;
+}
+@media (max-width: 560px) {
+    .auth-register-progress {
+        gap: 11px;
+        margin-bottom: 21px;
+    }
+    .auth-register-progress-list {
+        gap: 5px;
+    }
+    .auth-register-progress-step {
+        grid-template-columns: 24px minmax(0, 1fr);
+        gap: 5px;
+    }
+    .auth-register-progress-number {
+        width: 24px;
+        height: 24px;
+    }
+    .auth-register-progress-label {
+        font-size: 0.59rem;
+    }
+    .auth-register-navigation {
+        gap: 8px;
+    }
+    .auth-register-navigation .auth-demo-submit {
+        min-width: 0;
+        flex: 1 1 auto;
+        padding-right: 12px;
+        padding-left: 12px;
+    }
+    .auth-register-back {
+        min-height: 50px;
+        padding: 0 12px;
+    }
+}
 /* Fluxo local da demonstração acadêmica */
 .demo-code-card {
     display: grid;
