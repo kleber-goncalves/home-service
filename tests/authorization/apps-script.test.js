@@ -1849,7 +1849,7 @@ test("substituição de imagem preserva ID e ordem mesmo quando o serviço já p
     const records = harness.records("IMAGENS").filter((item) => item.status === "active");
     assert.equal(records.length, 5);
     const replaced = records.find((item) => item.id_imagem === target.id);
-    assert.equal(replaced.ordem_exibicao, String(target.order));
+    assert.equal(Number(replaced.ordem_exibicao), target.order);
     assert.notEqual(replaced.id_arquivo_drive, oldRecord.id_arquivo_drive);
     assert.equal(oldFile.sharing, "PRIVATE");
     assert.equal(harness.driveFiles.get(replaced.id_arquivo_drive).sharing, "ANYONE_WITH_LINK");
