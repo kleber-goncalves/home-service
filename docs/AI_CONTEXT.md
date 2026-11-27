@@ -425,9 +425,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 6127e971697e268a13aa6788bd868506e3121ec4
-- **Data do commit:** 2026-11-27T14:55:23-03:00
-- **Mensagem do commit:** feat(images): secure managed image replacement
+- **Commit de referência:** da3c3856445fbb90e056123c10510268c8869748
+- **Data do commit:** 2026-11-27T14:56:05-03:00
+- **Mensagem do commit:** feat(images): add authenticated private image reads
 - **Branch desta execução:** feat/professional-image-editor
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -563,13 +563,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| da3c385 | 2026-11-27 | feat(images): add authenticated private image reads |
+| e67ad6a | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 6127e97 | 2026-11-27 | feat(images): secure managed image replacement |
 | 5ecfeed | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 19b9004 | 2026-11-27 | feat(images): add reusable image editor primitives |
 | 918e758 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 59b9177 | 2026-11-27 | Merge pull request #52 from kleber-goncalves/feat/professional-dashboard-chart-visual-review |
 | d49743c | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 1b4e656 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| e88131d | 2026-11-27 | chore(preview): remover pagina temporaria de dados ficticios |
 
 <!-- END AUTO-GENERATED SECTION -->
