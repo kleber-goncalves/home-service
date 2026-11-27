@@ -425,10 +425,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** c1e6abdf8dae65bdef56de1d6aeafcb038c62be5
-- **Data do commit:** 2026-11-27T12:44:11-03:00
-- **Mensagem do commit:** Merge pull request #51 from kleber-goncalves/feat/professional-dashboard-motion-charts
-- **Branch desta execução:** dev
+- **Commit de referência:** d5813c81c8e8e0d42a26ccfede144b411be218c5
+- **Data do commit:** 2026-11-27T12:51:53-03:00
+- **Mensagem do commit:** feat(preview): criar showcase com dados ficticios isolados
+- **Branch desta execução:** feat/professional-dashboard-chart-visual-review
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 6
@@ -535,6 +535,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/main.jsx
 - src/pages/AuthDemoPage.jsx
 - src/pages/CategoriesPage.jsx
+- src/pages/DashboardVisualPreviewPage.jsx
 - src/pages/HomePage.jsx
 - src/pages/NotFoundPage.jsx
 - src/pages/Poc01Page.jsx
@@ -559,13 +560,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| d5813c8 | 2026-11-27 | feat(preview): criar showcase com dados ficticios isolados |
+| bff02fb | 2026-11-27 | feat(preview): adicionar rota visual sem autenticacao |
+| d6e2032 | 2026-11-27 | style(dashboard): refinar proporcao e responsividade dos graficos |
+| 1dbc1fd | 2026-11-27 | style(dashboard): ampliar graficos e melhorar legibilidade |
+| 7f27abd | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | c1e6abd | 2026-11-27 | Merge pull request #51 from kleber-goncalves/feat/professional-dashboard-motion-charts |
 | f52ddb9 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 9223984 | 2026-11-27 | feat(professional): animate interactive dashboard charts |
-| fabbc97 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 0853c4d | 2026-11-27 | chore(deps): adicionar gsap e recharts |
-| 8a51ccc | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| d39ae32 | 2026-11-27 | Merge pull request #50 from kleber-goncalves/feat/professional-dashboard-analytics |
-| 65dd0fd | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
