@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpRight, Check, House, MapPin, MessageCircle, Minus, Plus, Search, Sparkles, Users, UserRoundSearch, BriefcaseBusiness, CheckCircle2 } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, House, MapPin, MessageCircle, Minus, Plus, Sparkles, Users, BriefcaseBusiness, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -75,7 +75,7 @@ function ProfessionalCard({ professional }) {
                 {contactUrl ? (
                     <a className="professional-card-link" href={contactUrl} target="_blank" rel="noreferrer">Entrar em contato <ArrowRight size={15} aria-hidden="true" /></a>
                 ) : (
-                    <a className="professional-card-link" href="#como-funciona">Como funciona <ArrowRight size={15} aria-hidden="true" /></a>
+                    <a className="professional-card-link" href="/servicos">Ver serviços <ArrowRight size={15} aria-hidden="true" /></a>
                 )}
             </CardContent>
         </Card>
@@ -174,7 +174,7 @@ export function AboutSection() {
                         <div><span className="about-point-icon"><Users size={19} /></span><span><strong>Mais visibilidade</strong><small>Um espaço para apresentar serviços de forma clara.</small></span></div>
                         <div><span className="about-point-icon"><House size={19} /></span><span><strong>Contato direto</strong><small>A proposta é aproximar pessoas e profissionais.</small></span></div>
                     </div>
-                    <a className="text-link" href="#como-funciona">Entenda a proposta <ArrowUpRight size={16} aria-hidden="true" /></a>
+                    <a className="text-link" href="/servicos">Explorar serviços <ArrowUpRight size={16} aria-hidden="true" /></a>
                 </div>
                 <div className="about-gallery" aria-label="Imagens ilustrativas de serviços">
                     <figure className="about-gallery-main">
@@ -191,31 +191,6 @@ export function AboutSection() {
                     </figure>
                     <div className="about-gallery-note"><strong>Conexões que começam perto.</strong><span>Imagem e composição demonstrativas.</span></div>
                 </div>
-            </div>
-        </section>
-    );
-}
-
-export function HowItWorks() {
-    const steps = [
-        { number: "01", icon: Search, title: "Busque o serviço", description: "Escolha uma categoria ou descreva o que você precisa." },
-        { number: "02", icon: UserRoundSearch, title: "Conheça as opções", description: "Veja os detalhes públicos e conheça a apresentação de cada serviço." },
-        { number: "03", icon: MessageCircle, title: "Entre em contato", description: "Fale diretamente com o profissional pelos canais que ele divulgar." },
-    ];
-    return (
-        <section className="how-section section-space" id="como-funciona">
-            <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-                <SectionHeading eyebrow="Uma jornada simples" title="Como o Conecta Local vai funcionar?" description="A ideia é deixar o caminho entre a sua necessidade e o contato com o profissional mais claro." align="center" />
-                <div className="steps-grid">
-                    {steps.map(({ number, icon: Icon, title, description }, index) => (
-                        <article className="step-card" key={number}>
-                            <div className="step-topline"><span className="step-number">{number}</span><span className="step-icon"><Icon size={21} /></span></div>
-                            <h3>{title}</h3><p>{description}</p>
-                            {index < 2 && <ArrowRight className="step-arrow" size={20} aria-hidden="true" />}
-                        </article>
-                    ))}
-                </div>
-                <p className="steps-note">A vitrine apresenta os serviços publicados e permite conhecer os dados públicos antes de entrar em contato com o profissional.</p>
             </div>
         </section>
     );
@@ -298,7 +273,7 @@ export function FAQSection() {
 export function SiteFooter() {
     const links = [
         ["Início", "#inicio"], ["Categorias", "#categorias"], ["Sobre", "#sobre"],
-        ["Como funciona", "#como-funciona"], ["Perguntas frequentes", "#perguntas"],
+        ["Perguntas frequentes", "#perguntas"],
     ];
     return (
         <footer className="site-footer">

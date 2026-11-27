@@ -190,7 +190,7 @@ Arquivo: `src/components/home/site-header.jsx`
 
 - Cabeçalho branco, sticky, com superfície limpa, borda inferior discreta e sombra muito suave.
 - Marca Conecta Local posicionada à esquerda.
-- Navegação desktop enxuta com “Como funciona”, menu suspenso “Serviços” (todos os serviços e categorias) e acesso “Seja um profissional”.
+- Navegação desktop enxuta com menu suspenso “Serviços” (todos os serviços e categorias) e acesso “Seja um profissional”.
 - Campo de busca horizontal e expansível à direita da navegação; envia a palavra-chave ao catálogo por meio do parâmetro `q`.
 - Os botões “Entrar” e “Criar conta” permanecem imediatamente à direita da busca; quando há sessão, essa área é substituída pelo menu da conta.
 - Em telas de até 960 px, a navegação, a busca e as ações de acesso são agrupadas em um menu móvel expansível, que mantém a busca e os links de autenticação.
@@ -248,11 +248,11 @@ O componente `HomeFeaturedServiceCard` é compartilhado pela vitrine de serviço
 - Grade de três cartões em telas maiores, duas colunas em telas intermediárias e uma coluna em telas menores.
 - No catálogo, os links de exemplos fictícios preservam os filtros atuais na URL.
 
-### 8.6. HowItWorks e FAQSection
+### 8.6. FAQSection
 
 Arquivo: `src/components/home/home-sections.jsx`
 
-- A seção “Como funciona” é exibida na homepage após o Hero e recebe o identificador `como-funciona`, utilizado pelo link principal do header.
+- A homepage não exibe mais a seção “Como funciona”; a navegação principal não inclui esse atalho.
 - A FAQ apresenta layout editorial dividido em duas colunas no desktop.
 - Coluna de introdução com ilustração decorativa, título e texto de apoio.
 - Coluna de perguntas com blocos cinza-claro e grandes curvas.

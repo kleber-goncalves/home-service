@@ -156,9 +156,7 @@ export default function SiteHeader({ active = "" }) {
                     </AppLink>
 
                     <nav className="desktop-nav" aria-label="Navegação principal">
-                        <AppLink to="/#como-funciona">Como funciona</AppLink>
-
-                        <details
+                                        <details
                             className="desktop-services-menu"
                             onBlur={(event) => {
                                 if (!event.currentTarget.contains(event.relatedTarget)) {
@@ -279,10 +277,6 @@ export default function SiteHeader({ active = "" }) {
                     aria-label="Navegação móvel"
                     aria-hidden={!menuOpen}
                 >
-                    <AppLink to="/#como-funciona" onClick={closeMobileMenu}>
-                        Como funciona <ArrowRight size={15} aria-hidden="true" />
-                    </AppLink>
-
                     <details className="mobile-services-menu">
                         <summary>
                             Serviços
