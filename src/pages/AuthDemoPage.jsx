@@ -68,6 +68,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
     const [newService, setNewService] = useState(EMPTY_SERVICE);
     const [showServiceForm, setShowServiceForm] = useState(false);
     const [editingServiceId, setEditingServiceId] = useState(null);
+    const [serviceFormError, setServiceFormError] = useState(null);
     const [notice, setNotice] = useState(null);
     const [pageLoading, setPageLoading] = useState(true);
     const [busy, setBusy] = useState(false);
@@ -478,6 +479,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
     function cancelServiceForm() {
         setShowServiceForm(false);
         setEditingServiceId(null);
+        setServiceFormError(null);
         setNewService({
             ...EMPTY_SERVICE,
             categoryId: catalog.categories[0]?.id || "",
@@ -496,6 +498,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
             categoryId: catalog.categories[0]?.id || "",
             cityIds: catalog.cities.some((city) => city.id === currentUser?.cityId) ? [currentUser.cityId] : (catalog.cities[0]?.id ? [catalog.cities[0].id] : []),
         });
+        setServiceFormError(null);
         setShowServiceForm(true);
         setNotice(null);
     }
@@ -508,8 +511,14 @@ export default function AuthDemoPage({ initialMode = "login" }) {
             description: service.description,
             cityIds: Array.isArray(service.cityIds) ? service.cityIds.slice() : [],
         });
+        setServiceFormError(null);
         setShowServiceForm(true);
         setNotice(null);
+    }
+
+    function updateServiceFormField(field, value) {
+        setNewService((current) => ({ ...current, [field]: value }));
+        setServiceFormError(null);
     }
 
     function toggleServiceCity(cityId) {
@@ -519,21 +528,30 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                 ? current.cityIds.filter((id) => id !== cityId)
                 : [...current.cityIds, cityId],
         }));
+        setServiceFormError(null);
     }
 
     async function saveService(event) {
         event.preventDefault();
         if (!newService.cityIds.length) {
-            setNotice({ title: "Selecione uma cidade", message: "Escolha ao menos um município atendido pelo serviço.", tone: "warning" });
+            setServiceFormError({
+                title: "Selecione uma cidade",
+                message: "Escolha ao menos um município atendido pelo serviço.",
+            });
             return;
         }
         if (!newService.categoryId) {
-            setNotice({ title: "Selecione uma categoria", message: "O catálogo ainda não oferece uma categoria ativa.", tone: "warning" });
+            setServiceFormError({
+                title: "Selecione uma categoria",
+                message: "O catálogo ainda não oferece uma categoria ativa.",
+            });
             return;
         }
 
+        const wasEditing = Boolean(editingServiceId);
         setBusy(true);
         setNotice(null);
+        setServiceFormError(null);
         try {
             const payload = {
                 categoryId: newService.categoryId,
@@ -541,7 +559,7 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                 description: newService.description,
                 cityIds: newService.cityIds,
             };
-            if (editingServiceId) {
+            if (wasEditing) {
                 await appRequest("service.update", { serviceId: editingServiceId, ...payload }, csrfToken);
             } else {
                 await appRequest("service.create", payload, csrfToken);
@@ -551,14 +569,13 @@ export default function AuthDemoPage({ initialMode = "login" }) {
             setServices(latest.services || []);
 
             cancelServiceForm();
-            setNotice(editingServiceId
+            setNotice(wasEditing
                 ? { title: "Serviço atualizado", message: "As alterações foram confirmadas e salvas na planilha.", tone: "info" }
                 : { title: "Serviço salvo na planilha", message: "O serviço foi cadastrado e já pode aparecer na vitrine pública.", tone: "info" });
         } catch (error) {
-            setNotice({
-                title: editingServiceId ? "Não foi possível atualizar" : "Não foi possível salvar",
-                message: error.message,
-                tone: "warning",
+            setServiceFormError({
+                title: wasEditing ? "Não foi possível atualizar" : "Não foi possível salvar",
+                message: error.message || "Ocorreu um erro ao salvar o serviço. Tente novamente.",
             });
         } finally {
             setBusy(false);
@@ -671,11 +688,13 @@ export default function AuthDemoPage({ initialMode = "login" }) {
                 requestAnotherEmailCode={requestAnotherEmailCode}
                 toggleServiceForm={toggleServiceForm}
                 showServiceForm={showServiceForm}
+                cancelServiceForm={cancelServiceForm}
                 saveService={saveService}
+                serviceFormError={serviceFormError}
                 editingServiceId={editingServiceId}
                 newService={newService}
-                setNewService={setNewService}
                 editingService={editingService}
+                updateServiceFormField={updateServiceFormField}
                 toggleServiceCity={toggleServiceCity}
                 startEditingService={startEditingService}
                 toggleService={toggleService}
