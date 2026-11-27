@@ -119,7 +119,7 @@ O arredondamento é uma das características mais visíveis da identidade atual.
 |---|---:|---:|
 | Hero content | 46 px pela classe utilitária | Mantém a classe nos estilos consultados |
 | Cartão de destaque por categoria | 46 px | 14 px em telas até 640 px |
-| Cartão de serviço da homepage | 46 px | 19 px em telas até 640 px |
+| Cartão público de serviço (homepage e catálogo) | 46 px | 19 px em telas até 640 px |
 | Imagem do cartão de serviço | 26 px | 14 px em telas até 640 px |
 | Foto da composição LocalServiceOverview | 25 px | 21 px até 900 px; 18 px até 380 px |
 | Item da FAQ | 31 px | 23 px até 620 px |
@@ -228,19 +228,22 @@ Arquivo: `src/components/home/local-service-overview.jsx`
 - Quatro indicadores dinâmicos em grade.
 - Os indicadores podem usar traço de ausência (`—`) durante carregamento ou quando há erro, conforme os dados recebidos.
 
-### 8.5. Vitrine de serviços da homepage
+### 8.5. Cartões públicos de serviços
 
 Arquivos:
 - `src/components/home/featured-service-card.jsx`
 - `src/pages/HomePage.jsx`
+- `src/pages/ServicesPage.jsx`
 
-- Título e subtítulo centralizados na versão desktop.
-- Grade de três cartões em telas maiores.
-- Cartões brancos, com fotografia no topo e grandes curvas.
-- Categoria, título, descrição, ícone ilustrativo e localidade.
-- Identificação visual para exemplos fictícios.
+O componente `HomeFeaturedServiceCard` é compartilhado pela vitrine de serviços da homepage (`public-home-services`) e pelo catálogo completo (`/servicos`). As duas páginas usam o mesmo cartão e os mesmos estilos, evitando implementações visuais paralelas.
+
+- Cartões brancos, com fotografia no topo, cantos amplos e superfícies discretas.
+- Categoria, título, descrição, ícone ilustrativo e informação de atendimento.
+- Identificação visual para exemplos fictícios e contador de fotos adicionais.
+- Ação contextual: “Ver catálogo” para exemplos fictícios e “Ver detalhes” para serviços publicados.
 - Hover com pequeno deslocamento vertical e ampliação discreta da imagem.
-- A grade muda para duas colunas e depois uma coluna em breakpoints menores.
+- Grade de três cartões em telas maiores, duas colunas em telas intermediárias e uma coluna em telas menores.
+- No catálogo, os links de exemplos fictícios preservam os filtros atuais na URL.
 
 ### 8.6. FAQSection
 
@@ -354,7 +357,7 @@ Esses pontos ficam registrados para uma etapa futura de melhoria e refatoração
 | Hero e busca | `src/components/home/hero-search.jsx` |
 | Destaque por categoria | `src/components/home/category-featured-services.jsx` |
 | Resumo do catálogo | `src/components/home/local-service-overview.jsx` |
-| Cartão de serviço da homepage | `src/components/home/featured-service-card.jsx` |
+| Cartão público de serviço (homepage e catálogo) | `src/components/home/featured-service-card.jsx` |
 | FAQ e demais seções da homepage | `src/components/home/home-sections.jsx` |
 | Rodapé | `src/components/public/site-footer.jsx` |
 | Composição da homepage | `src/pages/HomePage.jsx` |
