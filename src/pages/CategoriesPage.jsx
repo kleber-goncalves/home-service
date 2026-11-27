@@ -14,6 +14,7 @@ import SiteHeader from "@/components/home/site-header";
 import SiteFooter from "@/components/public/site-footer";
 import AppLink from "@/components/public/app-link";
 import usePublicCatalog from "@/hooks/use-public-catalog";
+import { FAQSection } from "@/components/home/home-sections";
 
 function CategoryIcon({ name }) {
     const normalized = String(name || "")
@@ -33,38 +34,21 @@ function CategoryIcon({ name }) {
     return <BriefcaseBusiness size={31} strokeWidth={1.55} aria-hidden="true" />;
 }
 
-function countServicesByCategory(services) {
-    return services.reduce((counts, service) => {
-        const categoryCounts = counts[service.categoryId] || { published: 0, demo: 0 };
 
-        if (service.isDemo) {
-            categoryCounts.demo += 1;
-        } else {
-            categoryCounts.published += 1;
-        }
 
-        counts[service.categoryId] = categoryCounts;
-        return counts;
-    }, {});
-}
 
-function formatCount(value) {
-    return new Intl.NumberFormat("pt-BR").format(value);
-}
 
 export default function CategoriesPage() {
     const catalog = usePublicCatalog();
-    const serviceCounts = countServicesByCategory(catalog.services);
 
     return (
         <>
             <SiteHeader active="categorias" />
             <main className="public-page categories-page" id="conteudo" tabIndex="-1">
                 <section className="categories-page-hero" aria-labelledby="categories-page-title">
-                    <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className=" w-full px-4 sm:px-6 lg:px-29">
                         <div className="categories-page-heading">
                             <div className="categories-page-heading-copy">
-                                <span className="section-eyebrow">Explore por categoria</span>
                                 <h1 id="categories-page-title">
                                     Encontre o serviço certo para o que você precisa.
                                 </h1>
@@ -75,19 +59,14 @@ export default function CategoriesPage() {
                                     Escolha uma categoria e descubra serviços publicados e exemplos
                                     ilustrativos reunidos no Conecta Local.
                                 </p>
-                                <div className="categories-page-summary" aria-live="polite">
-                                    <span className="categories-page-summary-dot" aria-hidden="true" />
-                                    {catalog.loading
-                                        ? "Carregando categorias..."
-                                        : `${formatCount(catalog.categories.length)} categorias para explorar`}
-                                </div>
+                               
                             </div>
                         </div>
                     </div>
                 </section>
 
                 <section className="categories-page-content" aria-label="Categorias disponíveis">
-                    <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <div className=" w-full px-4 sm:px-6 lg:px-29">
                         {catalog.loading ? (
                             <div className="catalog-state categories-page-state" role="status">
                                 Carregando categorias e exemplos...
@@ -100,7 +79,7 @@ export default function CategoriesPage() {
                         ) : catalog.categories.length ? (
                             <div className="categories-page-grid">
                                 {catalog.categories.map((category) => {
-                                    const counts = serviceCounts[category.id] || { published: 0, demo: 0 };
+                        
 
                                     return (
                                         <article className="categories-page-card" key={category.id}>
@@ -108,9 +87,7 @@ export default function CategoriesPage() {
                                                 <span className="categories-page-card-icon">
                                                     <CategoryIcon name={category.name} />
                                                 </span>
-                                                <span className="categories-page-card-kicker">
-                                                    Categoria
-                                                </span>
+               
                                             </div>
 
                                             <div className="categories-page-card-copy">
@@ -120,16 +97,7 @@ export default function CategoriesPage() {
                                                 </p>
                                             </div>
 
-                                            <div className="categories-page-card-counts" role="group" aria-label="Quantidade de serviços nesta categoria">
-                                                <span className="categories-page-count categories-page-count--published">
-                                                    <strong>{formatCount(counts.published)}</strong>
-                                                    cadastrados
-                                                </span>
-                                                <span className="categories-page-count categories-page-count--demo">
-                                                    <strong>{formatCount(counts.demo)}</strong>
-                                                    exemplos fictícios
-                                                </span>
-                                            </div>
+                                            
 
                                             <AppLink
                                                 to={`/servicos?categoria=${encodeURIComponent(category.id)}`}
@@ -150,6 +118,7 @@ export default function CategoriesPage() {
                         )}
                     </div>
                 </section>
+                <FAQSection />
             </main>
             <SiteFooter />
         </>
