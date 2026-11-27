@@ -424,13 +424,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** d39ae3243f78e4624914d5615e861425a607631b
-- **Data do commit:** 2026-11-27T01:44:49-03:00
-- **Mensagem do commit:** Merge pull request #50 from kleber-goncalves/feat/professional-dashboard-analytics
-- **Branch desta execução:** dev
+- **Commit de referência:** 0853c4d85121134d0d7d97573188cfc6e0c1612d
+- **Data do commit:** 2026-11-27T12:35:21-03:00
+- **Mensagem do commit:** chore(deps): adicionar gsap e recharts
+- **Branch desta execução:** feat/professional-dashboard-motion-charts
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
-- **Dependências de runtime:** 4
+- **Dependências de runtime:** 6
 - **Dependências de desenvolvimento:** 11
 - **Workflows:** 2
 - **Scripts de automação:** 3
@@ -469,10 +469,12 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Pacote | Versão declarada |
 |---|---|
+| gsap | ^3.15.1 |
 | hash-wasm | 4.13.0 |
 | lucide-react | ^1.61.0 |
 | react | ^19.3.1 |
 | react-dom | ^19.3.1 |
+| recharts | ^3.11.2 |
 
 ### Dependências de desenvolvimento
 
@@ -556,13 +558,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 0853c4d | 2026-11-27 | chore(deps): adicionar gsap e recharts |
+| 8a51ccc | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | d39ae32 | 2026-11-27 | Merge pull request #50 from kleber-goncalves/feat/professional-dashboard-analytics |
 | 65dd0fd | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | d635922 | 2026-11-27 | feat(professional): add account-based dashboard analytics |
 | 10311af | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | c7b2da6 | 2026-11-27 | Merge pull request #49 from kleber-goncalves/feat/professional-dashboard-refresh |
 | f8d7e26 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 79ec113 | 2026-11-27 | fix(professional): forward form state setters to dashboard |
-| a589810 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
