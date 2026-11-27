@@ -223,10 +223,7 @@ export async function uploadServiceImage({
 }
 
 export async function getServiceImageFile(imageId, csrfToken, signal) {
-    const url = new URL("/api/managed-images", window.location.origin);
-    url.searchParams.set("id", imageId);
-
-    const response = await fetch(url, {
+    const response = await fetch("/api/managed-images?id=" + encodeURIComponent(imageId), {
         method: "GET",
         credentials: "same-origin",
         headers: { "X-CSRF-Token": csrfToken },
