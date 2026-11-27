@@ -71,6 +71,9 @@ jobs:
       - name: Run public catalog data tests
         run: npm run test:public-catalog
 
+      - name: Run professional service card logic tests
+        run: npm run test:professional-services
+
       - name: Validate occurrence register
         run: npm run check:occurrences
 
