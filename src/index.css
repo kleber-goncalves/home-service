@@ -6702,7 +6702,6 @@ summary:focus-visible {
         height: 43px;
         flex: 0 0 auto;
         place-items: center;
-        margin-left: auto;
         color: var(--navy);
         background: #f1f6ff;
         border: 1px solid #dce8f8;

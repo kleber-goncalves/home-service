@@ -248,7 +248,7 @@ O componente `HomeFeaturedServiceCard` é compartilhado pela vitrine de serviço
 - Grade de três cartões em telas maiores, duas colunas em telas intermediárias e uma coluna em telas menores.
 - No catálogo, os links de exemplos fictícios preservam os filtros atuais na URL.
 
-### 8.6. HowSection e FAQSection
+### 8.6. HowItWorks e FAQSection
 
 Arquivo: `src/components/home/home-sections.jsx`
 
