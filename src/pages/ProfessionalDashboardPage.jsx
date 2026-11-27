@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { DonutChart, HorizontalBarChart } from "@/components/ui/chart";
 import { Input } from "@/components/ui/input";
 import ProfessionalServiceList from "@/components/professional/services/professional-service-list";
+import ProfessionalServiceFormDialog from "@/components/professional/services/professional-service-form-dialog";
 import ProfilePhotoManager from "@/components/professional/profile-photo-manager";
 
 const NAV_ITEMS = [
@@ -125,11 +126,13 @@ export default function ProfessionalDashboardPage({
     requestAnotherEmailCode,
     toggleServiceForm,
     showServiceForm,
+    cancelServiceForm,
     saveService,
+    serviceFormError,
     editingServiceId,
     newService,
-    setNewService,
     editingService,
+    updateServiceFormField,
     toggleServiceCity,
     startEditingService,
     toggleService,
@@ -520,57 +523,9 @@ export default function ProfessionalDashboardPage({
                                 <h2>Meus serviços</h2>
                             </div>
                             <Button type="button" onClick={toggleServiceForm} disabled={busy}>
-                                {showServiceForm ? <X size={17} aria-hidden="true" /> : <Plus size={17} aria-hidden="true" />}
-                                {showServiceForm ? "Cancelar" : "Novo serviço"}
+                                <Plus size={17} aria-hidden="true" /> Novo serviço
                             </Button>
                         </div>
-
-                        {showServiceForm && (
-                            <form className="demo-new-service-form" onSubmit={saveService}>
-                                <h3>{editingServiceId ? "Editar serviço" : "Novo serviço"}</h3>
-                                <div className="demo-new-service-fields">
-                                    <label>
-                                        Nome do serviço
-                                        <Input value={newService.title} onChange={(event) => setNewService((current) => ({ ...current, title: event.target.value }))} placeholder="Ex.: Instalação de chuveiro" maxLength={100} minLength={5} required />
-                                    </label>
-                                    <label>
-                                        Categoria
-                                        <select value={newService.categoryId} onChange={(event) => setNewService((current) => ({ ...current, categoryId: event.target.value }))} required>
-                                            {editingService && !catalog.categories.some((category) => category.id === editingService.categoryId) && (
-                                                <option value={editingService.categoryId}>{editingService.category} (inativa)</option>
-                                            )}
-                                            {catalog.categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
-                                        </select>
-                                    </label>
-                                </div>
-                                <label>
-                                    Descrição
-                                    <textarea value={newService.description} onChange={(event) => setNewService((current) => ({ ...current, description: event.target.value }))} placeholder="Descreva o serviço oferecido." maxLength={1000} minLength={10} rows={3} required />
-                                </label>
-                                <fieldset className="demo-service-cities">
-                                    <legend>Municípios atendidos</legend>
-                                    <p>Selecione uma ou mais cidades onde este serviço pode ser encontrado.</p>
-                                    <div className="demo-service-city-options">
-                                        {[
-                                            ...catalog.cities,
-                                            ...(editingService?.cities || []).filter((city) => !catalog.cities.some((item) => item.id === city.id)),
-                                        ].map((city) => (
-                                            <label className="demo-service-city-option" key={city.id}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={newService.cityIds.includes(city.id)}
-                                                    onChange={() => toggleServiceCity(city.id)}
-                                                    disabled={busy}
-                                                />
-                                                <span>{city.name} - {city.state}{city.status === "inactive" ? " (inativa — vínculo existente)" : ""}</span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                    {!catalog.cities.length && <small>Não há cidades ativas cadastradas na planilha.</small>}
-                                </fieldset>
-                                <Button type="submit" disabled={busy}><Check size={16} aria-hidden="true" /> {busy ? "Salvando..." : editingServiceId ? "Salvar alterações" : "Salvar na planilha"}</Button>
-                            </form>
-                        )}
 
                         <ProfessionalServiceList
                             services={services}
@@ -581,6 +536,20 @@ export default function ProfessionalDashboardPage({
                             onToggle={toggleService}
                             onRemove={removeService}
                             onRefresh={refreshServices}
+                        />
+
+                        <ProfessionalServiceFormDialog
+                            open={showServiceForm}
+                            catalog={catalog}
+                            editingService={editingService}
+                            editingServiceId={editingServiceId}
+                            serviceForm={newService}
+                            serviceFormError={serviceFormError}
+                            busy={busy}
+                            onServiceFormChange={updateServiceFormField}
+                            onToggleCity={toggleServiceCity}
+                            onSubmit={saveService}
+                            onClose={cancelServiceForm}
                         />
 
                     </section>
