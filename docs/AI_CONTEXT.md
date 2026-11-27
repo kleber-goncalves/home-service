@@ -414,9 +414,9 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** 94acb2c174760de9bab6bceed09d3f8a4522f1d6
-- **Data do commit:** 2026-11-27T00:51:59-03:00
-- **Mensagem do commit:** style(auth): align authentication page with editorial design system
+- **Commit de referência:** 6f8ef8e7688a47e314bd21c31d656faf48b54225
+- **Data do commit:** 2026-11-27T00:52:01-03:00
+- **Mensagem do commit:** docs(design): document authentication page visual language
 - **Branch desta execução:** feat/login-page-editorial-refresh
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
@@ -544,6 +544,7 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 6f8ef8e | 2026-11-27 | docs(design): document authentication page visual language |
 | 94acb2c | 2026-11-27 | style(auth): align authentication page with editorial design system |
 | 490cfe3 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | e4703ec | 2026-11-27 | style(header): atualizar estilos de navegação e ajustar espaçamentos |
@@ -551,6 +552,5 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 | ca491d1 | 2026-11-27 | Merge pull request #47 from kleber-goncalves/feat/header-navigation-refresh |
 | 484d777 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 9e0203c | 2026-11-27 | chore(home): remove unused how-it-works styles |
-| d7cbc80 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
