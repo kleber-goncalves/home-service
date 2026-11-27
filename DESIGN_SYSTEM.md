@@ -260,6 +260,20 @@ Arquivo: `src/components/home/home-sections.jsx`
 - Indicador visual de mais/menos para representar estado fechado/aberto.
 - Em telas menores, a introdução fica acima da lista.
 
+### 8.8. Autenticação (login, cadastro e confirmação)
+
+Arquivo: `src/pages/AuthDemoPage.jsx`
+
+- Página de autenticação alinhada ao minimalismo editorial do projeto.
+- Composição em duas áreas no desktop: painel de apresentação com gradiente azul-claro/amarelo-pálido e cartão branco de formulário.
+- Painel de apresentação com tipografia Plus Jakarta Sans expressiva, texto em azul-marinho e curvas amplas.
+- Cartão de autenticação com superfície branca, borda discreta, sombra suave e raio amplo.
+- Campos com altura confortável, fundo quase branco, bordas suaves e foco azul visível.
+- Botão principal azul, de largura total, com cantos arredondados.
+- Avisos de demonstração e feedbacks preservam contraste e distinção semântica.
+- Em telas de até 820 px, a composição passa a uma coluna; em telas estreitas, os campos em grade são empilhados.
+- O redesign altera apenas a apresentação visual; os fluxos de login, cadastro, confirmação e sessão permanecem os mesmos.
+
 ### 8.7. SiteFooter
 
 Arquivo: `src/components/public/site-footer.jsx`
@@ -364,6 +378,7 @@ Esses pontos ficam registrados para uma etapa futura de melhoria e refatoração
 | Cartão público de serviço (homepage e catálogo) | `src/components/home/featured-service-card.jsx` |
 | Seções Como funciona e FAQ | `src/components/home/home-sections.jsx` |
 | Rodapé | `src/components/public/site-footer.jsx` |
+| Autenticação | `src/pages/AuthDemoPage.jsx` |
 | Composição da homepage | `src/pages/HomePage.jsx` |
 
 ## 15. Como usar este documento nas próximas alterações
