@@ -7537,3 +7537,146 @@ summary:focus-visible {
         animation-iteration-count: 1 !important;
     }
 }
+
+
+/* Shadcn-style UI primitives — dashboard analytics */
+.ui-card-header,
+.ui-card-content,
+.ui-card-footer {
+    min-width: 0;
+}
+.ui-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.ui-card-title { margin: 0; color: var(--navy); font-size: 1rem; font-weight: 850; letter-spacing: -0.035em; line-height: 1.3; }
+.ui-card-description { margin: 6px 0 0; color: #8995a3; font-size: 0.68rem; line-height: 1.55; }
+.ui-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+.ui-donut-chart {
+    display: grid;
+    grid-template-columns: minmax(124px, 0.85fr) minmax(0, 1.15fr);
+    align-items: center;
+    gap: 20px;
+    min-width: 0;
+}
+.ui-donut-chart-visual {
+    position: relative;
+    width: min(100%, 190px);
+    aspect-ratio: 1;
+    margin: 0 auto;
+}
+.ui-donut-chart-svg { display: block; width: 100%; height: 100%; overflow: visible; transform: rotate(-90deg); }
+.ui-donut-chart-track,
+.ui-donut-chart-segment { fill: none; }
+.ui-donut-chart-track { stroke: #eef2f7; stroke-width: 12; }
+.ui-donut-chart-segment { stroke-linecap: butt; transition: stroke-dasharray 180ms ease; }
+.ui-donut-chart-center {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 2px;
+    pointer-events: none;
+}
+.ui-donut-chart-center strong { color: var(--navy); font-size: clamp(1.3rem, 2.3vw, 1.8rem); font-weight: 850; letter-spacing: -0.06em; font-variant-numeric: tabular-nums; }
+.ui-donut-chart-center span { color: #8b98a7; font-size: 0.62rem; font-weight: 700; }
+.ui-donut-chart-legend { display: grid; gap: 11px; min-width: 0; margin: 0; padding: 0; list-style: none; }
+.ui-donut-chart-legend li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 9px; color: #607186; font-size: 0.65rem; }
+.ui-donut-chart-legend-label { display: flex; min-width: 0; align-items: center; gap: 8px; }
+.ui-donut-chart-legend-label > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ui-donut-chart-legend-label i { width: 8px; height: 8px; flex: 0 0 auto; border-radius: 50%; }
+.ui-donut-chart-legend li strong { color: var(--navy); font-size: 0.68rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.ui-donut-chart-legend li small { min-width: 31px; color: #98a3af; font-size: 0.58rem; text-align: right; font-variant-numeric: tabular-nums; }
+
+.ui-horizontal-bar-chart { display: grid; gap: 15px; min-width: 0; padding: 2px 0; }
+.ui-horizontal-bar-row { display: grid; min-width: 0; gap: 7px; }
+.ui-horizontal-bar-meta { display: flex; min-width: 0; align-items: center; justify-content: space-between; gap: 12px; color: #63748a; font-size: 0.66rem; }
+.ui-horizontal-bar-meta > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ui-horizontal-bar-meta strong { flex: 0 0 auto; color: var(--navy); font-size: 0.7rem; font-weight: 850; font-variant-numeric: tabular-nums; }
+.ui-horizontal-bar-track { height: 9px; overflow: hidden; background: #eef2f7; border-radius: 999px; }
+.ui-horizontal-bar-track span { display: block; height: 100%; min-width: 2px; border-radius: inherit; transition: width 220ms ease; }
+.ui-chart-empty { display: grid; min-height: 160px; place-items: center; padding: 16px; color: #8995a3; font-size: 0.68rem; line-height: 1.55; text-align: center; }
+
+.professional-dashboard-analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 16px;
+    min-width: 0;
+}
+.pro-dashboard-chart-card {
+    grid-column: span 6;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    padding: 0;
+    background: #fff;
+    border: 1px solid #e7ebef;
+    border-radius: 16px;
+    box-shadow: 0 8px 26px rgba(16, 40, 73, 0.035);
+}
+.pro-dashboard-chart-card--status,
+.pro-dashboard-chart-card--images { grid-column: span 5; }
+.pro-dashboard-chart-card--categories,
+.pro-dashboard-chart-card--cities { grid-column: span 7; }
+.pro-dashboard-chart-header { padding: 20px 21px 0; }
+.pro-dashboard-chart-header > div { min-width: 0; }
+.pro-dashboard-chart-title { margin-top: 5px; }
+.pro-dashboard-chart-description { max-width: 420px; }
+.pro-dashboard-chart-content { flex: 1; padding: 18px 21px 21px; }
+.pro-dashboard-chart-footer {
+    margin: 0 21px;
+    padding: 12px 0 16px;
+    color: #8793a1;
+    border-top: 1px solid #edf0f3;
+    font-size: 0.61rem;
+}
+.pro-dashboard-chart-footer strong { color: var(--navy); font-size: 0.7rem; font-variant-numeric: tabular-nums; }
+.pro-dashboard-analytics-note {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    padding: 17px 19px;
+    background: #f8fbff;
+    border: 1px solid #e2ebf8;
+    border-radius: 14px;
+    box-shadow: none;
+}
+.pro-dashboard-analytics-note-icon {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 auto;
+    place-items: center;
+    color: #1558d6;
+    background: #eaf2ff;
+    border-radius: 10px;
+}
+.pro-dashboard-analytics-note > div:nth-child(2) { flex: 1; min-width: 0; }
+.pro-dashboard-analytics-note strong { display: block; color: var(--navy); font-size: 0.72rem; font-weight: 850; }
+.pro-dashboard-analytics-note p { margin: 5px 0 0; color: #718096; font-size: 0.63rem; line-height: 1.55; }
+.pro-dashboard-analytics-note .ui-badge { flex: 0 0 auto; }
+
+@media (max-width: 1100px) {
+    .pro-dashboard-chart-card,
+    .pro-dashboard-chart-card--status,
+    .pro-dashboard-chart-card--categories,
+    .pro-dashboard-chart-card--cities,
+    .pro-dashboard-chart-card--images { grid-column: span 6; }
+}
+@media (max-width: 760px) {
+    .pro-dashboard-chart-card,
+    .pro-dashboard-chart-card--status,
+    .pro-dashboard-chart-card--categories,
+    .pro-dashboard-chart-card--cities,
+    .pro-dashboard-chart-card--images { grid-column: 1 / -1; }
+}
+@media (max-width: 480px) {
+    .pro-dashboard-chart-header { padding: 17px 15px 0; }
+    .pro-dashboard-chart-content { padding: 16px 15px 18px; }
+    .pro-dashboard-chart-footer { margin: 0 15px; }
+    .ui-donut-chart { grid-template-columns: minmax(0, 1fr); gap: 15px; }
+    .ui-donut-chart-visual { width: min(48vw, 164px); }
+    .ui-donut-chart-legend { gap: 9px; }
+    .pro-dashboard-analytics-note { flex-wrap: wrap; padding: 15px; }
+    .pro-dashboard-analytics-note .ui-badge { margin-left: 49px; }
+}

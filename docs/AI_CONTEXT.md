@@ -2,6 +2,16 @@
 
 > Documento de continuidade do projeto. Leia antes de sugerir ou realizar alterações. Reúne propósito, decisões, arquitetura planejada, estado implementado, regras de manutenção e limitações. A seção de snapshot ao final é atualizada pelo GitHub Actions.
 
+
+## Atualização — analytics da área profissional (27/11/2026)
+
+- A visão geral da área profissional foi redesenhada para usar componentes locais em src/components/ui, com APIs inspiradas no shadcn/ui. A solução não instala o pacote completo do shadcn nem adiciona dependência de gráficos.
+- Os componentes reutilizáveis incluem cartões compostos (CardHeader, CardTitle, CardDescription, CardContent, CardFooter) e gráficos DonutChart/HorizontalBarChart.
+- Os gráficos são calculados a partir dos serviços da conta: distribuição por situação, categoria, cidade e presença de imagens ativas. A lista de serviços, edição, publicação, pausa, imagens, perfil, conta e logout permanecem nos fluxos existentes.
+- Os números fictícios de visualizações e cliques foram retirados da visão geral. Audiência e contatos permanecem como etapa futura, pois ainda não há coleta de eventos reais.
+- Detalhamento visual e regras de manutenção: seção 10 de DESIGN_SYSTEM.md.
+- A integração deve permanecer em branch de feature → PR para dev. Autenticação e validação funcional integrada devem ser feitas somente no deployment fixo de dev, pois branches feat/* não recebem as variáveis do Apps Script. main não deve ser alterada sem autorização explícita.
+
 ## Atualização vigente — 2026-11-24
 
 ### Situação atual e próxima frente — verificada em 24/11/2026
@@ -414,10 +424,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** c7b2da627cae209ee634e622b15c621dfa59ff8f
-- **Data do commit:** 2026-11-27T01:29:36-03:00
-- **Mensagem do commit:** Merge pull request #49 from kleber-goncalves/feat/professional-dashboard-refresh
-- **Branch desta execução:** dev
+- **Commit de referência:** d6359228ef578de620ff73b2f761898c46f1c651
+- **Data do commit:** 2026-11-27T01:42:56-03:00
+- **Mensagem do commit:** feat(professional): add account-based dashboard analytics
+- **Branch desta execução:** feat/professional-dashboard-analytics
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -509,11 +519,11 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 - src/components/ui/badge.jsx
 - src/components/ui/button.jsx
 - src/components/ui/card.jsx
+- src/components/ui/chart.jsx
 - src/components/ui/input.jsx
 - src/contexts/auth-context.js
 - src/contexts/auth-provider.jsx
 - src/data/homepage.js
-- src/data/professional-dashboard-demo.js
 - src/hooks/use-auth.js
 - src/hooks/use-public-catalog.js
 - src/lib/navigation.js
@@ -546,13 +556,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| d635922 | 2026-11-27 | feat(professional): add account-based dashboard analytics |
+| 10311af | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | c7b2da6 | 2026-11-27 | Merge pull request #49 from kleber-goncalves/feat/professional-dashboard-refresh |
 | f8d7e26 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 79ec113 | 2026-11-27 | fix(professional): forward form state setters to dashboard |
 | a589810 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 789e11d | 2026-11-27 | feat(professional): add responsive dashboard with separated analytics |
 | 7707d6f | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| ad31ab1 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 2a826c1 | 2026-11-27 | refactor(auth): delegate professional area to dashboard page |
 
 <!-- END AUTO-GENERATED SECTION -->

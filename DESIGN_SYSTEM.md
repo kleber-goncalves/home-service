@@ -453,3 +453,21 @@ A área autenticada do profissional utiliza uma estrutura de dashboard com naveg
 | Estilos globais e dashboard | src/index.css |
 
 Os indicadores demonstrativos não devem ser interpretados como métricas reais nem persistidos como atividade dos usuários.
+
+
+## 10. Área profissional — componentes e analytics (27/11/2026)
+
+A área profissional adota uma camada local de componentes com APIs inspiradas no shadcn/ui, sem exigir a instalação integral do shadcn CLI:
+
+- src/components/ui/button.jsx e input.jsx: controles com foco visível e variantes consistentes.
+- src/components/ui/card.jsx: Card, CardHeader, CardTitle, CardDescription, CardContent e CardFooter.
+- src/components/ui/chart.jsx: gráficos SVG e HTML reutilizáveis (DonutChart e HorizontalBarChart), com rótulos acessíveis, estado vazio e valores provenientes das props.
+
+### Regras para o dashboard
+
+- A página src/pages/ProfessionalDashboardPage.jsx usa os componentes locais e preserva a navegação e os fluxos operacionais existentes.
+- Os quatro gráficos da visão geral são calculados a partir dos serviços da conta: situação, categoria, cidade e presença de imagens ativas.
+- Os indicadores de visualização de perfil e cliques em contato não são apresentados como métricas reais. A coleta de eventos ainda não está implementada.
+- Não adicionar números simulados ao painel sem uma identificação explícita como demonstração. Indicadores de audiência só entram após uma implementação de coleta, com privacidade e origem dos dados documentadas.
+- Os gráficos precisam permanecer legíveis em telas estreitas, incluindo 320 px, com cartões em uma coluna e legendas sem overflow.
+- Não foi adicionada dependência de gráficos: a implementação usa SVG/CSS nativos e os ícones existentes de lucide-react.
