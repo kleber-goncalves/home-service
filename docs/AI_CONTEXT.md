@@ -414,10 +414,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** af5c7cd44639557e48f7d0dfadaf2a1225b5f0db
-- **Data do commit:** 2026-11-27T00:18:12-03:00
-- **Mensagem do commit:** Merge branch 'dev' of https://github.com/kleber-goncalves/home-service into dev
-- **Branch desta execução:** dev
+- **Commit de referência:** 6f07025279106506847729c3c43b2d2e1160a321
+- **Data do commit:** 2026-11-27T00:26:02-03:00
+- **Mensagem do commit:** feat(header): refresh navigation with integrated search
+- **Branch desta execução:** feat/header-navigation-refresh
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -544,13 +544,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| 6f07025 | 2026-11-27 | feat(header): refresh navigation with integrated search |
+| e3ec6fb | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | af5c7cd | 2026-11-27 | Merge branch 'dev' of https://github.com/kleber-goncalves/home-service into dev |
 | 095ad81 | 2026-11-27 | feat(categories): adicionar seção de FAQ e otimizar layout da página de categorias |
 | 0404d64 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 19ee078 | 2026-11-27 | style(services): atualizar estilo do painel de filtro e remover contagem de fontes |
 | f33517c | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 31885a9 | 2026-11-26 | Merge pull request #46 from kleber-goncalves/feat/shared-service-card |
-| 2fa1fc3 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| ca59288 | 2026-11-26 | fix(services): restore professional metadata in shared cards |
 
 <!-- END AUTO-GENERATED SECTION -->
