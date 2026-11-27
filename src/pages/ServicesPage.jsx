@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Filter, Search, X } from "lucide-react";
 import SiteHeader from "@/components/home/site-header";
 import SiteFooter from "@/components/public/site-footer";
-import ServiceCard from "@/components/public/service-card";
+import HomeFeaturedServiceCard from "@/components/home/featured-service-card";
 import { Button } from "@/components/ui/button";
 import usePublicCatalog from "@/hooks/use-public-catalog";
 import { filterPublicServices } from "@/lib/public-catalog";
@@ -18,6 +18,15 @@ function readInitialFilters() {
 
 function formatCount(value) {
     return new Intl.NumberFormat("pt-BR").format(value);
+}
+
+function buildServicesHref({ query = "", categoryId = "", city = "" }) {
+    const params = new URLSearchParams();
+    if (query.trim()) params.set("q", query.trim());
+    if (categoryId) params.set("categoria", categoryId);
+    if (city.trim()) params.set("cidade", city.trim());
+    const search = params.toString();
+    return search ? `/servicos?${search}` : "/servicos";
 }
 
 export default function ServicesPage() {
@@ -37,12 +46,7 @@ export default function ServicesPage() {
     );
 
     useEffect(() => {
-        const params = new URLSearchParams();
-        if (filters.query.trim()) params.set("q", filters.query.trim());
-        if (filters.categoryId) params.set("categoria", filters.categoryId);
-        if (filters.city.trim()) params.set("cidade", filters.city.trim());
-        const search = params.toString();
-        window.history.replaceState({}, "", search ? `/servicos?${search}` : "/servicos");
+        window.history.replaceState({}, "", buildServicesHref(filters));
     }, [filters]);
 
     function updateFilter(name, value) {
@@ -54,6 +58,7 @@ export default function ServicesPage() {
     }
 
     const hasFilters = Boolean(filters.query.trim() || filters.categoryId || filters.city.trim());
+    const demoHref = buildServicesHref(filters);
 
     return (
         <>
@@ -195,9 +200,13 @@ export default function ServicesPage() {
                                         Não foi possível atualizar os serviços cadastrados. Os exemplos fictícios locais continuam disponíveis.
                                     </p>
                                 )}
-                                <div className="catalog-service-grid services-page-service-grid">
+                                <div className="home-featured-service-grid">
                                     {filteredServices.map((service) => (
-                                        <ServiceCard service={service} key={service.id} />
+                                        <HomeFeaturedServiceCard
+                                            service={service}
+                                            demoHref={demoHref}
+                                            key={service.id}
+                                        />
                                     ))}
                                 </div>
                             </>
