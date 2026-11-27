@@ -269,6 +269,7 @@ function mapAppsScriptError(output) {
         IMAGE_UPLOAD_OFFSET_MISMATCH: [409, "O progresso mudou. Atualize o envio antes de continuar."],
         IMAGE_UPLOAD_BUSY: [409, "O envio ainda está sendo processado."],
         IMAGE_NOT_FOUND: [404, "Imagem não encontrada."],
+        IMAGE_REPLACE_CONFLICT: [409, "A imagem mudou durante a substituição. Atualize a lista e tente novamente."],
         IMAGE_SIZE_INVALID: [400, "A imagem deve ter até 5 MB."],
         IMAGE_MIME_INVALID: [415, "Use uma imagem JPG, PNG ou WebP."],
         IMAGE_CONTENT_INVALID: [415, "O conteúdo do arquivo não corresponde ao formato informado."],
@@ -565,6 +566,7 @@ export function createAppHandler({
                             serviceId: payload.serviceId,
                             fileSize: payload.fileSize,
                             mimeType: payload.mimeType,
+                            ...(payload.replaceImageId !== undefined ? { replaceImageId: payload.replaceImageId } : {}),
                             tokenHash,
                         };
                     } else if (action === "profile.photo.upload.start") {
