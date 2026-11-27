@@ -281,6 +281,17 @@ O gerenciamento de imagens do profissional utiliza componentes separados e reuti
 
 A substituição usa o mesmo protocolo de upload resumível, com `replaceImageId`. O Apps Script confirma novamente a sessão, o proprietário, a imagem ativa e a posição de exibição. O registro existente conserva seu ID e sua ordem. O novo arquivo é validado e preparado antes da troca do vínculo; a imagem anterior só tem o compartilhamento restringido depois que os novos metadados foram gravados. Se uma etapa falhar, o fluxo tenta reverter o vínculo e restringir/remover o arquivo novo. O limite de cinco imagens não bloqueia a substituição porque ela ocupa a posição da imagem selecionada.
 
+
+### Entrega pública das imagens de serviços
+
+As imagens de serviços publicadas são entregues por `GET /api/public-images?id=<imageId>`. O Apps Script retorna a URL same-origin usando o **ID lógico da imagem** da aba `IMAGENS`; não retorna um link direto do Drive nem seu ID de arquivo ao navegador.
+
+O gateway Vercel chama `public.image.resolve` com HMAC. O Apps Script revalida a imagem ativa, o estado publicado do serviço, a conta profissional ativa e os metadados do arquivo. O token OAuth é usado exclusivamente no servidor para ler o Drive e nunca é exposto ao navegador. Serviços em rascunho, pausa, suspensão ou remoção não recebem URL pública.
+
+A mesma URL de gateway deve ser usada na listagem `service.listMine`, na resposta de conclusão do upload, na substituição e na recuperação de `image.upload.status`. Isso mantém a primeira imagem do card administrativo e a vitrine no mesmo fluxo de entrega segura.
+
+**Sincronização:** a alteração desse contrato no arquivo `apps-script/conecta-local/Code.gs` precisa ser copiada para o projeto Apps Script e publicada como nova versão da implantação Web App já existente. O gateway `/api/public-images` já existe no código Vercel de DEV; esta correção não exige uma nova implantação Apps Script nem uma URL paralela.
+
 ### Implantação
 
 As alterações em `apps-script/conecta-local/Code.gs` no GitHub não atualizam automaticamente o Web App do Google Apps Script. Antes de validar edição/substituição no ambiente DEV, sincronize o arquivo no projeto Apps Script e publique uma nova versão na implantação Web App existente. Não é necessário criar uma implantação paralela. A rota e os gateways Vercel continuam habilitados somente em Preview, conforme o modelo atual do protótipo.
