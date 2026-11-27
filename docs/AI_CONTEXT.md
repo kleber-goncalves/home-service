@@ -424,10 +424,10 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 > Gerado por scripts/update-ai-context.mjs. Não edite manualmente o conteúdo entre os marcadores.
 
-- **Commit de referência:** d6359228ef578de620ff73b2f761898c46f1c651
-- **Data do commit:** 2026-11-27T01:42:56-03:00
-- **Mensagem do commit:** feat(professional): add account-based dashboard analytics
-- **Branch desta execução:** feat/professional-dashboard-analytics
+- **Commit de referência:** d39ae3243f78e4624914d5615e861425a607631b
+- **Data do commit:** 2026-11-27T01:44:49-03:00
+- **Mensagem do commit:** Merge pull request #50 from kleber-goncalves/feat/professional-dashboard-analytics
+- **Branch desta execução:** dev
 - **Projeto declarado:** home-service@0.0.0
 - **Scripts npm:** 14
 - **Dependências de runtime:** 4
@@ -556,13 +556,13 @@ A Vercel hospeda o frontend. O workflow de CI valida o código, mas não substit
 
 | Commit | Data | Mensagem |
 |---|---|---|
+| d39ae32 | 2026-11-27 | Merge pull request #50 from kleber-goncalves/feat/professional-dashboard-analytics |
+| 65dd0fd | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | d635922 | 2026-11-27 | feat(professional): add account-based dashboard analytics |
 | 10311af | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | c7b2da6 | 2026-11-27 | Merge pull request #49 from kleber-goncalves/feat/professional-dashboard-refresh |
 | f8d7e26 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 | 79ec113 | 2026-11-27 | fix(professional): forward form state setters to dashboard |
 | a589810 | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
-| 789e11d | 2026-11-27 | feat(professional): add responsive dashboard with separated analytics |
-| 7707d6f | 2026-11-27 | docs(ai-context): atualizar snapshot automaticamente |
 
 <!-- END AUTO-GENERATED SECTION -->
